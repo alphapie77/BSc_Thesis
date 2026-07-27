@@ -16,24 +16,24 @@ transformers
 sentence-transformers
 accelerate
 
-# --- clustering / stats (Phase 2) ---
-hdbscan
-umap-learn        # VISUALIZATION ONLY - never cluster in UMAP space
-statsmodels
+# # --- clustering / stats (Phase 2) ---
+# hdbscan
+# umap-learn        # VISUALIZATION ONLY - never cluster in UMAP space
+# statsmodels
 
-# --- agents / RAG (Phase 4) ---
-langgraph
-chromadb
-groq
-google-generativeai
+# # --- agents / RAG (Phase 4) ---
+# langgraph
+# chromadb
+# groq
+# google-generativeai
 
-# --- eval (Phase 5) ---
-mauve-text
-netcal
-nltk
+# # --- eval (Phase 5) ---
+# mauve-text
+# netcal
+# nltk
 
-# --- plotting / tracking ---
-matplotlib
-seaborn
-tqdm
-wandb
+# # --- plotting / tracking ---
+# matplotlib
+# seaborn
+# tqdm
+# wandb
