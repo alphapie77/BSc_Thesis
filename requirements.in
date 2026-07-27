@@ -1,0 +1,39 @@
+# Unpinned inputs -> install resolves to the latest compatible release.
+# After a successful install, run src/common/env_snapshot.py to produce
+# requirements.lock.txt, which IS pinned and IS committed.
+
+# --- core ---
+numpy
+pandas
+scipy
+scikit-learn
+pyyaml
+openpyxl          # xlsx reading (S1)
+
+# --- embeddings / models ---
+torch
+transformers
+sentence-transformers
+accelerate
+
+# --- clustering / stats (Phase 2) ---
+hdbscan
+umap-learn        # VISUALIZATION ONLY - never cluster in UMAP space
+statsmodels
+
+# --- agents / RAG (Phase 4) ---
+langgraph
+chromadb
+groq
+google-generativeai
+
+# --- eval (Phase 5) ---
+mauve-text
+netcal
+nltk
+
+# --- plotting / tracking ---
+matplotlib
+seaborn
+tqdm
+wandb

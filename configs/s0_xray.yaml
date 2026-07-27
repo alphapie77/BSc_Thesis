@@ -1,0 +1,22 @@
+# S0 -- verification only. Reads raw, writes nothing but a report.
+name: s0_xray
+seed: 42
+input_xlsx: data/raw/Raw_Bangla_Movie_Review_Comment_Dataset_for_Sentiment_Analysis_and_Natural_Language_Processing.xlsx
+sheet: 0
+text_col: "Movie Review"
+label_col: "Sentiment"
+output_report: results/s0_data_xray.md
+
+# Claims from pipeline section S0, to be confirmed or refuted.
+claims:
+  n_rows: 5000
+  label_counts: {0: 1665, 1: 1664, 2: 1670}
+  exact_duplicates: 204
+  normalized_duplicates: 205
+  short_reviews_lt3_words: 72
+  null_rows: 1
+  usable_n: 4722
+  median_words: 8
+  max_words: 84
+  emoji_rows: 0
+  url_or_mention_rows: 0

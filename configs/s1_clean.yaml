@@ -1,0 +1,27 @@
+name: s1_clean
+seed: 42
+input_xlsx: data/raw/Raw_Bangla_Movie_Review_Comment_Dataset_for_Sentiment_Analysis_and_Natural_Language_Processing.xlsx
+text_col: "Movie Review"
+label_col: "Sentiment"
+
+# ORDER IS PART OF THE PROTOCOL. Counts change if this order changes.
+steps:
+  - drop_null
+  - strip_url_html_mentions
+  - normalize_whitespace
+  - drop_exact_duplicates
+  - drop_normalized_duplicates
+  - drop_short          # < min_words
+min_words: 3
+
+# Explicitly NOT done -- contextual encoders need natural text (pipeline 1.1.3)
+stemming: false
+stopword_removal: false
+
+# Deferred to S2 (needs LaBSE embeddings, run on Kaggle)
+near_duplicate_cosine_threshold: 0.95
+near_duplicate_stage: deferred_to_s2
+
+outputs:
+  cleaned_csv: data/cleaned/bn_clean.csv
+  log_json: results/s1_cleaning_log.json

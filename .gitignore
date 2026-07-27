@@ -1,0 +1,25 @@
+# --- Raw data is immutable and NOT versioned here (size + license) ---
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+
+# Derived data: cleaned CSVs are reproducible from raw + config -> not committed
+data/cleaned/*
+!data/cleaned/.gitkeep
+data/plots/*.csv
+
+# !!! EXCEPTION: split map IS committed. It is the single most important
+# artifact of the thesis (see pipeline section A). Never gitignore it.
+!data/splits/
+!data/splits/*.json
+
+# Env / caches
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+wandb/
+*.pt
+*.bin
+.DS_Store
