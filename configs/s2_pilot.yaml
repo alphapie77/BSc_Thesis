@@ -37,13 +37,27 @@ clustering:
   # Rule 9: UMAP is visualization-only. Clustering happens in LaBSE space.
   cluster_in_umap_space: false
 
-# Pre-committed trap-check bands (protocol.md, RQ1). Do not edit after a result.
+# Pre-committed trap-check bands. These mirror, one-to-one, the four bands in
+# docs/protocol.md "RQ1 pre-commitment: interpretation of ARI(cluster,
+# Sentiment)", pre-registered 2026-07-28 BEFORE any ARI value existed.
+# Do not edit after a result. If these and protocol.md ever disagree, the
+# protocol wins and the run is invalid.
 trap_check:
   metric: ARI(cluster_labels, Sentiment)
+
+  # Band 0 gate. A cluster holding less than min or more than max of n means
+  # K-Means did not partition; ARI is then uninterpretable and is overridden.
+  degenerate_cluster_share: {min: 0.05, max: 0.70}
+
   bands:
-    independent_below: 0.4
-    caveat_range: [0.4, 0.6]
-    fail_above: 0.6
+    # Band 0 -- degeneracy, evaluated FIRST and overriding ARI entirely.
+    no_claim: degenerate
+    # Band 1 -- clusters not aligned with the sentiment axis.
+    not_sentiment_aligned_below: 0.20
+    # Band 2 -- partial overlap; the residual test is MANDATORY, not optional.
+    partial_overlap_range: [0.20, 0.60]
+    # Band 3 -- the persona claim fails as stated.
+    persona_claim_fails_above: 0.60
 
 outputs:
   near_dup_pairs_csv: data/cleaned/near_dup_pairs.csv

@@ -41,8 +41,8 @@
 > statement can be tested against the data instead of recall, that test is
 > registered in `protocol.md` and its outcome supersedes this table.
 >
-> Lettering follows the supervision discussion. **This repo holds no fact (b)** —
-> none was recorded here, and none has been invented to fill the gap.
+> (b) — merged into (c) on 2026-07-28; retained as a numbering placeholder so
+> earlier references resolve.
 
 | # | Fact | Consequence | Confidence |
 |---|---|---|---|

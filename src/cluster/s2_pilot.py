@@ -218,9 +218,12 @@ def cluster_and_ari(emb: np.ndarray, labels: np.ndarray, cfg):
 
     # A cluster holding almost nothing, or nearly everything, means K-Means
     # found no usable structure -- ARI on such a solution is not interpretable.
-    degenerate = [
-        k for k, s in shares.items() if s < 0.05 or s > 0.70
-    ]
+    # Thresholds come from the config so they cannot drift from protocol.md.
+    share_band = cfg.get("trap_check", {}).get(
+        "degenerate_cluster_share", {"min": 0.05, "max": 0.70}
+    )
+    lo_share, hi_share = float(share_band["min"]), float(share_band["max"])
+    degenerate = [k for k, s in shares.items() if s < lo_share or s > hi_share]
 
     ct = pd.crosstab(pd.Series(assign, name="cluster"),
                      pd.Series(labels, name="sentiment"))
@@ -248,28 +251,104 @@ def cluster_and_ari(emb: np.ndarray, labels: np.ndarray, cfg):
     }
 
 
-def verdict(ari: float, bands: dict) -> tuple[str, str]:
-    lo, hi = bands["caveat_range"]
-    if ari < bands["independent_below"]:
-        return "PASS", (
-            f"ARI {ari:.4f} < {bands['independent_below']}: clusters are not a "
-            "restatement of the sentiment labels. Proceed with the persona "
-            "scheme as planned (protocol.md RQ1, branch 1)."
+# Verdict strings map ONE-TO-ONE onto the band names in docs/protocol.md, so a
+# reader can line up this report against the pre-registration without
+# interpretation. Do not rename without renaming the protocol band.
+NO_CLAIM = "NO_CLAIM"                              # Band 0 -- degenerate
+NOT_SENTIMENT_ALIGNED = "NOT_SENTIMENT_ALIGNED"    # Band 1 -- ARI < 0.20
+PARTIAL_OVERLAP = "PARTIAL_OVERLAP"                # Band 2 -- 0.20..0.60
+PERSONA_CLAIM_FAILS = "PERSONA_CLAIM_FAILS"        # Band 3 -- ARI > 0.60
+
+#: Emitted with Band 2 only. The pre-registration makes the residual test
+#: mandatory, so the marker is part of the verdict rather than a footnote.
+RESIDUAL_TEST_REQUIRED = "RESIDUAL_TEST_REQUIRED"
+
+
+def verdict(res: dict, bands: dict) -> dict:
+    """Map a clustering result onto its pre-registered band.
+
+    **Degeneracy is the first gate and overrides ARI entirely.** A partition
+    where one cluster is near-empty or holds most of the data scores a LOW ARI
+    by construction -- by failing to partition, not by being independent of
+    sentiment. Reading that as PASS is the precise failure this ordering
+    prevents, so Band 0 returns NO_CLAIM and no PASS/CAVEAT/FAIL-style verdict
+    is emitted at all. Only a non-degenerate partition reaches the ARI bands.
+
+    Returns {band, verdict, markers, text}.
+    """
+    if res.get("degenerate"):
+        shares = ", ".join(
+            f"cluster {k}: {v * 100:.1f}%" for k, v in res["cluster_shares"].items()
         )
-    if ari <= hi:
-        return "CAVEAT", (
-            f"ARI {ari:.4f} falls in [{lo}, {hi}]: clusters partially track "
-            "sentiment. Proceed, but the overlap must be reported explicitly "
-            "wherever the personas are claimed (protocol.md RQ1, branch 2)."
-        )
-    return "FAIL", (
-        f"ARI {ari:.4f} > {bands['fail_above']}: **do not claim personas "
-        "independent of sentiment.** Per the pre-committed branch 3, either "
-        "re-operationalize with engagement features (length / intensity / "
-        "specificity) or reframe as 'sentiment-anchored engagement tiers'. "
-        "Reported either way -- this outcome is publishable, not a failure to "
-        "hide."
-    )
+        return {
+            "band": 0,
+            "verdict": NO_CLAIM,
+            "markers": [],
+            "text": (
+                f"**{NO_CLAIM} (Band 0 — DEGENERATE).** Cluster(s) "
+                f"{res['degenerate_clusters']} fall outside the permitted share "
+                f"band ({shares}). K-Means did not partition the data, so **ARI "
+                f"is uninterpretable here and no claim is permitted in either "
+                f"direction** — a non-partition scores low ARI by construction "
+                f"and must not be read as independence from sentiment. "
+                f"Re-examine K, the encoder, and the distance metric; ARI "
+                f"reporting is suspended until the partition is non-degenerate "
+                f"(protocol.md RQ1, Band 0)."
+            ),
+        }
+
+    ari = res["ari"]
+    lo, hi = bands["partial_overlap_range"]
+
+    if ari < bands["not_sentiment_aligned_below"]:
+        return {
+            "band": 1,
+            "verdict": NOT_SENTIMENT_ALIGNED,
+            "markers": [],
+            "text": (
+                f"**{NOT_SENTIMENT_ALIGNED} (Band 1).** ARI {ari:.4f} < "
+                f"{bands['not_sentiment_aligned_below']}: the clusters are not "
+                "aligned with the sentiment axis. **This is not evidence that "
+                "the personas are valid** — only that they are not a sentiment "
+                "rediscovery. G-300 human validation remains the arbiter "
+                "(protocol.md RQ1, Band 1)."
+            ),
+        }
+
+    if lo <= ari <= hi:
+        return {
+            "band": 2,
+            "verdict": PARTIAL_OVERLAP,
+            "markers": [RESIDUAL_TEST_REQUIRED],
+            "text": (
+                f"**{PARTIAL_OVERLAP} (Band 2) — {RESIDUAL_TEST_REQUIRED}.** ARI "
+                f"{ari:.4f} falls in [{lo}, {hi}]. The residual test is "
+                "**mandatory, not discretionary**: conditioning on `Sentiment`, "
+                "does cluster membership still predict length, intensifier rate "
+                "and specificity? If yes, the persona claim survives but must be "
+                "disclosed as sentiment-correlated wherever it appears. If no, "
+                "Band 3 applies (protocol.md RQ1, Band 2)."
+            ),
+        }
+
+    return {
+        "band": 3,
+        "verdict": PERSONA_CLAIM_FAILS,
+        "markers": [],
+        "text": (
+            f"**{PERSONA_CLAIM_FAILS} (Band 3).** ARI {ari:.4f} > "
+            f"{bands['persona_claim_fails_above']}: the persona claim fails as "
+            "stated. Two candidate explanations, which this data cannot "
+            "distinguish: (1) genuine persona/sentiment overlap; or (2) a "
+            "**venue/community selection effect** — clusters recovering the "
+            "source Facebook group or YouTube channel rather than any persona. "
+            "Explanation (2) is **untestable in principle here**, because venue "
+            "was not retained at collection (provenance fact (c)); it must be "
+            "stated as an unresolvable alternative, not dismissed. Reframe as "
+            "'sentiment-anchored engagement tiers' or re-operationalize with "
+            "engagement features. Reported either way (protocol.md RQ1, Band 3)."
+        ),
+    }
 
 
 def crosstab_md(res) -> str:
@@ -316,7 +395,18 @@ def build_report(
 ) -> str:
     pt = cfg["near_duplicate"]["primary_threshold"]
     bands = cfg["trap_check"]["bands"]
-    flag, text = verdict(primary["ari"], bands)
+    v = verdict(primary, bands)
+    flag, text = v["verdict"], v["text"]
+
+    markers_md = f" · **{' + '.join(v['markers'])}**" if v["markers"] else ""
+    ari_caveat = (
+        " — **uninterpretable: partition is degenerate**" if v["band"] == 0 else ""
+    )
+
+    def _cell(res):
+        vv = verdict(res, bands)
+        marks = f" + {' + '.join(vv['markers'])}" if vv["markers"] else ""
+        return f"Band {vv['band']} · {vv['verdict']}{marks}"
 
     sweep_rows = "\n".join(
         f"| {r['threshold']:.2f}{' **(primary)**' if r['threshold'] == pt else ''} "
@@ -324,14 +414,14 @@ def build_report(
         f"{r['ari']:.4f} | {r['ari'] - baseline['ari']:+.4f} | "
         f"{r['cramers_v']:.4f} | "
         f"{'**YES**' if r['degenerate'] else 'no'} | "
-        f"{verdict(r['ari'], bands)[0]} |"
+        f"{_cell(r)} |"
         for r in sweep
     )
     baseline_row = (
         f"| — (no dedup) | — | 0 | {baseline['n_surviving']} | "
         f"{baseline['ari']:.4f} | — | {baseline['cramers_v']:.4f} | "
         f"{'**YES**' if baseline['degenerate'] else 'no'} | "
-        f"{verdict(baseline['ari'], bands)[0]} |"
+        f"{_cell(baseline)} |"
     )
     sizes = " / ".join(f"{k}:{v}" for k, v in primary["cluster_sizes"].items())
 
@@ -361,10 +451,11 @@ this outcome is on record so the split cannot be tuned to it.
 | rows removed as near-duplicates | {primary['n_removed']} |
 | **surviving n** | **{primary['n_surviving']}** |
 | cluster sizes | {sizes} |
-| **ARI(cluster, Sentiment)** | **{primary['ari']:.4f}** |
+| **ARI(cluster, Sentiment)** | **{primary['ari']:.4f}**{ari_caveat} |
 | chi2 (df {primary['chi2_dof']}) | {primary['chi2']:.2f} (p = {primary['chi2_p']:.3g}) |
 | Cramér's V | {primary['cramers_v']:.4f} |
-| **Verdict** | **{flag}** |
+| **Pre-registered band** | **Band {v['band']}** (protocol.md RQ1) |
+| **Verdict** | **{flag}**{markers_md} |
 
 {text}
 
