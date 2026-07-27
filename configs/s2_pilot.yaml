@@ -1,0 +1,50 @@
+# S2 PILOT -- near-duplicate removal + the mandatory ARI trap-check.
+# Runs on Kaggle (LaBSE needs a GPU to be quick; CPU works but is slow).
+#
+# THIS CONFIG DOES NOT FREEZE THE SPLIT. It produces no split map. The split is
+# frozen in a later step, only after the trap-check outcome is on record.
+name: s2_pilot
+seed: 42
+
+input_csv: data/cleaned/bn_clean.csv
+text_col: "Movie Review"
+label_col: "Sentiment"
+id_col: "review_id"
+
+# Row count carried over from S1. Asserted on load so a silently regenerated
+# bn_clean.csv cannot slip through.
+expected_input_n: 4730
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true          # L2-normalize -> cosine == dot product
+  max_seq_length: 64       # S0: median 8 words, max 84; 64 tokens is ample
+  cache_npy: data/cleaned/labse_emb_bn_clean.npy
+
+near_duplicate:
+  # The pipeline's operative threshold. Reported alongside the sweep below so
+  # the choice is visible as a sensitivity curve, not a single guess.
+  primary_threshold: 0.95
+  sweep_thresholds: [0.90, 0.95, 0.98]
+  keep: first_by_review_id  # deterministic: lowest review_id survives
+
+clustering:
+  algorithm: kmeans
+  k: 3
+  n_init: 10
+  random_state: 42
+  # Rule 9: UMAP is visualization-only. Clustering happens in LaBSE space.
+  cluster_in_umap_space: false
+
+# Pre-committed trap-check bands (protocol.md, RQ1). Do not edit after a result.
+trap_check:
+  metric: ARI(cluster_labels, Sentiment)
+  bands:
+    independent_below: 0.4
+    caveat_range: [0.4, 0.6]
+    fail_above: 0.6
+
+outputs:
+  near_dup_pairs_csv: data/cleaned/near_dup_pairs.csv
+  report_md: results/s2_pilot_ari_trapcheck.md

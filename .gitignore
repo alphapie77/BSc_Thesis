@@ -6,7 +6,13 @@ data/raw/*
 # Derived data: cleaned CSVs are reproducible from raw + config -> not committed
 data/cleaned/*
 !data/cleaned/.gitkeep
-data/plots/*.csv
+
+# !!! EXCEPTION: plot synopses ARE committed. They are hand-collected primary
+# data -- no script can regenerate them, and re-collecting means re-reading the
+# sources by hand. They are also the only held-out element of the evaluation, so
+# losing them invalidates S6. Treat them like the split map, not like a cache.
+!data/plots/
+!data/plots/*.csv
 
 # !!! EXCEPTION: split map IS committed. It is the single most important
 # artifact of the thesis (see pipeline section A). Never gitignore it.

@@ -1,0 +1,43 @@
+#!/bin/sh
+# Definition of Done, step (f). Enforced, not remembered.
+#
+# Blocks the commit unless `step_close.py --check` exits 0. That check refuses
+# to pass while the lab notebook has unfilled TODOs, or while results/ changes
+# without the notebook changing alongside it -- a number whose reasoning was
+# never written down cannot be defended in the thesis.
+#
+# Enable once per clone:  git config core.hooksPath .githooks
+
+if command -v python >/dev/null 2>&1; then
+    PY=python
+elif command -v python3 >/dev/null 2>&1; then
+    PY=python3
+else
+    echo "pre-commit: no python on PATH; cannot run step_close --check." >&2
+    echo "Fix your environment, or bypass deliberately with: git commit --no-verify" >&2
+    exit 1
+fi
+
+"$PY" src/common/step_close.py --check
+status=$?
+
+if [ $status -ne 0 ]; then
+    echo "" >&2
+    echo "-----------------------------------------------------------------" >&2
+    echo "COMMIT BLOCKED by .githooks/pre-commit (step_close.py --check)." >&2
+    echo "" >&2
+    echo "Fix the issues listed above -- they are the Definition of Done in" >&2
+    echo "CLAUDE.md, not optional hygiene." >&2
+    echo "" >&2
+    echo "To override deliberately (e.g. protocol.md is legitimately still" >&2
+    echo "unfrozen before S2), commit with:" >&2
+    echo "" >&2
+    echo "    git commit --no-verify" >&2
+    echo "" >&2
+    echo "--no-verify is the intended escape hatch. Use it knowingly; do not" >&2
+    echo "weaken the check itself to make a commit pass." >&2
+    echo "-----------------------------------------------------------------" >&2
+    exit $status
+fi
+
+exit 0

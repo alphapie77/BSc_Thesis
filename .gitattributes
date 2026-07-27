@@ -1,0 +1,8 @@
+# Shell scripts must keep LF endings regardless of platform.
+#
+# This checkout has core.autocrlf=true. Without these rules a fresh clone gets
+# CRLF endings, and a `#!/bin/sh` script with CRLF fails on Linux/macOS with a
+# misleading "bad interpreter" error -- for a git hook that means it silently
+# does not run.
+.githooks/** text eol=lf
+*.sh text eol=lf

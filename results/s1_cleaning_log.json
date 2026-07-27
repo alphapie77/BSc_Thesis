@@ -1,0 +1,135 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-07-27T14:19:13.917398+00:00",
+    "git_commit": "35295e29b378c9aadd2ea2af675e96bd71e29ec1-dirty",
+    "config": "configs/s1_clean.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "input_xlsx": "data/raw/Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing.xlsx",
+    "seed": 42,
+    "n_raw": 5000,
+    "step_order": [
+      "drop_null",
+      "strip_url_html_mentions",
+      "normalize_whitespace",
+      "drop_exact_duplicates",
+      "drop_normalized_duplicates",
+      "drop_short"
+    ],
+    "steps": [
+      {
+        "step": "load_raw",
+        "rows_after": 5000,
+        "rows_dropped": 0
+      },
+      {
+        "step": "drop_null",
+        "rows_before": 5000,
+        "rows_after": 4998,
+        "rows_dropped": 2,
+        "detail": {
+          "missing_or_blank_text": 1,
+          "missing_label": 1
+        }
+      },
+      {
+        "step": "strip_url_html_mentions",
+        "rows_before": 4998,
+        "rows_after": 4998,
+        "rows_dropped": 0,
+        "rows_text_modified": 0,
+        "detail": {
+          "rows_matching_url": 0,
+          "rows_matching_html": 0,
+          "rows_matching_mention": 0
+        }
+      },
+      {
+        "step": "normalize_whitespace",
+        "rows_before": 4998,
+        "rows_after": 4998,
+        "rows_dropped": 0,
+        "rows_text_modified": 254,
+        "detail": {
+          "note": "whitespace only -- no character normalization"
+        }
+      },
+      {
+        "step": "drop_exact_duplicates",
+        "rows_before": 4998,
+        "rows_after": 4793,
+        "rows_dropped": 205,
+        "detail": {
+          "key": "raw string equality, keep first occurrence"
+        }
+      },
+      {
+        "step": "drop_normalized_duplicates",
+        "rows_before": 4793,
+        "rows_after": 4792,
+        "rows_dropped": 1,
+        "detail": {
+          "key": "NFC + whitespace-collapse + strip, keep first occurrence",
+          "note": "comparison key only; stored text is unchanged"
+        }
+      },
+      {
+        "step": "drop_short",
+        "rows_before": 4792,
+        "rows_after": 4730,
+        "rows_dropped": 62,
+        "detail": {
+          "min_words": 3,
+          "tokenizer": "str.split()"
+        }
+      }
+    ],
+    "n_after_rule_based_cleaning": 4730,
+    "expected_final_n": 4730,
+    "class_balance": {
+      "label_distribution_raw": {
+        "0": 1665,
+        "1": 1664,
+        "2": 1670
+      },
+      "label_distribution_post_clean": {
+        "0": 1513,
+        "1": 1599,
+        "2": 1618
+      },
+      "per_class_drops": {
+        "0": 152,
+        "1": 65,
+        "2": 52
+      },
+      "per_class_drops_sum": 269,
+      "unlabelled_rows_dropped": 1,
+      "total_rows_dropped": 270,
+      "note": "Per-class drops sum to 269, not 270. The remaining 1 dropped row has a missing Sentiment label and therefore belongs to no class, so it cannot appear in any per-class count. 269 + 1 = 270.",
+      "balance_note": "The raw file is curated to near-uniform balance; cleaning breaks it. Drops concentrate in class 0. Downstream steps must not assume a balanced set after S1."
+    },
+    "review_id": {
+      "format": "bn_<raw_row_index zero-padded to 4>",
+      "derived_from": "0-based row index of the raw xlsx, pre-drop",
+      "n_unique": 4730,
+      "first": "bn_0000",
+      "last": "bn_4999",
+      "frozen": "referenced by the split map -- never regenerate",
+      "read_with": "pd.read_csv(..., dtype={'review_id': str})"
+    },
+    "columns_written": [
+      "review_id",
+      "Movie Review",
+      "Sentiment"
+    ],
+    "not_done_here": {
+      "near_duplicate_cosine_threshold": 0.95,
+      "near_duplicate_stage": "deferred_to_s2",
+      "stemming": false,
+      "stopword_removal": false,
+      "note": "final usable_n is pending near-duplicate removal in S2; 4730 is the rule-based count only"
+    }
+  }
+}

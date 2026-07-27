@@ -31,6 +31,38 @@ Commit `requirements.lock.txt`. From then on, reruns use:
 pip install -r requirements.lock.txt
 ```
 
+### Enable the pre-commit hook (once per clone)
+```bash
+git config core.hooksPath .githooks
+```
+Git does not track hook configuration, so this is **not** inherited when you
+clone — every working copy must run it once, or the check silently never runs.
+
+`.githooks/pre-commit` runs `python src/common/step_close.py --check` and blocks
+the commit on a non-zero exit. It enforces the Definition of Done in
+`CLAUDE.md`: no unfilled TODOs in `docs/lab_notebook.md`, and no commit that
+touches `results/` without touching the lab notebook alongside it.
+
+To bypass deliberately — for example while `docs/protocol.md` is legitimately
+still unfrozen before S2:
+```bash
+git commit --no-verify
+```
+`--no-verify` is the intended override. Weakening the check itself to make a
+commit pass is not.
+
+**The hook must be mode `100755` in the index.** This checkout has
+`core.fileMode=false`, so a plain `git add .githooks/pre-commit` can silently
+drop the executable bit back to `100644`. Git then **skips the hook without any
+warning** — the check looks enabled while never running. Verify and repair:
+```bash
+git ls-files -s .githooks/pre-commit      # must start with 100755
+git update-index --chmod=+x .githooks/pre-commit   # fix if it reads 100644
+```
+`.gitattributes` pins `.githooks/**` to LF endings for the same reason: with
+`core.autocrlf=true`, CRLF in a `#!/bin/sh` script breaks the hook on
+Linux/macOS.
+
 ## Data availability
 Base corpus: Raw Bangla Movie Review Comment Dataset (Mendeley), 5,000 rows.
 See `docs/dataset_card.md` for provenance and the honest note on pre-cleaning.
