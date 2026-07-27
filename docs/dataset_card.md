@@ -13,6 +13,39 @@ Data Statement.
 - **Known absence:** no movie-title column -> reviews cannot be mapped to films
   -> a held-out-films split is impossible.
 
+## Source file identity (fixes what every `review_id` points at)
+
+| Property | Value |
+|---|---|
+| Filename | `Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing.xlsx` |
+| **SHA-256** | `8f972734fc3629427cdf8d01716aa817f7b325410b2fdd0f26cbc2e68506db9f` |
+| Size | 195,186 bytes |
+| Sheet / shape | `Sheet1`, 5,000 rows × 2 cols (`Movie Review`, `Sentiment`) |
+| Download date | **UNCONFIRMED — to be filled by hand.** Filesystem mtime is 2026-07-27 19:51:35 +06:00, but that records when the file landed on this disk (possibly a copy), not when it was downloaded from Mendeley. |
+
+**Why the hash matters.** `review_id` is derived from the **row order of this
+exact file** (`bn_0042` = raw row 42, assigned before any row is dropped). The
+split map references those IDs. If Mendeley silently publishes an updated
+version — a row inserted, reordered, or corrected — then re-running S1 against
+it produces IDs that look identical but point at different reviews. **Nothing in
+the pipeline would raise an error**; the split would simply be wrong, and every
+downstream result with it. Verify before any re-run:
+
+```bash
+sha256sum "data/raw/Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing.xlsx"
+```
+
+A mismatch means the IDs are invalid — stop and reconcile, do not regenerate.
+
+**⚠️ The `.xlsx` is gitignored by design and has no backup in this repo.**
+`data/raw/` is excluded from version control (size + licensing), so cloning the
+repo does **not** restore it — a clone yields only `.gitkeep` and a README. The
+repo therefore protects the code, the results, and the IDs, but **not the one
+file they all resolve against**. Keep an independent off-repo copy (Drive or
+equivalent) and record its location here. Re-downloading from Mendeley is not a
+substitute: it is exactly the path that risks silently fetching a different
+version, which is what the hash above exists to detect.
+
 ## Class balance before and after cleaning
 
 The raw file is curated to near-uniform balance. **Rule-based cleaning (S1)
