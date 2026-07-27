@@ -9,6 +9,16 @@
 - Every file in `results/` carries a timestamp and the git commit hash it was produced from.
 - `data/raw/` is **read-only**. No script may write to it.
 - `data/splits/split_map_v1.json` is frozen after creation and never regenerated.
+- **The source `.xlsx` is pinned by checksum.** Every `review_id` derives from its
+  raw row order, so a different copy silently invalidates every ID with no error.
+  Verify byte-identity before any re-run:
+  ```
+  SHA-256  8f972734fc3629427cdf8d01716aa817f7b325410b2fdd0f26cbc2e68506db9f
+  size     195,186 bytes
+  ```
+  The file is re-downloadable from Mendeley, so the control is **verification,
+  not backup**. `bn_clean.csv` needs neither — it is deterministically
+  regenerable by `s1_clean.py`, which asserts n = 4,730.
 
 ## Layout
 ```

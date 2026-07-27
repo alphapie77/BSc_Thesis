@@ -168,6 +168,56 @@ test.
 
 ---
 
+## 2026-07-28 — Provenance v2: what the labels are, and what the sample is not
+**Feeds:** Ch.3 §Dataset; Ch.5 §Threats to Validity; dataset card
+
+The dataset's provenance was obtained **verbally from the data collector on
+2026-07-28**. **There is no written collection log**, and this is the single
+fact that sets the confidence on everything below to `recall-based (medium)`.
+Not the manner in which the account was obtained — the absence of a record.
+
+**On the revision during supervision.** The account was revised **once**: an
+initial description of the labels as a harvest-pass indicator was corrected to
+**single-coded per-item human annotation**. A second apparent change was
+**an input error, not a substantive revision** — confirmed as such by the
+collector. It is recorded here so that a reader comparing drafts does not infer
+two revisions where one occurred. A single correction under questioning is
+ordinary and is not itself grounds to discount the account; the discount comes
+from the missing log.
+
+**The distinction that now organizes the threats.** These are two different
+problems and conflating them would misdirect every mitigation:
+
+| | Status | Why |
+|---|---|---|
+| **Label validity** | **Adequate in kind, but single-coded and unquantified** | Labels are genuine per-item human judgments — not heuristics. But one annotator with no overlapping items means **no IAA is computable** and systematic bias is unmeasurable. |
+| **Sample validity** | **Compromised** | Quota stopping at ~1,665/class **destroys the natural class prior**; venue/thread/timestamp were not retained, so the sampling frame cannot be reconstructed. |
+
+The consequences differ. Label validity is *repairable after the fact*: the
+retrospective reliability study (200 items, 2 blind annotators, registered in
+STATUS parallel tracks) converts "no IAA exists" into an estimated figure.
+**Sample validity is not repairable** — no prevalence claim may ever be made
+from this corpus, and the unretained venue leaves a permanently untestable
+alternative explanation if clusters turn out to track sentiment (protocol.md,
+RQ1 Band 3).
+
+**Decision — the raw file needs verification, not backup.** The `.xlsx` is the
+root of every `review_id` (IDs derive from its raw row order), so a silently
+different copy would invalidate all of them with no error anywhere. But it is
+**re-downloadable from Mendeley**, so the risk is *substitution*, not *loss* —
+and the control for substitution is a checksum, not a second copy. SHA-256
+recorded in STATUS (Confidence: `verified`) and in the README reproducibility
+contract. `bn_clean.csv` needs neither: it is deterministically regenerable from
+the `.xlsx` by `s1_clean.py`, which asserts n = 4,730.
+
+**Pre-registration written today, before any ARI exists.** The RQ1 ARI bands
+were rewritten (DEGENERATE / <0.20 / 0.20–0.60 / >0.60) and the log-odds probe
+registered as a REQUIRED falsification test of the no-keyword-search claim. The
+S2 pilot has still never been run, which is what makes this pre-registration
+rather than rationalization — the commit timestamp is the evidence.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Due |

@@ -27,6 +27,28 @@
 | Bangla plot synopses | 130 (30 dev + 100 eval) | **0** | S6 evaluation | 🔴 highest — manual, slow, no shortcut |
 | Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 high |
 | Gold-300 annotation | 300 × 3 annotators | 0 | RQ1 validation | 🟡 needs S2 clusters first (stratified) |
+| **Retrospective base-label reliability study** | 200 items from R (disjoint from G-300), 2 native annotators, sentiment only, **blind to the original labels**; run in a session **separate** from persona annotation, order randomized | **0** | Ch.4 §Data Quality; Ch.5 §Threats | 🟡 converts "no IAA exists" (fact (a)) into an **estimated** base-label reliability figure. Report annotator-vs-annotator κ/α **and** their majority vs the original single-coder label. |
+
+---
+
+## Provenance facts (dataset collection)
+
+> **Source and standing.** Everything in this table marked `recall-based` was
+> reported **verbally by the data collector on 2026-07-28**. **There is no
+> written collection log.** These are recollections, not records: they cannot be
+> re-checked against an artifact, and they must never be described as
+> "verified" anywhere in the thesis, the dataset card, or a paper. Where a
+> statement can be tested against the data instead of recall, that test is
+> registered in `protocol.md` and its outcome supersedes this table.
+>
+> Lettering follows the supervision discussion. **This repo holds no fact (b)** —
+> none was recorded here, and none has been invented to fill the gap.
+
+| # | Fact | Consequence | Confidence |
+|---|---|---|---|
+| (a) | `Sentiment` labels are **per-item human judgments, but single-coded**: one annotator, no overlapping items. | **No inter-annotator agreement is computable for the base labels**, and single-annotator systematic bias is unmeasurable. Label validity is adequate in kind but unquantified. | recall-based (medium) |
+| (c) | Collection was a **bulk pull** from Bangla movie-related Facebook groups and YouTube channels — **no keyword or query-seeded search**. Stopping was **quota-driven at ~1,665 per class**. Source venue, thread, and timestamp were **not retained**. | (i) The **natural class prior is destroyed — no prevalence claim may be made from this corpus.** (ii) The disproportionate concentration of duplicates and sub-3-word items in class 0 (152 of 270 drops) is **consistent with quota-filling pressure**. | recall-based (medium) |
+| (hash) | Source `.xlsx` SHA-256 = `8f972734fc3629427cdf8d01716aa817f7b325410b2fdd0f26cbc2e68506db9f`, 195,186 bytes. | Every `review_id` derives from this file's raw row order. Any future copy can be checked byte-identical before a re-run; a mismatch invalidates all IDs. | **verified** (computed) |
 
 ---
 
