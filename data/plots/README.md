@@ -3,7 +3,7 @@
 **Target:** 130 (30 dev + 100 eval, disjoint) · **File:** `plots_bn.csv`
 
 ```bash
-python -m src.preprocess.plots_scrape --probe "মনপুরা"   # <-- START HERE, 2 seconds
+python -m src.preprocess.plots_scrape --probe             # <-- START HERE, 2 seconds
 python -m src.preprocess.plots_scrape                     # harvest
 python -m src.preprocess.plots_scrape --sample 130        # draw 130, seed 42
 python -m src.preprocess.plots_check                      # validate

@@ -41,6 +41,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.provenance import NEWLINE, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
+#: Default article for `--probe`. A well-known Bangladeshi film whose
+#: bn.wikipedia article has a real plot section.
+DEFAULT_PROBE_TITLE = "মনপুরা"
+
 BANGLA = re.compile(r"[ঀ-৿]")
 SENT_END = re.compile(r"[।!?]")
 LICENCE = "CC BY-SA 4.0"
@@ -313,8 +317,13 @@ def main() -> int:
     ap.add_argument("--config", default="configs/plots_scrape.yaml")
     ap.add_argument("--sample", type=int, default=0,
                     help="draw this many from an existing harvest and stop")
-    ap.add_argument("--probe", metavar="TITLE", default="",
-                    help="fetch ONE article and print every step. Run this first.")
+    # nargs="?" so `--probe` works with no argument. Typing a Bangla title on a
+    # Windows console is its own small ordeal, and the first thing anyone runs
+    # should not require it.
+    ap.add_argument("--probe", metavar="TITLE", nargs="?",
+                    const=DEFAULT_PROBE_TITLE, default="",
+                    help="fetch ONE article and print every step. Run this "
+                         f"first. Defaults to {DEFAULT_PROBE_TITLE}.")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[2]
