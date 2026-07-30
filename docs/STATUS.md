@@ -92,12 +92,14 @@ edited until the final `usable_n` is known (see Open decisions).
 | # | Decision | Blocks | Resolved by |
 |---|---|---|---|
 | **0** | **Where did rows 1999–4999 come from?** (Asked as "class 2" on 2026-07-30 and answered "same way" — but the question was wrong: it is a **region**, not a class, and 60% of the corpus is in it.) | **RQ1, Gold-300, split freeze — everything** | **the data collector**, re-asked (`docs/provenance_query.md`) |
-| **0b** | **Does the thesis proceed on region A only (1,910 rows, 2 classes), on the full corpus with the split disclosed, or make the split itself the object of study?** | the entire research question | **Sabbir** |
+| ~~**0b**~~ | ~~region A only, full corpus, or the split as the object of study?~~ **CLOSED 2026-07-30 — Sabbir: full corpus.** Conditions are pre-registered in `protocol.md` §"Scope decision": region becomes a **controlled factor**, the split stratifies on `Sentiment × region`, every headline metric is reported full / A / B, and no claim survives that does not survive within-region. Region A is retained as a robustness check, not the main line. | — | closed |
 | 1 | Final `usable_n` after near-dup removal | Step 4 | blocked by 0 |
 | 2 | Near-dup threshold: 0.90 gives Band 2, 0.95 and 0.98 give Band 1. Held at the pre-registered **0.95**; audit sheet generated and parked, since 52% of the contested band is class 2 | Step 4 | blocked by 0 |
 | 3 | ~~Do personas survive `ARI(cluster, Sentiment)`?~~ **Answered, but superseded**: ARI 0.1793 = Band 1, so the clusters are *not* a sentiment rediscovery — however the crosstab shows they separate class 2 from the rest almost perfectly, so the live question is now decision 0 | RQ1 claim | S2 pilot + 0 |
 | 4 | Correct the S0 table in the pipeline spec | — | after 1–2 |
 | 5 | Frame the register finding in the **stylometry / authorship** literature or the **machine-generated-text detection** literature? Writing decision, Sabbir's | Ch.2, Ch.4 | Sabbir |
+| 7 | **Three personas or two?** The design posits three; region A has two sentiment classes and region B three. K is settled by the S2 master K-table (pipeline gate G1), not by the label count — but the mismatch must be resolved before S3 | S2 → S3 | after the re-run |
+| 8 | If open decision 0 returns "region B was generated", does the thesis **exclude** it, **keep** it as a labelled condition, or **make the contrast the contribution**? Different from 0b, which only settled the corpus | Ch.1 framing | after 0 |
 | 6 | Should `s2_pilot.py` persist cluster assignments? Every follow-up question currently needs a full re-run or a reconstruction from the printed crosstab | future analyses | Sabbir |
 
 ---

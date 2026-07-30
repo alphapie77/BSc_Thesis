@@ -152,6 +152,79 @@ Whether the thesis ultimately runs on region A, on the full corpus with
 disclosure, or takes the split itself as its object. That is a scope decision
 (STATUS open decision 0b) and it is Sabbir's, not a number's.
 
+## Scope decision: the thesis runs on the FULL corpus (Sabbir, 2026-07-30)
+
+Region A alone was the conservative option and was declined. The full corpus is
+used. **This is defensible only under the conditions below, and they are
+conditions, not suggestions.**
+
+### The one rule that makes it defensible
+
+**`region` becomes a controlled factor, reported everywhere — not a footnote.**
+The corpus is two corpora (fact (split)); pretending otherwise would be the
+failure. Carrying region explicitly through the design turns a hidden confound
+into a measured variable, and makes the split a *result* rather than a
+liability.
+
+Concretely, and all of it pre-committed here:
+
+1. **The frozen split stratifies on `Sentiment × region`** (6 strata), not on
+   `Sentiment` alone. G-300, R1 and R2 therefore each carry a proportional share
+   of both corpora, and every downstream metric can be decomposed by region. A
+   split stratified only on sentiment would make region-wise reporting a matter
+   of luck.
+2. **Every headline metric is reported three ways: full, region A, region B.**
+   Not an appendix table — the main results table.
+3. **G-300 is stratified on region as well as cluster**, and inter-annotator
+   agreement is computed **per region**. If annotators agree less on one corpus
+   than the other, that is itself evidence about what region B is.
+4. **No claim survives that does not survive within-region.** A persona
+   structure visible only across the full corpus, and absent inside both A and
+   B separately, is a structure made of the seam.
+
+### RQ1-B pre-commitment: the cross-region generalisation test
+
+> **Written 2026-07-30, before any verifier exists.** This test does not appear
+> in the original pipeline. It exists because the corpus turned out to be two
+> corpora, and it converts that problem into a measurement.
+
+Verifier-A is trained on R1 restricted to one region and evaluated on the other,
+both directions, alongside the within-region baselines:
+
+| Train → Test | Purpose |
+|---|---|
+| A → A, B → B | within-register baselines |
+| **A → B**, **B → A** | the register gap, quantified |
+
+| Outcome | Claim |
+|---|---|
+| Cross-region accuracy drops **> 15 points** below the within-region baseline in either direction | The two corpora are **not interchangeable for modelling**. Any full-corpus verifier number is an average over two populations and must always be presented decomposed. Reported as a primary finding, not a caveat. |
+| Drop of **5–15 points** | Meaningful register gap; full-corpus numbers stay but every table carries the decomposition. |
+| Drop **< 5 points** | The register difference does not impede transfer. The split is still disclosed — it is measured and real — but it does not threaten the modelling claims. |
+
+**Any of the three is publishable, and the first is the most interesting.**
+
+### What may NOT be claimed, whatever the numbers say
+
+These follow from what is already established and are not contingent on any
+future result:
+
+1. **That the corpus represents organic Bangla audience opinion.** 60% of it has
+   **unknown provenance** and a register no comment thread produces. Any framing
+   of the corpus as "real audience reviews" is false as stated.
+2. **Any prevalence or distribution claim.** Already excluded by fact (c);
+   fact (split) makes it worse, not better.
+3. **That agreement between generated text and region-B references measures
+   realism.** If region B is machine-written — which is unresolved (open
+   decision 0) — then a system that generates audience reviews, trained and
+   scored against it, is partly **machine imitating machine**. This must appear
+   in Limitations regardless of how open decision 0 resolves, because the
+   thesis cannot currently rule it out.
+
+Point 3 is the sharp one and it does not go away by choosing the full corpus.
+It is the price of the larger n, and it is payable — provided it is paid in the
+open.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.

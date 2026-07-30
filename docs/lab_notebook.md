@@ -664,6 +664,80 @@ consolation prize.
 
 ---
 
+## 2026-07-30 — Scope settled: the full corpus, with region as a controlled factor
+
+**Feeds:** Ch.1 §Scope, Ch.3 §Design, Ch.5 §Limitations · **Artifact:**
+`docs/protocol.md` §"Scope decision" + RQ1-B · **Sabbir's decision.**
+
+### The decision
+
+Region A alone (1,910 rows, two classes) was the conservative option and was
+declined. **The thesis runs on the full corpus.** Recorded as his call, with the
+reasoning that follows written as conditions rather than attributed to him.
+
+### Why this is defensible, and what makes it so
+
+The full corpus is not the reckless choice — it is the *harder* choice, and it
+buys three real things: n = 4,730 instead of 1,910; three sentiment classes
+instead of two, so the three-persona design survives; and a cross-region
+comparison that region A alone could not produce.
+
+What makes it defensible is one rule: **region is carried explicitly through the
+design, not hidden.** A confound that is measured, stratified on, and reported
+is no longer a confound — it is a covariate. Pre-committed in `protocol.md`:
+split stratified on `Sentiment × region` (6 strata), every headline metric
+reported full / A / B in the *main* table, G-300 stratified on region with IAA
+computed per region, and no claim allowed to survive that does not survive
+within-region.
+
+### Findings
+
+- **A structure visible only across the full corpus, and absent inside both
+  regions separately, would be made of the seam.** That is the specific failure
+  mode the within-region rule exists to catch, and it is cheap to check once
+  cluster assignments are persisted.
+- **The cross-region generalisation test (RQ1-B) converts the problem into a
+  measurement.** Train Verifier-A on one region, test on the other, both
+  directions, against within-region baselines. Pre-registered with three
+  outcomes at >15 / 5–15 / <5 point drops. All three are publishable and the
+  largest drop is the most interesting — it would establish that the two corpora
+  are not interchangeable for modelling, which nobody has reported for this
+  dataset.
+
+### The cost, stated plainly
+
+Three things cannot be claimed on the full corpus regardless of any future
+number, and they are listed in `protocol.md` so they cannot quietly lapse:
+
+1. The corpus does **not** represent organic Bangla audience opinion — 60% has
+   unknown provenance and a register no comment thread produces.
+2. No prevalence or distribution claim (already excluded by fact (c)).
+3. **If region B is machine-written — unresolved, open decision 0 — then a
+   system generating audience reviews, trained and scored against it, is partly
+   machine imitating machine.** This goes in Limitations *whatever* open
+   decision 0 returns, because the thesis cannot currently rule it out.
+
+Point 3 is the real price of the larger n. It is payable, but only in the open.
+
+### Consequences for downstream steps
+
+- The split map must stratify on `Sentiment × region`; it cannot be written
+  until the S2 re-run persists cluster assignments (G-300 is cluster-stratified
+  by the pipeline's own spec).
+- Region A is retained as a **robustness check**, not the main line —
+  `configs/s2_pilot_regionA.yaml` stays.
+- New open decision 7: the design posits three personas, region A has two
+  sentiment classes and region B three. The pipeline's G1 gate settles K from the
+  master K-table rather than the label count, but the mismatch has to be faced
+  before S3.
+
+### Citations needed
+
+- None yet. If RQ1-B becomes a headline result, the framing decision (open
+  decision 5) covers where it is situated.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
