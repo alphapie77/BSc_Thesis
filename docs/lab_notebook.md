@@ -592,6 +592,78 @@ label 1 carries a typo (*থিবীর* for *পৃথিবীর*) and names
 - None yet. If the thesis reports the split as a dataset-integrity finding, the
   framing decision (open decision 5) covers it.
 
+---
+
+## 2026-07-30 (later still) — instrumenting the decisive test, before running it
+
+**Feeds:** Ch.4 §Persona discovery · **Artifacts:** `configs/s2_pilot.yaml`
+(region scoring), `configs/s2_pilot_regionA.yaml`, `tests/test_s2_region.py`,
+`docs/protocol.md` RQ1-A · **Nothing was run.**
+
+### Numbers
+
+None from a model. This entry exists precisely because **no result exists yet** —
+the interpretation is being fixed while the outcome is still unknown.
+
+Feasibility was computed first, because if region A could not carry the thesis
+none of the rest was worth building:
+
+- cleaned region A: **1,910** rows (948 negative / 962 positive), median 9 words
+- near-duplicate burden: of the 449 pairs, **387 are internal to region B**, 61
+  internal to A, and exactly **1 crosses** the boundary
+- after dedup at 0.95: **~1,897**
+- budget: G-300 eval-only + R1 ≈ 798 (RAG index) + R2 ≈ 799 (verifier training)
+
+~800 examples to fine-tune a binary BanglaBERT verifier is small but workable;
+~800 for a RAG index is thin but usable. Region A is a real fallback, not a
+consolation prize.
+
+### Findings (things we did not expect)
+
+- **The near-duplicate asymmetry was not looked for and is the strongest
+  evidence yet.** If the two regions were really one corpus, near-duplicate
+  pairs would cross the boundary at some rate. **Exactly one of 449 does.** This
+  owes nothing to the register features, so it is independent confirmation.
+
+### Decisions made (and why)
+
+- **`s2_pilot.py` now persists cluster assignments.** Their absence is why
+  `ARI(cluster, region)` could not be computed from the first run — a
+  one-column file would have saved a whole Kaggle session. Region derives from
+  `review_id` (`bn_<raw row>`), so no extra input is needed.
+- **The clustering is now scored against `region` as well as `Sentiment`, in the
+  same table.** Deliberately not in a separate document: quoting either number
+  alone misrepresents the result.
+- **Region A gets its own config, not a modified one.** Seed, encoder, K,
+  thresholds and all four bands identical — `tests/test_s2_region.py` asserts
+  it — so the subset run is the same instrument pointed at less data. Output
+  paths differ so the full-corpus result cannot be overwritten, and the
+  embedding cache is forced off for restricted runs because it is keyed to the
+  full corpus by row count.
+- **K stays at 3 for region A although region A has two classes, and the
+  weakness that creates is stated in the pre-registration rather than discovered
+  afterwards:** ARI between a 3-way partition and a 2-class labelling is
+  structurally capped below 1, so a low ARI there is *weaker* evidence than the
+  same number on the full corpus. K = 2 registered as secondary.
+- **Interpretation pre-registered before the run** (`protocol.md`, RQ1-A). The
+  *decision* to analyse a subset came from seeing S2c and is exploratory in
+  origin — said plainly there. What is fixed in advance is what each outcome
+  will be taken to mean, which is the part that otherwise drifts to fit the
+  number.
+
+### Consequences for downstream steps
+
+- The next Kaggle run produces both numbers at once; the notebook runs both
+  configs and zips both sets of outputs.
+- If `ARI(cluster, region)` exceeds `ARI(cluster, Sentiment)`, the full corpus is
+  finished as a basis for persona claims and open decision 0b resolves itself.
+
+### Citations needed
+
+- None. Same K-Means and ARI, scored against a second grouping.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |

@@ -21,7 +21,8 @@
 | 5b | S2b register probe (**exploratory**) | ✅ run — class 2 differs structurally from classes 0/1; **RQ1 persona claim suspended** | `results/s2b_register_probe.md` | 2026-07-30 |
 | 5c | Provenance query to the data collector | ⚠️ **asked 2026-07-30 — answer ("collected the same way") is contradicted by the file's own layout**; re-ask against the region split, not the class | `docs/provenance_query.md` | 2026-07-30 |
 | 5d | S2c region split (**exploratory**) — the corpus is two corpora | ✅ run — **60% of rows carry a uniform, non-organic signature** | `results/s2c_region_split.md` | 2026-07-30 |
-| 5e | Re-run S2 persisting cluster labels → compute `ARI(cluster, region)` | 🔴 **the decisive number, not yet computed** | — | — |
+| 5e | Re-run S2 persisting cluster labels → compute `ARI(cluster, region)` | 🟢 **code ready, pre-registered, never run** — `configs/s2_pilot.yaml` now scores against region and saves assignments | `results/s2_cluster_assignments.csv` | — |
+| 5f | S2-A: trap-check on region A alone (1,910 organic rows) | 🟢 **code ready, interpretation pre-registered (protocol RQ1-A), never run** | `results/s2a_regionA_trapcheck.md` | — |
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; **cannot freeze while 5c is open** | `docs/protocol.md` | — |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
@@ -103,6 +104,10 @@ edited until the final `usable_n` is known (see Open decisions).
 
 ## Immediate next actions
 
+0. 🔬 **Re-run both S2 configs on Kaggle** (same notebook, now runs two). This
+   produces the decisive `ARI(cluster, region)` and the region-A trap-check.
+   Both interpretations are pre-registered in `protocol.md` (RQ1-A) **before the
+   run** — do not read the numbers before re-reading that table.
 1. 🔴 **Put `docs/provenance_query.md` to the data collector.** Everything
    downstream — RQ1, Gold-300 stratification, the split freeze — waits on it.
    Gold-300 in particular: the annotation scheme was to be stratified on the S2

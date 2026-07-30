@@ -1,0 +1,78 @@
+# S2-A -- the trap-check re-run on REGION A ONLY (the organic corpus).
+#
+# ⚠️ The choice to run on a subset was made AFTER seeing S2c, so it is
+# exploratory in origin. But the OUTCOME is pre-registered: this file and the
+# claim table in docs/protocol.md ("RQ1-A pre-commitment") are committed
+# BEFORE the run, exactly as the original S2 pre-registration was. The commit
+# timestamp is the evidence.
+#
+# WHAT QUESTION THIS ANSWERS. S2 clustered across two corpora. If cluster 0 was
+# essentially region A, the trap-check measured provenance, not personas. The
+# only way to find out whether any audience structure exists in the *organic*
+# data is to cluster the organic data alone.
+#
+# WHAT CHANGES FROM s2_pilot.yaml, and nothing else:
+#   * region.restrict_to: A_organic     (1,910 cleaned rows)
+#   * separate output paths, so the full-corpus result is never overwritten
+#   * the embedding cache is disabled automatically for restricted runs
+# Seed, encoder, K, thresholds and the four verdict bands are IDENTICAL. This is
+# the same instrument pointed at a subset, not a new instrument.
+name: s2_pilot_regionA
+seed: 42
+
+input_csv: data/cleaned/bn_clean.csv
+text_col: "Movie Review"
+label_col: "Sentiment"
+id_col: "review_id"
+expected_input_n: 4730          # asserted BEFORE restriction
+
+region:
+  boundary_row: 1999
+  restrict_to: A_organic
+  # Only one region is present after restriction, so there is nothing to score
+  # region against. Set false to say so explicitly rather than rely on the
+  # automatic fallback.
+  score_against_region: false
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: null               # forced null for restricted runs anyway
+
+near_duplicate:
+  primary_threshold: 0.95       # unchanged, deliberately
+  sweep_thresholds: [0.90, 0.95, 0.98]
+  keep: first_by_review_id
+
+clustering:
+  # ⚠️ K = 3 is kept even though region A has only TWO sentiment classes.
+  #
+  # This is the honest choice, and it needs stating plainly: the thesis's
+  # persona scheme posits three audience types, so K=3 is what the design asks
+  # for. But ARI between a 3-way partition and a 2-class label is structurally
+  # capped below 1 -- a perfect persona clustering could not score 1.0 here.
+  #
+  # That makes a LOW ari in this run weaker evidence than a low ARI was on the
+  # full corpus, and the interpretation below accounts for it. A K=2 run is
+  # registered as a secondary comparison in protocol.md.
+  algorithm: kmeans
+  k: 3
+  n_init: 10
+  random_state: 42
+  cluster_in_umap_space: false
+
+trap_check:
+  metric: ARI(cluster_labels, Sentiment)
+  degenerate_cluster_share: {min: 0.05, max: 0.70}
+  bands:
+    no_claim: degenerate
+    not_sentiment_aligned_below: 0.20
+    partial_overlap_range: [0.20, 0.60]
+    persona_claim_fails_above: 0.60
+
+outputs:
+  near_dup_pairs_csv: data/cleaned/near_dup_pairs_regionA.csv
+  report_md: results/s2a_regionA_trapcheck.md
+  cluster_assignments_csv: results/s2a_regionA_cluster_assignments.csv

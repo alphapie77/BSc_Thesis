@@ -59,6 +59,22 @@ trap_check:
     # Band 3 -- the persona claim fails as stated.
     persona_claim_fails_above: 0.60
 
+# Added 2026-07-30 after S2c found the corpus is two corpora joined at raw row
+# 1999 (see results/s2c_region_split.md). `review_id` is `bn_<raw row>`, so
+# region is recoverable from the id with no extra data.
+#
+# This does NOT change what is clustered or how -- it adds a second thing the
+# same clustering is scored against. If ARI(cluster, region) exceeds
+# ARI(cluster, Sentiment), the encoder is recovering which file a review came
+# from, and no persona reading survives.
+region:
+  boundary_row: 1999
+  score_against_region: true
+  restrict_to: null          # null = whole corpus; "A_organic" for the subset
+
 outputs:
   near_dup_pairs_csv: data/cleaned/near_dup_pairs.csv
   report_md: results/s2_pilot_ari_trapcheck.md
+  # Persisted from this run onward. The first run did not save them, so every
+  # follow-up question had to be reconstructed from the printed crosstab.
+  cluster_assignments_csv: results/s2_cluster_assignments.csv

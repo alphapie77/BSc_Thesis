@@ -190,7 +190,29 @@ def greedy_keep_first(n: int, pairs: pd.DataFrame, threshold: float):
     return kept, removed
 
 
-def cluster_and_ari(emb: np.ndarray, labels: np.ndarray, cfg):
+def region_of(ids: np.ndarray, boundary: int) -> np.ndarray:
+    """Which half of the source .xlsx each review came from.
+
+    `review_id` is `bn_<raw row>`, so the raw row order of the source file --
+    and therefore how the file was assembled -- is recoverable from the id
+    alone. See `results/s2c_region_split.md`: the corpus is two corpora joined
+    at row 1999, and the register signature tracks this boundary rather than the
+    sentiment label.
+    """
+    rows = np.array([int(str(i).replace("bn_", "")) for i in ids])
+    return np.where(rows < boundary, "A_organic", "B_uniform")
+
+
+def cluster_and_ari(emb: np.ndarray, labels: np.ndarray, cfg,
+                    aux_labels: np.ndarray | None = None):
+    """Cluster, then score against Sentiment and (optionally) against region.
+
+    `aux_labels` exists because of S2c: if the clusters are recovering which
+    FILE a review came from rather than anything about audiences, then
+    ARI(cluster, region) will exceed ARI(cluster, Sentiment) -- and that
+    comparison is the whole question. Reported side by side so neither number
+    can be quoted without the other.
+    """
     from sklearn.cluster import KMeans
     from sklearn.metrics import adjusted_rand_score
 
@@ -232,7 +254,20 @@ def cluster_and_ari(emb: np.ndarray, labels: np.ndarray, cfg):
     denom = n * (min(ct.shape) - 1)
     cramers_v = float(np.sqrt(chi2 / denom)) if denom > 0 else float("nan")
 
+    aux = {}
+    if aux_labels is not None:
+        aux_ct = pd.crosstab(pd.Series(assign, name="cluster"),
+                             pd.Series(aux_labels, name="region"))
+        aux = {
+            "ari_region": float(adjusted_rand_score(aux_labels, assign)),
+            "region_crosstab_index": [int(x) for x in aux_ct.index],
+            "region_crosstab_columns": [str(c) for c in aux_ct.columns],
+            "region_crosstab_values": aux_ct.to_numpy().tolist(),
+        }
+
     return {
+        "assign": assign.tolist(),
+        **aux,
         "ari": float(adjusted_rand_score(labels, assign)),
         "n": n,
         "cluster_sizes": sizes,
@@ -369,6 +404,66 @@ def crosstab_md(res) -> str:
     return "\n".join(lines)
 
 
+def region_md(primary, baseline) -> str:
+    """The S2c question, answered numerically: sentiment or file of origin?
+
+    Reported next to the sentiment ARI rather than in a separate document,
+    because quoting either number alone misrepresents the result.
+    """
+    if "ari_region" not in primary:
+        return (
+            "### Cluster × region\n\n_Not scored: this run covers a single "
+            "region, so there is nothing to separate._"
+        )
+
+    a_sent, a_reg = primary["ari"], primary["ari_region"]
+    cols = primary["region_crosstab_columns"]
+    vals = primary["region_crosstab_values"]
+    lines = ["| Cluster | " + " | ".join(cols) + " | Row total |",
+             "|---" * (len(cols) + 2) + "|"]
+    for k, row in zip(primary["region_crosstab_index"], vals):
+        lines.append(f"| {k} | " + " | ".join(str(v) for v in row)
+                     + f" | {sum(row)} |")
+    ct = "\n".join(lines)
+
+    if a_reg > a_sent:
+        verdict = (
+            f"**ARI(cluster, region) = {a_reg:.4f} EXCEEDS ARI(cluster, "
+            f"Sentiment) = {a_sent:.4f}.** The clustering agrees more with which "
+            "half of the source file a review came from than with what the "
+            "review says. Any persona reading of these clusters is unsupported "
+            "until the corpus is restricted to one region: the structure being "
+            "recovered is provenance."
+        )
+    else:
+        verdict = (
+            f"**ARI(cluster, region) = {a_reg:.4f} does NOT exceed "
+            f"ARI(cluster, Sentiment) = {a_sent:.4f}.** The two-corpus split is "
+            "not the dominant axis the encoder recovered. That does not clear "
+            "the corpus -- the split is still a confound to disclose -- but it "
+            "removes the strongest version of the objection."
+        )
+
+    return f"""### Cluster × region — is this sentiment, or file of origin?
+
+`results/s2c_region_split.md` established that the source `.xlsx` is two corpora
+joined at raw row 1999, with sharply different register on either side. If the
+encoder is separating those two corpora rather than anything about audiences,
+this table is where it shows.
+
+{ct}
+
+| Scored against | ARI |
+|---|---|
+| `Sentiment` | {a_sent:.4f} |
+| **`region`** | **{a_reg:.4f}** |
+| `Sentiment`, before dedup | {baseline["ari"]:.4f} |
+| `region`, before dedup | {baseline.get("ari_region", float("nan")):.4f} |
+
+{verdict}
+"""
+
+
 def degeneracy_md(res) -> str:
     shares = ", ".join(
         f"cluster {k}: {v * 100:.1f}%" for k, v in res["cluster_shares"].items()
@@ -458,6 +553,8 @@ this outcome is on record so the split cannot be tuned to it.
 | **Verdict** | **{flag}**{markers_md} |
 
 {text}
+
+{region_md(primary, baseline)}
 
 ### Cluster degeneracy check
 
@@ -566,9 +663,32 @@ def main() -> int:
     cfg = yaml.safe_load((repo_root / cfg_path).read_text(encoding="utf-8"))
 
     df = load_clean(cfg, repo_root)
+
+    # Region is computed BEFORE any optional restriction, so `restrict_to_region`
+    # and the region scoring share one definition of the boundary.
+    rcfg = cfg.get("region", {}) or {}
+    boundary = int(rcfg.get("boundary_row", 1999))
+    df["_region"] = region_of(df[cfg["id_col"]].to_numpy(), boundary)
+
+    restrict = rcfg.get("restrict_to")
+    if restrict:
+        before = len(df)
+        df = df[df["_region"] == restrict].reset_index(drop=True)
+        print(f"restricted to region {restrict}: {before} -> {len(df)} rows")
+        if df.empty:
+            raise AssertionError(f"region {restrict!r} selected no rows")
+        # The embedding cache is keyed to the FULL corpus by row count, so a
+        # restricted run must not read or write it -- otherwise the next full
+        # run silently loads embeddings for a subset.
+        cfg = {**cfg, "embedding": {**cfg["embedding"], "cache_npy": None}}
+
     ids = df[cfg["id_col"]].to_numpy()
     texts = df[cfg["text_col"]].astype(str).tolist()
     labels_all = df[cfg["label_col"]].to_numpy()
+    regions_all = df["_region"].to_numpy()
+    score_region = bool(rcfg.get("score_against_region", True)) and (
+        len(set(regions_all)) > 1
+    )
 
     emb = embed(texts, cfg, repo_root)
     if emb.shape[0] != len(df):
@@ -586,7 +706,9 @@ def main() -> int:
     # Baseline: the trap-check BEFORE any near-duplicate removal. Reported next
     # to the post-dedup numbers so it is visible whether dedup itself moves ARI
     # -- near-duplicates inflate apparent cluster structure.
-    baseline = cluster_and_ari(emb, labels_all, cfg)
+    baseline = cluster_and_ari(
+        emb, labels_all, cfg, regions_all if score_region else None
+    )
     baseline["threshold"] = None
     baseline["n_removed"] = 0
     baseline["n_surviving"] = len(df)
@@ -596,7 +718,11 @@ def main() -> int:
     sweep, primary, primary_removed = [], None, None
     for t in thresholds:
         kept, removed = greedy_keep_first(len(df), pairs, t)
-        res = cluster_and_ari(emb[kept], labels_all[kept], cfg)
+        res = cluster_and_ari(
+            emb[kept], labels_all[kept], cfg,
+            regions_all[kept] if score_region else None,
+        )
+        res["kept_idx"] = kept.tolist()
         row = {
             "threshold": t,
             "n_pairs": int((pairs["cosine"] >= t).sum()),
@@ -605,12 +731,35 @@ def main() -> int:
             **res,
         }
         sweep.append(row)
+        extra = (
+            f"  ARI_region={res['ari_region']:.4f}" if "ari_region" in res else ""
+        )
         print(
             f"t={t:.2f}  removed={len(removed):<5} surviving={len(kept):<5} "
-            f"ARI={res['ari']:.4f}"
+            f"ARI={res['ari']:.4f}{extra}"
         )
         if t == primary_t:
             primary, primary_removed = row, removed
+
+    # --- cluster_assignments.csv -------------------------------------------
+    # Persisted because the first run was not: every follow-up question about
+    # the clustering then had to be reconstructed from the printed crosstab, or
+    # answered by re-embedding the whole corpus. One column per review is a
+    # trivial file and it makes the result interrogable instead of final.
+    assign_key = cfg["outputs"].get("cluster_assignments_csv")
+    if assign_key:
+        kept_idx = np.array(primary["kept_idx"], dtype=int)
+        out_assign = repo_root / assign_key
+        out_assign.parent.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame({
+            cfg["id_col"]: ids[kept_idx],
+            "cluster": primary["assign"],
+            cfg["label_col"]: labels_all[kept_idx],
+            "region": regions_all[kept_idx],
+            "threshold": primary_t,
+        }).to_csv(out_assign, index=False, encoding="utf-8",
+                  lineterminator=NEWLINE)
+        print(f"wrote {out_assign} ({len(kept_idx)} rows)")
 
     # --- near_dup_pairs.csv: every pair, fully auditable -------------------
     out_pairs = repo_root / cfg["outputs"]["near_dup_pairs_csv"]

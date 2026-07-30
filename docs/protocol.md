@@ -99,6 +99,59 @@ the signature of a query-seeded harvest.
 
 Neither outcome is a failure of the study. Only *not running the probe* would be.
 
+## RQ1-A pre-commitment: the trap-check re-run on region A alone
+
+> **Written 2026-07-30, before the region-A run exists.** No
+> `results/s2a_regionA_trapcheck.md` and no
+> `results/s2_cluster_assignments.csv` exist at the commit that introduces this
+> section. As with the original RQ1 pre-commitment, the commit timestamp is the
+> evidence.
+>
+> **Honest framing:** the *decision* to analyse a subset was made after seeing
+> S2c, so its origin is exploratory. What is pre-registered is the
+> **interpretation** — what each outcome will be taken to mean — fixed before
+> the number is known.
+
+### Test 1 — is the full-corpus clustering recovering provenance?
+
+`configs/s2_pilot.yaml` now scores the same clustering against `region` as well
+as `Sentiment`. Pre-committed reading, on the **primary threshold 0.95**:
+
+| Outcome | Claim |
+|---|---|
+| `ARI(cluster, region)` > `ARI(cluster, Sentiment)` | The encoder recovers **which file a review came from** more strongly than what it says. **No persona claim may rest on the full-corpus clustering.** The S2 trap-check is reported as confounded, and region A becomes the only defensible corpus. |
+| `ARI(cluster, region)` ≈ `ARI(cluster, Sentiment)` (within ±0.05) | Both are weak axes; neither dominates. The split is disclosed as a confound and region A is still preferred, but the strong version of the objection is not established. |
+| `ARI(cluster, region)` < `ARI(cluster, Sentiment)` | The two-corpus split is **not** the dominant recovered axis. This does not clear the corpus — the register difference is measured and real — but the full corpus remains usable with the split disclosed. |
+
+### Test 2 — does any structure survive inside the organic corpus?
+
+`configs/s2_pilot_regionA.yaml`: identical seed, encoder, K, thresholds and
+bands; the only change is the subset (1,910 cleaned rows, 2 classes).
+
+**Stated in advance, because it weakens the result and must not be discovered
+afterwards:** region A has **two** sentiment classes while K = 3, so ARI between
+a 3-way partition and a 2-class labelling is **structurally capped below 1**. A
+low ARI here is therefore *weaker* evidence of persona-independence than the
+same number was on the full corpus. A K = 2 run is registered as a **secondary**
+comparison for exactly this reason; the K = 3 run is primary because three
+personas is what the design posits.
+
+The four bands from RQ1 apply unchanged, with the degeneracy gate first. In
+addition:
+
+| Outcome | Claim |
+|---|---|
+| Non-degenerate, ARI < 0.20 | Clusters in the organic corpus are not a sentiment rediscovery. **Still not evidence that personas are valid** — G-300 remains the arbiter — but the persona programme may proceed on region A. |
+| Non-degenerate, 0.20–0.60 | Proceed with the residual test, disclosed as sentiment-correlated. |
+| Non-degenerate, ARI > 0.60 | With only two classes and K = 3 this would be a strong result: the clusters reproduce sentiment despite the structural cap. Persona claim fails on the organic corpus too. |
+| Degenerate | `NO_CLAIM`. At n ≈ 1,897 a degenerate partition may simply mean the corpus is too small for K = 3 — report that, do not tune K to escape it. |
+
+### What is NOT pre-registered here
+
+Whether the thesis ultimately runs on region A, on the full corpus with
+disclosure, or takes the split itself as its object. That is a scope decision
+(STATUS open decision 0b) and it is Sabbir's, not a number's.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
