@@ -29,7 +29,7 @@
 
 | Track | Target | Done | Blocks | Risk |
 |---|---|---|---|---|
-| Bangla plot synopses | 130 (30 dev + 100 eval) | **0** — tooling ready: `data/plots/plots_bn.csv` + `python -m src.preprocess.plots_check` | S6 evaluation | 🔴 highest — manual, slow, no shortcut. **26 working days at 5/day.** `split` stays empty until 130, then assigned once with seed 42 (collecting-order would make dev the famous films) |
+| Bangla plot synopses | 130 (30 dev + 100 eval) | **0** — **now scraped, not hand-written**: `plots_scrape.py` (harvest → sample 130, seed 42) + `plots_check.py`. Offline logic tested; **network path untested** — first real run is the test | S6 evaluation | 🟡 downgraded from 🔴. Scraping removes both the 26-day cost *and* two biases: the experimenter's register in the inputs, and hand-selection of famous films. **New obligation:** bn.wikipedia is CC BY-SA 4.0 — attribution + revision ids must be in the dataset card before publication |
 | Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 high |
 | Gold-300 annotation | 300 × 3 annotators | 0 | RQ1 validation | 🟡 needs S2 clusters first (stratified) |
 | **Retrospective base-label reliability study** | 200 items from R (disjoint from G-300), 2 native annotators, sentiment only, **blind to the original labels**; run in a session **separate** from persona annotation, order randomized | **0** | Ch.4 §Data Quality; Ch.5 §Threats | 🟡 converts "no IAA exists" (fact (a)) into an **estimated** base-label reliability figure. Report annotator-vs-annotator κ/α **and** their majority vs the original single-coder label. |
@@ -117,9 +117,10 @@ next run is written and pre-registered.
    (RQ1-A) **before the run** — re-read that table before reading the numbers.
 2. **Freeze the split** on `Sentiment × region` (6 strata) once cluster
    assignments exist. This closes open decisions 1 and 2.
-3. Start plot collection: 5/day from bn.wikipedia, log `source_url` for every
-   one. **0 of 130 and on the critical path** — the only track that cannot be
-   accelerated later.
+3. **Run the plot harvest** — `plots_scrape.py`, then `--sample 130`, then
+   **read the 130**. The quality gate counts characters and sentences; it cannot
+   tell a plot from a production-history paragraph. Anything that is not a plot
+   gets deleted from the harvest and the sample **redrawn**, never patched.
 4. Read Huang et al. (ICLR 2024) → fill its `related_work.md` entry.
 
 ## Infrastructure state (2026-07-30)

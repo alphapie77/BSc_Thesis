@@ -74,4 +74,57 @@ drop-set arithmetic verified in `results/s0_data_xray.md`.
 
 - **Note on n:** 4,730 is `n_after_rule_based_cleaning`. Near-duplicate removal
   (cosine >= 0.95) is deferred to S2, so the final `usable_n` is not yet fixed.
-- **To add:** collection method, annotator demographics, licensing, gold-300 release.
+- **To add:** annotator demographics, gold-300 release.
+
+---
+
+## The review corpus is two corpora — read this before using n = 4,730
+
+Rows 0–1998 and 1999–4999 of the source `.xlsx` differ on features that carry no
+sentiment content: **38.7% vs 99.2%** of rows carry a দাঁড়ি, **13.5% vs 0.8%**
+contain a first-person pronoun, and lexical richness is **255 vs 128** word types
+per 1,000 tokens. The change is a step at one row, not a drift. All 1,670
+class-2 rows sit in the second region. See `results/s2c_region_split.md`.
+
+**Collector's account (2026-07-30, recall-based, no written log):** gathered
+from many different places, all organic user comments, none written or
+generated, and no memory of which rows came from where.
+
+**These two records are not reconciled, and the thesis reports both.** The
+consequence is fixed regardless of cause: `region` is a controlled factor, the
+split is stratified on `Sentiment × region`, and every headline metric is
+reported full / A / B (`docs/protocol.md`, "Scope decision").
+
+**Do not describe this corpus as organic Bangla audience opinion.** ~60% of it
+has an unrecoverable provenance.
+
+---
+
+## Plot synopses (secondary corpus, n = 130)
+
+| | |
+|---|---|
+| Source | **bn.wikipedia.org**, MediaWiki API |
+| Method | `src/preprocess/plots_scrape.py`, harvest → sample 130 with seed 42 |
+| Per-row provenance | `source_url`, **`revision_id`**, `revision_timestamp` |
+| Split | 30 dev / 100 eval, assigned once at n = 130 with seed 42 |
+| **Licence** | **CC BY-SA 4.0** |
+
+### ⚠️ Attribution obligation — must be discharged before publication
+
+bn.wikipedia text is **CC BY-SA 4.0**: reuse requires **attribution** and
+**share-alike**. This is a licence condition, not a courtesy.
+
+Required before any release or submission:
+
+1. Attribute bn.wikipedia and its contributors, listing the article titles and
+   **revision ids** used (they are stored per row for exactly this purpose).
+2. Release any distributed derivative of the plot set under a compatible
+   share-alike licence.
+3. State the harvest date — article text changes, which is why revision ids are
+   recorded rather than titles alone.
+
+Unlike the review corpus, this one has **complete, checkable provenance**: any
+reader can fetch the exact revision used. That contrast is deliberate and is
+worth stating in the thesis — it is the difference between a corpus assembled
+with a record and one assembled without.

@@ -1,72 +1,79 @@
-# Bangla plot synopses — 130 needed, hand-collected
+# Bangla plot synopses — 130, harvested from bn.wikipedia
 
 **Target:** 130 (30 dev + 100 eval, disjoint) · **File:** `plots_bn.csv`
-**Check progress:** `python -m src.preprocess.plots_check`
-
-## Why this is the critical path
-
-Everything else in this thesis is code, and code runs overnight. These 130 do
-not. At 5 per day it is **26 working days**, and S6 — the entire experiment —
-cannot start without them. This is the only track that cannot be caught up later,
-which is why it starts now rather than when it is needed.
-
-They are also the **held-out element of the whole evaluation**: the corpus has no
-movie-title column, so reviews cannot be mapped to films, and these plots are
-what replaced the held-out-films split. Losing them invalidates S6. They are
-committed to git for that reason, unlike every other derived file.
-
-## The daily 5
-
-1. Open a Bangla film on **bn.wikipedia.org** (or bmdb.com.bd).
-2. Read the plot section. Write **3–8 sentences in your own words**.
-3. Paste the **exact page URL** into `source_url`.
-4. Fill the row. Leave `split` **empty** — see below.
-5. Run `python -m src.preprocess.plots_check` before you close the laptop.
-
-## Rules that matter
-
-- **`source_url` is not optional.** It is the one field that cannot be
-  reconstructed later. Provenance fact (c) in `docs/STATUS.md` is a live record
-  of what an unrecorded source costs — 60% of the review corpus now has an
-  unrecoverable origin, and the thesis carries that as a permanent limitation.
-  Do not create a second one.
-- **Summarise, do not paste.** A copied Wikipedia paragraph is someone else's
-  text and a copyright problem in an appendix. 3–8 sentences in your own words.
-  The checker rejects anything under 2 or over 12 sentences.
-- **Leave `split` empty.** It is assigned once, at 130, by
-  `--assign-split` with seed 42.
-
-  *Why:* if you filled it in as you went, the first 30 films would become the dev
-  set — and the first 30 films anyone thinks of are the famous ones with the
-  longest articles. Every threshold tuned on dev would then be tuned on easy
-  cases, and the eval-100 would be systematically harder. Collect blind, split
-  once.
-- **No duplicate films**, even under different `plot_id`s. Easy to do across
-  sessions, so the checker looks for repeated titles, synopses and URLs.
-- **Vary the films.** Different decades, genres, and both hits and flops. A set
-  of 130 blockbusters would make the evaluation easier than the claim implies.
-
-## Columns
-
-| Column | What goes in it |
-|---|---|
-| `plot_id` | `BN001` … `BN130` |
-| `language` | `bn` |
-| `title_bn` | Bangla title |
-| `title_en` | English/romanised title, if there is one |
-| `synopsis` | **3–8 sentences, your own words** |
-| `n_sentences` | leave blank — the checker counts it |
-| `source_url` | exact page URL, **required** |
-| `source_type` | `wikipedia_bn` \| `bmdb` \| `self_written` |
-| `collected_date` | `YYYY-MM-DD` |
-| `split` | **leave empty** until 130 |
-
-## When you reach 130
 
 ```bash
-python -m src.preprocess.plots_check                 # must report no problems
-python -m src.preprocess.plots_check --assign-split  # once, seed 42
+python -m src.preprocess.plots_scrape --config configs/plots_scrape.yaml  # harvest
+python -m src.preprocess.plots_scrape --sample 130                        # draw 130
+python -m src.preprocess.plots_check                                      # validate
+# ... read them, fix or re-draw ...
+python -m src.preprocess.plots_check --assign-split                       # once
 ```
 
-Then commit. From that point the split is frozen, exactly like
-`data/splits/split_map_v1.json`, and the tool refuses to reassign it.
+## Why scraped rather than hand-written
+
+Not only because it is faster. Hand-writing was the worse method:
+
+1. **Hand-written summaries would carry one person's register into the inputs.**
+   The thesis generates Bangla audience reviews *from these plots*, so the plot
+   text is part of the experiment. 130 summaries in the experimenter's own voice
+   is an uncontrolled variable sitting at the top of every generation.
+2. **Selection bias disappears.** Collecting by hand means collecting the films
+   you thought of — the famous ones, with the longest articles. Harvesting a
+   category and sampling with a seed has no opinion about which films matter.
+3. **It is checkable.** `source_url` + `revision_id` lets a reviewer fetch the
+   exact text used. A hand-written paraphrase can be checked against nothing.
+
+## Licence — an obligation, not a footnote
+
+bn.wikipedia text is **CC BY-SA 4.0**: reusable **with attribution and
+share-alike**. Every row stores `revision_id`, `revision_timestamp` and
+`licence`, so the exact revision is citable.
+
+**The dataset card must carry the attribution before anything is published,** and
+if the plot set is released it must be released under a compatible licence.
+This is a condition of use. It is also why verbatim extraction is *correct* here
+and paraphrasing would not have been better — a paraphrase of a CC BY-SA text is
+a derivative work either way, and it loses the ability to point at a revision.
+
+## The three steps
+
+**1. Harvest.** Walks the seed categories in `configs/plots_scrape.yaml`, pulls
+each article's plot section, applies the quality gate (3–12 sentences, ≥120
+characters, must contain Bangla), and writes every survivor to
+`plots_bn_harvest.csv`. Rate-limited to one request per second with a
+contactable User-Agent, because this is someone else's free server.
+
+Read `results/plots_harvest_report.md` afterwards. A large "no plot section"
+count is expected — most bn.wikipedia film articles are stubs. It only matters
+if the survivors fall short of 130.
+
+**2. Sample 130.** Blind, seed 42, from everything that qualified. Harvest-then-
+sample is deliberate: choosing which harvested films to keep, by eye, would put
+the selection bias straight back in.
+
+If the harvest yields fewer than 130, **widen `categories` or relax `quality`
+and re-harvest — do not hand-pick to make up the difference.**
+
+**3. Read them.** The gate is mechanical: it counts characters and sentences. It
+cannot tell a plot summary from a production-history paragraph that happened to
+sit under a matching heading. Anything that is not a plot gets **deleted from the
+harvest and the sample redrawn**, not patched by hand.
+
+## Leave `split` empty until the end
+
+It is assigned once, at 130, by `plots_check --assign-split`, seed 42.
+
+*Why:* filling it during collection would make the first 30 films the dev set,
+and the first 30 films in any list are the ones that surfaced first. Every
+threshold tuned on dev would then be tuned on easy cases and the eval-100 would
+be systematically harder. The tool refuses to reassign once it is set — the
+eval-100 is the only held-out element S6 has, and losing it invalidates the
+experiment.
+
+## Why these are committed to git
+
+The corpus has **no movie-title column**, so reviews cannot be mapped to films.
+That is why the held-out-films split was dropped and these 130 plots replaced it.
+They are the held-out element of the entire evaluation. Unlike every other
+derived file here, they are committed.

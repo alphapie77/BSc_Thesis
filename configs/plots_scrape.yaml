@@ -1,0 +1,69 @@
+# PLOT HARVEST -- pull Bangla film plot summaries from bn.wikipedia via the API.
+#
+# WHY SCRAPING IS THE BETTER METHOD HERE, not merely the faster one:
+#
+#   1. Hand-written summaries would carry SABBIR'S register into the inputs.
+#      The thesis generates Bangla audience reviews *from these plots*, so the
+#      prompt text is part of the experiment. 130 summaries in one person's
+#      voice is an uncontrolled variable sitting at the top of every generation.
+#      Wikipedia prose is not neutral either, but it is uniform and it is not
+#      the experimenter's.
+#   2. Selection bias disappears. Collecting by hand means collecting the films
+#      you thought of, which are the famous ones. Harvesting a category and
+#      sampling with a seed does not have opinions about which films matter.
+#   3. It is reproducible. `source_url` plus a REVISION ID means a reviewer can
+#      fetch the exact text used. A hand-written paraphrase cannot be checked
+#      against anything.
+#
+# LICENCE -- NOT OPTIONAL. bn.wikipedia text is CC BY-SA 4.0. Reuse is permitted
+# **with attribution and share-alike**. That is why `revision_id` and `licence`
+# are captured per row and why the dataset card must carry the attribution. This
+# is a condition of use, not bookkeeping.
+name: plots_scrape
+seed: 42
+
+api: "https://bn.wikipedia.org/w/api.php"
+
+# Wikipedia asks for a descriptive User-Agent with a contact address. Anonymous
+# scrapers get rate-limited or blocked, and rightly so.
+user_agent: "BSc-Thesis-PlotHarvest/1.0 (21701082@std.cu.ac.bd) python-urllib"
+request_delay_seconds: 1.0      # be polite; this is someone else's server
+batch_size: 20                  # titles per API call (API caps at 20 for extracts)
+
+# Seed categories. Deliberately broader than "Bangladeshi cinema" alone: a set
+# built only from recent hits would make the evaluation easier than the claim
+# implies. Add or remove freely -- the harvest reports what each contributed.
+categories:
+  - "বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র"
+  - "বিষয়শ্রেণী:ভারতীয় বাংলা ভাষার চলচ্চিত্র"
+  - "বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র"
+category_depth: 1               # follow sub-categories this many levels
+max_pages_per_category: 400
+
+# Section headings that hold a plot. bn.wikipedia is inconsistent about this,
+# so all the common spellings are listed; matching is on the normalised heading.
+plot_headings:
+  - "কাহিনী"
+  - "কাহিনি"
+  - "কাহিনী সংক্ষেপ"
+  - "কাহিনি সংক্ষেপ"
+  - "কাহিনীসংক্ষেপ"
+  - "সারসংক্ষেপ"
+  - "পটভূমি"
+  - "গল্প"
+  - "চলচ্চিত্রের কাহিনী"
+
+# Quality gate. Most bn.wikipedia film articles are stubs; harvesting without a
+# filter yields a corpus of one-line plots that no model could generate from.
+quality:
+  min_sentences: 3
+  max_sentences: 12       # longer gets truncated at a sentence boundary, not dropped
+  min_chars: 120
+  max_chars: 2000
+  require_bangla: true
+
+outputs:
+  # Everything that passed the gate. Not the final set -- kept so the sampling
+  # step is auditable and so a re-harvest can be diffed against it.
+  harvest_csv: data/plots/plots_bn_harvest.csv
+  report_md: results/plots_harvest_report.md

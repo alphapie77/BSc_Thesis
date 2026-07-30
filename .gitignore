@@ -33,3 +33,7 @@ wandb/
 # Unzipped Kaggle output bundles -- transient, the files inside are what matter
 zip/
 *.zip
+
+# Raw harvest -- regenerable by re-running plots_scrape.py; only the sampled
+# 130 in plots_bn.csv are committed.
+data/plots/plots_bn_harvest.csv

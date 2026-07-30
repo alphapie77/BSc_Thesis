@@ -807,6 +807,100 @@ position* rather than label, about rows 1999–4999. The answer:
 
 ---
 
+## 2026-07-30 — Plots: scraped, not hand-written (and that is the better method)
+
+**Feeds:** Ch.3 §Data, Ch.5 §Limitations · **Artifacts:**
+`src/preprocess/plots_scrape.py`, `configs/plots_scrape.yaml`,
+`data/plots/README.md`, dataset-card §Plot synopses · **Sabbir's request.**
+
+### The request, and why I stopped arguing for hand-collection
+
+Sabbir asked for the 130 plots to be scraped. I had built the manual workflow an
+hour earlier. On thinking it through, **the manual version was the worse method**
+and not only the slower one:
+
+- **Hand-written summaries put the experimenter's register into the inputs.**
+  The thesis generates Bangla audience reviews *from these plots*, so the plot
+  text is part of the experimental apparatus. 130 summaries in one person's voice
+  is an uncontrolled variable at the top of every generation — and after spending
+  the day proving that register differences dominate this corpus, seeding a new
+  one deliberately would have been indefensible.
+- **Hand-collection selects the films you think of**, which are the famous ones
+  with the longest articles. Harvest-then-sample has no opinion about which films
+  matter.
+- **A paraphrase is checkable against nothing.** `source_url` + `revision_id`
+  lets a reviewer fetch the exact text used.
+
+So this is not a concession to speed. The earlier design was wrong.
+
+### Decisions made (and why)
+
+- **Harvest and sample are separate commands.** Harvest everything that passes
+  the gate, then draw 130 blind with seed 42. Choosing which harvested films to
+  keep, by eye, would reintroduce exactly the bias the scraping removes. The
+  sampler refuses to run if the harvest is short, with a message saying to widen
+  the categories rather than hand-pick the remainder.
+- **Verbatim extraction, not paraphrase.** bn.wikipedia is CC BY-SA 4.0:
+  reusable with attribution and share-alike. A paraphrase is a derivative work
+  either way and loses the ability to point at a revision. Verbatim + revision id
+  is both the more honest and the more citable choice.
+- **Quality gate at 3–12 sentences, ≥120 chars, must contain Bangla.** Most
+  bn.wikipedia film articles are stubs; harvesting unfiltered would yield a
+  corpus of one-line plots nothing could be generated from. Over-length plots are
+  **truncated at a sentence boundary rather than dropped** — a good long plot is
+  not a bad plot.
+- **Rate-limited to 1 req/s with a contactable User-Agent.** It is someone
+  else's free server.
+- **Categories deliberately broader than Bangladeshi cinema alone.** A set built
+  only from recent hits would make the evaluation easier than the claim implies.
+
+### Findings
+
+- **Nine heading spellings are needed.** bn.wikipedia is inconsistent —
+  কাহিনী / কাহিনি / কাহিনীসংক্ষেপ / পটভূমি / গল্প all occur. Matching is on the
+  space-stripped heading. Verified against fixtures: all nine match, and
+  সঙ্গীত / অভিনয়ে correctly do not.
+- **A licence obligation now exists that did not before.** CC BY-SA attribution
+  and share-alike are conditions of use. Recorded in the dataset card as a
+  pre-publication checklist with three specific items, not a vague note.
+- **The plot corpus will have better provenance than the review corpus** —
+  complete, per-row, checkable against a revision. Worth stating in the thesis:
+  it is the difference between a corpus assembled with a record and one
+  assembled without, and today produced a live example of the cost of the latter.
+
+### What is NOT verified
+
+**The network path has never run.** The sandbox blocks bn.wikipedia, so
+`discover()` and `harvest()` are untested against the real API — the first real
+run is their first test. Tested offline against fixtures: section splitting,
+heading matching across all nine spellings, sentence counting, boundary
+truncation, and every quality-gate rejection reason.
+
+Expected first-run failure modes: category names not matching bn.wikipedia's
+exact strings, and `formatversion=2` response shapes differing from what the
+parser assumes.
+
+### Consequences for downstream steps
+
+- The 26-working-day manual track is gone; the plot corpus stops being the
+  critical path (STATUS parallel track downgraded 🔴 → 🟡).
+- **A human read of the sampled 130 is still required.** The gate counts
+  characters; it cannot tell a plot summary from a production-history paragraph
+  that sat under a matching heading. Rejects are deleted from the harvest and the
+  sample **redrawn**, never patched by hand — patching is hand-selection wearing
+  a different hat.
+- `plots_check.py` is kept: it validates the sampled output and owns
+  `--assign-split`.
+
+### Citations needed
+
+- Wikipedia as a plot-summary source has precedent in the summarisation
+  literature (e.g. the MPST-adjacent work already in the English arm). Worth a
+  citation in Ch.3 when the data section is written — **Sabbir to confirm which**,
+  since it should be a paper he has actually read.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
