@@ -210,6 +210,73 @@ def harvest(api: Api, cfg, titles: dict[str, str]) -> tuple[pd.DataFrame, dict]:
     return pd.DataFrame(rows), rejects
 
 
+def probe(api: Api, cfg, title: str) -> int:
+    """Fetch ONE article and show exactly what came back.
+
+    This code has never touched the real API -- it was written in an environment
+    that cannot reach bn.wikipedia. Rather than let a full harvest fail slowly
+    and opaquely, `--probe` makes the first contact cheap and legible: two
+    seconds, one article, and every intermediate step printed. If the response
+    shape or the heading list is wrong, it is visible here instead of showing up
+    as an empty CSV twenty minutes later.
+    """
+    print(f"probing: {title}\nAPI: {cfg['api']}\n")
+    try:
+        data = api.get(action="query", prop="extracts|revisions|info",
+                       titles=title, explaintext="1",
+                       rvprop="ids|timestamp", inprop="url")
+    except Exception as e:
+        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
+        print("\nIf this is a 403, the User-Agent may be rejected -- put a real "
+              "contact address in `user_agent`.")
+        return 1
+
+    pages = data.get("query", {}).get("pages")
+    if pages is None:
+        print("UNEXPECTED RESPONSE SHAPE. Raw keys:", list(data))
+        print(json.dumps(data, ensure_ascii=False)[:800])
+        print("\n-> formatversion=2 was expected. Check the `api` URL.")
+        return 1
+
+    page = pages[0]
+    if "missing" in page:
+        print(f"page not found: {title!r} -- try an exact bn.wikipedia title.")
+        return 1
+
+    print(f"title      : {page.get('title')}")
+    print(f"url        : {page.get('fullurl')}")
+    print(f"revision   : {page.get('revisions', [{}])[0].get('revid')}")
+    extract = page.get("extract", "") or ""
+    print(f"extract    : {len(extract)} chars")
+    if not extract:
+        print("\nEMPTY EXTRACT -- prop=extracts may be unavailable. "
+              "Fall back to action=parse.")
+        return 1
+
+    sections = split_sections(extract)
+    print(f"\nsections   : {len(sections)}")
+    for h in sections:
+        mark = "  <-- MATCHES plot_headings" if h.replace(" ", "") in {
+            x.replace(" ", "") for x in cfg["plot_headings"]} else ""
+        print(f"  - {h}{mark}")
+
+    head, body = pick_plot(sections, cfg["plot_headings"])
+    if not head:
+        print("\nNO PLOT SECTION MATCHED.")
+        print("-> add the right heading above to `plot_headings` in the config.")
+        return 1
+
+    body = truncate(re.sub(r"\n+", " ", body), int(cfg["quality"]["max_sentences"]))
+    reason = quality_reason(body, cfg["quality"])
+    print(f"\nplot heading : {head!r}")
+    print(f"sentences    : {n_sentences(body)} · chars: {len(body)}")
+    print(f"quality      : {reason or 'PASS'}")
+    print(f"\n--- extracted text ---\n{body[:600]}")
+    print("\nProbe OK. Run the full harvest." if not reason else
+          "\nExtraction works but this article fails the gate -- try another.")
+    return 0 if not reason else 1
+
+
 def do_sample(cfg, root: Path, n: int) -> int:
     """Draw the final N from the harvest, blind, with the global seed."""
     hp = root / cfg["outputs"]["harvest_csv"]
@@ -246,6 +313,8 @@ def main() -> int:
     ap.add_argument("--config", default="configs/plots_scrape.yaml")
     ap.add_argument("--sample", type=int, default=0,
                     help="draw this many from an existing harvest and stop")
+    ap.add_argument("--probe", metavar="TITLE", default="",
+                    help="fetch ONE article and print every step. Run this first.")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[2]
@@ -255,6 +324,8 @@ def main() -> int:
         return do_sample(cfg, root, args.sample)
 
     api = Api(cfg)
+    if args.probe:
+        return probe(api, cfg, args.probe)
     print("discovering film articles...")
     titles = discover(api, cfg)
     print(f"{len(titles)} candidate articles\n\nfetching plot sections...")

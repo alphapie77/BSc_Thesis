@@ -3,12 +3,22 @@
 **Target:** 130 (30 dev + 100 eval, disjoint) · **File:** `plots_bn.csv`
 
 ```bash
-python -m src.preprocess.plots_scrape --config configs/plots_scrape.yaml  # harvest
-python -m src.preprocess.plots_scrape --sample 130                        # draw 130
-python -m src.preprocess.plots_check                                      # validate
-# ... read them, fix or re-draw ...
-python -m src.preprocess.plots_check --assign-split                       # once
+python -m src.preprocess.plots_scrape --probe "মনপুরা"   # <-- START HERE, 2 seconds
+python -m src.preprocess.plots_scrape                     # harvest
+python -m src.preprocess.plots_scrape --sample 130        # draw 130, seed 42
+python -m src.preprocess.plots_check                      # validate
+# ... read them; delete non-plots from the harvest and re-sample ...
+python -m src.preprocess.plots_check --assign-split       # once, at 130
 ```
+
+> **Run `--probe` first.** This scraper was written in an environment that
+> cannot reach bn.wikipedia, so its network path has never executed. `--probe`
+> fetches **one** article and prints every step — response shape, section
+> headings found, which one matched, the extracted text, the quality verdict. If
+> something is wrong you see it in two seconds instead of as an empty CSV twenty
+> minutes later. Its diagnostics are tested against five failure modes: healthy
+> response, no matching heading, missing page, unexpected response shape, and a
+> dead connection.
 
 ## Why scraped rather than hand-written
 
