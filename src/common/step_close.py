@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from src.common.provenance import git_hash  # noqa: E402
+from src.common.provenance import git_hash, write_text_lf  # noqa: E402
 
 NOTEBOOK = ROOT / "docs" / "lab_notebook.md"
 RELATED = ROOT / "docs" / "related_work.md"
@@ -106,7 +106,7 @@ def scaffold(args) -> None:
         text = head.rstrip() + "\n\n---\n" + entry + "\n---\n\n" + OPEN_MARKER + tail
     else:
         text = text.rstrip() + "\n\n---\n" + entry
-    NOTEBOOK.write_text(text, encoding="utf-8")
+    write_text_lf(NOTEBOOK, text)
     print(f"Scaffolded {args.step} entry in docs/lab_notebook.md.")
     print("Now FILL THE TODOs BY HAND. `--check` will fail until you do.")
 

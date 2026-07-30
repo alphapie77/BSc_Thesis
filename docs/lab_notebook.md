@@ -218,6 +218,143 @@ rather than rationalization — the commit timestamp is the evidence.
 
 ---
 
+## 2026-07-30 — Infrastructure: LF normalization, S2 numeric tests, Kaggle runner
+
+**Feeds:** Ch.3 (Reproducibility), Appendix (environment) · **Artifacts:**
+`.gitattributes`, `tests/test_s2_numeric.py`, `notebooks/s2_pilot_kaggle.ipynb`
+· **No result numbers changed by this entry.**
+
+### What prompted it
+
+`git status` showed `results/env_snapshot.json`, `results/s0_data_xray.md` and
+`results/s1_cleaning_log.json` as modified, uncommitted, since 2026-07-28.
+Before running S2 on top of them they had to be explained, because a new result
+resting on unexplained modifications to earlier results is not defensible.
+
+### Finding — the diff was pure line-ending churn, not a content change
+
+`git diff --ignore-cr-at-eol -- results/` is **empty**. All three files were
+byte-identical to `HEAD` apart from CRLF-vs-LF: 24, 121 and 134 converted lines
+respectively. **No number, no table, no verdict changed.** Verified by comparing
+the md5 of each worktree file against `git show HEAD:<file>` after converting
+back to LF — all three match exactly. Nothing in the STATUS "Verified facts"
+table is affected.
+
+**Cause.** Python's text mode writes `os.linesep`, so `Path.write_text()` emits
+CRLF on Windows and LF on Linux — the same script on the same data produces
+different bytes on the two hosts this pipeline runs on by design (Windows
+locally, Kaggle remotely). `core.autocrlf` is **unset** in this checkout, so git
+records those CR bytes as real changes.
+
+**A stale claim was found and corrected.** The previous `.gitattributes` header
+asserted "This checkout has `core.autocrlf=true`". It is not, and there is no
+evidence it ever was; `git config core.autocrlf` returns empty. The comment was
+an assumption written as a fact, which is precisely how the phantom diff went
+unexplained for two days.
+
+### Why this was worth fixing rather than committing
+
+A 279-line diff with zero content change is not cosmetic — it is camouflage. The
+next real change to `s0_data_xray.md` would arrive inside a wall of identical
+noise, and the reviewer-facing claim that a result is reproducible across hosts
+is false if the same inputs yield different bytes. Byte-identical output across
+Windows and Kaggle is part of the reproducibility contract.
+
+### Decisions made (and why)
+
+- **Two-layer fix, not one.** Source layer: `provenance.write_text_lf()` and
+  `provenance.NEWLINE`, used by every writer of a text artifact
+  (`s0_xray`, `s1_clean`, `s2_pilot`, `step_close`, `env_snapshot`); pandas
+  `to_csv` calls now pass `lineterminator="\n"`. Git layer: `.gitattributes`
+  pins `eol=lf` for all text types. The writer keeps new files correct; the
+  attributes catch anything written by hand or by a tool that bypasses it.
+  Either alone would leave a hole.
+- **`*.xlsx binary` added explicitly.** Git's auto-detection would almost
+  certainly have handled it, but the raw `.xlsx` is pinned by SHA-256 and every
+  `review_id` derives from its row order. A line-ending conversion applied to it
+  would break the hash and invalidate all IDs with no error raised anywhere. Not
+  worth leaving to heuristics (inviolable rule 1).
+- **The three files were renormalized to LF rather than committed as CRLF.**
+  They are now byte-identical to `HEAD`, so `results/` carries no diff at all
+  and this commit touches no result file. That is the honest outcome: nothing
+  about the S0/S1 numbers was re-derived today, so nothing in `results/` should
+  appear to have changed.
+- **`requirements.lock.txt` renormalized to LF — this is not a hand-edit.**
+  CLAUDE.md forbids hand-editing the lock file, so the distinction matters: all
+  **166 pins are byte-identical** (verified by comparing the sorted pin sets
+  before and after, and by `diff` against `HEAD` with CRs stripped). Only the
+  166 line terminators changed. It had to be done in this commit rather than
+  left: the new `*.txt text eol=lf` rule would otherwise make the file appear
+  modified on the next `git add` by anyone, for no visible reason — exactly the
+  confusion this whole entry is about.
+- **A trailing newline is now written for result JSONs.** `env_snapshot.json`
+  previously ended without one, which shows as "\\ No newline at end of file" in
+  every diff and makes appending a line look like editing the last one. Applies
+  to files written from now on; the existing file was left byte-identical to
+  `HEAD` on purpose.
+- **`env_snapshot.py` gained `--out`, and refuses to target the lock file.**
+  Run with no arguments it overwrites `requirements.lock.txt` — which, executed
+  on Kaggle, would silently replace the record of the local environment with a
+  Linux freeze and leave every earlier result pointing at a machine it never ran
+  on. `--out` writes a snapshot *alongside* the lock instead. The old
+  `notebooks/README.md` would have led straight into this trap.
+- **Kaggle environment policy — host-native, recorded (Sabbir's decision,
+  2026-07-30).** S2 will run against Kaggle's preinstalled torch/CUDA with only
+  `sentence-transformers` and `pyyaml` installed on top, rather than applying
+  `requirements.lock.txt` (Windows-frozen, would drag in a full torch build and
+  conflict with Kaggle's CUDA image). **Consequence to report:** S2's numbers are
+  attributable to `results/env_snapshot_s2_kaggle.json`, *not* to
+  `requirements.lock.txt`. The thesis must describe two environments and state
+  which produced which result. This is a disclosure obligation, not a caveat to
+  bury.
+
+### Findings (things we did not expect)
+
+- **The S2 numeric core had no tests at all.** `test_s2_verdict.py` pinned the
+  *interpretation* of ARI but nothing checked the *computation* underneath it —
+  the blocked matmul in `all_near_dup_pairs` and the greedy pass in
+  `greedy_keep_first`, which together decide which rows exist for the rest of the
+  thesis. A pair missed at a 512-row block boundary would survive into the frozen
+  split, and the split is never regenerated (rule 3), so the error would be
+  **permanent and invisible**. Added `tests/test_s2_numeric.py`: 15 differential
+  tests against brute-force O(n²) references, `n = 1100` chosen to straddle the
+  block size with a short final block. **All 15 pass, all 8 existing verdict
+  tests still pass.** The dedup logic is correct as written — including the
+  transitive-chain guard (a~b, b~c, a≁c leaves the far end alive) and the
+  strongest-anchor tie-break.
+- **Float32 cosine can exceed 1.0.** Two L2-normalized identical vectors dot to
+  `1.0000001192092896`, not `1.0`. Harmless at the swept thresholds (0.90–0.98)
+  and no removal decision depends on it, but the `maximum` row of the report's
+  cosine-distribution table will print a value slightly above one and a reviewer
+  may ask. Noted here so the answer exists before the question.
+- **`notebooks/README.md` pointed at a script that does not exist**
+  (`src/cluster/pilot_trapcheck.py`; the real file is `src/cluster/s2_pilot.py`).
+  Following it would have failed on Kaggle after the clone. Corrected.
+- **`bn_clean.csv` re-verified end-to-end today** through `load_clean`: 4,730
+  rows, class balance 1,513 / 1,599 / 1,618, word count median 8 / max 84 /
+  min 3, zero nulls, `review_id` running `bn_0000`…`bn_4999`. Every figure
+  matches the STATUS "Verified facts" table. No drift.
+
+### Consequences for downstream steps
+
+- S2 can now be launched without a broken-runner or clobbered-lock failure mode.
+  The runner runs both test suites *before* the experiment and pre-flights
+  `load_clean` *before* LaBSE downloads weights, so a mismatch costs seconds
+  rather than a session.
+- The appendix must carry **two** environment records and say which result came
+  from which host. Do not present `requirements.lock.txt` as the environment for
+  S2.
+- No deviation logged in `protocol.md`: nothing here changes a method, a
+  threshold, or a pre-registered band. The pre-registration is untouched, and the
+  S2 pilot has still never been run.
+
+### Citations needed
+
+- None. No new method was introduced — this entry is tooling and test
+  infrastructure only.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Due |

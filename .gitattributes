@@ -1,8 +1,48 @@
-# Shell scripts must keep LF endings regardless of platform.
+# Line endings: LF everywhere, no exceptions.
 #
-# This checkout has core.autocrlf=true. Without these rules a fresh clone gets
-# CRLF endings, and a `#!/bin/sh` script with CRLF fails on Linux/macOS with a
-# misleading "bad interpreter" error -- for a git hook that means it silently
-# does not run.
+# This pipeline runs on two hosts by design -- Windows locally, Linux on Kaggle
+# -- and Python's text mode writes os.linesep, so the same script on the same
+# data emits LF on one and CRLF on the other. `core.autocrlf` is UNSET in this
+# checkout (verified 2026-07-30; an earlier version of this file claimed
+# core.autocrlf=true, which was never true), so git records those CR bytes as
+# real changes. That is how three result files came to show a 279-line diff with
+# zero changed content -- and a diff that large is exactly where a genuinely
+# changed number goes unnoticed.
+#
+# Pinning eol=lf here is the git-layer backstop. The source-layer fix is
+# `provenance.write_text_lf()`, which every writer of a text artifact uses.
+# Both exist on purpose: the writer keeps new files correct, these rules catch
+# anything written by hand or by a tool that bypasses it.
+#
+# Shell scripts additionally MUST be LF: a `#!/bin/sh` script with CRLF fails on
+# Linux/macOS with a misleading "bad interpreter" error, and for a git hook that
+# means it silently does not run -- i.e. the Definition-of-Done check disappears
+# without announcing itself.
+
+# Default for anything git detects as text.
+* text=auto eol=lf
+
+# Result and documentation artifacts: these are the ones a reviewer diffs.
+*.md text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.py text eol=lf
+*.txt text eol=lf
+*.bib text eol=lf
 .githooks/** text eol=lf
 *.sh text eol=lf
+
+# Binary -- never touch these bytes. The raw .xlsx is pinned by SHA-256 in
+# docs/dataset_card.md; any line-ending conversion would break that hash and,
+# with it, every review_id derived from the file's row order (inviolable rule 1:
+# data/raw/ is read-only).
+*.xlsx binary
+*.xls binary
+*.pdf binary
+*.npy binary
+*.png binary
+*.jpg binary
+*.pt binary
+*.bin binary

@@ -39,7 +39,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.common.provenance import stamp  # noqa: E402
+from src.common.provenance import NEWLINE, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
 
@@ -640,17 +640,15 @@ def main() -> int:
                 "removed_at_primary", "text_kept_side", "text_other_side",
             ]
         )
-    log.to_csv(out_pairs, index=False, encoding="utf-8")
+    log.to_csv(out_pairs, index=False, encoding="utf-8", lineterminator=NEWLINE)
 
-    out_md = repo_root / cfg["outputs"]["report_md"]
-    out_md.parent.mkdir(parents=True, exist_ok=True)
-    out_md.write_text(
+    out_md = write_text_lf(
+        repo_root / cfg["outputs"]["report_md"],
         build_report(
             cfg, cfg_path.as_posix(), stamp(cfg_path.as_posix()), len(df),
             sweep, primary, cfg["outputs"]["near_dup_pairs_csv"],
             dist, baseline,
         ),
-        encoding="utf-8",
     )
 
     print(f"wrote {out_pairs} ({len(log)} pairs)")

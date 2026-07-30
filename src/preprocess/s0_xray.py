@@ -18,7 +18,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.common.provenance import stamp  # noqa: E402
+from src.common.provenance import stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
 # --- Measurement definitions (stated in the report so they are auditable) ----
@@ -414,14 +414,12 @@ def main() -> int:
     ]
     prov = stamp(str(cfg_path))
 
-    out = repo_root / cfg["output_report"]
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(
+    out = write_text_lf(
+        repo_root / cfg["output_report"],
         build_report(
             cfg, cfg_path.as_posix(), input_path.relative_to(repo_root).as_posix(),
             obs, ctx, prov, decs,
         ),
-        encoding="utf-8",
     )
     print(f"wrote {out}")
     return 0

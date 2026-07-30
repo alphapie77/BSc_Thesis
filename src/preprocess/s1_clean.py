@@ -34,7 +34,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.common.provenance import write_result  # noqa: E402
+from src.common.provenance import NEWLINE, write_result  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 from src.preprocess.s0_xray import resolve_input, word_count  # noqa: E402
 
@@ -216,7 +216,10 @@ def main() -> int:
 
     out_csv = repo_root / cfg["outputs"]["cleaned_csv"]
     out_csv.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(out_csv, index=False, encoding="utf-8")
+    # lineterminator: LF on every host, so the file uploaded to Kaggle is
+    # byte-identical to the one written on Windows. Row content and review_ids
+    # are unaffected -- only the line ending changes. See provenance.NEWLINE.
+    df.to_csv(out_csv, index=False, encoding="utf-8", lineterminator=NEWLINE)
 
     write_result(
         {
