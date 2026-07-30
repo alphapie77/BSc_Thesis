@@ -53,6 +53,28 @@ COLUMNS = ["plot_id", "language", "title_bn", "title_en", "synopsis",
            "n_sentences", "source_url", "source_type", "collected_date", "split"]
 
 
+def ssl_context() -> "ssl.SSLContext":
+    """TLS context that trusts certifi's CA bundle rather than the OS store.
+
+    On Windows, `urllib` verifies against the system certificate store, which on
+    an under-updated machine still carries expired roots -- producing
+    `CERTIFICATE_VERIFY_FAILED: certificate has expired` against a server whose
+    certificate is perfectly valid. `certifi` ships a current bundle and is
+    already a dependency (via `requests`), so pointing at it fixes the cause.
+
+    Verification stays ON. Turning it off would "work" and is not an option:
+    this fetches text that becomes evaluation data, and an unverified connection
+    means the provenance recorded per row -- the whole point of storing revision
+    ids -- guarantees nothing.
+    """
+    import ssl
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
 class Api:
     def __init__(self, cfg):
         self.url = cfg["api"]
@@ -60,6 +82,7 @@ class Api:
         self.delay = float(cfg["request_delay_seconds"])
         self._last = 0.0
         self.calls = 0
+        self.ssl = ssl_context()
 
     def get(self, **params) -> dict:
         params.setdefault("format", "json")
@@ -70,7 +93,7 @@ class Api:
         q = urllib.parse.urlencode(params)
         req = urllib.request.Request(f"{self.url}?{q}",
                                      headers={"User-Agent": self.ua})
-        with urllib.request.urlopen(req, timeout=30) as r:
+        with urllib.request.urlopen(req, timeout=30, context=self.ssl) as r:
             data = json.loads(r.read().decode("utf-8"))
         self._last = time.time()
         self.calls += 1
@@ -230,9 +253,25 @@ def probe(api: Api, cfg, title: str) -> int:
                        titles=title, explaintext="1",
                        rvprop="ids|timestamp", inprop="url")
     except Exception as e:
-        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
-        print("\nIf this is a 403, the User-Agent may be rejected -- put a real "
-              "contact address in `user_agent`.")
+        msg = str(e)
+        print(f"REQUEST FAILED: {type(e).__name__}: {msg}")
+        if "CERTIFICATE_VERIFY_FAILED" in msg or "SSL" in msg:
+            try:
+                import certifi
+                print(f"\nUsing certifi bundle: {certifi.where()}")
+                print("Still failing with a current bundle. Try:")
+                print("    pip install --upgrade certifi")
+                print("If your machine is behind a corporate proxy that "
+                      "re-signs TLS, its root must be added to that bundle.")
+            except ImportError:
+                print("\ncertifi is NOT installed -- that is the cause. Run:")
+                print("    pip install certifi")
+            print("\nDo NOT disable verification: this text becomes evaluation "
+                  "data, and unverified transport makes the per-row provenance "
+                  "meaningless.")
+        elif "403" in msg:
+            print("\n403 -- the User-Agent may be rejected. Put a real contact "
+                  "address in `user_agent` in the config.")
         return 1
 
     pages = data.get("query", {}).get("pages")
