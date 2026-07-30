@@ -1,8 +1,38 @@
-# Provenance query — where did the class-2 (neutral) rows come from?
+# Provenance query — where did rows 2000–5000 come from?
 
 **Raised:** 2026-07-30 · **Status:** 🔴 **OPEN — blocks the RQ1 claim**
-**Evidence:** `results/s2b_register_probe.md` (exploratory)
+**Evidence:** `results/s2c_region_split.md` (exploratory)
 **Addressee:** the person who collected the dataset
+
+---
+
+> ## ⚠️ Round 1 asked the wrong question — read this first
+>
+> This document originally asked about the **class-2 (neutral)** rows. The
+> collector answered on 2026-07-30 that they were **collected the same way as
+> the others**.
+>
+> That answer prompted a look at the raw `.xlsx` itself, and the question turns
+> out to have been mis-aimed. The pattern does not follow the *label*, it
+> follows **position in the file**:
+>
+> | rows | label | দাঁড়ি | first-person | word types / 1k |
+> |---|---|---|---|---|
+> | 499–896 | **0** | 32.4% | 9.0% | 399 |
+> | 3665–4330 | **0** | **99.8%** | **0.0%** | **240** |
+>
+> **Both blocks are negative reviews.** They do not look like the same kind of
+> writing. So the neutral class was never the issue — it just happens to sit
+> entirely inside the second half of the file.
+>
+> Aggregated: **rows 0–1998** (1,999 rows: 38.7% দাঁড়ি, 13.5% first-person, 255
+> types/1k) versus **rows 1999–4999** (3,001 rows: **99.2%, 0.8%, 128**). The
+> change is a step over about 50 rows, not a gradual drift. That is **60% of the
+> corpus**.
+>
+> The revised question is in §"The questions (round 2)" below. The original
+> round-1 material is kept underneath it, unedited, because a superseded
+> question that disappears is one nobody can audit.
 
 ---
 
@@ -60,7 +90,41 @@ can be defended.**
 
 ---
 
-## The questions
+## The questions (round 2) — ask these
+
+Position in the file is what matters, so the questions are about **blocks of
+rows**, not about labels.
+
+1. **Was the dataset built in one sitting, or assembled from more than one
+   batch?** The label column runs in ten long blocks (499 rows of one label,
+   then 398 of another, and so on), which is what pasting batches together
+   looks like.
+
+2. **Do you remember adding a second batch of roughly 3,000 rows**, after an
+   initial batch of roughly 2,000? The writing changes character sharply at
+   about row 2,000.
+
+3. **For that second batch — was any of it written or generated rather than
+   copied from comments?** Not just the neutral ones: the negative and positive
+   rows in that region look the same way. A tool, a template, a paraphraser, or
+   writing them by hand would all produce this.
+
+4. **Or did the second batch come from a different kind of source** — a review
+   blog, a news site, an existing dataset, a friend's file?
+
+5. **Did you build this dataset yourself, or receive it (in whole or in part)
+   from someone else** before publishing to Mendeley? If part of it came from
+   elsewhere, that alone explains everything above and is entirely normal.
+
+6. **Is any file, sheet, chat, or download folder left from that period?** Even
+   a partial record beats none.
+
+Everything in round 1 below still applies, in particular that **no answer here
+is a problem** — only an unrecorded one is.
+
+---
+
+## The questions (round 1 — superseded, kept for the record)
 
 Please answer as precisely as memory allows, and say plainly where you are
 unsure — "I don't remember" is a usable answer and a guess is not.

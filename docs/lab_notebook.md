@@ -502,7 +502,95 @@ than expected — **scikit-learn 1.6.1 computed the KMeans and the ARI**, not
 
 ---
 
-## Open decisions (resolve before they are needed)
+## 2026-07-30 (later) — I asked the wrong question. It is not the class, it is the file.
+
+**Feeds:** Ch.4 §Data quality, Ch.5 §Threats · **Artifact:**
+`results/s2c_region_split.md` · **Supersedes:** the framing of
+`results/s2b_register_probe.md`
+
+### What happened
+
+The collector was asked where the class-2 rows came from and answered that they
+were **collected the same way as the others**. Rather than treat that as
+settling it or as contradicting it, the raw `.xlsx` was examined directly —
+`review_id` derives from its row order, so the file's assembly is recoverable.
+
+The label sequence has only **10 runs across 5,000 rows**: the file was pasted
+together in blocks. Then, per block, the register features:
+
+| rows | label | দাঁড়ি | first-person | exclaim | types/1k |
+|---|---|---|---|---|---|
+| 0–498 | 1 | 36.3% | 20.2% | 1.2% | 298 |
+| 499–896 | 0 | 32.4% | 9.0% | 3.0% | 399 |
+| 999–1498 | 1 | 54.4% | 14.6% | 6.0% | 359 |
+| 1499–1998 | 0 | 32.0% | 9.6% | 2.8% | 443 |
+| **1999–2999** | **2** | **100.0%** | **0.0%** | **0.0%** | **184** |
+| **3000–3664** | **1** | **96.5%** | **3.5%** | **1.2%** | **240** |
+| **3665–4330** | **0** | **99.8%** | **0.0%** | **0.0%** | **240** |
+| **4331–4999** | **2** | **100.0%** | **0.0%** | **0.0%** | **144** |
+
+**The split is by position in the file, not by label.** Rows 3665–4330 are
+labelled **0** and look nothing like rows 499–896, which are also labelled 0.
+
+Aggregated: rows 0–1998 (n = 1,999) at 38.7% দাঁড়ি / 13.5% first-person / 255
+types per 1k; rows 1999–4999 (n = 3,001) at **99.2% / 0.8% / 128**. The rolling
+দাঁড়ি rate steps from ~30% to 100% over roughly 50 rows around row 2000 — a step,
+not a drift.
+
+Reading samples confirms it independently. Region A, label 0: *"কি বাজে মুভি!
+কিভাবে বানায় এগুলা!"* Region B, label 0: *"সিনেমার গল্প একঘেয়ে।"* Region A,
+label 1 carries a typo (*থিবীর* for *পৃথিবীর*) and names actors; region B, label
+1 is multi-sentence, generic, and names nobody.
+
+### Findings
+
+- **`s2b`'s measurements were right and its interpretation was wrong.** Class 2
+  is not a different kind of text *because it is neutral*; it is a different kind
+  of text because **all 1,670 neutral rows sit inside region B**, and region B is
+  a different corpus. The neutral class is perfectly nested in the second file.
+  Corrected in STATUS as fact (split), with (reg) struck through rather than
+  deleted — a superseded claim that vanishes is a claim nobody can audit.
+- **This is 60% of the corpus**, not 34%. Region B holds 3,001 of 5,000 raw rows
+  and 2,820 of 4,730 cleaned rows, across **all three labels**.
+- **The cluster correspondence is suggestive but not established.** S2's cluster
+  0 holds 1,814 items (823/979/12); cleaned region A holds 1,910 (948/962/0).
+  Close — but `ARI(cluster, region)` cannot be computed, because `s2_pilot.py`
+  never persisted the assignments. That is the decisive number and it is
+  outstanding.
+- **The collector's recollection is inconsistent with the file's own layout.**
+  That is a finding about the record, not about the person: fact (a) already
+  established there is no written collection log, the recollection is old, and a
+  second source merged at assembly time is an easy thing to forget. `protocol.md`
+  pre-committed that a computed test supersedes the recall-based table where they
+  disagree — that pre-commitment is now doing exactly the work it was written for.
+
+### Decisions made (and why)
+
+- **The question to the collector is being re-asked**, against the region rather
+  than the class. "Where did the neutral reviews come from?" was answerable with
+  "same way" in good faith; "rows 2000 onward look like a different corpus,
+  including the negative ones — where did that block come from?" is a question
+  the answer can actually engage with.
+- **Nothing is deleted or re-run to make this go away.** The S2 result stands as
+  computed; it is now reported *with* the confound rather than instead of it.
+- **`s2b` is kept, not withdrawn.** Its numbers are correct and its framing error
+  is instructive — it is exactly the mistake of reading a file-layout artifact as
+  a semantic property.
+
+### Consequences for downstream steps
+
+- Every result over the full corpus is confounded, **including the S2 trap-check
+  itself**. The ARI of 0.1793 was computed across two corpora.
+- Region A survives as **1,910 cleaned rows, organic register, two classes**
+  (948 negative / 962 positive). Smaller and binary, but real — a viable corpus
+  if the thesis narrows to it.
+- The three-persona design assumed three classes. Region A has two.
+- Gold-300 stratification must not be drawn until decision 0b is settled.
+
+### Citations needed
+
+- None yet. If the thesis reports the split as a dataset-integrity finding, the
+  framing decision (open decision 5) covers it.
 
 | # | Decision | Blocks | Due |
 |---|---|---|---|

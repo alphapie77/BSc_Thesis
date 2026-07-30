@@ -1,0 +1,38 @@
+# REGION SPLIT -- the corpus is two corpora, and the seam is at a row number.
+#
+# ⚠️ EXPLORATORY, and it SUPERSEDES the framing in s2b_register_probe.
+#
+# s2b asked "is class 2 a different kind of text?" and answered yes. That was
+# true but mis-framed: class 2 exists ONLY in the second half of the raw file,
+# so what looked like a property of the neutral class is a property of a REGION
+# of the file. Rows 3665-4330 are labelled 0 (negative) and carry the same
+# signature -- 99.8% danda, 0% first-person -- while rows 499-896, also labelled
+# 0, sit at 32% and 9%. Same label, different corpus.
+#
+# So the grouping variable is `raw_row`, not `Sentiment`. `review_id` derives
+# from the raw row order of the source .xlsx (dataset_card.md), which is what
+# makes this recoverable at all.
+#
+# The boundary below was located by the rolling-window changepoint in the danda
+# rate, then rounded to the run boundary in the label sequence. It is declared
+# here rather than re-detected per run so the number is auditable.
+name: s2c_region_split
+seed: 42
+
+input_xlsx: "data/raw/Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing.xlsx"
+input_clean_csv: data/cleaned/bn_clean.csv
+text_col: "Movie Review"
+label_col: "Sentiment"
+id_col: "review_id"
+
+# Rule 1: data/raw is read-only. This step opens the .xlsx and writes nothing to it.
+boundary_row: 1999          # first row of region B, 0-indexed
+region_a_name: "A_organic"
+region_b_name: "B_uniform"
+
+# Rolling window for the changepoint figure. 100 rows is ~2% of the file:
+# wide enough to smooth label runs, narrow enough to localise a sharp seam.
+rolling_window: 100
+
+outputs:
+  report_md: results/s2c_region_split.md
