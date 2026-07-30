@@ -83,23 +83,45 @@ class Api:
         self._last = 0.0
         self.calls = 0
         self.ssl = ssl_context()
+        self.timeout = float(cfg.get("timeout_seconds", 60))
+        self.retries = int(cfg.get("retries", 4))
 
     def get(self, **params) -> dict:
+        """One API call, retried with backoff.
+
+        A run touches >1,200 articles over several minutes; a transient timeout
+        somewhere in the middle is not an exceptional event, it is the expected
+        case. Without retries the first blip discards everything fetched so far.
+        """
         params.setdefault("format", "json")
         params.setdefault("formatversion", "2")
-        wait = self.delay - (time.time() - self._last)
-        if wait > 0:
-            time.sleep(wait)
         q = urllib.parse.urlencode(params)
         req = urllib.request.Request(f"{self.url}?{q}",
                                      headers={"User-Agent": self.ua})
-        with urllib.request.urlopen(req, timeout=30, context=self.ssl) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        self._last = time.time()
-        self.calls += 1
-        if "error" in data:
-            raise RuntimeError(f"API error: {data['error']}")
-        return data
+
+        last_err = None
+        for attempt in range(self.retries):
+            wait = self.delay - (time.time() - self._last)
+            if wait > 0:
+                time.sleep(wait)
+            try:
+                with urllib.request.urlopen(
+                        req, timeout=self.timeout, context=self.ssl) as r:
+                    data = json.loads(r.read().decode("utf-8"))
+                self._last = time.time()
+                self.calls += 1
+                if "error" in data:
+                    raise RuntimeError(f"API error: {data['error']}")
+                return data
+            except Exception as e:
+                self._last = time.time()
+                last_err = e
+                if attempt < self.retries - 1:
+                    back = 2 ** (attempt + 1)
+                    print(f"\n  {type(e).__name__}: retrying in {back}s "
+                          f"({attempt + 2}/{self.retries})", flush=True)
+                    time.sleep(back)
+        raise last_err
 
 
 def discover(api: Api, cfg) -> dict[str, str]:
@@ -191,19 +213,62 @@ def quality_reason(text: str, q) -> str:
     return ""
 
 
-def harvest(api: Api, cfg, titles: dict[str, str]) -> tuple[pd.DataFrame, dict]:
-    rows, rejects = [], {}
-    names = list(titles)
-    batch = int(cfg["batch_size"])
-    q = cfg["quality"]
+def harvest(api: Api, cfg, titles: dict[str, str], root: Path
+            ) -> tuple[pd.DataFrame, dict]:
+    """Fetch plot sections, checkpointing so a crash never costs the whole run.
 
-    for i in range(0, len(names), batch):
+    The first attempt at this lost 1,225 articles' worth of work to one read
+    timeout. State is now written every `checkpoint_every` batches, and a re-run
+    skips titles already processed -- including ones that were rejected, so a
+    resumed run does not re-fetch every stub it has already seen.
+    """
+    state_path = root / cfg["outputs"]["state_json"]
+    out_path = root / cfg["outputs"]["harvest_csv"]
+
+    rows, rejects, processed = [], {}, set()
+    if state_path.exists():
+        st = json.loads(state_path.read_text(encoding="utf-8"))
+        processed = set(st.get("processed", []))
+        rejects = st.get("rejects", {})
+        if out_path.exists():
+            rows = pd.read_csv(out_path).to_dict("records")
+        print(f"resuming: {len(processed)} titles already processed, "
+              f"{len(rows)} usable so far")
+
+    def save():
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        write_text_lf(state_path, json.dumps(
+            {"processed": sorted(processed), "rejects": rejects},
+            ensure_ascii=False, indent=1) + "\n")
+        if rows:
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            pd.DataFrame(rows).to_csv(out_path, index=False, encoding="utf-8",
+                                      lineterminator=NEWLINE)
+
+    names = [t for t in titles if t not in processed]
+    batch = int(cfg["batch_size"])
+    every = int(cfg.get("checkpoint_every", 5))
+    q = cfg["quality"]
+    print(f"{len(names)} to fetch, {batch} per request")
+
+    for bi, i in enumerate(range(0, len(names), batch)):
         chunk = names[i:i + batch]
-        data = api.get(
-            action="query", prop="extracts|revisions|info",
-            titles="|".join(chunk), explaintext="1",
-            rvprop="ids|timestamp", inprop="url",
-        )
+        try:
+            data = api.get(
+                action="query", prop="extracts|revisions|info",
+                titles="|".join(chunk), explaintext="1",
+                rvprop="ids|timestamp", inprop="url",
+            )
+        except Exception as e:
+            # One dead batch must not end the run. Record and move on; the
+            # titles stay unprocessed so a later run retries them.
+            k = f"batch failed ({type(e).__name__})"
+            rejects[k] = rejects.get(k, 0) + len(chunk)
+            print(f"\n  skipping batch of {len(chunk)}: {type(e).__name__}")
+            save()
+            continue
+
+        processed.update(chunk)
         for page in data.get("query", {}).get("pages", []):
             title = page.get("title", "")
             if "missing" in page:
@@ -231,8 +296,12 @@ def harvest(api: Api, cfg, titles: dict[str, str]) -> tuple[pd.DataFrame, dict]:
                 "seed_category": titles[title],
                 "licence": LICENCE,
             })
+        if bi % every == 0:
+            save()
         print(f"  fetched {min(i + batch, len(names))}/{len(names)} "
-              f"-> {len(rows)} usable", end="\r")
+              f"-> {len(rows)} usable", end="\r", flush=True)
+
+    save()
     print()
     return pd.DataFrame(rows), rejects
 
@@ -377,7 +446,7 @@ def main() -> int:
     print("discovering film articles...")
     titles = discover(api, cfg)
     print(f"{len(titles)} candidate articles\n\nfetching plot sections...")
-    df, rejects = harvest(api, cfg, titles)
+    df, rejects = harvest(api, cfg, titles, root)
 
     if df.empty:
         sys.exit(

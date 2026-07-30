@@ -28,7 +28,17 @@ api: "https://bn.wikipedia.org/w/api.php"
 # scrapers get rate-limited or blocked, and rightly so.
 user_agent: "BSc-Thesis-PlotHarvest/1.0 (21701082@std.cu.ac.bd) python-urllib"
 request_delay_seconds: 1.0      # be polite; this is someone else's server
-batch_size: 20                  # titles per API call (API caps at 20 for extracts)
+
+# 20 full articles in one response is several megabytes and timed out on the
+# first real run. 8 keeps each response small; the extra requests cost seconds.
+batch_size: 8
+timeout_seconds: 90
+retries: 4                      # backoff 2s, 4s, 8s
+
+# A run touches >1,200 articles over several minutes. The first attempt lost all
+# of it to one read timeout, so state is written this often (in batches) and a
+# re-run skips what it already processed.
+checkpoint_every: 5
 
 # Seed categories. Deliberately broader than "Bangladeshi cinema" alone: a set
 # built only from recent hits would make the evaluation easier than the claim
@@ -67,3 +77,6 @@ outputs:
   # step is auditable and so a re-harvest can be diffed against it.
   harvest_csv: data/plots/plots_bn_harvest.csv
   report_md: results/plots_harvest_report.md
+  # Resume state: which titles have been processed (including rejected ones, so
+  # a resumed run does not re-fetch every stub it has already seen).
+  state_json: data/plots/.harvest_state.json
