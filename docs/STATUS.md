@@ -19,7 +19,7 @@
 | 4 | Frozen R1/R2 split | ⏸ **deferred** — must run after near-dup removal (leakage) | `data/splits/split_map_v1.json` | — |
 | 5 | S2 pilot: near-dup + ARI trap-check | ✅ **run** 2026-07-30 (Kaggle T4, commit `e3d8e43`) — ARI **0.1793**, Band 1, not degenerate | `results/s2_pilot_ari_trapcheck.md` | 2026-07-30 |
 | 5b | S2b register probe (**exploratory**) | ✅ run — class 2 differs structurally from classes 0/1; **RQ1 persona claim suspended** | `results/s2b_register_probe.md` | 2026-07-30 |
-| 5c | Provenance query to the data collector | ⚠️ **asked 2026-07-30 — answer ("collected the same way") is contradicted by the file's own layout**; re-ask against the region split, not the class | `docs/provenance_query.md` | 2026-07-30 |
+| 5c | Provenance query to the data collector | ✅ **CLOSED 2026-07-30 — unresolvable.** Answer: collected from **many different places, all organic; which rows came from where is not remembered, and no metadata was kept.** That is an honest answer, and the pre-committed consequence applies: the measurement stands as the best available evidence, reported as exploratory, with the gap stated in Limitations. **Do not re-ask.** | `docs/provenance_query.md` | 2026-07-30 |
 | 5d | S2c region split (**exploratory**) — the corpus is two corpora | ✅ run — **60% of rows carry a uniform, non-organic signature** | `results/s2c_region_split.md` | 2026-07-30 |
 | 5e | Re-run S2 persisting cluster labels → compute `ARI(cluster, region)` | 🟢 **code ready, pre-registered, never run** — `configs/s2_pilot.yaml` now scores against region and saves assignments | `results/s2_cluster_assignments.csv` | — |
 | 5f | S2-A: trap-check on region A alone (1,910 organic rows) | 🟢 **code ready, interpretation pre-registered (protocol RQ1-A), never run** | `results/s2a_regionA_trapcheck.md` | — |
@@ -53,6 +53,7 @@
 |---|---|---|---|
 | (a) | `Sentiment` labels are **per-item human judgments, but single-coded**: one annotator, no overlapping items. | **No inter-annotator agreement is computable for the base labels**, and single-annotator systematic bias is unmeasurable. Label validity is adequate in kind but unquantified. | recall-based (medium) |
 | (c) | Collection was a **bulk pull** from Bangla movie-related Facebook groups and YouTube channels — **no keyword or query-seeded search**. Stopping was **quota-driven at ~1,665 per class**. Source venue, thread, and timestamp were **not retained**. | (i) The **natural class prior is destroyed — no prevalence claim may be made from this corpus.** (ii) The disproportionate concentration of duplicates and sub-3-word items in class 0 (152 of 270 drops) is **consistent with quota-filling pressure**. | recall-based (medium) — ⚠️ **contradicted for class 2 by fact (reg) below** |
+| (collector-2) | **Collector's account, 2026-07-30, on the region split:** the data was gathered from **many different places**, all of it **organic user comments**; **none of it was written or machine-generated**; and **which rows came from which source is not remembered — no metadata was kept.** | Recorded as stated, in his words. It **does not reconcile with fact (split)**: many mixed sources would interleave registers throughout the file, whereas the observed change is a step at one row. The likeliest reconciliation — **collection in two separate sittings, months apart, with no log** — is consistent with both, but is inference, not testimony, and is labelled as such wherever it appears. | recall-based (low — the same recollection previously stated "same way" for a block the file shows was assembled separately) |
 | (split) | **The corpus is two corpora concatenated at raw row 1999.** Rows 0–1998 (n=1,999): দাঁড়ি **38.7%**, first-person **13.5%**, exclamation 3.4%, comma-runs 3.3%, **255** types/1k tokens, labels **999 / 999 / 0**. Rows 1999–4999 (n=3,001): দাঁড়ি **99.2%**, first-person **0.8%**, exclamation 0.3%, comma-runs **0.0%**, **128** types/1k, labels 666 / 665 / **1,670**. The seam is a step over ~50 rows, not a drift. **60% of the corpus is region B.** | **Supersedes fact (reg) below, which mis-framed this as a class-2 property.** Class 2 is perfectly nested inside region B, which is why it looked that way — but rows 3665–4330 are labelled **0** and carry the same signature. **Every result over the full corpus is confounded.** Region A survives cleaning as 1,910 rows, organic, two classes — a smaller but usable corpus. | **verified** (computed, `results/s2c_region_split.md`) — **EXPLORATORY** framing |
 | (reg) | ~~Superseded by (split).~~ **Class 2 is not the same kind of text as classes 0 and 1.** 100% carry দাঁড়ি (vs 58% / 66%); **0%** contain a first-person pronoun (expected 149), an exclamation mark (expected 38), or a comma run (expected 33); vocabulary is **1,772 types per 12,000 tokens vs 3,577 / 3,303**. S2 separates it almost perfectly — 12 of 1,572 class-2 items in cluster 0; φ = 0.565 for *cluster 0 vs rest* × *class 2 vs rest*, **above** the 3-way sentiment V of 0.410. | **The RQ1 persona claim is suspended.** The clusters may be tracking how the text was produced rather than who the audience is. Three explanations fit (generated to fill quota / different venue / hand-written) and all three break fact (c). Only the collector can choose between them — `docs/provenance_query.md`. | **verified** (computed, `results/s2b_register_probe.md`) — but **EXPLORATORY**: the hypothesis came from looking at the data |
 | (hash) | Source `.xlsx` SHA-256 = `8f972734fc3629427cdf8d01716aa817f7b325410b2fdd0f26cbc2e68506db9f`, 195,186 bytes. | Every `review_id` derives from this file's raw row order. Any future copy can be checked byte-identical before a re-run; a mismatch invalidates all IDs. | **verified** (computed) |
@@ -91,7 +92,7 @@ edited until the final `usable_n` is known (see Open decisions).
 
 | # | Decision | Blocks | Resolved by |
 |---|---|---|---|
-| **0** | **Where did rows 1999–4999 come from?** (Asked as "class 2" on 2026-07-30 and answered "same way" — but the question was wrong: it is a **region**, not a class, and 60% of the corpus is in it.) | **RQ1, Gold-300, split freeze — everything** | **the data collector**, re-asked (`docs/provenance_query.md`) |
+| ~~**0**~~ | ~~Where did rows 1999–4999 come from?~~ **CLOSED 2026-07-30 — unresolvable, and correctly so.** Collector's account: many different sources, all organic user comments, **no memory of which rows came from where and no metadata retained**. Nothing further can be recovered; the file has no venue, thread or timestamp column (fact (c)) and no collection log exists (fact (a)). **The measurement (fact (split)) and the collector's account are both recorded and they are not reconciled** — that is the honest end state, not a failure. Nothing downstream stays blocked on it. | — | closed |
 | ~~**0b**~~ | ~~region A only, full corpus, or the split as the object of study?~~ **CLOSED 2026-07-30 — Sabbir: full corpus.** Conditions are pre-registered in `protocol.md` §"Scope decision": region becomes a **controlled factor**, the split stratifies on `Sentiment × region`, every headline metric is reported full / A / B, and no claim survives that does not survive within-region. Region A is retained as a robustness check, not the main line. | — | closed |
 | 1 | Final `usable_n` after near-dup removal | Step 4 | blocked by 0 |
 | 2 | Near-dup threshold: 0.90 gives Band 2, 0.95 and 0.98 give Band 1. Held at the pre-registered **0.95**; audit sheet generated and parked, since 52% of the contested band is class 2 | Step 4 | blocked by 0 |
@@ -106,19 +107,20 @@ edited until the final `usable_n` is known (see Open decisions).
 
 ## Immediate next actions
 
-0. 🔬 **Re-run both S2 configs on Kaggle** (same notebook, now runs two). This
-   produces the decisive `ARI(cluster, region)` and the region-A trap-check.
-   Both interpretations are pre-registered in `protocol.md` (RQ1-A) **before the
-   run** — do not read the numbers before re-reading that table.
-1. 🔴 **Put `docs/provenance_query.md` to the data collector.** Everything
-   downstream — RQ1, Gold-300 stratification, the split freeze — waits on it.
-   Gold-300 in particular: the annotation scheme was to be stratified on the S2
-   clusters, so finding this out *before* 300 items are annotated is the
-   cheapest moment it will ever be found out.
-2. Read Huang et al. (ICLR 2024) → fill its `related_work.md` entry.
+**Nothing is blocked any more.** The provenance question is closed as
+unresolvable, the scope decision is made (full corpus), and the code for the
+next run is written and pre-registered.
+
+1. 🔬 **Re-run both S2 configs on Kaggle** (one notebook, two runs). Produces
+   `ARI(cluster, region)` and the region-A robustness check, and persists
+   cluster assignments. Interpretations are pre-registered in `protocol.md`
+   (RQ1-A) **before the run** — re-read that table before reading the numbers.
+2. **Freeze the split** on `Sentiment × region` (6 strata) once cluster
+   assignments exist. This closes open decisions 1 and 2.
 3. Start plot collection: 5/day from bn.wikipedia, log `source_url` for every
-   one. **Unblocked by all of the above** — and now the highest-value use of
-   waiting time.
+   one. **0 of 130 and on the critical path** — the only track that cannot be
+   accelerated later.
+4. Read Huang et al. (ICLR 2024) → fill its `related_work.md` entry.
 
 ## Infrastructure state (2026-07-30)
 

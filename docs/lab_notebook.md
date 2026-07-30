@@ -738,6 +738,75 @@ Point 3 is the real price of the larger n. It is payable, but only in the open.
 
 ---
 
+## 2026-07-30 — Provenance question closed: unresolvable, and that is the answer
+
+**Feeds:** Ch.4 §Data quality, Ch.5 §Limitations · **Artifact:** STATUS facts
+(collector-2) and (split) · **Nothing was computed.**
+
+### What was asked and what came back
+
+The collector was asked twice. First about the class-2 rows — answered "collected
+the same way". Then, after the file's layout showed the pattern follows *row
+position* rather than label, about rows 1999–4999. The answer:
+
+> gathered from **many different places**, all organic user comments, none
+> written or machine-generated, and **which rows came from where is not
+> remembered — no metadata was kept**.
+
+### Findings
+
+- **"I don't remember" is the most useful answer available**, and it was
+  pre-committed as a valid outcome in `provenance_query.md` before it was
+  received. A guess would have entered the record and been falsifiable later; a
+  refusal to guess leaves the record clean.
+- **The account does not reconcile with the measurement, and is not forced to.**
+  Many mixed sources would interleave registers throughout the file. The observed
+  change is a step at one row: before it, 61% of rows carry no দাঁড়ি; after it,
+  0.8% do. Sampling from many places does not produce that.
+- **The likeliest reconciliation is collection in two sittings** — an initial
+  batch, then more added later when the count fell short, months apart, with no
+  log. That fits both the testimony and the file. But it is **inference, not
+  testimony**, and is labelled as such in STATUS rather than folded into the
+  collector's account.
+- **Recall reliability is now itself evidence.** The same recollection stated
+  "collected the same way" for a block the file shows was assembled separately.
+  Fact (collector-2) is therefore recorded at **low** confidence — not as a
+  judgement of the person, but because it has now been checked once against an
+  artifact and did not match.
+
+### Decisions made (and why)
+
+- **The question is closed and will not be re-asked.** There is no venue, thread
+  or timestamp column (fact (c)) and no collection log (fact (a)). A third round
+  would produce recollection under pressure to supply an answer, which is worse
+  evidence than none.
+- **Both records are kept, unreconciled.** Fact (collector-2) states the
+  collector's account in his words; fact (split) states what is measured. The
+  thesis reports both and does not adjudicate. Deleting either would be the only
+  dishonest move available here.
+- **Nothing downstream stays blocked on it.** Waiting for an answer that cannot
+  arrive is how a thesis stalls. The scope decision is made, the code is written,
+  and the register split is handled as a controlled factor whatever its cause.
+
+### Consequences for downstream steps
+
+- Limitations must state that ~60% of the corpus has an **unrecoverable**
+  provenance, and that the register split is measured but unexplained. That is a
+  disclosable limitation, not a defect — many published corpora have worse and
+  say less.
+- The `machine-imitating-machine` risk (protocol.md, "what may NOT be claimed",
+  point 3) **remains conditional and stays in Limitations**, because it cannot be
+  ruled out. The collector denies it; the denial is recorded; neither settles it.
+
+### Citations needed
+
+- Possibly one on dataset documentation practice (datasheets / data statements)
+  when Limitations is written — it would let the absent collection log be framed
+  against an established standard rather than as an ad-hoc complaint. Sabbir's
+  call at writing time; logged as open decision 5's neighbour, not decided here.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
