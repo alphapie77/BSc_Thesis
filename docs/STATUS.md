@@ -29,7 +29,7 @@
 
 | Track | Target | Done | Blocks | Risk |
 |---|---|---|---|---|
-| Bangla plot synopses | 130 (30 dev + 100 eval) | **0** | S6 evaluation | 🔴 highest — manual, slow, no shortcut |
+| Bangla plot synopses | 130 (30 dev + 100 eval) | **0** — tooling ready: `data/plots/plots_bn.csv` + `python -m src.preprocess.plots_check` | S6 evaluation | 🔴 highest — manual, slow, no shortcut. **26 working days at 5/day.** `split` stays empty until 130, then assigned once with seed 42 (collecting-order would make dev the famous films) |
 | Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 high |
 | Gold-300 annotation | 300 × 3 annotators | 0 | RQ1 validation | 🟡 needs S2 clusters first (stratified) |
 | **Retrospective base-label reliability study** | 200 items from R (disjoint from G-300), 2 native annotators, sentiment only, **blind to the original labels**; run in a session **separate** from persona annotation, order randomized | **0** | Ch.4 §Data Quality; Ch.5 §Threats | 🟡 converts "no IAA exists" (fact (a)) into an **estimated** base-label reliability figure. Report annotator-vs-annotator κ/α **and** their majority vs the original single-coder label. |
