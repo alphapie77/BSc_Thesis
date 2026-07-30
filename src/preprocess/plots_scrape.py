@@ -176,11 +176,41 @@ def split_sections(extract: str) -> dict[str, str]:
     return out
 
 
-def pick_plot(sections: dict[str, str], headings: list[str]) -> tuple[str, str]:
-    """First section whose heading matches. Returns (heading, text)."""
-    wanted = {h.replace(" ", "") for h in headings}
+def pick_plot(sections: dict[str, str], headings: list[str],
+              stems: list[str] | None = None,
+              exclude: list[str] | None = None) -> tuple[str, str]:
+    """First section whose heading names a plot. Returns (heading, text).
+
+    Exact matching against a fixed list rejected 94% of articles on the first
+    real harvest -- bn.wikipedia's heading wording varies far more than a list
+    can anticipate (কাহিনী সংক্ষেপ, সংক্ষিপ্ত কাহিনী, কাহিনীর সারাংশ ...). So
+    exact matches are tried first, then a **stem** match: any heading containing
+    কাহিন / গল্প / সার / পটভূমি / প্লট.
+
+    Stems alone would over-match -- নির্মাণ কাহিনী is a making-of, কাহিনী সূত্র is
+    a source credit -- so `exclude` vetoes a heading that also carries a
+    production or metadata term. Precision matters more than recall here: a
+    making-of paragraph passed off as a plot is a silently corrupted evaluation
+    input, whereas a missed article merely costs one row out of 1,225.
+    """
+    stems = stems or []
+    exclude = exclude or []
+
+    def flat(h: str) -> str:
+        return h.replace(" ", "")
+
+    wanted = {flat(h) for h in headings}
     for head, body in sections.items():
-        if head.replace(" ", "") in wanted and body.strip():
+        if flat(head) in wanted and body.strip():
+            return head, body.strip()
+
+    for head, body in sections.items():
+        if not body.strip() or head == "__lead__":
+            continue
+        f = flat(head)
+        if any(x in f for x in exclude):
+            continue
+        if any(s in f for s in stems):
             return head, body.strip()
     return "", ""
 
@@ -225,11 +255,12 @@ def harvest(api: Api, cfg, titles: dict[str, str], root: Path
     state_path = root / cfg["outputs"]["state_json"]
     out_path = root / cfg["outputs"]["harvest_csv"]
 
-    rows, rejects, processed = [], {}, set()
+    rows, rejects, processed, missed = [], {}, set(), {}
     if state_path.exists():
         st = json.loads(state_path.read_text(encoding="utf-8"))
         processed = set(st.get("processed", []))
         rejects = st.get("rejects", {})
+        missed = st.get("missed_headings", {})
         if out_path.exists():
             rows = pd.read_csv(out_path).to_dict("records")
         print(f"resuming: {len(processed)} titles already processed, "
@@ -238,7 +269,9 @@ def harvest(api: Api, cfg, titles: dict[str, str], root: Path
     def save():
         state_path.parent.mkdir(parents=True, exist_ok=True)
         write_text_lf(state_path, json.dumps(
-            {"processed": sorted(processed), "rejects": rejects},
+            {"processed": sorted(processed), "rejects": rejects,
+             "missed_headings": dict(sorted(missed.items(),
+                                           key=lambda x: -x[1])[:60])},
             ensure_ascii=False, indent=1) + "\n")
         if rows:
             out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -275,9 +308,18 @@ def harvest(api: Api, cfg, titles: dict[str, str], root: Path
                 rejects["missing page"] = rejects.get("missing page", 0) + 1
                 continue
             extract = page.get("extract", "") or ""
-            head, body = pick_plot(split_sections(extract), cfg["plot_headings"])
+            sections = split_sections(extract)
+            head, body = pick_plot(
+                sections, cfg["plot_headings"],
+                cfg.get("plot_heading_stems"), cfg.get("plot_heading_exclude"),
+            )
             if not body:
                 rejects["no plot section"] = rejects.get("no plot section", 0) + 1
+                # Tally what these articles DO have, so a shortfall is diagnosed
+                # from the corpus rather than by guessing at the list again.
+                for h in sections:
+                    if h != "__lead__":
+                        missed[h] = missed.get(h, 0) + 1
                 continue
             body = truncate(re.sub(r"\n+", " ", body), int(q["max_sentences"]))
             reason = quality_reason(body, q)
@@ -303,7 +345,7 @@ def harvest(api: Api, cfg, titles: dict[str, str], root: Path
 
     save()
     print()
-    return pd.DataFrame(rows), rejects
+    return pd.DataFrame(rows), rejects, missed
 
 
 def probe(api: Api, cfg, title: str) -> int:
@@ -428,6 +470,10 @@ def main() -> int:
     # nargs="?" so `--probe` works with no argument. Typing a Bangla title on a
     # Windows console is its own small ordeal, and the first thing anyone runs
     # should not require it.
+    ap.add_argument("--reset", action="store_true",
+                    help="clear the checkpoint and re-harvest from scratch. "
+                         "Needed after changing the heading config, since "
+                         "processed titles are otherwise skipped.")
     ap.add_argument("--probe", metavar="TITLE", nargs="?",
                     const=DEFAULT_PROBE_TITLE, default="",
                     help="fetch ONE article and print every step. Run this "
@@ -440,13 +486,21 @@ def main() -> int:
     if args.sample:
         return do_sample(cfg, root, args.sample)
 
+    if args.reset:
+        for k in ("state_json", "harvest_csv"):
+            f = root / cfg["outputs"][k]
+            if f.exists():
+                f.unlink()
+                print(f"removed {f.name}")
+        print("checkpoint cleared -- harvesting from scratch.\n")
+
     api = Api(cfg)
     if args.probe:
         return probe(api, cfg, args.probe)
     print("discovering film articles...")
     titles = discover(api, cfg)
     print(f"{len(titles)} candidate articles\n\nfetching plot sections...")
-    df, rejects = harvest(api, cfg, titles, root)
+    df, rejects, missed = harvest(api, cfg, titles, root)
 
     if df.empty:
         sys.exit(
@@ -460,16 +514,21 @@ def main() -> int:
 
     write_text_lf(root / cfg["outputs"]["report_md"],
                   build_report(cfg, args.config, stamp(args.config), df,
-                               rejects, len(titles), api.calls))
+                               rejects, len(titles), api.calls, missed))
     print(f"\n{len(df)} usable plots -> {cfg['outputs']['harvest_csv']}")
     print(f"rejected: {sum(rejects.values())}  {rejects}")
     print(f"\nNext: python -m src.preprocess.plots_scrape --sample 130")
     return 0
 
 
-def build_report(cfg, cfg_path, prov, df, rejects, n_candidates, calls) -> str:
+def build_report(cfg, cfg_path, prov, df, rejects, n_candidates, calls,
+                 missed=None) -> str:
     rej = "\n".join(f"| {k} | {v} |" for k, v in
                     sorted(rejects.items(), key=lambda x: -x[1])) or "| — | 0 |"
+    top = sorted((missed or {}).items(), key=lambda x: -x[1])[:25]
+    missed_md = ("| Heading | Articles |\n|---|---|\n" +
+                 "\n".join(f"| {k} | {v} |" for k, v in top)
+                 ) if top else "_none_"
     bycat = df["seed_category"].value_counts()
     cat = "\n".join(f"| {k} | {v} |" for k, v in bycat.items())
     return f"""# Plot harvest — bn.wikipedia
@@ -493,6 +552,14 @@ def build_report(cfg, cfg_path, prov, df, rejects, n_candidates, calls) -> str:
 
 Most bn.wikipedia film articles are stubs, so a large "no plot section" count is
 expected rather than a fault. It matters only if the survivors fall below 130.
+
+### Headings on articles that yielded nothing
+
+Tallied so a shortfall is diagnosed from the corpus rather than by guessing at
+the heading list again. If a plot-like heading appears high here, add its stem
+to `plot_heading_stems` and re-run with `--reset`.
+
+{missed_md}
 
 ### By seed category
 

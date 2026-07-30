@@ -45,10 +45,14 @@ checkpoint_every: 5
 # implies. Add or remove freely -- the harvest reports what each contributed.
 categories:
   - "বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র"
-  - "বিষয়শ্রেণী:ভারতীয় বাংলা ভাষার চলচ্চিত্র"
   - "বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র"
-category_depth: 1               # follow sub-categories this many levels
-max_pages_per_category: 400
+  - "বিষয়শ্রেণী:ভারতীয় বাংলা চলচ্চিত্র"
+  - "বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র"
+# depth 2, because most films sit in by-decade and by-genre SUBcategories rather
+# than directly in the parent. A category that returns +0 has the wrong name --
+# harmless, and reported per category so it is visible.
+category_depth: 2
+max_pages_per_category: 900
 
 # Section headings that hold a plot. bn.wikipedia is inconsistent about this,
 # so all the common spellings are listed; matching is on the normalised heading.
@@ -62,6 +66,38 @@ plot_headings:
   - "পটভূমি"
   - "গল্প"
   - "চলচ্চিত্রের কাহিনী"
+
+# Fallback when no exact heading matches. The first harvest rejected 94% of
+# articles for "no plot section", which was a fault in the list above, not in
+# bn.wikipedia: heading wording varies more than any list can anticipate.
+# A heading containing one of these stems is treated as a plot section.
+plot_heading_stems:
+  - "কাহিন"        # কাহিনী, কাহিনি, কাহিনীসংক্ষেপ, সংক্ষিপ্তকাহিনী, কাহিনীররূপরেখা
+  - "গল্প"
+  - "সারসংক্ষেপ"
+  - "সারাংশ"
+  - "পটভূমি"
+  - "প্লট"
+  - "বিষয়বস্তু"
+
+# ...unless the heading also carries one of these. নির্মাণ কাহিনী is a making-of
+# and কাহিনী সূত্র is a source credit; both contain a stem and neither is a plot.
+# Precision over recall: a making-of paragraph passed off as a plot is a
+# silently corrupted evaluation input, while a missed article costs one row.
+plot_heading_exclude:
+  - "নির্মাণ"
+  - "সূত্র"
+  - "তথ্য"
+  - "সঙ্গীত"
+  - "সাউন্ড"
+  - "অভিনয়"
+  - "কুশীলব"
+  - "পুরস্কার"
+  - "মুক্তি"
+  - "প্রচার"
+  - "সমালোচ"
+  - "বহিঃসংযোগ"
+  - "পটভূমিকা"     # often "historical background", not the film's plot
 
 # Quality gate. Most bn.wikipedia film articles are stubs; harvesting without a
 # filter yields a corpus of one-line plots that no model could generate from.

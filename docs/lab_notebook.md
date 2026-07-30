@@ -901,6 +901,78 @@ parser assumes.
 
 ---
 
+## 2026-07-30 — First plot harvest: 67 of 130, and the shortfall was my fault
+
+**Feeds:** Ch.3 §Data · **Artifact:** `results/plots_harvest_report.md`
+**Ran on:** Sabbir's machine (the sandbox cannot reach bn.wikipedia)
+
+### Numbers
+
+| | |
+|---|---|
+| candidate articles discovered | **1,225** |
+| passed the quality gate | **67** |
+| rejected: no plot section | **1,148** |
+| rejected: under 3 sentences | 5 |
+| rejected: under 120 chars | 5 |
+
+67 against a target of 130.
+
+### Findings
+
+- **1,148 rejections for "no plot section" is 94%, and that is not a corpus of
+  stubs — it is a fault in my heading list.** bn.wikipedia's section wording
+  varies far more than the nine exact strings I guessed: কাহিনী সংক্ষেপ,
+  সংক্ষিপ্ত কাহিনী, কাহিনীর সারাংশ, গল্প সংক্ষেপ, প্লট are all in use. Exact
+  matching against a list I invented was the wrong mechanism.
+- **Two network faults surfaced before this, both mine.** A read timeout on a
+  batch of 20 full extracts killed a run that had already fetched 1,225 articles,
+  because nothing was checkpointed — the timeout was the trigger, the missing
+  checkpoint was the defect. And `urllib` on Windows verified TLS against the
+  system certificate store, which carries an expired root, while a current
+  `certifi` bundle sat unused in the venv.
+- **1,225 candidates is comfortably enough** for 130 if the extraction rate
+  improves at all. The discovery step is not the constraint.
+
+### Decisions made (and why)
+
+- **Stem matching, with an exclusion list.** Exact headings are still tried
+  first; failing that, a heading containing কাহিন / গল্প / সার / পটভূমি / প্লট /
+  বিষয়বস্তু counts. Stems alone would over-match — নির্মাণ কাহিনী is a making-of,
+  কাহিনী সূত্র is a source credit — so a heading also carrying a production or
+  metadata term is vetoed. **Precision over recall on purpose:** a making-of
+  paragraph passed off as a plot is a silently corrupted evaluation input,
+  whereas a missed article costs one row out of 1,225.
+- **The harvest now tallies the headings of everything it rejected**, top 25 into
+  the report. If this still falls short, the next fix comes from the corpus
+  rather than from me imagining more Bangla section titles. Guessing twice would
+  have been the same mistake twice.
+- **`--reset` added.** Processed titles are skipped on resume, so a heading-config
+  change would otherwise have no effect — the run would cheerfully re-report 67.
+- **Discovery widened**: depth 1 → 2 (most films sit in by-decade and by-genre
+  subcategories, not the parent), cap 400 → 900, and the category that returned
+  **+0 articles** replaced — its name was simply wrong. A category contributing
+  nothing is printed per category, which is how that was visible at all.
+- **TLS verification stays on.** Disabling it would have "fixed" the certificate
+  error. This text becomes evaluation data; over an unverified connection the
+  per-row `revision_id` — the entire reason for recording provenance — guarantees
+  nothing.
+
+### Consequences for downstream steps
+
+- Re-run needed with `--reset`. If the yield still lands under 130, the report's
+  heading tally names the next stems to add; failing that, widen the categories
+  further. **Not** to be closed by hand-writing the remainder — that reinstates
+  the two biases scraping was chosen to remove.
+- The quality gate itself is barely rejecting anything (10 of 1,225), so it is
+  not the constraint and should not be relaxed to make the number.
+
+### Citations needed
+
+- None. No method here, only extraction plumbing.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
