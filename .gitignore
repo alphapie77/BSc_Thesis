@@ -29,3 +29,7 @@ wandb/
 *.pt
 *.bin
 .DS_Store
+
+# Unzipped Kaggle output bundles -- transient, the files inside are what matter
+zip/
+*.zip

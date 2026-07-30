@@ -1,0 +1,77 @@
+# REGISTER PROBE -- is `Sentiment == 2` a different KIND of text, not a
+# different opinion about films?
+#
+# ⚠️ EXPLORATORY. The hypothesis came from reading the data, not from the
+# pre-registration. Nothing here may be reported as a confirmatory test, and no
+# threshold below was fixed in advance. It is registered in protocol.md's
+# deviations log as exploratory on 2026-07-30. Its purpose is to decide whether
+# a confirmatory test is warranted and to give the data collector a specific,
+# answerable question -- not to settle anything by itself.
+#
+# WHY IT EXISTS. S2 found clusters that do not reproduce the sentiment partition
+# (ARI 0.179) yet are moderately associated with it (V 0.410). Refolding the
+# crosstab as "cluster 0 vs rest" x "Sentiment 2 vs rest" gives phi = 0.565 --
+# a STRONGER association than the full three-way table. Only 12 of 1,572
+# class-2 items land in cluster 0. That pattern is what you would see if the
+# encoder were separating class 2 from the rest for reasons that have nothing
+# to do with sentiment.
+#
+# protocol.md RQ1 Band 3 already names this confound -- clusters recovering the
+# source rather than a persona -- and STATUS called it "untestable in principle"
+# because venue was never retained. Venue was not retained, but WRITING STYLE
+# survives in the text itself, and style is measurable. That is the gap this
+# probe fills.
+name: s2b_register_probe
+seed: 42
+
+input_csv: data/cleaned/bn_clean.csv
+text_col: "Movie Review"
+label_col: "Sentiment"
+id_col: "review_id"
+expected_input_n: 4730
+
+# Optional. Present after a Kaggle S2 run; the probe skips that section if absent.
+near_dup_pairs_csv: data/cleaned/near_dup_pairs.csv
+
+# The class under suspicion, tested against the union of the others.
+focal_class: 2
+
+# ---------------------------------------------------------------------------
+# FEATURES: orthographic and structural ONLY.
+#
+# This restriction is the whole argument. A feature that touches word choice
+# would leak sentiment -- "দুর্বল" predicts both a negative label and a
+# particular register, and separating class 2 with it would prove nothing. Every
+# feature below counts characters, punctuation or length. None can encode an
+# opinion about a film, so any separation they achieve is separation of FORM.
+#
+# `first_person` is the one judgement call: it is a closed set of pronouns and
+# reports voice, not polarity. Reported separately so a reader who disagrees can
+# discount it without touching the rest.
+# ---------------------------------------------------------------------------
+features:
+  - n_words
+  - n_chars
+  - mean_word_len
+  - n_danda            # "।" -- the formal sentence terminator
+  - has_danda
+  - n_comma
+  - has_comma_run      # ",,," and friends: social-media punctuation
+  - n_exclaim
+  - n_question
+  - punct_per_token
+  - has_latin
+  - has_digit
+  - first_person       # closed pronoun set; voice, not polarity
+
+# Type richness at an EQUAL token budget. Comparing raw type counts across
+# classes is meaningless when the classes differ in total length, so each class
+# is subsampled to the same number of tokens and the unique-type count is
+# bootstrapped.
+lexical_richness:
+  token_budget: 12000
+  bootstrap: 200
+
+outputs:
+  report_md: results/s2b_register_probe.md
+  features_csv: results/s2b_register_features.csv

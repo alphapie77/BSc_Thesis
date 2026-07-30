@@ -355,6 +355,153 @@ Windows and Kaggle is part of the reproducibility contract.
 
 ---
 
+## 2026-07-30 — S2 pilot: the trap-check ran, and found something else
+
+**Feeds:** Ch.4 §Persona discovery, Ch.4 §Data quality, Ch.5 §Threats
+**Artifacts:** `results/s2_pilot_ari_trapcheck.md`,
+`results/env_snapshot_s2_kaggle.json`, `results/s2b_register_probe.md`,
+`docs/provenance_query.md`
+**Ran on:** Kaggle, Tesla T4, commit `e3d8e43`
+
+### Numbers
+
+- ARI(cluster, Sentiment) at the primary threshold 0.95: **0.1793** → Band 1,
+  `NOT_SENTIMENT_ALIGNED`
+- Cramér's V 0.4104 · χ² 1558.05 (df 4) · surviving n **4,625**
+- Cluster shares 39.2 / 30.9 / 29.9 — **not degenerate**, so the ARI is
+  interpretable
+- Sensitivity: no-dedup 0.1792 (Band 1) · **0.90 → 0.2181 (Band 2)** ·
+  0.95 → 0.1793 (Band 1) · 0.98 → 0.1784 (Band 1)
+- Off-diagonal cosine: median 0.3511, p99.9 **0.7561**, max 0.999758
+
+### Reading it in the pre-registered order
+
+**Distribution first.** p99.9 = 0.7561 sits below every swept threshold, so none
+of them cut into the bulk of the distribution — they trim a genuine duplicate
+tail (449 pairs out of 11,184,085, i.e. 0.004%). The pre-registered worry that a
+threshold might be removing merely *similar* short reviews did not trigger. The
+median of 0.3511 is itself worth reporting: with 8-word reviews, unrelated texts
+already sit at high cosine.
+
+**Degeneracy second.** All three clusters inside the 5–70% band at every swept
+threshold, so Band 0 does not apply and the ARI means something.
+
+**Then the number.** Band 1 at the pre-registered primary threshold.
+
+### Findings (things we did not expect)
+
+**(1) The sensitivity curve is not constant.** At t = 0.90 the verdict crosses
+into Band 2 (`PARTIAL_OVERLAP` + `RESIDUAL_TEST_REQUIRED`); at 0.95 and 0.98 it
+is Band 1. ΔARI vs no-dedup is +0.0388 at 0.90 but +0.0001 at 0.95 — so the
+low threshold is doing real work on the headline number, not housekeeping. The
+primary threshold was fixed in `configs/s2_pilot.yaml` on 2026-07-28, two days
+before the run, so the headline stays Band 1 and the 0.90 result is a
+**mandatory disclosure**, not a reason to switch. Moving to 0.90 now would be
+threshold-shopping.
+
+**(2) A low ARI beside a moderate V is not a clean result.** The report's own
+text warned this combination is a caveat rather than a pass, and the crosstab
+shows why. Per class, the distribution across clusters is:
+
+| Sentiment | Cluster 0 | Cluster 1 | Cluster 2 |
+|---|---|---|---|
+| 0 | 55.5% | 27.8% | 16.8% |
+| 1 | 62.4% | 20.3% | 17.3% |
+| 2 | **0.8%** | 44.3% | 54.9% |
+
+Classes 0 and 1 are distributed **almost identically** — the clustering cannot
+separate them at all. Class 2 is almost entirely absent from cluster 0 (12 of
+1,572) and then split across the other two. So the recovered structure is
+effectively **binary**: class 2 versus the rest. ARI is low because a three-way
+partition that merges two classes and splits the third scores poorly even when
+strong structure exists. Recomputing ARI and V independently from the crosstab
+reproduced the report exactly (0.1793 / 0.4104), so the report's arithmetic is
+sound.
+
+**(3) — the important one. Class 2 appears not to be the same kind of text.**
+Refolding the crosstab as *cluster 0 vs rest* × *class 2 vs rest* gives
+**φ = 0.565**, a stronger association than the clustering has with sentiment as
+a whole. That prompted the register probe (`results/s2b_register_probe.md`,
+**exploratory**), which measured only features that cannot encode an opinion
+about a film:
+
+| | class 0 | class 1 | **class 2** |
+|---|---|---|---|
+| contains দাঁড়ি | 58.0% | 66.0% | **100.0%** |
+| first-person pronoun | — | — | **0.0%** (expected 149) |
+| exclamation mark | — | — | **0.0%** (expected 38) |
+| comma run `,,,` | — | — | **0.0%** (expected 33) |
+| word types per 12,000 tokens | 3,577 | 3,303 | **1,772** |
+
+Four structural absolutes and roughly half the vocabulary at identical length.
+Near-duplicate endpoints are 50.1% class 2 against a 34.2% corpus share, and
+51.8% in the contested 0.90–0.95 band — which is also why the threshold question
+and this question are the same question.
+
+**This is the confound RQ1 Band 3 pre-registered** ("clusters recovering the
+source rather than any persona"), and which `STATUS.md` recorded as *untestable
+in principle* because venue was never retained. **That record was wrong in one
+specific way: venue was not retained, but writing style survives in the text.**
+Three explanations fit equally well — generated to fill the quota, collected
+from a different venue, or hand-written as neutral examples — and all three
+break provenance fact (c) and all three mean the clusters track provenance.
+Statistics cannot choose between them; only the collector can.
+`docs/provenance_query.md` puts the question in answerable form.
+
+**(4) `git_hash()` was calling every run dirty.** The stamp on the S2 report
+reads `e3d8e434…-dirty`, but the run came from a **fresh `--depth 1` clone**,
+where no tracked file can have been modified. The suffix came from bare
+`git status --porcelain`, which also lists untracked files — and every run
+creates untracked outputs. A flag that is always on is not a flag. Fixed to use
+`-uno`; untracked files are now counted separately in `stamp()`. Verified in a
+clean-room clone: untracked files alone leave the hash clean, editing a tracked
+file restores `-dirty`.
+
+**(5) Two gaps in the tooling.** `s2_pilot.py` never persists cluster
+assignments, so every follow-up question about the clustering has to be
+reconstructed from the printed crosstab or answered by re-running the whole
+embedding. And the Kaggle environment diverges from `requirements.lock.txt` more
+than expected — **scikit-learn 1.6.1 computed the KMeans and the ARI**, not
+1.9.0; numpy 2.0.2 not 2.4.6; transformers 5.0.0 not 5.14.1.
+
+### Decisions made (and why)
+
+- **Threshold left at the pre-registered 0.95**, with the 0.90 divergence
+  reported as a sensitivity caveat. The audit sheet for revisiting it
+  (`results/s2_threshold_audit_sheet.csv`, blinded, 30 contested + 8 control
+  pairs) is generated and **parked** — 52% of the contested band is class 2, so
+  the threshold question is downstream of the provenance question and answering
+  it first would settle nothing.
+- **RQ1's persona claim is suspended**, not withdrawn, pending the provenance
+  answer.
+- **Register probe registered as exploratory** in `protocol.md`, not slipped in
+  as a planned analysis. Nothing is trained in it, so inviolable rule 10 stands.
+- **The split stays unfrozen.** Open decisions 1 and 2 cannot close while the
+  composition of the corpus is in question.
+
+### Consequences for downstream steps
+
+- Gold-300 stratification was to be drawn from the S2 clusters. If those clusters
+  are tracking provenance, the annotation scheme needs rethinking **before** 300
+  items are annotated — this is the cheapest possible moment to find out.
+- The appendix must report two environments and say which produced S2.
+- `docs/STATUS.md` fact (c) and the "untestable in principle" note both need
+  correcting.
+
+### Citations needed
+
+- **None for method.** Everything in the probe is textbook: rank AUC
+  (Mann–Whitney U), Wilson score intervals, type–token ratio at a fixed token
+  budget. No published technique was adopted, so attaching a citation would
+  misrepresent where the analysis came from.
+- **Open, and Sabbir's to decide:** whether the finding is *framed* in the
+  stylometry / authorship-attribution literature or the
+  machine-generated-text-detection literature when it reaches Ch.4. That choice
+  shapes the related-work section and is a writing decision, not a method one.
+  Logged in `STATUS.md` open decisions rather than guessed at here.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Due |

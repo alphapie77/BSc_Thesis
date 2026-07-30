@@ -1,0 +1,50 @@
+# S2 THRESHOLD AUDIT -- sample the removals that separate 0.90 from 0.95.
+#
+# WHY THIS EXISTS. The S2 sensitivity curve is not constant: at t = 0.90 the
+# trap-check lands in Band 2 (PARTIAL_OVERLAP), at 0.95 and 0.98 in Band 1. The
+# difference is ~220 extra rows removed at 0.90. Whether 0.90 is defensible
+# therefore turns on a question the ARI cannot answer: are those extra removals
+# genuine near-duplicates, or merely *similar* short reviews?
+#
+# That question is answered by reading Bangla text, by a human, and it must be
+# answered WITHOUT the ARI in view -- otherwise the threshold is chosen for the
+# number it produces, which is precisely what the pre-registration forbids.
+# This config exists so the sample that informed the decision is reproducible
+# and can be re-derived by a reviewer.
+#
+# THIS SCRIPT DECIDES NOTHING. It writes a review sheet with an empty verdict
+# column. The judgement is the annotator's and is recorded by hand.
+name: s2_audit
+seed: 42
+
+input_pairs_csv: data/cleaned/near_dup_pairs.csv
+
+# The contested band: pairs strong enough to trigger removal at the low
+# threshold but not at the primary one. Half-open [lo, hi) -- a pair at exactly
+# 0.95 is removed under BOTH thresholds and is therefore not in dispute.
+band:
+  lo: 0.90
+  hi: 0.95
+
+sample:
+  n: 30
+  # Stratified across the band so the sheet is not dominated by whichever end
+  # happens to be denser. A verdict that flips at 0.93 is invisible in a sample
+  # drawn only from 0.90-0.91.
+  strata: 5
+  method: stratified_uniform
+
+# Context pairs from OUTSIDE the contested band, shuffled into the sheet and
+# unlabelled. They calibrate the annotator: if pairs at >= 0.98 are not called
+# duplicates either, the disagreement is about the definition of "duplicate",
+# not about the threshold. Their identity is recorded in the key file only.
+controls:
+  n_high: 5      # cosine >= 0.98 -- expected to be obvious duplicates
+  n_low: 5       # cosine in [0.90, 0.91) -- the weakest removals at t=0.90
+
+outputs:
+  # For annotation. Contains NO cosine, NO threshold, NO control marking --
+  # nothing that could steer the judgement.
+  review_sheet_csv: results/s2_threshold_audit_sheet.csv
+  # The blinding key: which row is which. Not opened until the sheet is filled.
+  key_csv: results/s2_threshold_audit_key.csv
