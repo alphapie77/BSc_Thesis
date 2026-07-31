@@ -1164,6 +1164,82 @@ chars, **65 person articles**.
 
 ---
 
+## 2026-07-31 — Plot corpus FROZEN: 120 = 30 dev + 90 eval
+
+**Feeds:** Ch.3 §Data · **Artifacts:** `data/plots/plots_bn.csv` (committed,
+frozen), `data/plots/rejected_by_review.csv`
+
+### Numbers
+
+| | |
+|---|---|
+| harvested | 124 |
+| rejected on human review | **4** |
+| **frozen set** | **120** — 30 dev / 90 eval, seed 42 |
+| sentences | min 3, median 9, max 12 |
+| provenance | 120/120 carry `revision_id`; licence CC BY-SA 4.0 throughout |
+
+### The four rejections, and who caught what
+
+| id | film | reason | found by |
+|---|---|---|---|
+| BN024 | আদম সুরত | production history — funding, cinematographer changes, how the director met his wife. No plot at all, and it is a documentary. | both |
+| BN042 | কাগজের ফুল | the director's fatal road accident and a prime-ministerial statement. The film was never finished. | screen |
+| BN068 | দহন (১৯৮৫) | commentary *about* the story's themes, not the story. Says what it is about, never what happens. | screen |
+| BN113 | শঙ্খবেলা | a 3-sentence fragment that sets up and stops — passed the minimum exactly | **Sabbir** |
+
+### Findings
+
+- **The two review methods caught different things, and neither was
+  sufficient.** My keyword screen flagged 9 candidates, of which 5 were false
+  positives — BN087 বাঁশি trips on "নির্মাণ" because *the protagonist's dream is
+  to make a film*, which is the plot. It found the three that are structurally
+  not plots. It could not have found BN113, which is a real plot that simply
+  stops; only reading it does that. Sabbir's read caught BN113 and BN024.
+- **BN113 is the argument for human review in one row.** It passed every
+  mechanical gate — Bangla, exactly 3 sentences, over 120 characters, no
+  biography section — and it is unusable, because nothing happens in it.
+- **The 3-sentence floor is doing less work than it appears.** BN113 sat exactly
+  on it. Not changing the gate after the fact, but worth knowing that "3
+  sentences" and "a usable plot" are not the same predicate.
+
+### Decisions made (and why)
+
+- **BN072 দ্য নেমসেক kept — Sabbir's decision.** It is a complete, well-written
+  plot summary, but the film is Mira Nair's English-language American
+  production, in bn.wikipedia because its subject is a Bengali immigrant family.
+  I recommended dropping it as outside "Bangla cinema"; Sabbir chose to keep it,
+  which settles the scope question in favour of the broader reading. **Recorded
+  as his call, and my dissent recorded as fact rather than argued further** — but
+  it means the plot corpus contains one non-Bangla-language film, and that
+  should be stated if the corpus is described as Bangla cinema without
+  qualification.
+- **Rejections removed from the HARVEST, not from the sample**, then re-sampled.
+  Deleting from `plots_bn.csv` would have left the harvest holding items already
+  judged unusable, ready to be drawn again.
+- **Logged to `rejected_by_review.csv`** rather than vanishing: what a reviewer
+  saw and refused is part of how this corpus was built.
+- **Split frozen at 30 dev / 90 eval, seed 42.** `plots_check` now refuses to
+  reassign it.
+
+### Consequences for downstream steps
+
+- S6 runs on **90 eval plots** against the spec's 100. Deviation logged
+  2026-07-31; bootstrap CIs absorb it; Limitations states it.
+- **The plot corpus has complete per-row provenance** — URL, revision id,
+  timestamp, licence — which the review corpus does not. Worth the contrast in
+  Ch.3: one corpus assembled with a record, one without, in the same thesis.
+- **CC BY-SA attribution is now an outstanding obligation**, not a future one:
+  the dataset card carries a three-item checklist that must be discharged before
+  submission.
+
+### Citations needed
+
+- Still open (decision 5's neighbour): whether Wikipedia-as-plot-source gets a
+  citation in Ch.3. Sabbir to pick a paper he has read.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
