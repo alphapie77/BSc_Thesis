@@ -1638,6 +1638,100 @@ correctness of their reasoning."*
 
 ---
 
+## 2026-08-01 — All six base papers briefed. Three of them change the design.
+
+**Feeds:** Ch.1, Ch.2, **§5.1 ablation** · **Artifacts:**
+`docs/base_papers_brief.md`, `docs/references.bib` (6 entries)
+**Read by:** Claude. Sabbir has read none — stated at the top of the brief.
+
+### Depth, stated honestly
+
+One paper read in full (Huang et al. — section and table numbers throughout).
+Five read at **abstract + bibliographic record** only. Every claim in the brief
+is tagged 📗 or 📙 so a reader knows which is which, and three papers are marked
+⬛ *"needs full text before it can carry weight in Ch.2"*.
+
+That is not ideal and the brief says so. But an abstract-level brief that is
+**labelled** as abstract-level is honest and useful; an abstract-level brief
+presented as a reading is the thing that gets someone destroyed in a viva.
+
+### Findings — each of these changes something
+
+- **Kamoi et al. is the other half of Huang.** Huang shows intrinsic correction
+  failing; Kamoi's survey concludes that *"self-correction works well in tasks
+  that can use reliable external feedback"*. Together: **the problem is the
+  judge, and externalising it is the known fix.** Their finding (1) — no prior
+  work shows successful correction from *prompted-LLM* feedback — also predicts
+  our ablation row 7 will lose, which makes it the right headline baseline.
+  They also publish an **experiment-design checklist** for exactly this kind of
+  study; it should be run against §5.1 before S6.
+- **The Self-Correction Illusion (2026) is the most dangerous paper in the
+  list.** Holding a claim byte-identical (SHA-256 verified) and changing only
+  the chat-template role that carries it lifts correction rates by **23–93
+  percentage points**. Their conclusion: the failure to self-correct *"is not a
+  cognitive deficit; it is a chat-template artifact"*, and they build a
+  **training-free** intervention on it. It supports our framing — external
+  presentation is what unlocks correction — **and simultaneously offers a free
+  competitor to our trained verifier.** → open decision 11 proposes row 7b:
+  self-critique wrapped in an external role. If 7b ≈ row 6, the verifier is not
+  earning its cost, and **that is a negative result we would much rather find
+  ourselves than have a reviewer find.**
+- **Sands et al. is the closest existing work to our S6**, and their stated
+  gap — *"a noticeable gap in emotional richness and stylistic coherence"* —
+  is precisely what a verifier-in-the-loop targets. Their finding that **GPT-4o
+  overemphasises positive emotions** is a direct warning for generator choice
+  and for our persona-mix sanity check. Also worth noting: they feed the model
+  **subtitles and screenplays**, which exist only *after* a film is made. Ours
+  is a **pre-release** setting where a synopsis is all there is — harder, and a
+  more honest framing.
+- **Two pipeline claims about MoP are unverified.** It is cited as *"Findings of
+  ACL 2025"*; the arXiv record shows **no venue at all** (v1, 7 Apr 2025). And
+  the pipeline says it *"uses IMDB/SST-2"*; the abstract names no dataset.
+  Recorded in `references.bib` as a comment above the entry, and cited as arXiv
+  until a published version is confirmed.
+- **Cobbe et al. is load-bearing, not background.** Huang §6 points at *this
+  paper* as the alternative to intrinsic correction. One honest difference to
+  state: **their verifier ranks (best-of-N); ours gates and refines in a loop.**
+  Best-of-N is also exactly the cost-matched baseline open decision 9 needs — so
+  the baseline and the ancestor are the same paper.
+
+### A near-miss worth recording
+
+I first read Sands et al. as **"Chandra et al."**, because the bibliographic
+metadata lists the corresponding author last and that was the name in
+`citation_author`. I was one step from "correcting" a citation in the pipeline
+that was **already right**. The article page's author list settled it: Brendan
+Sands is first, Chandra is last. Recorded in the brief so Sabbir checks me the
+same way — metadata is not the paper.
+
+### Decisions made (and why)
+
+- **A separate `base_papers_brief.md` rather than six long `related_work.md`
+  entries.** `related_work.md` stays the register of record, structured for
+  assembling Ch.2. The brief is the thing you read on a phone before a
+  supervision meeting. Different jobs, different files.
+- **Depth tagged per paper, and the three that need full text marked.** The
+  temptation is to write six entries of uniform confidence; the honest version
+  is uneven and says where it is thin.
+- **`references.bib` now has all six**, with `note` fields recording reading
+  depth and the MoP venue caveat carried as a comment in the file itself.
+
+### Consequences for downstream steps
+
+- **Three open decisions (9, 10, 11) now sit against a pre-registered ablation
+  table**, all from six papers' worth of reading. Each is a config edit today
+  and an unrepeatable experiment after S6.
+- Ch.2's gap sentence is now writable: no prior work does persona-controlled
+  review generation with an external trained verifier in a low-resource
+  language, and the closest work (Sands) names the exact weakness we target.
+
+### Citations needed
+
+- All six are in `references.bib`. Keys match the `related_work.md` headings, as
+  that file requires.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |
