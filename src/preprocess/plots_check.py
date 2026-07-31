@@ -271,7 +271,15 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     path = root / PLOTS
     if not path.exists():
-        sys.exit(f"{PLOTS} not found. Copy data/plots/plots_bn_template.csv to it.")
+        sys.exit(
+            f"{PLOTS} not found. It is produced by the harvester, not by hand:\n"
+            "  python -m src.preprocess.plots_scrape --probe\n"
+            "  python -m src.preprocess.plots_scrape\n"
+            "  python -m src.preprocess.plots_scrape --sample <n>\n"
+            "It is also committed to git -- if it is missing from a clone, "
+            "recover it from history rather than regenerating it: the split is "
+            "frozen and a re-harvest would produce a different set."
+        )
 
     df = pd.read_csv(path, dtype=str).fillna("")
     df = df[df["plot_id"].astype(str).str.strip() != ""]

@@ -1498,6 +1498,67 @@ between any two parts, union covers the input exactly, dev ⊆ R1.
 
 ---
 
+## 2026-08-01 — Repo tidy: what was dead, and what only looked dead
+
+**Feeds:** repo hygiene · **Prompted by:** Sabbir — *"oproyojonio gulo jeno batil hoy"*
+
+### Removed
+
+- **5 redundant `.gitkeep` files** — `data/plots/`, `data/raw/`, `data/splits/`,
+  `notebooks/`, `results/` all hold real tracked files now, so the placeholders
+  were doing nothing. `data/cleaned/.gitkeep` **kept**: that directory is
+  gitignored by design (derived data), so without it the directory does not
+  exist in a fresh clone and every script that writes there fails.
+- **`data/plots/plots_bn_template.csv`** — dead since the corpus became scraped
+  rather than hand-entered. Its only remaining reference was an error message in
+  `plots_check.py` telling the user to copy it, which was actively wrong advice:
+  `plots_bn.csv` is now **frozen and committed**, so a missing copy must be
+  recovered from git history, not regenerated. A re-harvest would produce a
+  different set and silently invalidate the frozen split. Message rewritten to
+  say so.
+
+### Kept, deliberately
+
+- **`src/agents/`, `src/eval/`, `src/verifier/`** — `__init__.py` only. They are
+  Phases 3–5 of the declared layout, not clutter. Marked as empty in the README
+  so nobody goes looking for code that was never written.
+- **`results/s2_threshold_audit_{sheet,key}.csv`** — generated, never annotated.
+  Parked rather than deleted: the 0.90-vs-0.95 question is still live in
+  principle, and the sheet is blinded and reproducible. Marked ⏸ in the STATUS
+  artifact index so its standing is explicit.
+- **`results/s2b_register_probe.md`** — superseded framing, correct
+  measurements. Kept with a banner, because a superseded claim that disappears
+  is one nobody can audit.
+- **`docs/legacy/`** — the pre-defence report and conference draft. Source
+  material; they are what the pipeline was built from.
+
+### Also corrected
+
+- **`README.md` still said "Phase 0 — setup. No experimental results yet."**
+  Six days and the entire S2 result later. Now states Phase 1 complete, points
+  at STATUS as the source of truth, and leads with the corpus-detector finding —
+  because anyone opening this repo needs that before they read anything else.
+- **The README repeated the `core.autocrlf=true` claim** that `.gitattributes`
+  had already been corrected for. Both now say it is unset, and why that
+  mattered.
+- **Hook mode verified `100755`** in the index — the README warns that a plain
+  `git add` can silently drop the executable bit and disable the check without
+  any warning. It has not.
+
+### Findings
+
+- **Two of the three stale documents were the ones a newcomer reads first**
+  (`README.md`, and the pipeline spec earlier today). The files that get updated
+  are the ones being worked in; the entry points rot precisely because nobody
+  working on the project needs to read them.
+
+### Consequences
+
+- 80 tracked files → 74. Nothing that had a reader was removed.
+- All 40 tests pass and all 13 modules import after the cleanup.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |

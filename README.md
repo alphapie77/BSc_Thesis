@@ -1,7 +1,23 @@
 # A Neuro-Symbolic Multi-Agent Framework for Pre-release Audience Simulation in Bangla Cinema
 ### A Verifier-in-the-Loop Approach
 
-**Status:** Phase 0 — setup. No experimental results yet.
+**Status:** Phase 1 complete (2026-08-01) — data prepared and characterised,
+plot corpus frozen (120), split frozen (G 300 / R1 2,162 / R2 2,163).
+Phase 2 next: persona discovery, Gate G1.
+
+**Read `docs/STATUS.md` first.** It is the single source of truth for progress,
+verified facts, and open decisions. This file states the contract; STATUS states
+the state.
+
+### The one finding you need before reading anything else
+The 5,000-row corpus is **two corpora**, joined at raw row 1999 and differing
+sharply in register. LaBSE K-Means on the full corpus identifies **which of the
+two a review came from with 93.3% accuracy** — far more strongly than it tracks
+sentiment (ARI 0.4813 vs 0.1793). So `region` is a controlled factor throughout,
+persona discovery happens inside the organic region only, and no claim survives
+that does not survive within-region. Provenance is unrecoverable: no collection
+log exists and the collector does not remember. See
+`results/s2c_region_split.md` and `results/s2_pilot_ari_trapcheck.md`.
 
 ## Reproducibility contract
 - **Global seed = 42** (`src/common/seed.py`, used everywhere).
@@ -22,11 +38,13 @@
 
 ## Layout
 ```
-data/      raw/ (immutable)  cleaned/  splits/ (frozen)  plots/
-src/       common/ preprocess/ cluster/ verifier/ agents/ eval/
+data/      raw/ (immutable)  cleaned/ (gitignored)  splits/ (FROZEN)  plots/ (FROZEN)
+src/       common/ preprocess/ cluster/ | verifier/ agents/ eval/ (Phases 3-5, empty)
 configs/   one YAML per experiment
-results/   auto-logged, never hand-edited
-docs/      protocol.md, dataset card, model card
+results/   auto-logged, never hand-edited — indexed in docs/STATUS.md
+docs/      STATUS (read first), protocol (pre-registrations + deviations),
+           lab_notebook (dated reasoning), dataset_card, research_pipeline (spec)
+tests/     40 tests. The split-map and notebook ones exist because both broke.
 notebooks/ Kaggle/Colab runners ONLY (clone + install + call a script)
 ```
 
@@ -69,9 +87,11 @@ warning** — the check looks enabled while never running. Verify and repair:
 git ls-files -s .githooks/pre-commit      # must start with 100755
 git update-index --chmod=+x .githooks/pre-commit   # fix if it reads 100644
 ```
-`.gitattributes` pins `.githooks/**` to LF endings for the same reason: with
-`core.autocrlf=true`, CRLF in a `#!/bin/sh` script breaks the hook on
-Linux/macOS.
+`.gitattributes` pins **everything** to LF endings. `core.autocrlf` is **unset**
+here (an earlier version of this file claimed otherwise, which was never true),
+so CRLF written by Python on Windows shows up as a real diff: three result files
+once appeared as a 279-line change with zero changed content. CRLF in a
+`#!/bin/sh` script also breaks the hook on Linux/macOS, silently.
 
 ## Data availability
 Base corpus: Raw Bangla Movie Review Comment Dataset (Mendeley), 5,000 rows.
