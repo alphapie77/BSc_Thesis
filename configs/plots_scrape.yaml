@@ -43,15 +43,29 @@ checkpoint_every: 5
 # Seed categories. Deliberately broader than "Bangladeshi cinema" alone: a set
 # built only from recent hits would make the evaluation easier than the claim
 # implies. Add or remove freely -- the harvest reports what each contributed.
+# Names confirmed against bn.wikipedia with --find-categories on 2026-07-31,
+# after two invented ones returned +0. "ভারতীয় বাংলা চলচ্চিত্র" does not exist
+# and has been removed.
 categories:
   - "বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র"
   - "বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র"
-  - "বিষয়শ্রেণী:ভারতীয় বাংলা চলচ্চিত্র"
   - "বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র"
+  - "বিষয়শ্রেণী:বাংলাদেশের স্বাধীনতা যুদ্ধের চলচ্চিত্র"
+
+# ⚠️ DELIBERATELY NOT ADDED: the by-year categories, though they are the largest
+# available (২০১৯-এর চলচ্চিত্র = 268, ২০২২-এর = 220, ২০২১-এর = 151 ...).
+#
+# They are language-neutral: তামিল, হিন্দি, ব্রিটিশ and জাপানি films all sit in
+# them. Their bn.wikipedia articles are in Bangla, so they would pass every gate
+# here and inflate the count nicely -- while quietly making the plot corpus stop
+# being Bangla cinema. The thesis generates audience reviews for Bangla films
+# from a review corpus about Bangla films; a Tamil film's plot rendered in
+# Bangla breaks that match without breaking any check. Taking the easy 800 rows
+# would have been the kind of shortcut this project spent the week documenting.
 # depth 2, because most films sit in by-decade and by-genre SUBcategories rather
 # than directly in the parent. A category that returns +0 has the wrong name --
 # harmless, and reported per category so it is visible.
-category_depth: 2
+category_depth: 3
 # 900 was BINDING: all three working categories returned 912/957/951, i.e. they
 # stopped at the cap rather than running out of films. bn.wikipedia has far
 # more than 900 per category, so this was throwing away candidates.
