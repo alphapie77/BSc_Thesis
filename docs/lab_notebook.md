@@ -1559,6 +1559,85 @@ between any two parts, union covers the input exactly, dev ⊆ R1.
 
 ---
 
+## 2026-08-01 — Base paper 1/5 read: Huang et al. bites on our ablation table
+
+**Feeds:** Ch.1 §1.1(2), Ch.2, RQ2 motivation, **§5.1 ablation design**
+**Artifacts:** `docs/related_work.md` (entry filled), `docs/references.bib`
+**Read by:** Claude. **Not by Sabbir** — recorded on the entry itself.
+
+### What the paper actually claims
+
+**Intrinsic** self-correction — *"without any external or human feedback"* (§2)
+— fails on reasoning benchmarks and often degrades performance. Every intrinsic
+number in Tables 3–4 is at or below its standard-prompting baseline. Llama-2-70b
+on GSM8K: **62.0 → 43.5 → 36.5** over two rounds. GPT-4 on GSM8K:
+**95.5 → 91.5 → 89.0**. The oracle-label rows do improve (GPT-3.5 GSM8K
+75.9 → 84.3), and §3.2 argues those *"can only be regarded as indicative of an
+oracle's performance"* — if you hold the ground truth, why run the model.
+
+Their diagnosis (§3.3): the model keeps its first answer 74.7% of the time on
+GSM8K, and among the rest is **more likely to turn a correct answer into an
+incorrect one** than the reverse, because *"LLMs cannot properly judge the
+correctness of their reasoning."*
+
+### Findings
+
+- **The paper endorses our approach by name.** §6 "Leveraging external feedback"
+  says that when valid external feedback exists it should be used, and cites
+  **Cobbe et al. 2021**, Lightman et al. 2023 and Wang et al. 2023b for
+  *"train a verifier or a critique model … to verify or refine LLM outputs"*.
+  That is this thesis. **Huang et al. is not an obstacle to route around — it is
+  the paper that names our direction as the promising one.** The pipeline called
+  it a "theoretical anchor", which undersells it.
+- **It does not test our setting.** Reasoning benchmarks only; no generation
+  task, no persona control, no low-resource language. Writing "Huang et al.
+  proved LLMs cannot self-correct, therefore we use an external verifier" would
+  be an overstatement an examiner who has read it will catch. Safe wording is in
+  the entry.
+- **§4 and §5 bite on our ablation table, and this is the real return on
+  reading it.**
+  - §4: multi-agent debate at 9 calls scores **83.0** against self-consistency's
+    **88.2**. What looks like "critique" is selection across generations.
+  - §5: a reported Self-Refine gain came from stating the requirement *only* in
+    the feedback prompt. Move it into the initial prompt and standard prompting
+    wins: **81.8 vs 75.1**.
+  - §6 asks that self-correction be compared against baselines **of comparable
+    inference cost**.
+
+  Our §5.1 table has rows 1–3 single-call and rows 4–8 looping, no
+  self-consistency baseline at all, and no cost column. **"Row 6 beats row 1"
+  is currently open to exactly the objection this paper makes.** Raised as
+  open decisions 9 and 10 rather than acted on — §5.1 is pre-registered and
+  changing it is Sabbir's call.
+
+### Decisions made (and why)
+
+- **The entry records who read it.** The file's own rule is *"filled when read,
+  never from an abstract alone"*. The content rule is satisfied — full text, v2,
+  with section and table numbers throughout — but the *reader* is not the person
+  who will be examined on it. Marking that is the honest move; quietly filing it
+  as read would leave a landmine in the viva.
+- **Section and table numbers are attached to every claim**, so the whole entry
+  is checkable in under an hour rather than taken on trust.
+- **Three follow-up papers logged**: Wang et al. 2022 (self-consistency, needed
+  for the baseline in decision 9), Madaan et al. 2023 (Self-Refine — the closest
+  thing to our loop *without* a trained verifier), and Cobbe et al. 2021 moves
+  from "background" to load-bearing.
+
+### Consequences for downstream steps
+
+- Open decisions **9** and **10** must close before S6 runs. Both concern the
+  headline comparison; discovering them after 2,160 generations would be
+  expensive.
+- `references.bib` existed but was **empty** — first entry added.
+
+### Citations needed
+
+- Done for this paper: `huang2024selfcorrect` in `references.bib`, key matching
+  the `related_work.md` heading as the file requires.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |

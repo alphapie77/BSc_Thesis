@@ -15,14 +15,109 @@
 
 ## Tier 1 — Load-bearing (the thesis argument collapses without these)
 
-### [ ] huang2024selfcorrect — Huang et al., ICLR 2024
-*Large Language Models Cannot Self-Correct Reasoning Yet*
+### [x] huang2024selfcorrect — Huang et al., ICLR 2024
+*Large Language Models Cannot Self-Correct Reasoning Yet* · arXiv 2310.01798 v2
 - **Role:** theoretical anchor. Justifies why the Critic must be **external**.
-- **Feeds:** Ch.1 §1.1(2), Ch.2 §self-correction, RQ2 motivation.
-- **Read for:** the exact claim boundary — what fails (intrinsic, no oracle) vs
-  what is not tested. Do not overstate it.
-- **Numbers to compare:** their self-correction deltas vs our self-critique baseline.
-- **Notes:**
+- **Feeds:** Ch.1 §1.1(2), Ch.2 §self-correction, RQ2 motivation, §5.1 ablation design.
+- **Read:** 2026-08-01. ⚠️ **Read by Claude, not by Sabbir** — see the note at the
+  end of this entry. Sections and table numbers below are from the arXiv v2 HTML.
+
+**The claim, exactly as they scope it (§2, ¶ "Consequently…"):** they define
+**intrinsic self-correction** as self-correction *"without any external or human
+feedback"*, and state that all unqualified uses of "self-correction" in the
+paper mean that setting. The finding is that LLMs *"struggle to self-correct
+their responses without external feedback, and at times, their performance even
+degrades"* (abstract).
+
+**What the claim does NOT cover** — this is the boundary the entry was told to
+find:
+- Only **reasoning** benchmarks: GSM8K (1,319 items), CommonSenseQA (1,221 dev),
+  HotpotQA (100). **No generation task, no persona control, no low-resource
+  language.**
+- Only **intrinsic** correction. External feedback is explicitly *endorsed*
+  (below), not refuted.
+- The title's *"Yet"* is load-bearing: they frame it as the current state, not a
+  ceiling.
+- Models tested: GPT-3.5-Turbo, GPT-4, GPT-4-Turbo, Llama-2-70b-chat.
+
+**Numbers (Tables 2–4), accuracy %:**
+
+| Setting | Model | GSM8K | CommonSenseQA | HotpotQA |
+|---|---|---|---|---|
+| Standard prompting | GPT-3.5 | 75.9 | 75.8 | 26.0 |
+| Self-correct **with oracle** | GPT-3.5 | **84.3** | **89.7** | **29.0** |
+| Self-correct **intrinsic**, r1 → r2 | GPT-3.5 | 75.1 → **74.7** | 38.1 → **41.8** | 25.0 → 25.0 |
+| Standard prompting | GPT-4 | 95.5 | 82.0 | 49.0 |
+| Self-correct **intrinsic**, r1 → r2 | GPT-4 | 91.5 → **89.0** | 79.5 → 80.0 | 49.0 → **43.0** |
+| Standard prompting | Llama-2-70b | 62.0 | 64.0 | — |
+| Self-correct **intrinsic**, r1 → r2 | Llama-2-70b | 43.5 → **36.5** | 37.5 → **36.5** | — |
+
+Every intrinsic number is **at or below** its standard-prompting baseline. The
+oracle row is the one that improves — and they argue (§3.2) that oracle results
+*"can only be regarded as indicative of an oracle's performance"*, since if you
+already hold the ground truth there is little reason to run the model at all.
+
+**Why it degrades (§3.3):** on GSM8K, GPT-3.5 keeps its first answer 74.7% of
+the time; among the rest it is **more likely to change a correct answer to an
+incorrect one** than the reverse. Their diagnosis: *"LLMs cannot properly judge
+the correctness of their reasoning."* **This is the sentence our whole design
+rests on** — it is a claim about the *judge*, not about the *generator*, which
+is exactly why we externalise the judge.
+
+**Two further results, both of which bite on our ablation table:**
+- **§4 — multi-agent debate is self-consistency in disguise.** At a matched
+  9 model calls: debate **83.0** vs self-consistency **88.2** on GSM8K. The gain
+  people attribute to "critique" is really selection across generations.
+- **§5 — a prompt-design confound.** Self-Refine's reported gain on
+  CommonGen-Hard came partly from stating the requirement *only* in the feedback
+  prompt. Putting it in the initial prompt instead: standard **81.8** vs **75.1**
+  after self-correction. So "self-correction helped" can just mean "the second
+  prompt was more informative than the first".
+
+**They endorse our approach by name (§6, "Leveraging external feedback"):**
+*"when valid external feedback is available, it is beneficial to leverage it
+properly"*, citing **Cobbe et al. 2021**, Lightman et al. 2023 and Wang et al.
+2023b — *"train a verifier or a critique model on a high-quality dataset to
+verify or refine LLM outputs"*. That is this thesis, in a low-resource language,
+on a generation task. **Huang et al. is not an obstacle we route around; it is
+the paper that names our direction as the promising one.**
+
+**How to cite it without overstating (use this wording):**
+> Huang et al. (2024) show that *intrinsic* self-correction — without external
+> feedback — fails to improve, and often degrades, LLM performance on reasoning
+> benchmarks, and attribute this to the model's inability to judge the
+> correctness of its own output. This motivates externalising the judge; it does
+> not by itself establish that an external verifier helps on persona-controlled
+> generation in Bangla, which is what RQ2 tests.
+
+❌ **Do not write** "Huang et al. proved LLMs cannot self-correct, therefore we
+use an external verifier." They did not test our setting, and an examiner who
+has read the paper will say so.
+
+**Consequences for our design (raised as open questions, not adopted):**
+1. **Inference-cost matching.** §6 asks that self-correction be compared against
+   baselines *"with comparable inference costs"*. Our ablation rows 1–3 are
+   single-call; rows 4–8 loop. Row 6 beating row 1 may be partly a call-count
+   effect. → see open decision 9.
+2. **A self-consistency / best-of-N baseline at matched calls** is the strong
+   baseline they demand, and our table has none. → open decision 9.
+3. **Prompt parity.** Row 1's zero-shot persona prompt must state the persona
+   requirement as fully as the verifier feedback does, or our gain is §5's
+   confound wearing our variable names. → open decision 10.
+
+**Follow-up reading this entry generated:** Cobbe et al. 2021 (already Tier-1 —
+now clearly load-bearing, since Huang et al. point at it as the alternative);
+Wang et al. 2022 self-consistency (needed for the baseline above); Madaan et al.
+2023 Self-Refine (the paper §5 critiques, and the closest thing to our loop
+without a trained verifier).
+
+> **Provenance of this entry.** Claude read the paper and wrote this; Sabbir has
+> not read it yet. The file's own rule is *"filled when read, never from an
+> abstract alone"* — that rule is satisfied for the *content* (full text, v2),
+> but not for the *reader*. **Everything above is checkable against the section
+> and table numbers given.** An examiner will ask Sabbir about this paper
+> directly, and this entry is a summary, not a substitute for the two hours it
+> takes to read §3 and §6.
 
 ### [ ] kamoi2024when — Kamoi et al., TACL 2024
 *When Can LLMs Actually Correct Their Own Mistakes?*
