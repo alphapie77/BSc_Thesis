@@ -1,7 +1,7 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-07-31 · **Phase:** 0→1 (setup + Bangla data)
-**Week:** 1 of 14
+**Last updated:** 2026-08-01 · **Phase:** 0→1 (setup + Bangla data)
+**Week:** 2 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
 > step. `CLAUDE.md` points here rather than duplicating it, so this file is the
@@ -16,22 +16,22 @@
 | 1 | Repo skeleton + reproducibility contract | ✅ done | repo, `seed.py`, `provenance.py` | 2026-07-27 |
 | 2 | S0 verification (read-only) | ✅ done | `results/s0_data_xray.md` | 2026-07-27 |
 | 3 | S1 cleaning → `bn_clean.csv` (n=4,730) | ✅ done | `data/cleaned/bn_clean.csv`, `results/s1_cleaning_log.json` | 2026-07-27 |
-| 4 | Frozen R1/R2 split | ⏸ **deferred** — must run after near-dup removal (leakage) | `data/splits/split_map_v1.json` | — |
+| 4 | Frozen R1/R2 split | 🟢 **unblocked** — cluster assignments now exist; stratify on `Sentiment × region` | `data/splits/split_map_v1.json` | — |
 | 5 | S2 pilot: near-dup + ARI trap-check | ✅ **run** 2026-07-30 (Kaggle T4, commit `e3d8e43`) — ARI **0.1793**, Band 1, not degenerate | `results/s2_pilot_ari_trapcheck.md` | 2026-07-30 |
 | 5b | S2b register probe (**exploratory**) | ✅ run — class 2 differs structurally from classes 0/1; **RQ1 persona claim suspended** | `results/s2b_register_probe.md` | 2026-07-30 |
 | 5c | Provenance query to the data collector | ✅ **CLOSED 2026-07-30 — unresolvable.** Answer: collected from **many different places, all organic; which rows came from where is not remembered, and no metadata was kept.** That is an honest answer, and the pre-committed consequence applies: the measurement stands as the best available evidence, reported as exploratory, with the gap stated in Limitations. **Do not re-ask.** | `docs/provenance_query.md` | 2026-07-30 |
 | 5d | S2c region split (**exploratory**) — the corpus is two corpora | ✅ run — **60% of rows carry a uniform, non-organic signature** | `results/s2c_region_split.md` | 2026-07-30 |
-| 5e | Re-run S2 persisting cluster labels → compute `ARI(cluster, region)` | 🟢 **code ready, pre-registered, never run** — `configs/s2_pilot.yaml` now scores against region and saves assignments | `results/s2_cluster_assignments.csv` | — |
-| 5f | S2-A: trap-check on region A alone (1,910 organic rows) | 🟢 **code ready, interpretation pre-registered (protocol RQ1-A), never run** | `results/s2a_regionA_trapcheck.md` | — |
-| 6 | protocol.md freeze + supervisor signature | 📝 draft; **cannot freeze while 5c is open** | `docs/protocol.md` | — |
+| 5e | `ARI(cluster, region)` — the decisive test | ✅ **RUN 2026-07-31. Pre-registered outcome 1 fires.** ARI(region) **0.4813** vs ARI(Sentiment) **0.1793**, at every threshold. Binary recast: ARI 0.7487, φ 0.861, **93.3% accuracy at identifying which corpus a review came from**. The clusters are a corpus detector, not personas. | `results/s2_cluster_assignments.csv` | 2026-07-31 |
+| 5f | S2-A: trap-check on region A alone | ✅ **run** — n=1,897, **not degenerate** (29.5/38.9/31.6), ARI **0.1804 → Band 1**. But V=**0.5455** (up from 0.4104) and the clusters are visibly sentiment-ordered; ARI is capped because K=3 meets 2 classes — **pre-registered as weakening this evidence**. G-300 is the arbiter. | `results/s2a_regionA_trapcheck.md` | 2026-07-31 |
+| 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
 | Track | Target | Done | Blocks | Risk |
 |---|---|---|---|---|
 | Bangla plot synopses | ~~130~~ → **120 = 30 dev + 90 eval** (deviation logged 2026-07-31) | ✅ **FROZEN** — 124 harvested, **4 rejected on human review** (BN024 production history, BN042 director's death, BN068 theme commentary, BN113 a 3-sentence fragment). Split assigned once with seed 42; `plots_check` refuses to reassign. Every row carries `revision_id` + licence. | S6 evaluation | 🟢 **done** — BN113 passed every mechanical gate and is unusable, which is the case for human review in one row. ⚠️ **Outstanding: CC BY-SA attribution** (3-item checklist in the dataset card) must be discharged before submission. One kept plot (BN072 দ্য নেমসেক) is an English-language film — Sabbir's scope call, recorded in the notebook |
-| Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 high |
-| Gold-300 annotation | 300 × 3 annotators | 0 | RQ1 validation | 🟡 needs S2 clusters first (stratified) |
+| Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 **highest now** — plots are frozen and S2 is done, so nothing else is competing for the time |
+| Gold-300 annotation | 300 × 3 annotators | **0** | RQ1 validation | 🔴 **now the arbiter.** Must be stratified on the **region-A** clustering, never the full-corpus one — that one is a corpus detector. G-300 is what decides whether cluster 1 (the 54/46 mixed cluster) is an audience persona or just the ambivalent reviews; nothing else can. |
 | **Retrospective base-label reliability study** | 200 items from R (disjoint from G-300), 2 native annotators, sentiment only, **blind to the original labels**; run in a session **separate** from persona annotation, order randomized | **0** | Ch.4 §Data Quality; Ch.5 §Threats | 🟡 converts "no IAA exists" (fact (a)) into an **estimated** base-label reliability figure. Report annotator-vs-annotator κ/α **and** their majority vs the original single-coder label. |
 
 ---
@@ -96,7 +96,7 @@ edited until the final `usable_n` is known (see Open decisions).
 | ~~**0b**~~ | ~~region A only, full corpus, or the split as the object of study?~~ **CLOSED 2026-07-30 — Sabbir: full corpus.** Conditions are pre-registered in `protocol.md` §"Scope decision": region becomes a **controlled factor**, the split stratifies on `Sentiment × region`, every headline metric is reported full / A / B, and no claim survives that does not survive within-region. Region A is retained as a robustness check, not the main line. | — | closed |
 | 1 | Final `usable_n` after near-dup removal | Step 4 | blocked by 0 |
 | 2 | Near-dup threshold: 0.90 gives Band 2, 0.95 and 0.98 give Band 1. Held at the pre-registered **0.95**; audit sheet generated and parked, since 52% of the contested band is class 2 | Step 4 | blocked by 0 |
-| 3 | ~~Do personas survive `ARI(cluster, Sentiment)`?~~ **Answered, but superseded**: ARI 0.1793 = Band 1, so the clusters are *not* a sentiment rediscovery — however the crosstab shows they separate class 2 from the rest almost perfectly, so the live question is now decision 0 | RQ1 claim | S2 pilot + 0 |
+| 3 | ~~Do personas survive the trap-check?~~ **ANSWERED 2026-07-31.** On the full corpus the clusters are a **corpus detector** (93.3% accuracy) — no persona claim stands there. In region A they are non-degenerate, Band 1, but sentiment-ordered with V=0.5455. **Persona discovery moves inside region A; G-300 decides whether the mixed middle cluster is a persona.** | RQ1 claim | closed |
 | 4 | Correct the S0 table in the pipeline spec | — | after 1–2 |
 | 5 | Frame the register finding in the **stylometry / authorship** literature or the **machine-generated-text detection** literature? Writing decision, Sabbir's | Ch.2, Ch.4 | Sabbir |
 | 7 | **Three personas or two?** The design posits three; region A has two sentiment classes and region B three. K is settled by the S2 master K-table (pipeline gate G1), not by the label count — but the mismatch must be resolved before S3 | S2 → S3 | after the re-run |

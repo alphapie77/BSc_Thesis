@@ -1240,7 +1240,118 @@ frozen), `data/plots/rejected_by_review.csv`
 
 ---
 
-| # | Decision | Blocks | Due |
+## 2026-07-31 — The decisive run: the clusters are a corpus detector
+
+**Feeds:** Ch.4 §Persona discovery, Ch.5 §Threats · **Artifacts:**
+`results/s2_pilot_ari_trapcheck.md`, `results/s2a_regionA_trapcheck.md`,
+`results/s2_cluster_assignments.csv` · **Ran on:** Kaggle T4
+
+### Numbers — full corpus, primary threshold 0.95, n = 4,625
+
+| Scored against | ARI |
+|---|---|
+| `Sentiment` | 0.1793 |
+| **`region`** | **0.4813** |
+
+Cluster × region:
+
+| Cluster | A_organic | B_uniform |
+|---|---|---|
+| 0 | **1,700** | 114 |
+| 1 | 119 | **1,308** |
+| 2 | 78 | **1,306** |
+
+Cramér's V = **0.8610**. Region is binary while K = 3, so the three-way ARI is
+structurally capped; merging the two region-B clusters gives the undistorted
+comparison: **ARI = 0.7487, φ = 0.8607, and the clustering identifies which
+corpus a review came from with 93.3% accuracy.**
+
+Consistent across every threshold: ARI(region) 0.5943 / 0.4813 / 0.4799 at
+0.90 / 0.95 / 0.98, against ARI(Sentiment) 0.2181 / 0.1793 / 0.1784.
+
+### The pre-registered outcome fires
+
+`protocol.md` RQ1-A, Test 1, written on 2026-07-30 before this run existed:
+
+> `ARI(cluster, region)` > `ARI(cluster, Sentiment)` → the encoder recovers
+> **which file a review came from** more strongly than what it says. **No
+> persona claim may rest on the full-corpus clustering.**
+
+0.4813 > 0.1793, by a factor of 2.7, at every threshold. **The condition is met
+and there is nothing to negotiate** — which is the entire reason it was written
+down in advance.
+
+So the three clusters found on 2026-07-30, and read then as candidate audience
+personas, are **not personas**. They are the seam in the file. LaBSE was
+separating two corpora with 93.3% accuracy while appearing to do persona
+discovery.
+
+### Region A alone — n = 1,897, not degenerate
+
+Cluster shares 29.5 / 38.9 / 31.6, comfortably inside the 5–70% band, so the
+number is interpretable. **ARI = 0.1804 → Band 1, NOT_SENTIMENT_ALIGNED**,
+constant across all four threshold rows.
+
+But the crosstab has to be read alongside it:
+
+| Cluster | Sentiment 0 | Sentiment 1 | |
+|---|---|---|---|
+| 0 | 64 | 496 | 89% positive |
+| 1 | 396 | 342 | **54 / 46 — mixed** |
+| 2 | 484 | 115 | 81% negative |
+
+Cramér's V = **0.5455**, *higher* than the full corpus's 0.4104. The clusters
+are strongly sentiment-ordered — negative-leaning, mixed, positive-leaning —
+and ARI is low largely because **a three-way partition cannot align with a
+two-class label**. That structural cap was written into the RQ1-A
+pre-registration precisely so it could not be discovered now and used as a
+convenient explanation.
+
+**So Band 1 here is a weaker result than Band 1 on the full corpus was.** The
+pre-registered claim ("the persona programme may proceed on region A") holds,
+but only in its literal form: the clusters are not a *rediscovery* of the
+sentiment partition. They are visibly sentiment-*correlated*, and whether
+cluster 1 — the mixed one — is an audience persona or simply the ambivalent
+reviews is exactly what G-300 has to settle. It cannot be settled from here.
+
+### Findings
+
+- **The 2026-07-30 reading of S2 was wrong, and the instrument that corrected it
+  was built the same day.** Persisting cluster assignments cost one CSV column
+  and turned an unanswerable question into a two-minute one.
+- **93.3% corpus-detection accuracy is itself a reportable finding.** No
+  published work on this dataset reports that its two halves are separable at
+  all, let alone by an off-the-shelf multilingual encoder with no supervision.
+- **V rose when the confound was removed** (0.4104 → 0.5455). The register split
+  was *suppressing* the sentiment signal on the full corpus by dominating the
+  first axis.
+
+### Decisions made (and why)
+
+- **Persona discovery moves inside region A.** The full corpus stays — Sabbir's
+  scope decision — but the pre-committed rule that no claim survives unless it
+  survives within-region is now load-bearing rather than precautionary.
+- **Nothing is re-run to look better.** The full-corpus trap-check stands as
+  computed and is reported as confounded, with the region table beside it.
+- **K remains an open question, not a settled one.** Region A has two sentiment
+  classes and the K-Means K = 3 was inherited from the persona design. The
+  pipeline's own G1 gate settles K from the master K-table; that gate has not
+  run yet, and this result makes it more important, not less.
+
+### Consequences for downstream steps
+
+- **Gold-300 stratification must be drawn from the region-A clustering**, not the
+  full-corpus one. Had the annotation been done a week earlier, 300 items would
+  have been stratified on a corpus detector.
+- The split freeze can now proceed: cluster assignments exist for both.
+- Ch.4 gains a result it did not have: an encoder recovering dataset provenance
+  from text alone.
+
+### Citations needed
+
+- The corpus-detection result may want a pointer to the dataset-artefact /
+  shortcut-learning literature when written up. **Sabbir's call** — open
+  decision 5 covers the framing.
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
 | 2 | Near-dup threshold (0.90 / 0.95 / 0.98) — from the sensitivity curve | Split freeze | S2 pilot |
