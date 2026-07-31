@@ -973,6 +973,73 @@ parser assumes.
 
 ---
 
+## 2026-07-31 — Second harvest: 110 of 130, and the tally earns its keep
+
+**Feeds:** Ch.3 §Data · **Artifact:** `results/plots_harvest_report.md`
+
+### Numbers
+
+| | first harvest | **second** |
+|---|---|---|
+| candidates discovered | 1,225 | **2,820** |
+| usable | 67 | **110** |
+| rejected: no plot section | 1,148 | **2,690** |
+
+Stem matching plus depth-2 discovery took the yield from 67 to 110. Still 20
+short of 130.
+
+### Findings
+
+- **The 900-page cap was binding, and had been all along.** The three working
+  categories returned **912 / 957 / 951** — all sitting on the cap rather than
+  exhausting the category. Both harvests were silently discarding candidates.
+  Raised to 6,000. A round number appearing three times should have been noticed
+  the first time; it was in the output of run 1 and I read past it.
+- **The heading tally paid for itself immediately.** The rejected articles are
+  dominated by তথ্যসূত্র (221) and বহিঃসংযোগ (182) — stubs carrying nothing but
+  references — plus কর্মজীবন, ব্যক্তিগত জীবন, চলচ্চিত্রের তালিকা, which are
+  **person articles, not films**: actors and directors swept in by the film
+  categories. So the misses are mostly genuine absence of plot sections, **and
+  adding more heading stems would not have helped.** That is worth knowing from
+  the corpus instead of from a third round of guessing.
+- **`কাহিনী সংক্ষেপ` appears 8 times among the *rejected*.** Those articles have
+  the heading but yielded no body — most likely level-3 subsections underneath it
+  taking the text. Small (8 of 2,690) and not worth chasing yet, but recorded so
+  it is not rediscovered later as a mystery.
+- **Two category names in a row were ones I invented**, both returning +0. That
+  is what `--find-categories` now exists for: it searches the Category namespace
+  and prints each candidate's page count, so the config gets real names rather
+  than plausible ones.
+
+### Decisions made (and why)
+
+- **Cap raised to 6,000 and `--find-categories` added, before deciding anything
+  about the target.** The shortfall may simply be an artefact of the cap; there
+  is no point debating whether 130 is reachable while the harvester is still
+  throwing candidates away.
+- **The quality gate is not being relaxed.** It rejected 20 of 2,820 — it is not
+  the constraint, and loosening it to manufacture a number would trade real
+  quality for an arbitrary target.
+- **Not hand-writing the remainder**, even at 110 of 130. That reinstates both
+  biases scraping was chosen to remove, and it would do so for the last 20 rows
+  only — a corpus where 15% of items came from a different process, which is
+  precisely the defect being documented in the review corpus this week.
+
+### Consequences for downstream steps
+
+- Re-run with `--reset`. If the raised cap does not close the gap, the remaining
+  options are more categories (from `--find-categories`, not invention) or a
+  **logged, deliberate reduction of the target** — the 30 dev / 100 eval split is
+  a design choice from the pipeline, not a statistical requirement, and changing
+  it is legitimate provided it is a recorded decision rather than a quiet
+  accommodation.
+
+### Citations needed
+
+- None.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |

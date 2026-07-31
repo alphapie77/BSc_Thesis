@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-07-30 · **Phase:** 0→1 (setup + Bangla data)
+**Last updated:** 2026-07-31 · **Phase:** 0→1 (setup + Bangla data)
 **Week:** 1 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -29,7 +29,7 @@
 
 | Track | Target | Done | Blocks | Risk |
 |---|---|---|---|---|
-| Bangla plot synopses | 130 (30 dev + 100 eval) | **0** — **now scraped, not hand-written**: `plots_scrape.py` (harvest → sample 130, seed 42) + `plots_check.py`. Offline logic tested; **network path untested** — first real run is the test | S6 evaluation | 🟡 downgraded from 🔴. Scraping removes both the 26-day cost *and* two biases: the experimenter's register in the inputs, and hand-selection of famous films. **New obligation:** bn.wikipedia is CC BY-SA 4.0 — attribution + revision ids must be in the dataset card before publication |
+| Bangla plot synopses | 130 (30 dev + 100 eval) | **110 harvested** (of 2,820 candidates) — scraped, not hand-written. 20 short; the 900-page discovery cap was found to be **binding** (categories returned 912/957/951) and is raised to 6,000, so a re-run may close the gap | S6 evaluation | 🟡 — Scraping removes both the 26-day cost *and* two biases: the experimenter's register in the inputs, and hand-selection of famous films. **New obligation:** bn.wikipedia is CC BY-SA 4.0 — attribution + revision ids must be in the dataset card before publication |
 | Base-paper reading | 5 Tier-1 | **0** | Ch.1, Ch.2 | 🔴 high |
 | Gold-300 annotation | 300 × 3 annotators | 0 | RQ1 validation | 🟡 needs S2 clusters first (stratified) |
 | **Retrospective base-label reliability study** | 200 items from R (disjoint from G-300), 2 native annotators, sentiment only, **blind to the original labels**; run in a session **separate** from persona annotation, order randomized | **0** | Ch.4 §Data Quality; Ch.5 §Threats | 🟡 converts "no IAA exists" (fact (a)) into an **estimated** base-label reliability figure. Report annotator-vs-annotator κ/α **and** their majority vs the original single-coder label. |

@@ -158,6 +158,41 @@ def discover(api: Api, cfg) -> dict[str, str]:
     return found
 
 
+def find_categories(api: Api, term: str, limit: int = 40) -> int:
+    """Search the Category namespace and report each candidate's size.
+
+    Two seed categories in a row returned **+0 articles** because I invented
+    their names. Guessing a third time would be the same mistake again, so this
+    asks bn.wikipedia what its film categories are actually called and how many
+    pages each holds. Paste the productive ones into `categories`.
+    """
+    print(f'searching Category namespace for "{term}"...\n')
+    data = api.get(action="query", list="search", srsearch=term,
+                   srnamespace="14", srlimit=str(limit))
+    hits = [h["title"] for h in data.get("query", {}).get("search", [])]
+    if not hits:
+        print("no categories matched. Try a shorter term.")
+        return 1
+
+    rows = []
+    for title in hits:
+        d = api.get(action="query", list="categorymembers", cmtitle=title,
+                    cmlimit="500", cmtype="page")
+        n = len(d.get("query", {}).get("categorymembers", []))
+        more = "+" if "continue" in d else ""
+        rows.append((n, more, title))
+
+    rows.sort(reverse=True)
+    print(f"{'pages':>7}  category")
+    print(f"{'-' * 7}  {'-' * 50}")
+    for n, more, title in rows:
+        print(f"{n:>6}{more}  {title}")
+    print("\n'+' means the category has more than 500 pages (this only counts "
+          "the first page of results).\nAdd the productive ones to "
+          "`categories:` in the config, then re-run with --reset.")
+    return 0
+
+
 def split_sections(extract: str) -> dict[str, str]:
     """Plain-text extract -> {heading: body}. Level-2 headings only.
 
@@ -470,6 +505,10 @@ def main() -> int:
     # nargs="?" so `--probe` works with no argument. Typing a Bangla title on a
     # Windows console is its own small ordeal, and the first thing anyone runs
     # should not require it.
+    ap.add_argument("--find-categories", metavar="TERM", nargs="?",
+                    const="চলচ্চিত্র", default="",
+                    help="search bn.wikipedia for category names and their "
+                         "sizes, instead of guessing at them")
     ap.add_argument("--reset", action="store_true",
                     help="clear the checkpoint and re-harvest from scratch. "
                          "Needed after changing the heading config, since "
@@ -495,6 +534,8 @@ def main() -> int:
         print("checkpoint cleared -- harvesting from scratch.\n")
 
     api = Api(cfg)
+    if args.find_categories:
+        return find_categories(api, args.find_categories)
     if args.probe:
         return probe(api, cfg, args.probe)
     print("discovering film articles...")
