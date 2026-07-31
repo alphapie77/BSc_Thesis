@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-01 · **Phase:** 0→1 (setup + Bangla data)
+**Last updated:** 2026-08-01 · **Phase:** 1 COMPLETE → 2 (persona discovery)
 **Week:** 2 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -16,7 +16,7 @@
 | 1 | Repo skeleton + reproducibility contract | ✅ done | repo, `seed.py`, `provenance.py` | 2026-07-27 |
 | 2 | S0 verification (read-only) | ✅ done | `results/s0_data_xray.md` | 2026-07-27 |
 | 3 | S1 cleaning → `bn_clean.csv` (n=4,730) | ✅ done | `data/cleaned/bn_clean.csv`, `results/s1_cleaning_log.json` | 2026-07-27 |
-| 4 | Frozen R1/R2 split | 🟢 **unblocked** — cluster assignments now exist; stratify on `Sentiment × region` | `data/splits/split_map_v1.json` | — |
+| 4 | **Frozen G/R1/R2 split** | ✅ **FROZEN 2026-08-01.** G=**300** · R1=**2,162** · R2=**2,163** · dev=**200**, over the 4,625 deduped rows. Stratified on `Sentiment × region` (not cluster — the full-corpus clustering is a corpus detector; deviation logged). Every part matches the corpus to within **0.1pp** on both variables; zero overlap. Script refuses to overwrite; `tests/test_split_map.py` pins the invariants. | `data/splits/split_map_v1.json` | 2026-08-01 |
 | 5 | S2 pilot: near-dup + ARI trap-check | ✅ **run** 2026-07-30 (Kaggle T4, commit `e3d8e43`) — ARI **0.1793**, Band 1, not degenerate | `results/s2_pilot_ari_trapcheck.md` | 2026-07-30 |
 | 5b | S2b register probe (**exploratory**) | ✅ run — class 2 differs structurally from classes 0/1; **RQ1 persona claim suspended** | `results/s2b_register_probe.md` | 2026-07-30 |
 | 5c | Provenance query to the data collector | ✅ **CLOSED 2026-07-30 — unresolvable.** Answer: collected from **many different places, all organic; which rows came from where is not remembered, and no metadata was kept.** That is an honest answer, and the pre-committed consequence applies: the measurement stands as the best available evidence, reported as exploratory, with the gap stated in Limitations. **Do not re-ask.** | `docs/provenance_query.md` | 2026-07-30 |

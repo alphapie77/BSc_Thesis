@@ -1427,8 +1427,86 @@ No new computation. Four documents were carrying refuted figures.
 ### Citations needed
 
 - None.
+
+---
+
+## 2026-08-01 — Split FROZEN. Phase 1 is closed.
+
+**Feeds:** everything downstream · **Artifact:**
+`data/splits/split_map_v1.json` (committed, frozen)
+
+### Numbers
+
+| Part | n | region A / B | Sentiment 0 / 1 / 2 |
 |---|---|---|---|
-| 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
-| 2 | Near-dup threshold (0.90 / 0.95 / 0.98) — from the sensitivity curve | Split freeze | S2 pilot |
-| 3 | Whether personas survive the ARI trap-check, or reframe as engagement tiers | RQ1 claim | S2 pilot |
-| 4 | Correct the S0 table in `research_pipeline_en.md` (deferred until 1–2 settle) | — | after S2 |
+| **G** (gold, eval-only) | **300** | 123 / 177 | 96 / 102 / 102 |
+| **R1** (Verifier-A + RAG) | **2,162** | 886 / 1,276 | 694 / 733 / 735 |
+| **R2** (Verifier-B) | **2,163** | 888 / 1,275 | 694 / 734 / 735 |
+| dev (⊂ R1) | 200 | 82 / 118 | 64 / 68 / 68 |
+
+Built over the **4,625** rows surviving near-duplicate removal at t = 0.95 —
+**not** over `bn_clean.csv`'s 4,730. A split defined on the pre-dedup set could
+put a near-duplicate pair on opposite sides of the R1/R2 wall, which is a leak
+that looks like nothing.
+
+Verified independently of the writing script: every part matches the corpus on
+both region and sentiment to **within 0.1 percentage points**, zero overlap
+between any two parts, union covers the input exactly, dev ⊆ R1.
+
+### Decisions made (and why)
+
+- **Stratified on `Sentiment × region`, not on cluster** — a departure from
+  pipeline §A, logged in `protocol.md`. The cluster instruction predates the
+  finding that the full-corpus clustering is a **corpus detector**; stratifying
+  the gold set on it would stratify on a file seam. And Gate G1 has not run, so
+  a cluster-stratification would go stale the moment K changes.
+- **The 300 gold ids are fixed now, even though the persona scheme is not.**
+  Which items are held out, and what they will eventually be annotated *for*,
+  are separate questions. Fixing the ids now is what makes "G never enters
+  training" true from this moment rather than from whenever the scheme settles.
+- **The script refuses to overwrite the map.** The override flag is
+  deliberately unwieldy (`--i-am-recreating-the-split-and-i-know-why`) and
+  stores the stated reason inside the new map.
+- **The map carries its own contract** — `_contract` and `_provenance`
+  (including the SHA-256 of the input) live inside the JSON, so a reader who
+  opens only that file still learns that G is eval-only and why R2 exists.
+- **`tests/test_split_map.py` pins the invariants permanently**, not just at
+  creation. Verified by corrupting a copy: leaking 5 R1 ids into R2 fails with
+  the reason named.
+
+### Findings
+
+- **Nothing else in this repo would notice a broken split.** The verifier would
+  train, the loop would run, the numbers would look plausible. That is why the
+  invariants live in a test rather than only in the script that ran once.
+- **The Open-decisions table below had lost its header row** to one of my
+  earlier edits — the rows were orphaned under a `### Citations needed`
+  heading. Repaired here. Small, but it is the second formatting casualty of
+  editing these files programmatically, after the notebook cell.
+
+### Consequences for downstream steps
+
+- **Phase 1 is complete.** Data prepared, corpus characterised, plot corpus
+  frozen, split frozen.
+- S4 can begin: R1 → Verifier-A, R2 → Verifier-B, dev for the τ sweep.
+- G-300 annotation still waits on the persona scheme (Gate G1), but the
+  **identity** of the held-out 300 is settled and unarguable.
+
+### Citations needed
+
+- None.
+
+---
+
+## Open decisions (resolve before they are needed)
+
+| # | Decision | Blocks | Status |
+|---|---|---|---|
+| ~~1~~ | ~~Final `usable_n` after near-dup removal~~ | — | ✅ **4,625** at t = 0.95 |
+| ~~2~~ | ~~Near-dup threshold from the sensitivity curve~~ | — | ✅ held at the pre-registered **0.95**; 0.90 disclosed as a sensitivity caveat |
+| ~~3~~ | ~~Do personas survive the trap-check?~~ | — | ✅ **answered**: on the full corpus the clusters are a corpus detector (93.3%); in region A they are Band 1 but sentiment-ordered. G-300 decides. |
+| ~~4~~ | ~~Correct the S0 table in `research_pipeline_en.md`~~ | — | ✅ corrected 2026-08-01, with strikethrough |
+| 5 | Frame the register finding in **stylometry/authorship** or **machine-generated-text detection** literature? | Ch.2, Ch.4 | 🔵 Sabbir's, at writing time |
+| 6 | Should `s2_pilot.py` persist UMAP coordinates too, for the Ch.4 figure? | Ch.4 figures | 🔵 open |
+| 7 | **Three personas or two?** The design posits three; region A has two sentiment classes. Gate G1's master K-table settles K, not the label count | S2 → S3 | 🔴 **next** |
+| 8 | If the provenance question ever reopens, does region B get **excluded**, **kept as a labelled condition**, or become **the contribution**? | Ch.1 framing | ⏸ dormant (decision 0 closed unresolvable) |

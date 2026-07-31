@@ -1,0 +1,57 @@
+# THE FROZEN SPLIT — the single most important artifact in the thesis.
+#
+# Written once, committed to git, never regenerated. Everything downstream
+# (verifier training, the RAG index, threshold tuning, the S6 experiment) is
+# defined relative to these three lists of review_ids. Regenerating them
+# silently invalidates every result computed before the regeneration, with no
+# error anywhere.
+#
+# ── WHAT GOES WHERE ────────────────────────────────────────────────────────
+#   G   gold-300   EVAL ONLY. Never enters training, the RAG index, prompts, or
+#                  threshold tuning. Human-annotated later; held out from now.
+#   R1  ~half of R Verifier-A + the RAG index + a 200-row dev slice for the
+#                  threshold sweep.
+#   R2  ~half of R Verifier-B, which never enters the loop. That wall IS the
+#                  Goodhart test: if B were trained on what A saw, "the loop
+#                  improves the score" and "the loop games the scorer" become
+#                  indistinguishable.
+#
+# ── WHY STRATIFY ON `Sentiment x region` AND NOT ON CLUSTER ────────────────
+# The pipeline (§A) says G-300 is *cluster*-stratified. That instruction was
+# written before we knew two things:
+#
+#   1. The corpus is two corpora (results/s2c_region_split.md), and
+#   2. the full-corpus clustering is a CORPUS DETECTOR -- it recovers which of
+#      the two a review came from with 93.3% accuracy
+#      (results/s2_pilot_ari_trapcheck.md).
+#
+# Stratifying on that clustering would stratify the gold set on a file seam.
+# And the persona scheme is not settled: Gate G1 (the master K-table, K=2..8)
+# has not run, so any cluster-stratification now would be stale the moment K
+# changes.
+#
+# `region` and `Sentiment` are both known, both stable, and both matter --
+# region because it is the confound, Sentiment because it is the label. So the
+# split is stratified on their interaction, and the persona question is left to
+# the annotation stage, where it belongs.
+#
+# Region A holds no class-2 rows, so 5 of the 6 cells are non-empty. That is a
+# property of the data, not an error.
+name: s3_split
+seed: 42
+
+# Input is the POST-dedup assignment file, not bn_clean.csv: the split must be
+# defined over exactly the rows that survive near-duplicate removal, or a
+# near-duplicate pair could straddle R1/R2 and leak.
+input_assignments: results/s2_cluster_assignments.csv
+id_col: review_id
+label_col: Sentiment
+region_col: region
+expected_n: 4625            # asserted; a mismatch means the threshold moved
+
+sizes:
+  gold: 300
+  dev_slice: 200            # carved from R1 only -- never from R2, never from G
+  r1_fraction: 0.5
+
+output: data/splits/split_map_v1.json
