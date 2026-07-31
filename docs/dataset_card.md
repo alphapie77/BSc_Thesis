@@ -100,15 +100,41 @@ has an unrecoverable provenance.
 
 ---
 
-## Plot synopses (secondary corpus, n = 130)
+## Plot synopses (secondary corpus, n = 120) — FROZEN 2026-07-31
 
 | | |
 |---|---|
 | Source | **bn.wikipedia.org**, MediaWiki API |
-| Method | `src/preprocess/plots_scrape.py`, harvest → sample 130 with seed 42 |
-| Per-row provenance | `source_url`, **`revision_id`**, `revision_timestamp` |
-| Split | 30 dev / 100 eval, assigned once at n = 130 with seed 42 |
+| Method | `src/preprocess/plots_scrape.py` — harvest 3,135 candidates → 124 passing the gate → **4 removed on human review** → 120 |
+| **Split** | **30 dev / 90 eval**, assigned once with seed 42, frozen |
+| Per-row provenance | `source_url`, **`revision_id`**, `revision_timestamp` — complete for all 120 |
+| Length | 3–12 sentences (median 9) |
 | **Licence** | **CC BY-SA 4.0** |
+
+**Not 130.** The pipeline spec asks for 130 = 30 dev + 100 eval; bn.wikipedia
+does not contain 130 Bangla-film articles with a usable plot section. Two routes
+to 130 existed and both were refused — relaxing the quality gate (thin,
+two-sentence plots) and adding the language-neutral by-year categories (which
+would have admitted Tamil and Hindi films described in Bangla, passing every
+check while making the corpus stop being Bangla cinema). Deviation logged in
+`docs/protocol.md`, 2026-07-31.
+
+**Removed on human review**, after passing every mechanical gate:
+
+| id | film | why |
+|---|---|---|
+| BN024 | আদম সুরত | production history, and a documentary |
+| BN042 | কাগজের ফুল | the director's fatal accident; the film was never finished |
+| BN068 | দহন (১৯৮৫) | commentary *about* the story, never what happens |
+| BN113 | শঙ্খবেলা | a 3-sentence fragment that sets up and stops |
+
+Logged in `data/plots/rejected_by_review.csv`. BN113 is the case for human
+review in one row: Bangla, exactly 3 sentences, over 120 characters, no
+biography section — passes everything, and nothing happens in it.
+
+**One caveat to state if this corpus is described as Bangla cinema:** BN072
+(দ্য নেমসেক) is Mira Nair's **English-language** film, in bn.wikipedia because
+its subject is a Bengali immigrant family. Kept as a scope decision (2026-07-31).
 
 ### ⚠️ Attribution obligation — must be discharged before publication
 

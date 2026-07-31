@@ -11,16 +11,49 @@
 
 ## 📊 S0 — X-ray of the actual data file (ground truth for everything below)
 
+> ## ⛔ CORRECTED 2026-08-01 — read this before the table
+>
+> **This section was written from claims, not measurements. Three of its numbers
+> were wrong and one of its premises was wrong.** Corrections are inline below,
+> struck through rather than deleted, so the original can still be audited.
+>
+> **The premise that failed:** this table treats the 5,000 rows as one corpus.
+> **They are two.** Rows 0–1998 and 1999–4999 differ on features that carry no
+> sentiment content — দাঁড়ি 38.7% vs 99.2%, first-person pronouns 13.5% vs 0.8%,
+> lexical richness 255 vs 128 types per 1,000 tokens — with a step transition at
+> one row, not a drift. All 1,670 class-2 rows sit in the second region.
+> Evidence: `results/s2c_region_split.md`.
+>
+> **The consequence, measured:** LaBSE K-Means on the full corpus identifies
+> **which of the two corpora a review came from with 93.3% accuracy**
+> (ARI(cluster, region) = 0.4813 against ARI(cluster, Sentiment) = 0.1793;
+> binary recast ARI 0.7487, φ 0.861). The clusters this pipeline calls "personas"
+> are, on the full corpus, **a corpus detector**. See
+> `results/s2_pilot_ari_trapcheck.md`.
+>
+> **What this changes in the design, and it is not cosmetic:**
+> - `region` is a **controlled factor** throughout. The split stratifies on
+>   `Sentiment × region`, every headline metric is reported full / A / B, and no
+>   claim survives that does not survive within-region.
+>   (`docs/protocol.md`, "Scope decision".)
+> - **Persona discovery happens inside region A**, never on the full corpus.
+> - **Gold-300 must be stratified on the region-A clustering.** Stratifying on
+>   the full-corpus clustering would stratify 300 annotations on a file seam.
+> - Provenance is **unrecoverable**: no venue, thread or timestamp column, no
+>   collection log, and the collector does not remember. Closed as unresolvable
+>   2026-07-30; both the measurement and his account are recorded, unreconciled.
+
 **File:** `Raw_Bangla_Movie_Review_Comment_Dataset...xlsx` → 1 sheet, **5,000 rows × 2 columns: `Movie Review`, `Sentiment`**
 
 | Finding | Number | Consequence |
 |---|---|---|
-| Sentiment labels (0/1/2) | 1,665 / 1,664 / 1,670 — perfectly balanced | 🎁 Free external-validity metadata (§2.4); the balance is curated — disclose in the dataset card |
+| Sentiment labels (0/1/2) | 1,665 / 1,664 / 1,670 — ~~perfectly balanced~~ **balanced in the raw file only; 1,513 / 1,599 / 1,618 after cleaning** | 🎁 Free external-validity metadata (§2.4); the balance is curated — disclose in the dataset card. **No prevalence claim may be made: stopping was quota-driven.** |
 | **Movie-title column** | **Absent**; in-text name mentions are rare (শাকিব=18, শাবানা=17) | ❌ A held-out-films split is impossible → split map and §5.4 redesigned accordingly |
-| Exact/normalized duplicates | 204 / 205 | Removed in cleaning |
+| Exact/normalized duplicates | 204 / ~~205~~ **206** | Removed in cleaning |
 | Reviews with <3 words | 72 | Removed |
-| Null rows | 1 | Removed |
-| **Usable n** | **≈ 4,722** | All split sizes derive from this |
+| Null rows | ~~1~~ **2** — one missing text, one missing label | Removed |
+| **Usable n** | ~~**≈ 4,722**~~ **4,730** after rule-based cleaning; **4,625** after near-duplicate removal at the pre-registered t = 0.95 | All split sizes derive from this. 4,722 came from subtracting the three drop sets as if disjoint, double-counting the 10 rows in SHORT ∩ DUP. Verified in `results/s0_data_xray.md`. |
+| **Corpus composition** | **Two corpora, joined at raw row 1999**: 1,999 organic + 3,001 uniform-register | **NOT in the original table.** Region A survives cleaning as 1,910 rows / 2 classes; region B as 2,820 / 3 classes. See the correction box above. |
 | Word count | median **8**, mean 9.6, max 84; only 12 reviews ≥50 words | Very short reviews — generated text must match this length distribution (JS-on-length matters); verifier max_len=64 suffices |
 | Emoji | **0 rows** | ❌ Emoji features are dead → symbolic scorer is text-only (§3.5); the pre-defence emoji preprocessing tables do not match this file — fix in the thesis |
 | URLs/mentions | 0 | The file is partially pre-cleaned despite the "Raw" name — state this honestly in the dataset card |
@@ -39,17 +72,17 @@
 ☐ 3. Begin the core base papers (§0.3 — at minimum MoP + Huang first)
 
 **Weeks 2–3 — Data (S1)**
-☐ 4. xlsx → clean: drop dup(204)+short(72)+null(1) → `bn_clean.csv` (~4,722) [§1.1]
-☐ 5. Freeze the split file: G-placeholder + R1/R2 (~2,211 each) — one commit, never touched again
-☐ 6. Collect 130 Bangla plots — 30 dev + 100 eval, disjoint (Wikipedia-bn/bmdb) [§1.1.7]
-☐ 7. English arm: IMDB subsample n=4,722 + MPST plots 30+100 + tokenizer-fertility table [§1.2]
+☑ 4. xlsx → clean → `bn_clean.csv` — **n = 4,730**, not 4,722 (see corrected S0) [§1.1]
+☐ 5. Freeze the split file — **stratify on `Sentiment × region`** (6 strata), not on Sentiment alone. G-placeholder + R1/R2. One commit, never touched again
+☑ 6. Bangla plots — **120 = 30 dev + 90 eval**, harvested from bn.wikipedia and FROZEN 2026-07-31. Not 130: the source does not hold 130 Bangla films with usable plot sections, and both routes to 130 were refused (deviation logged) [§1.1.7]
+☐ 7. English arm: IMDB subsample **matched to the Bangla n actually used** (4,730, or 1,910 if the arm mirrors region A) + MPST plots **30+90** + tokenizer-fertility table [§1.2]
 
 **Weeks 3–5 — Personas (S2–S3)**
 ☐ 8. LaBSE embed → master K-table (7 criteria, K=2..8) [§2.1–2.2]
 ☐ 9. GMM-BIC + HDBSCAN + multi-encoder ARI [§2.2]
-☐ 10. **ARI(cluster, Sentiment) trap-check** [§2.4] — record the outcome whatever it is
+☑ 10. **ARI(cluster, Sentiment) trap-check** [§2.4] — DONE. Full corpus 0.1793 but ARI(cluster, **region**) 0.4813 → the clusters are a corpus detector. Region A alone: 0.1804, Band 1, not degenerate. **Also score every future clustering against `region`.**
 ☐ 11. Verify Gate G1 → persona definitions + linguistic profiling [§2.3–2.4]
-☐ 12. Stratify G-300 → annotation guideline → 3 annotators → κ+α [§2.5] → Gate G2
+☐ 12. Stratify G-300 **on the region-A clustering** → annotation guideline → 3 annotators → κ+α **reported per region** [§2.5] → Gate G2
 
 **Weeks 5–7 — Verifiers (S4)**
 ☐ 13. Backbone ablation (4 models × gold-300) [§3.2] → pick the winner
@@ -79,7 +112,7 @@
 ### A. Data split map — done once on Day 1, seed=42, then untouchable
 
 ```
-Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable ≈ 4,722
+Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable = 4,730 (4,625 after near-dup removal)
                                 │
                 ┌───────────────┴───────────────┐
                 ▼                               ▼
@@ -91,7 +124,7 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable ≈ 4,7
                                     + RAG index      (eval-only)
                                     + dev slice 200
 ```
-**Where H went:** the file has no movie-title column and in-text mentions are rare → reviews cannot be mapped to films, so the "held-out films" split is removed. The held-out element for evaluation is now **130 externally collected plots** (§1.1.7: 30 dev + 100 eval, disjoint) — these never need to map to any review.
+**Where H went:** the file has no movie-title column and in-text mentions are rare → reviews cannot be mapped to films, so the "held-out films" split is removed. The held-out element for evaluation is now **120 externally collected plots** (§1.1.7: 30 dev + 90 eval, disjoint; harvested and frozen 2026-07-31) — these never need to map to any review.
 
 **Inviolable rules:**
 - **G never enters** training, the RAG index, prompts, or threshold tuning. Eval-only.
@@ -104,12 +137,12 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable ≈ 4,7
 
 | Stage | What gets trained | Input → Output | Gate (fail = next stage forbidden) |
 |---|---|---|---|
-| **S1** Data prep + split | nothing | xlsx 5,000 → clean ≈4,722 + IMDB subsample (matched n) + 130+130 plots → `bn_clean`, `en_clean`, frozen split file | — |
-| **S2** Persona discovery | K-Means (both languages) + GMM + HDBSCAN robustness | R + LaBSE → master K-table (7 criteria), stability, theory grounding, persona definitions | **G1:** prediction strength < 0.8 or bootstrap ARI worse than neighboring K → K=3 may not be forced; most stable K becomes primary, K=3 theory-motivated secondary |
-| **S3** Human gold | nothing | stratified 300 → gold labels + Fleiss κ **and** Krippendorff's α (ordinal) | **G2:** α < 0.667 → revise guideline + re-annotate; failing twice → reframe claim ("theory-driven scheme, validated learnability") |
+| **S1** Data prep + split | nothing | xlsx 5,000 → clean **4,730** + IMDB subsample (matched n) + **120 bn plots (30/90)** + matched en plots → `bn_clean`, `en_clean`, frozen split file **stratified on `Sentiment × region`** | — |
+| **S2** Persona discovery ⚠️ **on region A only** — on the full corpus the clusters are a corpus detector (93.3%) | K-Means (both languages) + GMM + HDBSCAN robustness | R + LaBSE → master K-table (7 criteria), stability, theory grounding, persona definitions | **G1:** prediction strength < 0.8 or bootstrap ARI worse than neighboring K → K=3 may not be forced; most stable K becomes primary, K=3 theory-motivated secondary |
+| **S3** Human gold | nothing | **region-A-**stratified 300 → gold labels + Fleiss κ **and** Krippendorff's α (ordinal) | **G2:** α < 0.667 → revise guideline + re-annotate; failing twice → reframe claim ("theory-driven scheme, validated learnability") |
 | **S4** Verifier training | **bn-A, bn-B, en-A, en-B** (4 classifiers) + symbolic-weight LR ×2 + temperature scaling ×4 | R1/R2 → dual accuracy (weak-label **and** gold), calibration (ECE before/after) | **G3:** gold accuracy < ~55% (chance=33%) → verifier too weak; increase symbolic weight / inspect data |
 | **S5** Loop build + τ sweep | nothing (calibration only) | Verifier-A + R1-RAG → LangGraph loop, τ sweep 0.30–0.95 on dev-plots, operating point | **G4:** if first-attempt pass rate doesn't reach 60–70%, raise τ — "everything passes" means the loop is dead (the old mistake) |
-| **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × 100 eval-plots (disjoint from dev-30) × 3 personas → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only |
+| **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × **90 eval-plots** (disjoint from dev-30) × 3 personas → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only |
 
 **Total trained artifacts: 10** (4 verifiers + 2 LR + 4 temperature scalings) — all small, all free-Colab. **No LLM is ever trained** — generation is prompted only.
 
@@ -168,10 +201,10 @@ Contents: (a) every hypothesis, (b) its metric, (c) sample size, (d) statistical
 1. **Start from the raw 5k. Do not use the augmented 9,998** for clustering/training — augmentation creates semantic duplicates that artificially harden cluster structure. If used at all: as a separate disclosed robustness check.
 2. Cleaning (regex): strip URL/HTML/mentions/hashtag symbols; normalize whitespace.
 3. **⚠️ Old pipeline's mistake, corrected: no stemming, no stopword removal.** LaBSE/BanglaBERT are contextual encoders and need natural text; stemming/stopwords belong to the TF-IDF era. Also delete the TF-IDF/Count-Vectorization sections from the thesis — unused anywhere.
-4. Filter (numbers now known): exact dup **204**, <3-word **72**, null **1** → **≈4,722**; then near-duplicate check (LaBSE cosine >0.95) — remove and count.
+4. Filter (**measured**, superseding the estimates): exact dup **204**, <3-word **72**, null **2** → **4,730** (the union is 270, not the 278 you get by subtracting the drop sets as if disjoint); near-duplicate removal at LaBSE cosine ≥ 0.95 removes a further **105** → **4,625**.
 5. ~~Movie-title tagging~~ **(cancelled)** — no title column, rare in-text names → film mapping impossible. Replaced by the redesigned §5.4. State this limitation in the dataset card.
 6. Emoji **(zero in the file)** — nothing to extract; symbolic scorer is text-only (§3.5). The file is partially pre-cleaned despite "Raw" — state honestly; fix the inconsistent pre-defence emoji tables.
-7. **Plot collection (budget-corrected):** collect **130** Bangla plot synopses (3–6 sentences) — **30 dev-plots** (τ-sweep + pilot, §4.5) + **100 eval-plots** (S6 main run only), **disjoint**, else the threshold is tuned on eval data (leakage). Sources: Wikipedia (bn), bmdb.com.bd, self-written; log the source per plot. **Plot text never comes from the review corpus.**
+7. **Plot collection (DONE 2026-07-31):** **120** Bangla plot synopses (3–12 sentences, median 9) — **30 dev-plots** (τ-sweep + pilot, §4.5) + **90 eval-plots** (S6 main run only), **disjoint**, else the threshold is tuned on eval data (leakage). Sources: Wikipedia (bn), bmdb.com.bd, self-written; log the source per plot. **Plot text never comes from the review corpus.**
 
 ### 1.2 English Arm Charter
 
@@ -181,7 +214,7 @@ Contents: (a) every hypothesis, (b) its metric, (c) sample size, (d) statistical
 
 **Datasets:**
 1. **Reviews (clustering + verifier training): IMDB Large Movie Review (Maas et al. 2011)** — HuggingFace `imdb`. Deliberate: **MoP also uses IMDB/SST-2**, so our English numbers are directly comparable with theirs — say so in the paper.
-2. **Plots (generation input): MPST v2** (Kar et al., LREC 2018; ritual.uh.edu/mpst-2018) — sample 30 dev + 100 eval synopses. IMDB has no plots; review corpus and plot corpus are from different sources — disclose (symmetric with Bangla).
+2. **Plots (generation input): MPST v2** (Kar et al., LREC 2018; ritual.uh.edu/mpst-2018) — sample **30 dev + 90 eval** synopses, matched to the Bangla side. IMDB has no plots; review corpus and plot corpus are from different sources — disclose (symmetric with Bangla).
 3. Random subsample to n = |bn_clean| (seed=42), same cleaning, same split construction.
 
 **Scope table (what the English arm does / does not do):**
@@ -204,7 +237,7 @@ Contents: (a) every hypothesis, (b) its metric, (c) sample size, (d) statistical
 ### 1.3 Dataset cards (both corpora)
 Source, collection dates, per-step attrition, length distributions, license, the partial-pre-cleaning disclosure. *Base: Gebru et al., Datasheets for Datasets.*
 
-**Deliverables:** `bn_clean.csv`, `en_clean.csv` (matched n), 130+130 plots, dataset cards, fertility table.
+**Deliverables:** `bn_clean.csv`, `en_clean.csv` (matched n), **120 bn + 120 en** plots, dataset cards, fertility table.
 
 ---
 
@@ -377,7 +410,7 @@ Attempt distribution (1/2/3), hybrid-score growth per attempt, persona-wise retr
 | 7 | ⭐ Self-critique (same LLM critiques itself) | **Intrinsic vs extrinsic — the headline baseline** |
 | 8 | LLM-as-judge critic (Gemini judges) | Cheap trained verifier vs large LLM judge |
 
-- **Scale:** 100 eval-plots (never dev-plots) × 3 personas × 8 conditions = **2,400 generations per language** (৳0 on Groq; overnight batches).
+- **Scale:** **90** eval-plots (never dev-plots) × 3 personas × 8 conditions = **2,160 generations per language** (৳0 on Groq; overnight batches).
 - Row 7 < Row 6 → external verification is necessary in low-resource — **the headline, a direct extension of Huang et al.**
 - Row 8 ≈ Row 6 at 1/40th the cost → the efficiency claim. (Note LLM-judge biases to discuss: position, verbosity, self-preference; degraded reliability in lower-resource languages — further motivation for a *trained* critic.)
 
@@ -407,7 +440,7 @@ Verifier-A and Verifier-B scores side by side per condition:
 
 ### 5.4 Plot-level realism test (redesigned — film mapping is impossible)
 - **Corpus-level distributional realism:** all generated reviews per persona vs that persona's real reviews → **MAUVE + JS(length) + JS(sentiment-classifier output)**.
-- **Persona-mix sanity:** unconditional generation on the 100 eval-plots → Verifier-B label distribution vs the corpus's observed persona proportions (whatever S2 yields) → JS.
+- **Persona-mix sanity:** unconditional generation on the 90 eval-plots → Verifier-B label distribution vs the corpus's observed persona proportions (whatever S2 yields) → JS.
 - **Mandatory Limitations sentence:** *"Our data lacks review-to-film mapping; hence we validate distributional realism at corpus level, not per-film audience prediction. 'Simulation' should be read as persona-conditioned response generation, not validated predictive audience modeling."*
 
 ### 5.5 Cross-lingual comparison

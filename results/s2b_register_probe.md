@@ -1,5 +1,24 @@
 # S2b — Register probe: is `Sentiment == 2` a different kind of text?
 
+> # ⛔ SUPERSEDED by `results/s2c_region_split.md`
+>
+> **The measurements below are correct. The framing is wrong.**
+>
+> This file asks whether **class 2** is a different kind of text and
+> answers yes. It is — but not *because it is class 2*. Every class-2
+> row sits inside the second half of the source file, and **that half is a
+> different corpus regardless of label**: rows 3665–4330 are labelled **0** and
+> carry the same signature, while rows 499–896, also labelled 0, do not.
+>
+> The grouping variable is **`raw_row`, not `Sentiment`**. Read
+> `results/s2c_region_split.md` for the corrected account, and
+> `results/s2_pilot_ari_trapcheck.md` for the consequence — the S2 clusters
+> identify **which corpus** a review came from with 93.3% accuracy.
+>
+> Kept rather than deleted: this is a worked example of reading a file-layout
+> artefact as a semantic property, and a superseded claim that disappears is one
+> nobody can audit.
+
 > ### ⚠️ EXPLORATORY — not a confirmatory test
 >
 > The hypothesis behind this probe came from **reading the data after S2**, not
@@ -10,7 +29,7 @@
 > `docs/protocol.md` (Deviations log, 2026-07-30).
 
 - **Config:** `configs/s2b_register_probe.yaml` · **Input:** `data/cleaned/bn_clean.csv` (4730 rows)
-- **Generated (UTC):** 2026-07-30T14:22:52.243354+00:00 · **Commit:** `1d100a9e2e8f91ae111a82ef996fad8b6cae607e-dirty`
+- **Generated (UTC):** 2026-07-31T18:17:14.874898+00:00 · **Commit:** `53ff903290517870a3397600664b419cbe56e069-dirty`
 - **Nothing is trained.** AUC is a rank statistic with no fitted parameters, so
   inviolable rule 10 is untouched.
 

@@ -1352,6 +1352,81 @@ reviews is exactly what G-300 has to settle. It cannot be settled from here.
 - The corpus-detection result may want a pointer to the dataset-artefact /
   shortcut-learning literature when written up. **Sabbir's call** — open
   decision 5 covers the framing.
+
+---
+
+## 2026-08-01 — Consistency sweep: Sabbir was right, the docs had drifted
+
+**Feeds:** all chapters (these are the normative documents) · **Artifacts:**
+`docs/research_pipeline_en.md`, `docs/dataset_card.md`, `docs/protocol.md`,
+`results/s2b_register_probe.md`, artifact index in `STATUS.md`
+**Prompted by:** Sabbir — *"onk kichui updated nai folder gulo te maybe"*
+
+### Numbers
+
+No new computation. Four documents were carrying refuted figures.
+
+### Findings — four defects, all mine
+
+- **`results/s2b_register_probe.md` had no forward pointer.** Read alone, it says
+  class 2 is a different kind of text *because it is class 2*. That is the exact
+  mistake `s2c` corrected: every class-2 row sits in the second corpus, and rows
+  3665–4330 are labelled **0** with the same signature. Anyone opening that file
+  first — a supervisor, an examiner — would have taken away the wrong finding.
+- **`docs/research_pipeline_en.md`, the normative spec, still said `usable ≈
+  4,722` and `130 plots / 30 + 100`, and contained ZERO mentions of the region
+  split.** The largest finding of the week was absent from the document that
+  defines the design. `CLAUDE.md` says the pipeline wins on method — so a
+  pipeline that does not know the corpus is two corpora is a live trap, not a
+  stale note.
+- **`docs/dataset_card.md`** still described the plot corpus as n = 130,
+  30 dev / 100 eval.
+- **`docs/protocol.md` RQ2 still specified 100 eval-plots** — a *live* spec line,
+  not a historical record — and the plot deviation quoted the pre-review estimate
+  (~124 / ~94) rather than the frozen 120 / 90.
+
+- **Three result files were orphaned**: on disk, referenced from nothing. One was
+  `s2a_regionA_cluster_assignments.csv` — **the file G-300 stratification must be
+  drawn from.** A result nobody can find is a result nobody can check.
+
+### Decisions made (and why)
+
+- **The s2b banner went into the report TEMPLATE, not the file.** Editing the
+  generated markdown by hand would have been undone by the next re-run — which is
+  how a warning quietly disappears. The report was regenerated to prove it
+  survives.
+- **Strikethrough, not deletion, in the pipeline spec.** `~~4,722~~ 4,730` with
+  the reason attached, so the original claim and its refutation are both
+  readable. A number that silently changes cannot be audited, and the corrections
+  themselves are a finding.
+- **Historical numbers in this notebook and in the deviations log left
+  untouched.** Recording what was believed at the time is what those files are
+  *for*; "fixing" them would destroy the record of how the understanding moved.
+  The rule applied: correct the **normative** documents, preserve the
+  **historical** ones.
+- **Artifact index added to STATUS**, covering all 14 files in `results/` with
+  their standing — current, superseded, or parked.
+
+### Findings (about process, not data)
+
+- **The drift was invisible from inside the work.** Six days of appending to
+  STATUS and the notebook, and neither I nor the pre-commit hook noticed the
+  spec had gone stale — the hook checks that reasoning accompanies results, not
+  that the design document still matches reality. Sabbir noticed by looking at
+  the folder. Worth repeating this sweep at each phase boundary rather than
+  waiting to be asked.
+
+### Consequences for downstream steps
+
+- The spec now carries the region split, so S2/S3 instructions inside it
+  (persona discovery on region A, G-300 stratified on the region-A clustering)
+  are correct where someone would actually read them.
+- S6's scale drops from 2,400 to **2,160 generations per language** (90 eval
+  plots, not 100), corrected in both the spec and the protocol.
+
+### Citations needed
+
+- None.
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
 | 2 | Near-dup threshold (0.90 / 0.95 / 0.98) — from the sensitivity curve | Split freeze | S2 pilot |

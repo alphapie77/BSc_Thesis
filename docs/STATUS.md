@@ -123,6 +123,28 @@ next run is written and pre-registered.
    gets deleted from the harvest and the sample **redrawn**, never patched.
 4. Read Huang et al. (ICLR 2024) → fill its `related_work.md` entry.
 
+## Artifact index — every file in `results/`, and what it is for
+
+Added 2026-08-01 after three files were found orphaned: present on disk,
+referenced nowhere. A result nobody can find is a result nobody can check.
+
+| File | What it holds | Standing |
+|---|---|---|
+| `s0_data_xray.md` | S0 verification against the raw file | ✅ current |
+| `s1_cleaning_log.json` | cleaning counts → n = 4,730 | ✅ current |
+| `s2_pilot_ari_trapcheck.md` | full-corpus trap-check **+ the region table** | ✅ current — **the decisive result** |
+| `s2_cluster_assignments.csv` | per-review cluster, sentiment, region (n=4,625) | ✅ current — input to the split freeze and G-300 |
+| `s2a_regionA_trapcheck.md` | trap-check on the organic corpus alone | ✅ current |
+| `s2a_regionA_cluster_assignments.csv` | per-review cluster for region A (n=1,897) | ✅ current — **G-300 stratification comes from HERE**, not the full-corpus file |
+| `s2b_register_probe.md` | register measurements by class | ⛔ **framing superseded** by `s2c` — the file now carries a banner saying so |
+| `s2b_register_features.csv` | per-row orthographic features (n=4,730) | supporting data for `s2b`; measurements stand, framing does not |
+| `s2c_region_split.md` | the two-corpora finding | ✅ current — supersedes `s2b`'s framing |
+| `s2_threshold_audit_sheet.csv` | blinded 0.90-vs-0.95 review sheet, 38 items | ⏸ **generated, never annotated.** Parked: the threshold question turned out to be downstream of the region split |
+| `s2_threshold_audit_key.csv` | the blinding key for the above | ⏸ do not open until the sheet is filled |
+| `plots_harvest_report.md` | harvest yield, reject reasons, heading tally | ✅ current (4th harvest) |
+| `env_snapshot.json` | local Windows environment | ✅ current |
+| `env_snapshot_s2_kaggle.json` | **the environment S2's numbers came from** — Kaggle T4, scikit-learn 1.6.1 | ✅ current — cite this, not `requirements.lock.txt`, for S2 |
+
 ## Infrastructure state (2026-07-30)
 
 | Item | State |
