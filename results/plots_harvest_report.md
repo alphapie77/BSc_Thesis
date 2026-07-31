@@ -1,24 +1,24 @@
 # Plot harvest — bn.wikipedia
 
-- **Config:** `configs/plots_scrape.yaml` · **Generated (UTC):** 2026-07-31T13:28:06.993680+00:00
-- **Commit:** `b061046574134b08b2345b495e8531755b441baa` · **API calls:** 807
+- **Config:** `configs/plots_scrape.yaml` · **Generated (UTC):** 2026-07-31T16:56:57.951181+00:00
+- **Commit:** `ba05361fbfbe9528a351666ff4ed26929b955d79` · **API calls:** 924
 
 ## Yield
 
 | | |
 |---|---|
-| candidate articles discovered | 2995 |
-| passed the quality gate | **132** |
-| rejected | 2863 |
+| candidate articles discovered | 3135 |
+| passed the quality gate | **124** |
+| rejected | 3011 |
 
 ### Why articles were rejected
 
 | Reason | Count |
 |---|---|
-| no plot section | 2848 |
-| under 3 sentences | 8 |
+| no plot section | 2925 |
+| person article, not a film | 65 |
+| under 3 sentences | 15 |
 | under 120 chars | 6 |
-| over 2000 chars | 1 |
 
 Most bn.wikipedia film articles are stubs, so a large "no plot section" count is
 expected rather than a fault. It matters only if the survivors fall below 130.
@@ -31,39 +31,39 @@ to `plot_heading_stems` and re-run with `--reset`.
 
 | Heading | Articles |
 |---|---|
-| তথ্যসূত্র | 227 |
-| বহিঃসংযোগ | 198 |
-| সঙ্গীত | 54 |
-| পুরস্কার | 34 |
-| অভিনয়শিল্পী | 33 |
-| মুক্তি | 32 |
-| শ্রেষ্ঠাংশে | 30 |
-| অভিনয়ে | 28 |
-| চলচ্চিত্রের তালিকা | 28 |
-| কর্মজীবন | 23 |
-| চলচ্চিত্র | 18 |
-| কুশীলব | 17 |
-| আরও দেখুন | 17 |
-| নির্মাণ | 14 |
-| অভিনয় | 14 |
-| অভিনয়শিল্পীদল | 12 |
-| কাহিনী | 11 |
-| ব্যক্তিগত জীবন | 11 |
-| টেলিভিশন | 10 |
-| প্রারম্ভিক জীবন | 10 |
-| গানের তালিকা | 9 |
-| চলচ্চিত্র তালিকা | 8 |
-| সংগীত | 7 |
-| আরো দেখুন | 7 |
-| কাহিনী সংক্ষেপ | 6 |
+| তথ্যসূত্র | 180 |
+| বহিঃসংযোগ | 153 |
+| সঙ্গীত | 49 |
+| অভিনয়শিল্পী | 40 |
+| মুক্তি | 38 |
+| অভিনয়ে | 31 |
+| শ্রেষ্ঠাংশে | 28 |
+| পুরস্কার | 23 |
+| কুশীলব | 21 |
+| নির্মাণ | 16 |
+| আরও দেখুন | 16 |
+| কাহিনী | 13 |
+| অভিনয় | 12 |
+| সাউন্ডট্র্যাক | 10 |
+| অভিনয়শিল্পীদল | 9 |
+| সংগীত | 8 |
+| কাহিনী সংক্ষেপ | 8 |
+| গানের তালিকা | 7 |
+| প্রযোজনা | 7 |
+| সাউন্ডট্রাক | 7 |
+| মুক্তিপ্রাপ্ত চলচ্চিত্র সমূহ | 6 |
+| চলচ্চিত্র | 6 |
+| কাহিনি সংক্ষেপ | 5 |
+| পুরস্কার ও মনোনয়ন | 5 |
+| কলাকুশলী | 5 |
 
 ### By seed category
 
 | Category | Plots |
 |---|---|
-| বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র | 88 |
-| বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র | 41 |
-| বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র | 3 |
+| বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র | 66 |
+| বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র | 57 |
+| বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র | 1 |
 
 ## Licence — an obligation, not a note
 
@@ -77,7 +77,7 @@ must carry the attribution before anything is published.**
 | Statistic | Sentences |
 |---|---|
 | min | 3 |
-| median | 8 |
+| median | 9 |
 | max | 12 |
 
 ## What still needs a human

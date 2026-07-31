@@ -1098,6 +1098,72 @@ chars, 1 over 2,000 chars.
 
 ---
 
+## 2026-07-31 — Fourth harvest: 124, and the number going *down* is the good news
+
+**Feeds:** Ch.3 §Data, Ch.5 §Limitations · **Artifact:**
+`results/plots_harvest_report.md`, `docs/protocol.md` (Deviations)
+
+### Numbers
+
+| harvest | candidates | usable |
+|---|---|---|
+| 1 | 1,225 | 67 |
+| 2 | 2,820 | 110 |
+| 3 | 2,995 | 132 |
+| **4** | **3,135** | **124** |
+
+Harvest 4 rejects: 2,925 no plot section, 15 under 3 sentences, 6 under 120
+chars, **65 person articles**.
+
+### Findings
+
+- **132 was never really 132.** The person-article veto rejected 65 articles, and
+  **8 of them had been counted as usable** in harvest 3. Reading headings by eye,
+  I had found only 2 (অপর্ণা সেন, অনুস্মৃতি সরকার) — the other 6 were
+  biographies hiding under `পটভূমি` or `কাহিনী`, indistinguishable from a film
+  plot by heading alone. So the count went 132 → 124 because it got **more
+  honest**, not worse.
+- **The eyeball check caught 25% of the problem.** That is the argument for the
+  structural veto over inspection, and worth remembering the next time a
+  spot-check feels sufficient.
+- **`বাংলাদেশের স্বাধীনতা যুদ্ধের চলচ্চিত্র` contributed +0** — not a wrong name
+  this time: its 84 films were already reached through the other categories.
+  `+0` means "no *new* articles", which is different from "does not exist", and
+  the two look identical in the output. Worth distinguishing if this is ever
+  extended.
+- **bn.wikipedia does not contain 130 Bangla films with usable plot sections.**
+  Four harvests establish that; it is a property of the source, not of the
+  harvester.
+
+### Decisions made (and why)
+
+- **Target follows the data: 30 dev + ~94 eval, floor of 80.** Logged as a
+  deviation in `protocol.md` **before** the number is used. `N_DEV` stays at 30
+  because the dev slice tunes the loop threshold; eval takes the remainder.
+- **Both routes to 130 were available and both were refused.** Relaxing the
+  quality gate would have admitted two-sentence plots — but the gate rejected
+  only ~20 of 3,135, so it is not the constraint, and thin plots are poor
+  generation inputs. Adding the by-year categories would have overshot 130
+  easily — but they are language-neutral, and Tamil or Hindi films described in
+  Bangla would have **passed every check in this harvester** while making the
+  plot corpus stop being Bangla cinema. Nothing downstream would have noticed.
+- **`plots_check` now refuses to split below 80 eval**, with a message naming
+  both shortcuts so a future run cannot take them absent-mindedly.
+
+### Consequences for downstream steps
+
+- S6 runs on ~94 eval plots rather than 100. Bootstrap CIs absorb that; the
+  Limitations section states it.
+- The set still has to be **read** before the split is frozen. The veto is
+  structural and will not catch a production-history paragraph that happens to
+  sit under `কাহিনী`.
+
+### Citations needed
+
+- None.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |

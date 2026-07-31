@@ -3,17 +3,17 @@
 Two commands, and the separation between them matters:
 
     python -m src.preprocess.plots_check                 # check progress + errors
-    python -m src.preprocess.plots_check --assign-split  # ONCE, at 130 plots
+    python -m src.preprocess.plots_check --assign-split  # ONCE, when done
 
 **Why the split is assigned at the end, not as you collect.** If `split` were
 filled in row by row, the first 30 plots would become the dev set -- and the
 first 30 films anyone collects are the ones they thought of first: the famous
 ones, the ones with long Wikipedia articles. The dev set would then differ
 systematically from the eval set, and every threshold tuned on dev would be
-tuned on easy cases. Collect all 130 blind, then split once with seed 42.
+tuned on easy cases. Collect the whole set blind, then split once with seed 42.
 
 `--assign-split` refuses to run twice. The assignment is committed to git and is
-as frozen as the review split map: the eval-100 is the only held-out element the
+as frozen as the review split map: the eval set is the only held-out element the
 whole evaluation rests on.
 """
 from __future__ import annotations
@@ -31,7 +31,24 @@ from src.common.provenance import NEWLINE  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
 PLOTS = Path("data/plots/plots_bn.csv")
-TARGET, N_DEV, N_EVAL = 130, 30, 100
+
+#: The pipeline spec asks for 130 = 30 dev + 100 eval. bn.wikipedia does not
+#: have 130 Bangla-film articles carrying a usable plot section: the harvest
+#: tops out at ~124 after person articles are excluded, and the only ways past
+#: that were to relax the quality gate (admitting two-sentence plots) or to add
+#: the language-neutral by-year categories (admitting Tamil and Hindi films).
+#: Both trade the corpus's validity for an arbitrary round number.
+#:
+#: So the target follows the data. `N_DEV` is fixed at 30 because the dev slice
+#: exists to tune the loop threshold and 30 is the smallest defensible number
+#: for that; **eval takes whatever remains**. Losing a few eval plots costs a
+#: little power in a bootstrap CI. Padding the set with thin or non-Bangla plots
+#: would cost validity, which no amount of n buys back.
+#:
+#: Logged in docs/protocol.md (Deviations, 2026-07-31).
+N_DEV = 30
+MIN_EVAL = 80          # below this, stop and reconsider rather than proceed
+TARGET = 130           # aspiration, not a gate -- reported against, not enforced
 BANGLA = re.compile(r"[ঀ-৿]")
 URL = re.compile(r"^https?://\S+$")
 REQUIRED = ["plot_id", "language", "title_bn", "synopsis", "source_url",
@@ -86,9 +103,9 @@ def report(df: pd.DataFrame) -> int:
     errs = check(df) if len(df) else []
     done = len(df)
     print(f"plots collected: {done} / {TARGET}")
-    if done < TARGET:
-        left = TARGET - done
-        print(f"  {left} to go  ->  {left / 5:.0f} more days at 5/day")
+    if done:
+        print(f"  would split {N_DEV} dev / {done - N_DEV} eval "
+              f"(floor for eval is {MIN_EVAL})")
     bar = int(40 * done / TARGET)
     print("  [" + "#" * bar + "." * (40 - bar) + "]")
 
@@ -102,9 +119,9 @@ def report(df: pd.DataFrame) -> int:
         print("\nsplit assigned:")
         for k, v in df["split"].value_counts().items():
             print(f"  {k:20s} {v}")
-    elif done >= TARGET:
-        print(f"\n{TARGET} reached -- run with --assign-split to freeze "
-              f"{N_DEV} dev / {N_EVAL} eval.")
+    elif done - N_DEV >= MIN_EVAL:
+        print(f"\nEnough to split -- run with --assign-split to freeze "
+              f"{N_DEV} dev / {done - N_DEV} eval.")
 
     if errs:
         print(f"\n{len(errs)} problem(s):")
@@ -119,8 +136,15 @@ def report(df: pd.DataFrame) -> int:
 
 
 def assign_split(df: pd.DataFrame, root: Path) -> int:
-    if len(df) != TARGET:
-        sys.exit(f"need exactly {TARGET} plots to split, found {len(df)}.")
+    n = len(df)
+    n_eval = n - N_DEV
+    if n_eval < MIN_EVAL:
+        sys.exit(
+            f"only {n} plots ({n_eval} would be eval, floor is {MIN_EVAL}).\n"
+            "Harvest more before splitting. Do NOT relax the quality gate or add "
+            "the by-year categories to get here -- both trade the corpus's "
+            "validity for a number."
+        )
     if (df["split"].astype(str).str.strip() != "").any():
         sys.exit(
             "split is already assigned. It is frozen on purpose -- the eval-100 "
@@ -133,11 +157,13 @@ def assign_split(df: pd.DataFrame, root: Path) -> int:
 
     set_seed()
     shuffled = df.sample(frac=1.0, random_state=42).reset_index(drop=True)
-    shuffled["split"] = ["dev"] * N_DEV + ["eval"] * N_EVAL
+    shuffled["split"] = ["dev"] * N_DEV + ["eval"] * n_eval
     out = shuffled.sort_values("plot_id").reset_index(drop=True)
     out.to_csv(root / PLOTS, index=False, encoding="utf-8",
                lineterminator=NEWLINE)
-    print(f"assigned {N_DEV} dev / {N_EVAL} eval with seed 42 and wrote {PLOTS}.")
+    print(f"assigned {N_DEV} dev / {n_eval} eval with seed 42 and wrote {PLOTS}.")
+    if n != TARGET:
+        print(f"NOTE: {n} plots, not the spec's {TARGET}. This is the logged\n              deviation (protocol.md, 2026-07-31) -- eval takes what remains\n              rather than the set being padded to a round number.")
     print("Commit this now. It is frozen from here on.")
     return 0
 
