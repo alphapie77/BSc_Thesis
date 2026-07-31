@@ -38,3 +38,4 @@ zip/
 # 130 in plots_bn.csv are committed.
 data/plots/plots_bn_harvest.csv
 data/plots/.harvest_state.json
+data/plots/review.html

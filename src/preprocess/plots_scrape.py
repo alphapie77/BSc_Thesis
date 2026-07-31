@@ -481,6 +481,47 @@ def probe(api: Api, cfg, title: str) -> int:
     return 0 if not reason else 1
 
 
+def do_drop(cfg, root: Path, ids: str) -> int:
+    """Remove reviewer-rejected plots from the HARVEST, then re-sample.
+
+    Deleting the rows from `plots_bn.csv` directly would leave the harvest
+    holding items already judged unusable, so the next `--sample` would draw
+    them straight back. Rejecting at the source keeps one place true.
+
+    The rejected titles are appended to a log rather than silently dropped: the
+    set that reviewers saw and refused is part of how this corpus was built.
+    """
+    plots = root / PLOTS_OUT
+    harvest = root / cfg["outputs"]["harvest_csv"]
+    if not plots.exists():
+        sys.exit(f"{PLOTS_OUT} not found -- run --sample first.")
+
+    wanted = {i.strip() for i in ids.split(",") if i.strip()}
+    p = pd.read_csv(plots)
+    hit = p[p["plot_id"].isin(wanted)]
+    missing = wanted - set(hit["plot_id"])
+    if missing:
+        sys.exit(f"unknown plot_id(s): {sorted(missing)}")
+
+    h = pd.read_csv(harvest)
+    before = len(h)
+    h = h[~h["title_bn"].isin(set(hit["title_bn"]))].reset_index(drop=True)
+    h.to_csv(harvest, index=False, encoding="utf-8", lineterminator=NEWLINE)
+
+    log = root / "data/plots/rejected_by_review.csv"
+    rec = hit[["plot_id", "title_bn", "source_url"]].copy()
+    rec["rejected_on"] = pd.Timestamp.now("UTC").strftime("%Y-%m-%d")
+    if log.exists():
+        rec = pd.concat([pd.read_csv(log), rec], ignore_index=True)
+    rec.to_csv(log, index=False, encoding="utf-8", lineterminator=NEWLINE)
+
+    for t in hit["title_bn"]:
+        print(f"  dropped: {t}")
+    print(f"\nharvest {before} -> {len(h)}; logged to {log.name}")
+    print(f"Now re-sample: python -m src.preprocess.plots_scrape --sample {len(h)}")
+    return 0
+
+
 def do_sample(cfg, root: Path, n: int) -> int:
     """Draw the final N from the harvest, blind, with the global seed."""
     hp = root / cfg["outputs"]["harvest_csv"]
@@ -499,7 +540,7 @@ def do_sample(cfg, root: Path, n: int) -> int:
     s["language"] = "bn"
     s["title_en"] = ""
     s["source_type"] = "wikipedia_bn"
-    s["collected_date"] = pd.Timestamp.utcnow().strftime("%Y-%m-%d")
+    s["collected_date"] = pd.Timestamp.now("UTC").strftime("%Y-%m-%d")
     s["split"] = ""          # assigned once, later, by plots_check --assign-split
 
     out = root / PLOTS_OUT
@@ -520,6 +561,9 @@ def main() -> int:
     # nargs="?" so `--probe` works with no argument. Typing a Bangla title on a
     # Windows console is its own small ordeal, and the first thing anyone runs
     # should not require it.
+    ap.add_argument("--drop", metavar="IDS", default="",
+                    help="comma-separated plot_ids rejected on review; removes "
+                         "them from the HARVEST and logs them")
     ap.add_argument("--find-categories", metavar="TERM", nargs="?",
                     const="চলচ্চিত্র", default="",
                     help="search bn.wikipedia for category names and their "
@@ -537,6 +581,8 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     cfg = yaml.safe_load((root / args.config).read_text(encoding="utf-8"))
 
+    if args.drop:
+        return do_drop(cfg, root, args.drop)
     if args.sample:
         return do_sample(cfg, root, args.sample)
 

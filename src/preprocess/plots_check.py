@@ -168,9 +168,104 @@ def assign_split(df: pd.DataFrame, root: Path) -> int:
     return 0
 
 
+REVIEW_HTML = Path("data/plots/review.html")
+
+REVIEW_PAGE = """<!doctype html>
+<meta charset="utf-8">
+<title>Plot review — {n} synopses</title>
+<style>
+ body {{ font-family: "Nirmala UI", "Noto Sans Bengali", system-ui, sans-serif;
+        max-width: 46rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.75;
+        color: #1a1a1a; }}
+ h1 {{ font-size: 1.4rem; }}
+ .intro {{ background: #f4f6f8; padding: 1rem 1.2rem; border-radius: 8px;
+          border-left: 4px solid #666; font-size: .95rem; }}
+ .card {{ border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem;
+         margin: 1rem 0; }}
+ .card.bad {{ background: #fff5f5; border-color: #e0a0a0; }}
+ .head {{ display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }}
+ .id {{ font-family: ui-monospace, monospace; color: #666; font-size: .85rem; }}
+ .title {{ font-weight: 600; font-size: 1.05rem; }}
+ .meta {{ color: #777; font-size: .8rem; }}
+ .synopsis {{ margin-top: .6rem; font-size: 1.02rem; }}
+ label {{ cursor: pointer; user-select: none; font-size: .9rem; color: #b00; }}
+ #bar {{ position: sticky; top: 0; background: #fff; padding: .8rem 0;
+        border-bottom: 2px solid #333; z-index: 9; }}
+ button {{ font-size: .95rem; padding: .45rem .9rem; cursor: pointer; }}
+ #out {{ width: 100%; font-family: ui-monospace, monospace; font-size: .85rem;
+        margin-top: .5rem; }}
+</style>
+<h1>Plot review — {n} synopses</h1>
+<div class="intro">
+<p><b>What to look for.</b> Every one of these passed the mechanical gate:
+Bangla text, 3–12 sentences, over 120 characters, and no biography section
+anywhere in the article. What the gate <i>cannot</i> tell is whether the text is
+actually the <b>story of a film</b>.</p>
+<p>Tick a card if it is <b>not a film plot</b> — a production history, a
+biography, a real-world historical background, a song list, or a description of
+a TV serial rather than a film. If it reads like the story of a film, leave it
+alone, even if it is clumsy.</p>
+<p>Then press the button and send me the list.</p>
+</div>
+<div id="bar">
+  <button onclick="collect()">Collect the ticked ones</button>
+  <span id="count"></span>
+  <textarea id="out" rows="3" placeholder="the list appears here"></textarea>
+</div>
+{cards}
+<script>
+function collect() {{
+  const bad = [...document.querySelectorAll('input:checked')].map(b => b.value);
+  document.getElementById('out').value = bad.join(',');
+  document.getElementById('count').textContent =
+    bad.length + ' of {n} marked';
+  document.getElementById('out').select();
+}}
+document.addEventListener('change', e => {{
+  if (e.target.type === 'checkbox')
+    e.target.closest('.card').classList.toggle('bad', e.target.checked);
+}});
+</script>
+"""
+
+
+def write_review(df: pd.DataFrame, root: Path) -> int:
+    """Render the sampled set as a page a human can actually read.
+
+    124 Bangla paragraphs in a spreadsheet cell is not a reviewable format, and
+    a review that is unpleasant enough gets skipped -- which is exactly how the
+    two biographies would have survived.
+    """
+    cards = []
+    for r in df.itertuples():
+        url = str(getattr(r, "source_url", ""))
+        title = str(getattr(r, "title_bn", ""))
+        cards.append(
+            f'<div class="card"><div class="head">'
+            f'<span class="id">{r.plot_id}</span>'
+            f'<span class="title"><a href="{url}" target="_blank">{title}</a></span>'
+            f'<span class="meta">{getattr(r, "n_sentences", "")} sentences</span>'
+            f'<label><input type="checkbox" value="{r.plot_id}"> not a film plot'
+            f'</label></div>'
+            f'<div class="synopsis">{getattr(r, "synopsis", "")}</div></div>'
+        )
+    out = root / REVIEW_HTML
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        REVIEW_PAGE.format(n=len(df), cards="\n".join(cards)),
+        encoding="utf-8", newline=NEWLINE,
+    )
+    print(f"wrote {REVIEW_HTML} ({len(df)} cards)")
+    print("Open it in a browser, tick anything that is not a film plot, press "
+          "the button, and send me the list.")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--assign-split", action="store_true")
+    ap.add_argument("--review", action="store_true",
+                    help="write a browser-readable review page of the sampled set")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[2]
@@ -181,6 +276,8 @@ def main() -> int:
     df = pd.read_csv(path, dtype=str).fillna("")
     df = df[df["plot_id"].astype(str).str.strip() != ""]
 
+    if args.review:
+        return write_review(df, root)
     if args.assign_split:
         return assign_split(df, root)
     return report(df)
