@@ -101,6 +101,23 @@ plot_heading_exclude:
   - "সমালোচ"
   - "বহিঃসংযোগ"
   - "পটভূমিকা"     # often "historical background", not the film's plot
+  - "জীবন"         # জীবনকাহিনী, প্রারম্ভিক জীবন এবং পটভূমি -- biography, not plot
+
+# Whole-article veto. The film categories sweep in actors and directors, whose
+# articles have a section that trips the plot stems -- জীবনকাহিনী matched for
+# অপর্ণা সেন and প্রারম্ভিক জীবন এবং পটভূমি for অনুস্মৃতি সরকার, both of whom are
+# people. Rejecting on a heading elsewhere in the article is stronger than
+# vetoing one heading at a time: a person's biography is never a film plot, no
+# matter what the section is called.
+person_article_headings:
+  - "কর্মজীবন"
+  - "ব্যক্তিগতজীবন"
+  - "প্রারম্ভিকজীবন"
+  - "শিক্ষাজীবন"
+  - "জীবনী"
+  - "চলচ্চিত্রেরতালিকা"
+  - "চলচ্চিত্রসমূহ"
+  - "চলচ্চিত্রতালিকা"
 
 # Quality gate. Most bn.wikipedia film articles are stubs; harvesting without a
 # filter yields a corpus of one-line plots that no model could generate from.

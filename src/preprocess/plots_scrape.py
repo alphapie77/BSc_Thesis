@@ -344,6 +344,21 @@ def harvest(api: Api, cfg, titles: dict[str, str], root: Path
                 continue
             extract = page.get("extract", "") or ""
             sections = split_sections(extract)
+
+            # Whole-article veto before extraction. The film categories sweep in
+            # actors and directors; their biographies trip the plot stems
+            # (জীবনকাহিনী, প্রারম্ভিক জীবন এবং পটভূমি). A person's life story is
+            # never a film plot, whatever the section is called, so rejecting on
+            # evidence found elsewhere in the article beats vetoing headings one
+            # at a time.
+            person_marks = {h.replace(" ", "")
+                            for h in cfg.get("person_article_headings", [])}
+            if person_marks and any(h.replace(" ", "") in person_marks
+                                    for h in sections):
+                rejects["person article, not a film"] = \
+                    rejects.get("person article, not a film", 0) + 1
+                continue
+
             head, body = pick_plot(
                 sections, cfg["plot_headings"],
                 cfg.get("plot_heading_stems"), cfg.get("plot_heading_exclude"),

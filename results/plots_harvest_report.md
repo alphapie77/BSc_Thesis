@@ -1,23 +1,24 @@
 # Plot harvest — bn.wikipedia
 
-- **Config:** `configs/plots_scrape.yaml` · **Generated (UTC):** 2026-07-30T16:28:22.367920+00:00
-- **Commit:** `1c971d3c5b1e4314768103adc03707d0a743d53a` · **API calls:** 554
+- **Config:** `configs/plots_scrape.yaml` · **Generated (UTC):** 2026-07-31T13:28:06.993680+00:00
+- **Commit:** `b061046574134b08b2345b495e8531755b441baa` · **API calls:** 807
 
 ## Yield
 
 | | |
 |---|---|
-| candidate articles discovered | 2820 |
-| passed the quality gate | **110** |
-| rejected | 2710 |
+| candidate articles discovered | 2995 |
+| passed the quality gate | **132** |
+| rejected | 2863 |
 
 ### Why articles were rejected
 
 | Reason | Count |
 |---|---|
-| no plot section | 2690 |
-| under 3 sentences | 15 |
-| under 120 chars | 5 |
+| no plot section | 2848 |
+| under 3 sentences | 8 |
+| under 120 chars | 6 |
+| over 2000 chars | 1 |
 
 Most bn.wikipedia film articles are stubs, so a large "no plot section" count is
 expected rather than a fault. It matters only if the survivors fall below 130.
@@ -30,39 +31,39 @@ to `plot_heading_stems` and re-run with `--reset`.
 
 | Heading | Articles |
 |---|---|
-| তথ্যসূত্র | 221 |
-| বহিঃসংযোগ | 182 |
-| সঙ্গীত | 58 |
-| অভিনয়শিল্পী | 35 |
+| তথ্যসূত্র | 227 |
+| বহিঃসংযোগ | 198 |
+| সঙ্গীত | 54 |
 | পুরস্কার | 34 |
-| অভিনয়ে | 32 |
-| মুক্তি | 31 |
-| শ্রেষ্ঠাংশে | 24 |
-| চলচ্চিত্রের তালিকা | 24 |
-| কর্মজীবন | 20 |
-| আরও দেখুন | 19 |
+| অভিনয়শিল্পী | 33 |
+| মুক্তি | 32 |
+| শ্রেষ্ঠাংশে | 30 |
+| অভিনয়ে | 28 |
+| চলচ্চিত্রের তালিকা | 28 |
+| কর্মজীবন | 23 |
 | চলচ্চিত্র | 18 |
-| কুশীলব | 16 |
-| অভিনয় | 16 |
+| কুশীলব | 17 |
+| আরও দেখুন | 17 |
 | নির্মাণ | 14 |
+| অভিনয় | 14 |
 | অভিনয়শিল্পীদল | 12 |
-| সংগীত | 9 |
-| টেলিভিশন | 9 |
-| ব্যক্তিগত জীবন | 9 |
-| প্রারম্ভিক জীবন | 9 |
-| গানের তালিকা | 8 |
-| কাহিনী সংক্ষেপ | 8 |
-| প্রযোজনা | 7 |
-| চলচ্চিত্রসমূহ | 7 |
-| চিত্রগ্রহণ | 6 |
+| কাহিনী | 11 |
+| ব্যক্তিগত জীবন | 11 |
+| টেলিভিশন | 10 |
+| প্রারম্ভিক জীবন | 10 |
+| গানের তালিকা | 9 |
+| চলচ্চিত্র তালিকা | 8 |
+| সংগীত | 7 |
+| আরো দেখুন | 7 |
+| কাহিনী সংক্ষেপ | 6 |
 
 ### By seed category
 
 | Category | Plots |
 |---|---|
-| বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র | 53 |
-| বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র | 35 |
-| বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র | 22 |
+| বিষয়শ্রেণী:বাংলা ভাষার চলচ্চিত্র | 88 |
+| বিষয়শ্রেণী:বাংলাদেশী চলচ্চিত্র | 41 |
+| বিষয়শ্রেণী:পশ্চিমবঙ্গের চলচ্চিত্র | 3 |
 
 ## Licence — an obligation, not a note
 

@@ -1040,6 +1040,64 @@ short of 130.
 
 ---
 
+## 2026-07-31 — Third harvest: 132, and two of them are people
+
+**Feeds:** Ch.3 §Data · **Artifact:** `results/plots_harvest_report.md`
+
+### Numbers
+
+| harvest | candidates | usable |
+|---|---|---|
+| 1 | 1,225 | 67 |
+| 2 | 2,820 | 110 |
+| **3** | **2,995** | **132** |
+
+Rejects at harvest 3: 2,848 no plot section, 8 under 3 sentences, 6 under 120
+chars, 1 over 2,000 chars.
+
+### Findings
+
+- **Raising the binding cap was the fix**: 110 → 132, over the target of 130.
+- **Quality is good, and that was checked rather than assumed.** `পটভূমি` is the
+  single most common heading (38 of 132) and could plausibly have meant
+  "historical background of a real event" rather than the film's story. Six
+  drawn at random — পালাবি কোথায়, ভটভটি, বাপি বাড়ি যা, মায়া, মন মানে না,
+  এখানে রাজনৈতিক আলাপ জরুরি — are all genuine plot summaries. The heading is
+  safe.
+- **Two rows are biographies of people, not films.** `জীবনকাহিনী` pulled
+  **অপর্ণা সেন** and `প্রারম্ভিক জীবন এবং পটভূমি` pulled **অনুস্মৃতি সরকার** —
+  a director and an actress, swept in because bn.wikipedia's film categories
+  contain people. Both passed every mechanical gate: Bangla, 3–12 sentences,
+  over 120 characters. **Nothing except reading them would have caught this**,
+  which is exactly why the README insists the sampled set is read.
+- **132 − 2 = 130 exactly.** Zero slack, and the set has not been read yet.
+
+### Decisions made (and why)
+
+- **Whole-article veto for person articles**, not another heading exclusion. If
+  an article carries কর্মজীবন / ব্যক্তিগত জীবন / চলচ্চিত্রের তালিকা anywhere,
+  it is a person and is rejected outright. Stronger than vetoing one heading at
+  a time: a biography is never a film plot regardless of what the section
+  containing it is called, and the next such article will use a section name
+  nobody has thought of. `জীবন` also added to the heading exclusions as a
+  cheaper second line.
+- **More harvest before sampling, not straight to `--sample 130`.** Landing on
+  exactly 130 with zero margin means the first genuine reject during reading
+  puts the set back under target, and the "blind sample of 130 from 132" is
+  barely a sample at all. `--find-categories` first — the one category still
+  returning **+0** has a name I invented, and fixing it is free candidates.
+
+### Consequences for downstream steps
+
+- Reading the sampled set remains mandatory and is now demonstrably not a
+  formality: the mechanical gate passed two biographies.
+
+### Citations needed
+
+- None.
+
+---
+
 | # | Decision | Blocks | Due |
 |---|---|---|---|
 | 1 | Final `usable_n` after near-dup removal | Split freeze | S2 pilot |
