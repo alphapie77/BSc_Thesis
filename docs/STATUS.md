@@ -23,6 +23,7 @@
 | 5d | S2c region split (**exploratory**) — the corpus is two corpora | ✅ run — **60% of rows carry a uniform, non-organic signature** | `results/s2c_region_split.md` | 2026-07-30 |
 | 5e | `ARI(cluster, region)` — the decisive test | ✅ **RUN 2026-07-31. Pre-registered outcome 1 fires.** ARI(region) **0.4813** vs ARI(Sentiment) **0.1793**, at every threshold. Binary recast: ARI 0.7487, φ 0.861, **93.3% accuracy at identifying which corpus a review came from**. The clusters are a corpus detector, not personas. | `results/s2_cluster_assignments.csv` | 2026-07-31 |
 | 5f | S2-A: trap-check on region A alone | ✅ **run** — n=1,897, **not degenerate** (29.5/38.9/31.6), ARI **0.1804 → Band 1**. But V=**0.5455** (up from 0.4104) and the clusters are visibly sentiment-ordered; ARI is capped because K=3 meets 2 classes — **pre-registered as weakening this evidence**. G-300 is the arbiter. | `results/s2a_regionA_trapcheck.md` | 2026-07-31 |
+| 5g | **Gate G1 — master K-table (region A)** | 🟢 **built, pre-registered (protocol RQ1-C), NEVER RUN.** K=2..8, 7 criteria + bootstrap stability + GMM-BIC + HDBSCAN. Rule fixed in advance: **largest K with prediction strength ≥ 0.80**, stability beats compactness. ⚠️ **5 of 8 tests SKIP without scikit-learn** — they run first on Kaggle. | `results/s2d_ktable_regionA.md` | 2026-08-01 |
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
@@ -99,7 +100,7 @@ edited until the final `usable_n` is known (see Open decisions).
 | 3 | ~~Do personas survive the trap-check?~~ **ANSWERED 2026-07-31.** On the full corpus the clusters are a **corpus detector** (93.3% accuracy) — no persona claim stands there. In region A they are non-degenerate, Band 1, but sentiment-ordered with V=0.5455. **Persona discovery moves inside region A; G-300 decides whether the mixed middle cluster is a persona.** | RQ1 claim | closed |
 | 4 | Correct the S0 table in the pipeline spec | — | after 1–2 |
 | 5 | Frame the register finding in the **stylometry / authorship** literature or the **machine-generated-text detection** literature? Writing decision, Sabbir's | Ch.2, Ch.4 | Sabbir |
-| 7 | **Three personas or two?** The design posits three; region A has two sentiment classes and region B three. K is settled by the S2 master K-table (pipeline gate G1), not by the label count — but the mismatch must be resolved before S3 | S2 → S3 | after the re-run |
+| 7 | **Three personas or two?** | S2 → S3, **and G-300** | 🟢 **code ready, outcome pre-registered.** RQ1-C fixes what every result means, including K=2 (design gives way, two personas, K=3 as theory-motivated secondary) and `NO_STABLE_K` (theory-driven scheme via the Gate G2 fallback, or RQ1 as a negative result). Closes when G1 runs on Kaggle |
 | 8 | If open decision 0 returns "region B was generated", does the thesis **exclude** it, **keep** it as a labelled condition, or **make the contrast the contribution**? Different from 0b, which only settled the corpus | Ch.1 framing | after 0 |
 | ~~6~~ | ~~Should `s2_pilot.py` persist cluster assignments?~~ | — | ✅ done 2026-07-31 |
 | **9** | **Add an inference-cost-matched baseline to §5.1?** Huang et al. §6 require self-correction to be compared against baselines *of comparable inference cost*. Our rows 1–3 are single-call while 4–8 loop, so "row 6 beats row 1" may be partly a call-count effect. They also name **self-consistency / best-of-N at matched calls** as the strong baseline — our table has none. | §5.1 ablation, **the RQ2 headline** | 🔴 **Sabbir** — changes a pre-registered design |
@@ -114,7 +115,7 @@ edited until the final `usable_n` is known (see Open decisions).
 unresolvable, the scope decision is made (full corpus), and the code for the
 next run is written and pre-registered.
 
-1. 🔬 **Re-run both S2 configs on Kaggle** (one notebook, two runs). Produces
+1. 🔬 **Re-run the Kaggle notebook** — now three runs: both S2 configs **plus Gate G1** (one notebook, two runs). Produces
    `ARI(cluster, region)` and the region-A robustness check, and persists
    cluster assignments. Interpretations are pre-registered in `protocol.md`
    (RQ1-A) **before the run** — re-read that table before reading the numbers.

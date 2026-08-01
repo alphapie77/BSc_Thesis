@@ -1,0 +1,86 @@
+# GATE G1 — the master K-table. The tribunal for K.
+#
+# The three-persona design is a HYPOTHESIS. This table is the test. Interpretation
+# is pre-registered in docs/protocol.md ("RQ1-C pre-commitment") BEFORE this ever
+# ran — including what happens if K=2 wins and the design has to give way.
+#
+# ── WHY REGION A ONLY ──────────────────────────────────────────────────────
+# The full-corpus clustering identifies which of the two source corpora a review
+# came from with 93.3% accuracy (results/s2_pilot_ari_trapcheck.md). Running a
+# K-table on it would be choosing how many ways to split a file seam. The
+# organic corpus is the only place a persona question is even meaningful.
+#
+# ── THE DECISION RULE, from pipeline §2.2 — not invented here ──────────────
+#   1. Prediction strength: the LARGEST K with PS >= 0.80 (Tibshirani & Walther's
+#      own cutoff, adopted before running and not to be lowered afterwards).
+#   2. Bootstrap ARI: 80% subsample x 100 runs. STABILITY BEATS COMPACTNESS.
+#   3. Cross-checks: GMM+BIC (honest if personas overlap) and HDBSCAN (finds its
+#      own K, reports noise).
+#   4. Criteria disagreeing is the expected case, not a bug. Report the whole
+#      table; the tie-break is human validation and theory, stated openly.
+name: s2d_ktable
+seed: 42
+
+# Region-A assignments from the S2-A run: review_id, cluster, Sentiment, region.
+# Only the ids are used -- the K=3 clustering in that file is NOT an input here,
+# because this step re-clusters from the embeddings at every K.
+input_assignments: results/s2a_regionA_cluster_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+label_col: Sentiment
+text_col: "Movie Review"
+expected_n: 1897
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: data/cleaned/labse_emb_regionA.npy
+
+k_range: [2, 3, 4, 5, 6, 7, 8]
+
+kmeans:
+  n_init: 10
+  random_state: 42
+
+# Tibshirani & Walther (2005). Split the data in half, cluster each half, train a
+# classifier on one half's centroids, and measure how often pairs co-assigned in
+# the test half are also co-assigned by the training half's model. The minimum
+# over clusters is the score -- a single bad cluster should sink the K.
+prediction_strength:
+  n_splits: 20          # repeated 50/50 splits; report mean
+  threshold: 0.80       # ⚠️ PRE-REGISTERED. Do not lower after seeing the table.
+
+# Pipeline §2.2: 80% subsample x 100 runs, ARI against the full-data labels.
+bootstrap:
+  n_runs: 100
+  subsample_frac: 0.8
+
+# Tibshirani, Walther & Hastie (2001). Compare within-cluster dispersion against
+# a uniform reference over the data's bounding box in PCA space.
+gap_statistic:
+  n_reference: 20
+  pca_components: 50    # LaBSE is 768-d; a uniform box in 768-d is meaningless
+
+gmm:
+  covariance_type: diag  # 768-d with n<2000: full covariance is unestimable
+  n_init: 3
+
+hdbscan:
+  min_cluster_size: 30   # ~1.6% of n -- below this a "persona" is not a group
+  min_samples: 5
+
+# Same four bands as RQ1, applied at EVERY K. Stability and validity are
+# different properties: a K can be perfectly stable and still be a rediscovery
+# of the sentiment split.
+trap_check:
+  degenerate_cluster_share: {min: 0.05, max: 0.70}
+  bands:
+    not_sentiment_aligned_below: 0.20
+    partial_overlap_range: [0.20, 0.60]
+    persona_claim_fails_above: 0.60
+
+outputs:
+  report_md: results/s2d_ktable_regionA.md
+  table_csv: results/s2d_ktable_regionA.csv

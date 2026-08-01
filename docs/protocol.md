@@ -225,6 +225,56 @@ Point 3 is the sharp one and it does not go away by choosing the full corpus.
 It is the price of the larger n, and it is payable — provided it is paid in the
 open.
 
+## RQ1-C pre-commitment: Gate G1, the master K-table
+
+> **Written 2026-08-01, before the K-table exists.** No
+> `results/s2d_ktable_regionA.md` exists at the commit that introduces this
+> section. As with RQ1 and RQ1-A, the commit timestamp is the evidence.
+
+### Where it runs, and why
+
+**Region A only** (n ≈ 1,897 after dedup). The full-corpus clustering was shown
+to be a corpus detector (93.3%); running a K-table on it would be selecting the
+number of ways to split a file seam.
+
+### The decision rule — taken from pipeline §2.2, not invented here
+
+1. **Prediction strength:** the **largest K with PS ≥ 0.80** (Tibshirani &
+   Walther's own cutoff).
+2. **Bootstrap ARI:** 80% subsample × 100 runs, mean ± SD per K. **Stability
+   beats compactness** where they disagree.
+3. **Cross-checks:** GMM + BIC (soft membership — the honest model if personas
+   overlap) and HDBSCAN (finds its own K, reports noise fraction). If HDBSCAN
+   independently lands near the chosen K, that is strong evidence.
+4. **If criteria disagree:** report the **full table**, no cherry-picking;
+   stability > compactness; human validation and theory are the stated tie-break;
+   the disagreement goes in Limitations.
+
+### What each outcome means — fixed now
+
+| Outcome | Claim |
+|---|---|
+| **Selected K = 3, PS ≥ 0.80, bootstrap ARI stable** | The three-persona design is **empirically supported**, not just posited. Proceed to S3 with K=3. This is the best case and it is *not* the expected one. |
+| **Selected K = 2** | **The three-persona design gives way.** Region A has two sentiment classes, so a K of 2 raises the obvious worry that the clusters are the sentiment split — the ARI trap-check at K=2 settles that, and it is reported either way. If K=2 wins on stability, the thesis runs **two personas**, and the title's framing is adjusted rather than the data. K=3 is reported as the theory-motivated secondary, per pipeline §2.2. |
+| **Selected K ≥ 4** | Report it. A K larger than the design posited is a *finding about the audience*, not a failure — but with n ≈ 1,897 and 8-word reviews, check the degeneracy band (5–70%) before believing it. |
+| **No K reaches PS ≥ 0.80** | **`NO_STABLE_K`.** The honest reading is that this corpus does not support a stable partition at any K in 2–8. Then the persona scheme cannot be data-derived, and the thesis must either (a) use a **theory-driven** scheme validated by G-300, exactly as the pipeline's Gate G2 fallback already anticipates, or (b) reframe RQ1 as a negative result. **Both are publishable; neither is a reason to lower the cutoff.** |
+| **HDBSCAN disagrees sharply** (e.g. finds 2 where PS picks 5, or >40% noise) | Reported as a robustness failure in Limitations. A high noise fraction is itself informative: it would mean much of the corpus belongs to no persona. |
+
+### What is forbidden
+
+- **Lowering the PS cutoff after seeing the table.** 0.80 is Tibshirani &
+  Walther's, adopted before running.
+- **Choosing K to match the three-persona design.** The design is the hypothesis;
+  the table is the test.
+- **Reporting only the criteria that agree.** The full table goes in the thesis.
+
+### The trap-check runs at every K
+
+`ARI(cluster, Sentiment)` is computed for **each** K in 2–8, with the same
+pre-registered bands as RQ1. A K whose clusters merely reproduce the sentiment
+split is disclosed as such regardless of how stable it is — stability and
+validity are different properties.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.

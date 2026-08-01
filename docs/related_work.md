@@ -147,7 +147,7 @@ without a trained verifier).
   analogue to ours.
 - ⬛ **Get their experiment-design checklist and run §5.1 against it before S6.**
 
-### [~] mop2025 — Mixture-of-Personas (arXiv 2504.05019) ⚠️ venue unverified
+### [x] mop2025 — Mixture-of-Personas (arXiv 2504.05019) ⚠️ venue unverified
 - **Role:** **closest competitor.** Borrow formalism (population P, K groups,
   persona g_k). Uses IMDB/SST-2 — overlaps our English arm.
 - **Feeds:** Ch.2, and the head-to-head comparison table.
@@ -157,16 +157,74 @@ without a trained verifier).
   human-validate, that gap is our contribution ①.
 - **Notes:**
 
-- **✅ Key question ANSWERED (2026-08-01):** their §4 has only Steerability /
-  Synthetic Data Generation / Transferability / Ablations, plus §7 Limitations.
-  **No human-evaluation or persona-validation section exists.** Personas are
-  synthesised from data and scored on automatic alignment + diversity metrics.
-  **Contribution ① stands.**
+- **✅ [x] ENTRY COMPLETE (2026-08-01, from the PDF).** Every register field
+  below is now filled from §4.1–4.5.
+- **✅ Persona validation: NONE.** §4 has only Steerability / Synthetic Data
+  Generation / Transferability / Ablations, plus §7 Limitations. No human
+  evaluation anywhere. **Contribution ① stands.**
+- **✅ K selection: THERE IS NONE. K is fixed at 100 by hand.** §4.1: *"we choose
+  the number of personas to be 100 … We then run K-Means and the persona
+  synthesizer to extract 100 persona descriptions."* No K-table, no stability
+  analysis, no selection criterion. **Our Gate G1 (7 criteria, bootstrap ARI,
+  prediction strength) is therefore contribution ②** — and note the conceptual
+  gap: they model a population as **100 micro-personas**; we model **3 audience
+  types**. Different granularity, and Ch.2 should say so rather than imply we do
+  the same thing at different K.
+- **✅ Datasets — the pipeline's claim is CONFIRMED:** AGNews (topic) + **Yelp,
+  SST-2, IMDB** (sentiment).
+- **✅ MAUVE: yes, primary alignment metric**, alongside **FID** and **KL Cosine**
+  (their own diversity metric: KL between pairwise-cosine histograms). Encoder
+  `all-mpnet-base-v2`; base LLM Llama3-8B-Instruct for MoP *and* all baselines;
+  5,000 synthetic responses per method; top M=4 persona–exemplar pairs per input.
+  **§C's mandate to use `mauve-text` is justified — the numbers are comparable.**
+- **⚠️ Persona-conditioning accuracy: they never measure it.** Alignment is
+  distributional (FID / MAUVE / KL Cosine) plus downstream F1. **There is no
+  per-persona controllability number in the paper** — which is exactly the axis
+  RQ2 measures. Another gap.
+
+**Numbers to compare (Table 1, AGNews / Yelp / SST-2 / IMDB):**
+
+| | FID ↓ | MAUVE ↑ | KL Cosine ↓ |
+|---|---|---|---|
+| MoP AGNews | **0.951** | **0.871** | 0.069 |
+| MoP Yelp | 0.948 | 0.826 | 0.067 |
+| MoP SST-2 | 1.131 | 0.855 | 0.319 |
+| MoP IMDB | 0.771 | 0.865 | 0.039 |
+| best baseline (PICLe/ProGen/AttrPrompt) | 1.769–4.736 | 0.537–0.767 | — |
+| MoP improvement | 46–69% | **+13.6% to +41.3%** | 33–80% |
+
+**Table 2 — downstream F1** (DistilBERT trained on 5,000 synthetic samples,
+tested on golden test set):
+
+| | AGNews | Yelp | SST-2 | IMDB |
+|---|---|---|---|---|
+| Golden data | 0.903 | 0.896 | 0.919 | 0.877 |
+| **MoP** | 0.871 | 0.867 | 0.845 | **0.865** |
+| AttrPrompt | 0.836 | 0.864 | 0.838 | 0.793 |
+
+**Table 4 — ablation, and this one matters to us:**
+
+| | FID ↓ | MAUVE ↑ | KL Cosine ↓ |
+|---|---|---|---|
+| MoP | 0.951 | 0.871 | 0.069 |
+| **w/o exemplars** | **3.694** | **0.552** | **0.560** |
+| w/o persona synthesiser | 1.674 | 0.807 | 0.174 |
+| w/ random personas | 1.814 | 0.622 | 0.061 |
+
+🔑 **Removing the exemplars is far more damaging than removing the persona
+synthesiser** (MAUVE 0.871 → 0.552 vs → 0.807). **The exemplars carry most of
+the benefit, not the persona descriptions.** Since our RAG layer is structurally
+their exemplar layer, this predicts our row 3 (RAG only) may beat rows 1–2
+(persona prompting) by more than expected — and it is an argument that our
+ablation is right to separate them.
+- **Transferability (Table 3):** MoP trained on Llama3-8B transfers to
+  Gemma2-9B (MAUVE 0.957) and Mistral-7B (0.869) without retraining.
 - **Formalism to adopt:** p(y|x) = Σₖ πₖ · p_LM(y|gₖ, x), Σπₖ = 1; plus a second
   level weighting in-context exemplars. Our RAG over R1 ≈ their exemplar level.
 - ⚠️ **Venue unverified** — arXiv shows no venue, not "Findings of ACL 2025".
   ⚠️ **"IMDB/SST-2" unverified** — abstract names no dataset.
-- ⬛ **Still needed:** §4.1 datasets, whether they report MAUVE, K selection.
+- ⚠️ **Venue still unverified** — arXiv shows none; the pipeline's "Findings of
+  ACL 2025" remains unconfirmed. Everything else in this entry is now filled.
 ### [~] sands2026 — Sands et al., NCAA 2026 (doi 10.1007/s00521-026-12247-0)
 - **Role:** English persona-prompted movie reviews. Their gaps = our motivation.
 - **Feeds:** Ch.1 §1.1(2), Ch.2, and directly the §5.5 cross-lingual framing.

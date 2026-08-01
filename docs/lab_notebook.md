@@ -1807,6 +1807,151 @@ abstract is unusually specific; Cobbe has no arXiv HTML.
 
 ---
 
+## 2026-08-01 — MoP entry closed from the PDF. It hands us contribution ②.
+
+**Feeds:** Ch.2, **Gate G1 design** · **Artifact:** `docs/related_work.md`
+(`mop2025` now `[x]`)
+
+### Why this one section was read before starting G1
+
+Of the three outstanding reading gaps, only MoP's **K-selection method** touches
+the next code step. If the closest competitor had a principled way of choosing
+K, we would want to know it before running our own K-table rather than after.
+The arXiv HTML buried §4.1 in MathML; **the PDF is clean** and answered
+everything in one section.
+
+### Findings
+
+- **🔑 MoP does not select K. It is fixed at 100 by hand.** §4.1: *"we choose the
+  number of personas to be 100 … We then run K-Means and the persona synthesizer
+  to extract 100 persona descriptions."* No K-table, no stability analysis, no
+  criterion, no sensitivity check. **Our Gate G1 — seven criteria, bootstrap ARI,
+  prediction strength — is therefore contribution ②**, sitting beside human
+  validation as contribution ①.
+- **And the granularity differs conceptually, which Ch.2 must say plainly.** They
+  model a population as **100 micro-personas**; we model **3 audience types**.
+  These are not the same object at different K. Pretending otherwise would
+  invite a reviewer to point it out.
+- **🔑 Their ablation predicts something about ours.** Removing exemplars is far
+  more damaging than removing the persona synthesiser: MAUVE 0.871 → **0.552**
+  versus → 0.807. **The exemplars carry most of the benefit, not the persona
+  descriptions.** Our RAG layer is structurally their exemplar layer, so this
+  predicts row 3 (RAG only) may beat rows 1–2 (persona prompting) by more than
+  we assumed — and it validates keeping them as separate ablation rows.
+- **⚠️ They never measure persona-conditioning accuracy.** Alignment is
+  distributional (FID / MAUVE / KL Cosine) plus downstream F1. **There is no
+  per-persona controllability number anywhere in the paper** — which is precisely
+  the axis RQ2 measures. A third gap.
+- **✅ Both unverified pipeline claims resolved.** Datasets *are* AGNews + Yelp +
+  **SST-2 + IMDB**. MAUVE *is* reported, as the primary alignment metric. §C's
+  mandate to use `mauve-text` is justified: the numbers will be comparable.
+  Encoder `all-mpnet-base-v2`; Llama3-8B-Instruct as base for MoP *and* every
+  baseline; 5,000 synthetic responses per method.
+- **Venue still unverified** — arXiv shows none. "Findings of ACL 2025" stays
+  flagged.
+
+### Numbers now in the register
+
+MoP AGNews FID 0.951 / MAUVE 0.871 / KL 0.069, with +13.6% to +41.3% MAUVE over
+the best baseline across four datasets; downstream F1 within 0.01–0.07 of golden
+data. Transfers to Gemma2-9B (MAUVE 0.957) and Mistral-7B (0.869) without
+retraining.
+
+### Decisions made (and why)
+
+- **Read this one section rather than finishing all three gaps.** Sands's and
+  Cobbe's numbers feed Ch.2 and §5.x, which are weeks away; MoP's K-selection
+  feeds the step being built today. Sequencing by what blocks what, not by
+  tidiness.
+- **`mop2025` marked `[x]` — the first entry besides Huang to be complete.**
+  Every register field is filled from the PDF.
+
+### Consequences for downstream steps
+
+- **G1 can proceed** knowing the closest competitor offers no K-selection
+  precedent to follow or beat — which raises the value of doing it properly.
+- Ch.2 gains three distinct gaps against MoP: no persona validation, no K
+  selection, no persona-conditioning accuracy.
+
+### Citations needed
+
+- None new; `mop2025` already in `references.bib`.
+
+---
+
+## 2026-08-01 — Gate G1 built and pre-registered. Not run.
+
+**Feeds:** Ch.4 §Persona discovery, **open decision 7** · **Artifacts:**
+`configs/s2d_ktable.yaml`, `src/cluster/s2d_ktable.py`,
+`tests/test_s2d_ktable.py`, `docs/protocol.md` RQ1-C · **Nothing was run.**
+
+### Numbers
+
+None. That is the point: the interpretation was fixed while the outcome is
+still unknown.
+
+### Decisions made (and why)
+
+- **The decision rule was not invented here.** Pipeline §2.2 already fixes it —
+  *the largest K with prediction strength ≥ 0.80* (Tibshirani & Walther's own
+  cutoff), with **stability beating compactness** where criteria disagree. The
+  code applies that rule mechanically; it does not choose.
+- **Prediction strength takes the MINIMUM over clusters, not the mean.** One
+  unreproducible cluster should sink a K. A mean would let two good clusters
+  hide a bad one — and that is precisely how a K=3 that is really K=2-plus-noise
+  would survive. There is a test for exactly this.
+- **The gap statistic runs in PCA space (~50 components).** Its uniform
+  reference is drawn over the data's bounding box, and in 768 dimensions a
+  bounding box is almost entirely empty, so the reference would be meaningless.
+- **The trap-check runs at every K, not only the selected one.** Stability and
+  validity are different properties: a K can be perfectly stable and still be a
+  rediscovery of the sentiment split. Both columns sit in the same table so
+  neither can be quoted alone.
+- **RQ1-C pre-commits every outcome, including the one that costs us the title.**
+  If K=2 wins, the three-persona design gives way and the thesis runs two
+  personas, with K=3 retained as the theory-motivated secondary. If no K reaches
+  0.80, the verdict is `NO_STABLE_K` and the scheme must become theory-driven
+  (the pipeline's own Gate G2 fallback) or RQ1 becomes a negative result.
+  **Both are publishable; lowering the cutoff is not an option**, and a test
+  asserts the threshold is still 0.80 so it cannot drift quietly.
+- **Region A only.** Running a K-table on the full corpus would be choosing how
+  many ways to split a file seam.
+
+### Findings
+
+- **I shipped a test suite that reported `8/8 passed` while five of its tests had
+  not run.** scikit-learn is absent from the authoring sandbox, and the skip
+  path printed a message and returned — which the runner counted as a pass.
+  Fixed: skips now raise a `Skipped` sentinel and the summary reads
+  `3 passed, 5 SKIPPED, 0 failed`, with a warning naming what did not execute.
+  **A suite that reports green for tests it never ran is worse than no suite,
+  because it is trusted** — and this is the second false-green I have caught in
+  my own work this week, after the notebook cell.
+- The five skipped tests are the ones that actually validate the statistics
+  (prediction strength peaking at the true K, the minimum-over-clusters rule,
+  bootstrap ARI separating structure from noise). **They run for the first time
+  on Kaggle**, which is why the runner now prints their skip count separately.
+
+### Consequences for downstream steps
+
+- G1 runs on Kaggle in the same notebook, after both S2 configs, reusing their
+  region-A row set. HDBSCAN needs `pip install hdbscan`.
+- Open decision 7 (three personas or two) closes when this runs.
+- **G-300 stratification depends on the outcome**, so no annotation can start
+  until the K question is settled.
+
+### Citations needed
+
+- **Tibshirani & Walther (2005)**, prediction strength — the 0.80 cutoff is
+  theirs and the thesis must attribute it.
+- **Tibshirani, Walther & Hastie (2001)**, gap statistic.
+- Both need entries in `related_work.md` (Tier 2) and `references.bib` before
+  Ch.4 is written. **Not added yet — I have not read either paper**, and adding
+  a citation for a method I took from the pipeline's summary would be exactly
+  the shortcut this file exists to prevent.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |
