@@ -1732,6 +1732,81 @@ same way — metadata is not the paper.
 
 ---
 
+## 2026-08-01 (later) — Deeper reads. Kamoi hands us a gap sentence.
+
+**Feeds:** Ch.1, Ch.2, §5.1 · **Artifact:** `docs/base_papers_brief.md` (rewritten)
+**Depth now:** Huang 📗, Kamoi 📗, Illusion 📗, MoP 📘 partial, Sands 📙, Cobbe 📙
+
+### Findings
+
+- 🎁 **Kamoi §5.2 states our gap for us:** *"Fine-tuning enables self-correction
+  when large training data is available but is **unexplored for small training
+  data**."* Our verifier trains on **R1 = 2,162 rows**. A TACL survey naming our
+  exact regime as unexplored is a stronger Ch.1 sentence than anything we could
+  have argued ourselves — and we would not have found it from the abstract.
+- **Kamoi's Table 1 gives us a placement problem worth solving deliberately.**
+  Their taxonomy is Intrinsic / Oracle / Fair-Asymmetric / Unfair-Asymmetric /
+  **Cross-Model**, and REFINER and RL4F — a large LM paired with a trained T5
+  feedback model — sit under Cross-Model as the closest structural analogue to
+  ours. We should classify ourselves in Ch.2 before a reviewer does it for us.
+  The asymmetry axis matters too: if our verifier sees information the generator
+  never had, that is *asymmetric* and must be disclosed.
+- **The Illusion paper's fourth control is the one that matters to us.** Their
+  **self-distrust control** — instructing the agent to verify its own thoughts —
+  yields **0–23%** correction against **70%** for the role relabel. So naive
+  self-distrust is not a substitute for external presentation, and our row 7 is
+  predicted to lose for a *mechanistic* reason rather than an empirical accident.
+  Their **within-thought duplication control** (+6.7 pp, p=0.26) further isolates
+  a **+46.7 pp pure role-tag effect** — it is not "the model saw it twice".
+- ⚠️ **But their lifts are measured on a *failure pool*** — tasks pre-selected
+  for having already failed intrinsic correction. That concentrates power on the
+  target regime and it means the 23–93 pp figures are on a selected subset. Must
+  be stated that way whenever we cite them.
+- ✅ **MoP does not validate its personas — confirmed from the paper's own
+  section list.** §4 contains only Steerability, Synthetic Data Generation,
+  Transferability and Ablations, plus §7 Limitations. **No human-evaluation
+  section exists anywhere.** Contribution ① stands. Their formalism is
+  p(y|x) = Σₖ πₖ·p_LM(y|gₖ,x), with a second level weighting in-context
+  exemplars — and **our RAG over R1 is arguably that same exemplar level**,
+  which is worth saying in Ch.2 rather than leaving a reviewer to notice.
+
+### What could not be read, and why
+
+**MoP §4.1** — datasets, whether they report MAUVE, and how they choose K. The
+arXiv HTML renders that section behind MathML markup that costs more to parse
+than the content is worth; the PDF will be readable. Marked ⬛ rather than
+guessed. This also leaves the pipeline's *"uses IMDB/SST-2"* claim unverified,
+alongside its unverified *"Findings of ACL 2025"* venue.
+
+**Sands and Cobbe** remain 📙 abstract + record. Sands is open access and its
+abstract is unusually specific; Cobbe has no arXiv HTML.
+
+### Decisions made (and why)
+
+- **Depth tagged per paper in the brief, with three ⬛ marks for what still needs
+  the PDF.** The temptation with six papers is to write six sections of uniform
+  confidence. The honest version is uneven and says where it is thin.
+- **`related_work.md` entries updated to `[~]` with the substantive findings**,
+  and the brief carries the numbers. Two files, two jobs: the register stays
+  structured for assembling Ch.2, the brief is readable in one sitting.
+- **MoP's heading now carries "⚠️ venue unverified"** in the register itself, so
+  the wrong venue cannot be copied into a bibliography from this file.
+
+### Consequences for downstream steps
+
+- Ch.1's gap paragraph now has a citable sentence (Kamoi §5.2) rather than an
+  argument we have to construct.
+- Ch.2 owes a taxonomy placement (Kamoi Table 1) and an explicit comparison of
+  our RAG layer to MoP's exemplar layer.
+- Open decisions 9, 10, 11 stand; nothing in the deeper reading weakened them,
+  and the Illusion controls strengthened 11.
+
+### Citations needed
+
+- All six in `references.bib`, keys matching the register headings.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |

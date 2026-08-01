@@ -119,13 +119,35 @@ without a trained verifier).
 > directly, and this entry is a summary, not a substitute for the two hours it
 > takes to read §3 and §6.
 
-### [ ] kamoi2024when — Kamoi et al., TACL 2024
-*When Can LLMs Actually Correct Their Own Mistakes?*
-- **Role:** intrinsic-vs-extrinsic taxonomy — supplies our framing vocabulary.
-- **Feeds:** Ch.2 taxonomy paragraph; positions our verifier as extrinsic feedback.
-- **Notes:**
+> **All six Tier-1 entries below were briefed on 2026-08-01 in
+> `docs/base_papers_brief.md`**, with reading depth tagged per paper (📗 body
+> read / 📘 partial / 📙 abstract + record). That file carries the numbers, the
+> quotes and the design consequences; these entries carry the register fields.
+> **Read by Claude, not by Sabbir** — the depth tags in the brief are the honest
+> record of what was actually read.
 
-### [ ] mop2025 — Mixture-of-Personas, Findings of ACL 2025 (arXiv 2504.05019)
+### [~] kamoi2024when — Kamoi et al., TACL 2024
+*When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey* · TACL 12: 1417–1440
+- **Role:** intrinsic-vs-extrinsic taxonomy — supplies our framing vocabulary.
+- **Feeds:** Ch.2 taxonomy paragraph; **Ch.1 gap sentence**; decision 9.
+- 🎁 **§5.2: *"Fine-tuning enables self-correction when large training data is
+  available but is unexplored for small training data."*** Our verifier trains on
+  **R1 = 2,162 rows**. A TACL survey names our exact regime as *unexplored* —
+  a gap sentence we do not have to argue for.
+- **§5.1:** *"Self-correction is effective in tasks where reliable external
+  feedback is available"* — the sentence RQ2 rests on.
+- **RQ1 finding:** *no* prior work shows successful correction from **prompted-LLM**
+  feedback → predicts our row 7 loses, which is why it is the right baseline.
+- **§6 "Strong Baselines":** *"Self-correction is often not compared with
+  sufficiently strong baselines"* — independent confirmation of decision 9.
+- **Taxonomy (Table 1)** — use this vocabulary: Intrinsic / Oracle /
+  Fair-Asymmetric / Unfair-Asymmetric / **Cross-Model**. ⬛ **We must place our
+  own system in it before a reviewer does** — REFINER and RL4F (a large LM with a
+  trained T5 feedback model) sit under Cross-Model and are the closest structural
+  analogue to ours.
+- ⬛ **Get their experiment-design checklist and run §5.1 against it before S6.**
+
+### [~] mop2025 — Mixture-of-Personas (arXiv 2504.05019) ⚠️ venue unverified
 - **Role:** **closest competitor.** Borrow formalism (population P, K groups,
   persona g_k). Uses IMDB/SST-2 — overlaps our English arm.
 - **Feeds:** Ch.2, and the head-to-head comparison table.
@@ -135,20 +157,44 @@ without a trained verifier).
   human-validate, that gap is our contribution ①.
 - **Notes:**
 
-### [ ] sands2026 — Sands et al., NCAA 2026 (doi 10.1007/s00521-026-12247-0)
+- **✅ Key question ANSWERED (2026-08-01):** their §4 has only Steerability /
+  Synthetic Data Generation / Transferability / Ablations, plus §7 Limitations.
+  **No human-evaluation or persona-validation section exists.** Personas are
+  synthesised from data and scored on automatic alignment + diversity metrics.
+  **Contribution ① stands.**
+- **Formalism to adopt:** p(y|x) = Σₖ πₖ · p_LM(y|gₖ, x), Σπₖ = 1; plus a second
+  level weighting in-context exemplars. Our RAG over R1 ≈ their exemplar level.
+- ⚠️ **Venue unverified** — arXiv shows no venue, not "Findings of ACL 2025".
+  ⚠️ **"IMDB/SST-2" unverified** — abstract names no dataset.
+- ⬛ **Still needed:** §4.1 datasets, whether they report MAUVE, K selection.
+### [~] sands2026 — Sands et al., NCAA 2026 (doi 10.1007/s00521-026-12247-0)
 - **Role:** English persona-prompted movie reviews. Their gaps = our motivation.
 - **Feeds:** Ch.1 §1.1(2), Ch.2, and directly the §5.5 cross-lingual framing.
 - **Numbers to compare:** their persona-control reliability on English.
 - **Notes:**
 
-### [ ] cobbe2021verifiers — Cobbe et al. 2021
+- **Their gap is our target:** *"a noticeable gap in emotional richness and
+  stylistic coherence"* vs IMDb, despite fluent, structurally complete output.
+- **Generator warning:** GPT-4o overemphasises positive emotions; DeepSeek-V3
+  most balanced; Gemini-2.0 excessive emotional intensity.
+- **Design gap we exploit:** they feed subtitles + screenplays, which exist only
+  post-production. Ours is pre-release — synopsis only.
+- ⬛ Body not read; read the results section before citing a metric.
+### [~] cobbe2021verifiers — Cobbe et al. 2021
 *Training Verifiers to Solve Math Word Problems*
 - **Role:** origin of the trained-verifier line; our generate–verify–refine
   ancestor. Establishes that a **separately trained** verifier beats self-scoring.
 - **Feeds:** Ch.2 §verifiers, Ch.3 verifier design rationale.
 - **Notes:**
 
-### [ ] selfcorrectionillusion2026 — arXiv 2606.05976
+- **Load-bearing, not background:** Huang §6 names this as the alternative to
+  intrinsic correction.
+- **Key claim:** *"verification scales more effectively with increased data than
+  a finetuning baseline"* — pre-empts "why not fine-tune the generator?".
+- **Honest difference:** their verifier **ranks** (best-of-N); ours **gates and
+  refines**. Best-of-N is also the cost-matched baseline decision 9 needs.
+- ⬛ Body not read (no arXiv HTML for 2021).
+### [~] selfcorrectionillusion2026 — arXiv 2606.05976
 *The Self-Correction Illusion*
 - **Role:** why external-role feedback works — the Critic's justification.
 - **⚠️ Verify this exists and the ID is correct before citing.** Provenance is
@@ -157,6 +203,20 @@ without a trained verifier).
 
 ---
 
+- **Claim:** willingness to correct depends on the chat-template **role label**,
+  not the claim's content. Byte-identical claim (SHA-256), only the role varies.
+- **Numbers:** +23 to +93 pp; 10/13 cells significant, 3 exceptions all ceiling
+  (L₀ ≥ 67%); 9/13 survive Holm–Bonferroni and BH; 26/30 per-task flips on
+  Llama-70B logic.
+- **Mechanism:** bare wrapper 17–23 pp, role tag a further ~30 pp; nonsense
+  `<xqzy>` 30% vs `<memory>` 70%; within-thought duplication control only
+  +6.7 pp (p=0.26) → +46.7 pp pure role-tag effect.
+- 🔴 **Self-distrust control:** telling the agent to verify its own thoughts
+  gives 0–23% vs 70% for the relabel. **Naive self-distrust is not a
+  substitute** — which is why our row 7 should lose, mechanistically.
+- ⚠️ **Scope:** measured on a *failure pool* (tasks where intrinsic correction
+  already failed), so lifts are on a pre-selected subset.
+- → **open decision 11**: add row 7b, self-critique under an external role.
 ## Tier 2 — Method citations (each defends one design choice)
 
 | Key | Paper | Defends |
