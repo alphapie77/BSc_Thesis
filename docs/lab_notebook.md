@@ -1952,6 +1952,115 @@ still unknown.
 
 ---
 
+## 2026-08-03 — Gate G1 ran. K = 2, and the corpus has no cluster structure.
+
+**Feeds:** Ch.4 §Persona discovery, **Ch.5 §Threats**, open decision 7
+**Artifacts:** `results/s2d_ktable_regionA.md`, `results/s2d_ktable_regionA.csv`
+**Ran on:** Kaggle T4 · n = 1,897 (region A, post-dedup)
+
+### Numbers
+
+| K | **PS** | bootstrap ARI | silhouette | gap | GMM-BIC | ARI vs Sentiment | shares |
+|---|---|---|---|---|---|---|---|
+| **2** | **0.860** ✅ | **0.940 ± 0.029** | **0.053** | 0.9498 | −6.125e6 | 0.152 | 39.7 / 60.3 |
+| 3 | 0.669 | 0.909 ± 0.045 | 0.015 | 0.9700 | −6.152e6 | 0.180 | 29.5–38.9 |
+| 4 | 0.415 | 0.531 ± 0.178 | 0.011 | 0.9857 | −6.168e6 | 0.127 | 18.8–34.1 |
+| 5 | 0.375 | 0.647 ± 0.213 | 0.018 | 0.9986 | −6.183e6 | 0.115 | 12.5–25.8 |
+| 6 | 0.364 | 0.671 ± 0.162 | 0.012 | 1.0122 | −6.198e6 | 0.085 | 11.1–24.1 |
+| 7 | 0.354 | 0.755 ± 0.097 | 0.017 | 1.0224 | −6.201e6 | 0.084 | 9.2–19.5 |
+| 8 | 0.315 | 0.642 ± 0.098 | 0.010 | 1.0323 | −6.210e6 | 0.073 | 8.6–15.8 |
+
+**HDBSCAN: K = 0, noise = 100.0%.**
+
+### The verdict, by the rule fixed on 2026-08-01
+
+**Only K = 2 clears the pre-registered PS ≥ 0.80** (0.860). K=3 reaches **0.669**
+— not marginal, not "close enough". RQ1-C's K=2 branch therefore applies:
+
+> **The three-persona design gives way.** The thesis runs two personas; K=3 is
+> retained as the theory-motivated secondary (pipeline §2.2).
+
+**Open decision 7 is closed: two personas.**
+
+### The worry that K=2 raised is dispelled
+
+Region A has two sentiment classes, so the obvious fear was that a 2-way
+clustering just *is* the sentiment split. **ARI(cluster, Sentiment) = 0.152 →
+Band 1, NOT_SENTIMENT_ALIGNED.** It is not. Cluster shares 39.7 / 60.3 —
+comfortably non-degenerate. Bootstrap ARI 0.940 ± 0.029 is the tightest in the
+table.
+
+### 🔴 The finding that matters more than K
+
+**The criteria do not merely disagree — they disagree in a patterned way, and
+the pattern says there are no clusters here at all.**
+
+- Agreeing on K=2: prediction strength, bootstrap ARI, **silhouette**,
+  Calinski-Harabasz.
+- Pointing at K=8 (the largest tested): **Davies-Bouldin**, **GMM-BIC**.
+- **Gap statistic: the rule `gap(k) ≥ gap(k+1) − s(k+1)` is satisfied at NO K.**
+  Gap rises monotonically 0.9498 → 1.0323 across the whole range. A gap curve
+  that never turns over is the textbook signature of a dataset with **no cluster
+  structure** — it would keep climbing past K=8.
+- **HDBSCAN classified 100% of points as noise.** An algorithm free to find its
+  own K, and to say "nothing here", said exactly that.
+- **Silhouette peaks at 0.053.** Zero means points sit on cluster boundaries.
+  0.05 is not weak structure; it is the absence of structure.
+
+**Synthesis, and this is what goes in the thesis:** region A contains a
+**highly reproducible bisection** (PS 0.86, bootstrap ARI 0.94) of a space that
+contains **no separated groups**. Those are compatible. A dominant continuous
+axis gets cut in the same place every time — that is what stability measures —
+without there being two things to find. K-Means always returns K parts;
+HDBSCAN and the gap statistic are the two instruments here allowed to answer
+"none", and both did.
+
+**Stability is reproducibility of a cut, not evidence of groups.** The
+pre-registration warned that stability ≠ validity; this table is that warning
+made concrete.
+
+### Decisions made (and why)
+
+- **K = 2 stands as the selected K.** The rule was fixed in advance and it was
+  followed. Reading the disagreement as licence to reinstate K=3 would be
+  exactly the manoeuvre the pre-registration exists to block — and K=3's own PS
+  is worse, so there is no reading under which K=3 wins.
+- **No deviation logged.** Nothing departed from the protocol; the rule produced
+  an uncomfortable answer, which is what rules are for.
+- **The full table goes in the thesis, disagreement included** (pipeline §2.2:
+  no cherry-picking). Reporting only PS and bootstrap ARI would hide the fact
+  that half the criteria point elsewhere and two say "no clusters".
+- **The persona language must be qualified from here on.** Writing "we
+  discovered two audience personas" would overclaim. What was found is a stable
+  2-way partition whose status as *personas* is undetermined — and that is
+  precisely G-300's question, not a statistic's.
+
+### Consequences for downstream steps
+
+- **G-300 is now decisive rather than confirmatory.** If three annotators can
+  reliably tell the two halves apart, the partition means something and the
+  persona framing survives (probably as a *tier* or *axis* rather than
+  categorical types). If they cannot, RQ1 becomes a negative result — which
+  RQ1-C already recorded as publishable.
+- **Ch.5 §Threats gains a concrete entry:** three independent indicators
+  (silhouette ≈ 0, monotone gap, 100% HDBSCAN noise) agree that LaBSE space over
+  8-word Bangla reviews has no cluster structure. That is a limitation of the
+  data and encoder, and it should be stated plainly rather than buried.
+- **Title and framing need revisiting** — "three personas" appears throughout
+  the pipeline and the pre-defence material. Sabbir's call; logged as open
+  decision 12.
+
+### Citations needed
+
+- **Tibshirani & Walther (2005)** — prediction strength, and the 0.80 cutoff.
+- **Tibshirani, Walther & Hastie (2001)** — gap statistic; the monotone-gap
+  reading needs their own framing to be stated correctly.
+- **Campello, Moulavi & Sander (2013)** — HDBSCAN.
+- Still **not added** to `references.bib`: I have not read any of the three. A
+  method citation taken from a summary is the shortcut this file exists to stop.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |

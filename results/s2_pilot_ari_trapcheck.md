@@ -13,8 +13,8 @@ this outcome is on record so the split cannot be tuned to it.
   random_state=42, in LaBSE space (rule 9: UMAP
   is visualization-only and is not used here)
 - **Seed:** 42
-- **Generated (UTC):** 2026-07-31T17:40:47.362884+00:00
-- **Git commit:** `abcdfcfd2c69364f6001d912c87ca2a30851d045`
+- **Generated (UTC):** 2026-08-03T10:55:16.764695+00:00
+- **Git commit:** `cf8d5cfc191d60c972ba14fe4815b818627794aa`
 
 ## Trap-check result at the primary threshold (0.95)
 
