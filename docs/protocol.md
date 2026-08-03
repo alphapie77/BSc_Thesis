@@ -353,6 +353,93 @@ removal is unnecessary. Nothing here is trained, nothing enters the RAG index or
 any model, and no feature computed in this step is used as a model input — it is
 a descriptive diagnostic and a reading aid. Rules 7 and 10 are intact.
 
+## RQ1-E pre-commitment: the residual test, run voluntarily
+
+> **Written 2026-08-03, after S2e's table was read but before
+> `src/cluster/s2f_residual.py` exists and before any number in it is known.**
+> No `results/s2f_regionA_k2_residual.md` exists at the commit that introduces
+> this section.
+
+### Why this is being run when the pre-registration does not require it
+
+RQ1 Band 2 makes a residual test **mandatory** only at ARI ≥ 0.20. S2e reports
+ARI(cluster, Sentiment) = **0.1522**, which is Band 1, so mechanically no
+residual test is owed.
+
+**Running it anyway, because ARI is the wrong instrument here and this project
+has already been misled by it once.** The same 2×2 that yields ARI 0.1522 yields
+**φ = 0.3981**, χ² = 300.7, and a cluster→sentiment accuracy of **69.5%** against
+a 50.2% majority baseline — a 19.3-point lift. Every one of the twelve reviews
+nearest cluster 0's centre is labelled positive; every one of the twelve nearest
+cluster 1's centre is labelled negative; and the log-odds lists separate praise
+terms (সুন্দর, অসাধারণ, সেরা) from complaint terms (না, নাই, বাজে, ফালতু).
+`s2b_register_probe.md` recorded exactly this gap before (φ 0.565 against
+V 0.410). A test that a reviewer will certainly demand, and that costs one
+script over data already on disk, should not be skipped on a technicality.
+
+**Recorded plainly: this is Band 1 by the pre-registered rule. The residual test
+is voluntary and additional; it does not retroactively move the corpus into
+Band 2, and no band assignment is being revised.**
+
+### The four tests, and what each outcome will mean
+
+Nothing is trained anywhere in this step. AUC and φ are rank/contingency
+statistics; the richness comparison is sampling at a fixed token budget. Rule 10
+untouched.
+
+**Test A — does length separate the clusters *within* a sentiment class?**
+Directionless AUC of `n_words` against cluster, computed separately for
+Sentiment 0 and Sentiment 1; the reported figure is the **minimum** of the two.
+
+| Outcome | Claim |
+|---|---|
+| min ≥ 0.60 | Length contributes **independently of sentiment**. The `LENGTH_CONFOUNDED` verdict stands on its own and is not an artefact of longer reviews being more positive. |
+| min < 0.60 | In at least one sentiment class, length does not separate the halves. The length effect is then partly carried by sentiment and must be reported as entangled, not additive. |
+
+**Test B — does sentiment separate the clusters *within* a length band?**
+`|φ(cluster, Sentiment)|` inside each quartile band of `n_words`; the reported
+figure is the **minimum** across bands.
+
+| Outcome | Claim |
+|---|---|
+| min ≥ 0.20 | Sentiment contributes **independently of length**, in every band. |
+| min < 0.20 | There is at least one length band in which sentiment does not separate the halves. Named, with its band, rather than averaged away. |
+
+**Test C — the decisive one: how much is left over?**
+Cross-classify Sentiment × `n_words` quartile (8 cells) and predict cluster by
+each cell's own majority. Report accuracy against the marginal baseline (60.3%,
+the larger cluster's share). **This is a resubstitution estimate fitted and
+scored on the same rows, so it is an optimistic UPPER BOUND** on how much
+sentiment and length together account for — and it is reported with that
+sentence attached, every time.
+
+| Outcome | Claim |
+|---|---|
+| lift ≥ 25 points | Sentiment and length **largely account for the partition**. The cut is then a valence × verbosity grid, and **the persona claim is unsupported**: G-300 would be paying three annotators to rediscover two variables already in the CSV. RQ1 is reported as a negative result on data-derived personas, exactly as RQ1-C permits. |
+| lift 10–25 points | Substantial but partial. G-300 proceeds; **both** variables are reported as controls beside every persona claim, and the residual is stated as the part being annotated. |
+| lift < 10 points | Most of the partition is explained by **neither**. Whatever LaBSE is cutting on, it is not valence and not verbosity — and G-300 becomes the right place to spend, because no cheaper instrument has explained the cut. |
+
+**Test D — does the lexical-richness inversion survive a length control?**
+S2e found cluster 1 is **33% shorter yet draws 18% more word types** at an equal
+token budget (1,913 vs 1,623 per 4,000 tokens). Pure length would predict the
+opposite, which is why this is currently the strongest evidence that the halves
+differ in **kind** rather than in **size**. It is also the claim most likely to
+be a length artefact, so it gets its own control: types at a fixed budget,
+computed **within each length band**.
+
+| Outcome | Claim |
+|---|---|
+| Inversion holds in **every** band | The difference in kind survives its most obvious control. Reported as the strongest pre-G-300 evidence for the persona reading — still not proof, and still subordinate to G-300. |
+| Inversion holds in **some** bands | Reported band by band, never aggregated into a single sentence. |
+| Inversion vanishes or reverses | It was a length artefact. **Withdrawn**, and the withdrawal is stated in the same place the claim was made. |
+
+### What may not be concluded
+
+A clean Test C (lift < 10) does **not** show the halves are personas. It shows
+the two cheapest explanations have been eliminated. That is a stronger position
+than S2e left us in and a weaker one than a persona claim requires, and the
+thesis must say so in those words.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
@@ -397,5 +484,6 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-08-01 | Split map — **stratified on `Sentiment × region`, not on cluster** | Pipeline §A specifies a *cluster*-stratified gold set. `data/splits/split_map_v1.json` is stratified on `Sentiment × region` (5 non-empty cells; region A holds no class-2 rows). G=300, R1=2,162, R2=2,163, dev=200, over the 4,625 rows surviving near-duplicate removal at the pre-registered t = 0.95. | The cluster instruction predates two findings. **(1)** The corpus is two corpora (`s2c_region_split.md`). **(2)** The full-corpus clustering is a **corpus detector** — 93.3% accuracy at identifying which of the two a review came from (`s2_pilot_ari_trapcheck.md`). Stratifying the gold set on that clustering would stratify it on a file seam. Additionally, **Gate G1 has not run**: the master K-table is outstanding, so any cluster-stratification now goes stale the moment K changes. `region` and `Sentiment` are both known, both stable, and both matter — region because it is the confound the design now controls for, Sentiment because it is the label. Verified: every part matches the corpus on both variables to within 0.1pp, zero overlap between any two parts, union covers the input exactly. Pinned permanently by `tests/test_split_map.py`. **The persona-stratification question moves to the annotation stage, where the scheme will actually be settled.** |
 | 2026-07-31 | Plot corpus — **target reduced from 130 to whatever the source yields.** ⟶ **FINAL: 120 = 30 dev + 90 eval**, frozen the same day. (The estimate below said ~124/94; human review then removed 4 more — BN024 production history, BN042 the director's fatal accident, BN068 commentary about a story rather than the story, BN113 a 3-sentence fragment that sets up and stops. All four had passed every mechanical gate.) | The pipeline's §1.1.7 asks for 130 = 30 dev + 100 eval. bn.wikipedia does not contain 130 Bangla-film articles with a usable plot section. Four harvests: 67 → 110 → 132 → **124**, the last figure lower because a person-article veto removed 8 rows that had been counted as usable — actors' and directors' biographies swept in by the film categories. `N_DEV` stays at **30** (the dev slice tunes the loop threshold and 30 is the smallest defensible size); **eval takes the remainder**, with a hard floor of 80 below which the tool refuses to split. | **Two ways to reach 130 existed and both were refused.** (1) Relax the quality gate to admit two-sentence plots — but it was rejecting only ~20 of 3,135, so it is not the constraint, and thin plots are poor generation inputs. (2) Add the by-year categories, the largest available (২০১৯-এর = 268, ২০২২-এর = 220, ...) — but they are **language-neutral**: Tamil, Hindi, British and Japanese films sit in them, their bn.wikipedia articles are in Bangla, and they would therefore pass every gate in the harvester while quietly making the plot corpus stop being *Bangla cinema*. No check in the pipeline would have caught it. **Losing six eval plots costs a little power in a bootstrap CI; padding the set costs validity, which no n buys back.** 130 was a design choice in the spec, not a statistical requirement, and this is recorded before the number is used rather than after it is convenient. |
 | 2026-08-03 | RQ1-D — **K=2 profile registered as EXPLORATORY IN ORIGIN, pre-registered in interpretation** | New analysis added after G1's table was seen: `src/cluster/s2e_profile.py`, `configs/s2e_profile.yaml` → `results/s2e_regionA_k2_profile.md` (+ assignments, features and log-odds CSVs). Section "RQ1-D pre-commitment" added above, **before the script existed**. | Two gaps in G1, both closed here. **(1)** G1 selected K = 2 and never persisted the labels; G-300 stratification needs them, and they cannot be recovered from `s2d_ktable_regionA.csv`. **(2)** G1 never asked what separates the halves. That question is decisive *before* annotation, not after: G1 reports PS 0.860 and bootstrap ARI 0.940 (a reproducible cut) alongside silhouette 0.053, a monotonically rising gap statistic satisfied at no K, and **HDBSCAN calling 100% of points noise** (no separated groups). A reproducible bisection of a continuum is what K-Means yields when it cuts along the dominant direction of variation — and with ~8-word reviews on L2-normalised LaBSE, **length** is the obvious candidate. If a word count reproduces the encoder's cut, spending 300 annotations on it would buy an expensive confirmation of a ruler. The **decision to profile is post-hoc and is labelled as such in the report itself**; what was fixed in advance is what each `length_auc` band would be taken to mean, including the pre-committed refusal to run G-300 on a `LENGTH_DOMINATED` partition. Guarded in code: `s2e_profile.py` re-derives G1's silhouette and ARI and **aborts** if they differ by more than 1e-6, so it cannot profile a K = 2 solution other than the one G1 selected; `tests/test_s2e_profile.py` (11 tests) additionally fails if the two configs' embedding or K-Means blocks ever diverge. Nothing is trained (AUC and Cliff's delta are rank statistics, the Dirichlet prior is fixed) — rule 10 untouched; whitespace tokens only, no stemming, stopword removal or TF-IDF — rule 7 untouched. New method citation: `monroe2008fightinwords`. |
+| 2026-08-03 | RQ1-E — **residual test run VOLUNTARILY at Band 1** | New analysis: `src/cluster/s2f_residual.py`, `configs/s2f_residual.yaml` → `results/s2f_regionA_k2_residual.md` + `_cells.csv`. Section "RQ1-E pre-commitment" added above, before the script existed. **No band assignment is revised**: ARI(cluster, Sentiment) = 0.1522 remains Band 1 and the corpus does not move into Band 2. | Band 2 makes a residual test mandatory at ARI ≥ 0.20 and we are below it, so nothing was owed. Run anyway because **ARI is the wrong instrument for this association and this project has already been misled by that gap once** — `s2b_register_probe.md` recorded φ 0.565 against V 0.410. The same 2×2 that yields ARI 0.1522 yields **φ = 0.3981**, χ² = 300.7, and cluster→sentiment accuracy 69.5% against a 50.2% baseline; all 12 reviews nearest cluster 0's centre are positive and all 12 nearest cluster 1's are negative. Skipping on a technicality would leave a question a reviewer will certainly ask, answerable from data already on disk. **Results:** A min AUC 0.6115 (length independent of sentiment), B min \|φ\| 0.3133 (sentiment independent of length in every band), **C lift +9.80 pp → `RESIDUAL_SURVIVES`** — but **0.2 pp from the 10.0 cutoff**, and the script emits an automatic boundary-warning box at ≤2 pp so the weakness cannot depend on anyone remembering it. D: the richness inversion holds in **all four** length bands. Decomposition (added after the first run, before any interpretation was written): Sentiment alone +9.28 pp, length alone +5.22 pp, both +9.80 — so **length adds only 0.53 pp once sentiment is known**, and S2e's `LENGTH_CONFOUNDED` overstates length's independent contribution. Test C is a **resubstitution** estimate and therefore an upper bound; the bias direction was chosen deliberately, since it makes the persona-killing verdict easier to reach. Nothing trained (rule 10); whitespace tokens only (rule 7). Pinned by `tests/test_s2f_residual.py` (9 tests), including one that fails if the 10.0 cutoff or the quartile count moves, because either would flip the published verdict. |
 | 2026-07-30 | Provenance — `git_hash()` semantics | `-dirty` now reflects **tracked** modifications only (`git status --porcelain -uno`); untracked files are counted separately in `stamp()` as `untracked_files` | The suffix previously came from bare `--porcelain`, which also lists untracked files. Every run creates untracked artifacts — its own outputs, caches, a copied input — so every stamp came out `-dirty` and the flag stopped distinguishing anything; the one case it exists to catch (a result produced from edited but uncommitted source) had become invisible. This is why `results/s2_pilot_ari_trapcheck.md` carries `e3d8e434…-dirty` despite being produced from a **fresh `--depth 1` clone**, in which no tracked file *can* have been modified. The S2 result is therefore attributable to a pristine `e3d8e43`. Untracked files are reported, not ignored — a source file that was never committed is a real provenance gap. |
 | 2026-07-27 | S1 class balance | Post-cleaning class balance is no longer uniform; the R1/R2 split will be sentiment-stratified | Raw 1665/1664/1670 becomes 1513/1599/1618 after S1. Drops concentrate in class 0 (152 of 270 total; 152 of the 269 labelled drops), because duplicates and sub-3-word reviews are over-represented in the negative class. Stratifying the R1/R2 split on `Sentiment` keeps the shifted distribution identical across partitions instead of letting it drift further. Counts in `results/s1_cleaning_log.json` and `docs/dataset_card.md`. |

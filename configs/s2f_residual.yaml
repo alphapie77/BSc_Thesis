@@ -1,0 +1,64 @@
+# S2f — THE RESIDUAL TEST. How much of the K=2 cut is just valence and verbosity?
+#
+# S2e returned LENGTH_CONFOUNDED (length_auc 0.6764) and, in the same file, a
+# crosstab whose φ is 0.3981 even though its ARI is 0.1522. Two cheap variables
+# are each doing real work. This step asks whether, TOGETHER, they do all of it.
+#
+# ── WHY THIS RUNS WHEN THE PRE-REGISTRATION DOES NOT DEMAND IT ────────────────
+# RQ1 Band 2 makes a residual test mandatory at ARI ≥ 0.20. We are at 0.1522 —
+# Band 1 — so nothing is owed. It runs anyway because ARI is the wrong
+# instrument here and this project has been misled by it once already
+# (s2b: φ 0.565 vs V 0.410). Voluntary and additional; it does NOT move the
+# corpus into Band 2 and no band assignment is revised.
+#
+# ── INTERPRETATION IS PRE-REGISTERED ──────────────────────────────────────────
+# docs/protocol.md, "RQ1-E pre-commitment", written before this script existed.
+# Test C is the decisive one, and its estimate is deliberately OPTIMISTIC:
+# cell-majority accuracy is fitted and scored on the same rows, so it is an
+# UPPER BOUND on what sentiment and length explain. That sentence travels with
+# the number everywhere it appears.
+#
+# Nothing is trained. AUC and φ are rank/contingency statistics; richness is
+# sampling at a fixed token budget. Rule 10 untouched.
+name: s2f_residual
+seed: 42
+
+input_assignments: results/s2e_regionA_k2_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+cluster_col: cluster_k2
+label_col: Sentiment
+text_col: "Movie Review"
+length_col: n_words
+expected_n: 1897
+
+# Quartiles of n_words within region A. Edges are DERIVED, not chosen: picking
+# cut points by hand after seeing the table is how a residual test gets tuned
+# into agreement. Reported in the output so a reader can check them.
+length_bands:
+  n_quantiles: 4
+
+# ── Test A: length within a sentiment class ──────────────────────────────────
+test_a:
+  independent_at_or_above: 0.60      # minimum over sentiment classes
+
+# ── Test B: sentiment within a length band ───────────────────────────────────
+test_b:
+  independent_at_or_above: 0.20      # minimum |phi| over bands
+
+# ── Test C: what is LEFT after conditioning on both ──────────────────────────
+test_c:
+  explained_at_or_above: 25.0        # percentage-point lift over the marginal
+  partial_at_or_above: 10.0
+
+# ── Test D: does the richness inversion survive a length control? ────────────
+# Budget is derived from the smallest (band x cluster) cell, so every cell is
+# compared at a size all of them can actually supply. A cell too small even for
+# the floor is reported as NaN rather than quietly compared at a smaller budget.
+test_d:
+  bootstrap: 200
+  min_budget: 250
+
+outputs:
+  cells_csv: results/s2f_regionA_k2_cells.csv
+  report_md: results/s2f_regionA_k2_residual.md

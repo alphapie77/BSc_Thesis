@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-03 · **Phase:** 1 COMPLETE → 2 (persona discovery)
+**Last updated:** 2026-08-03 (S2e + S2f) · **Phase:** 1 COMPLETE → 2 (persona discovery)
 **Week:** 2 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -24,6 +24,8 @@
 | 5e | `ARI(cluster, region)` — the decisive test | ✅ **RUN 2026-07-31. Pre-registered outcome 1 fires.** ARI(region) **0.4813** vs ARI(Sentiment) **0.1793**, at every threshold. Binary recast: ARI 0.7487, φ 0.861, **93.3% accuracy at identifying which corpus a review came from**. The clusters are a corpus detector, not personas. | `results/s2_cluster_assignments.csv` | 2026-07-31 |
 | 5f | S2-A: trap-check on region A alone | ✅ **run** — n=1,897, **not degenerate** (29.5/38.9/31.6), ARI **0.1804 → Band 1**. But V=**0.5455** (up from 0.4104) and the clusters are visibly sentiment-ordered; ARI is capped because K=3 meets 2 classes — **pre-registered as weakening this evidence**. G-300 is the arbiter. | `results/s2a_regionA_trapcheck.md` | 2026-07-31 |
 | 5g | **Gate G1 — master K-table (region A)** | ✅ **RUN 2026-08-03. SELECTED K = 2** — the only K clearing the pre-registered PS ≥ 0.80 (**0.860**; K=3 = 0.669). Bootstrap ARI 0.940±0.029, shares 39.7/60.3, ARI vs Sentiment **0.152 → Band 1** (so it is *not* the sentiment split). 🔴 **But three indicators say there are no clusters at all**: silhouette peaks at **0.053**, the gap statistic **rises monotonically and selects no K**, and **HDBSCAN calls 100% of points noise**. A reproducible bisection of a continuum, not two discovered groups. | `results/s2d_ktable_regionA.md` | 2026-08-03 |
+| 5h | **S2e — what the K=2 cut is made of** | ✅ **RUN 2026-08-03.** `length_auc` **0.6764 → `LENGTH_CONFOUNDED`** (RQ1-D band [0.65, 0.75)): G-300 may proceed, but the guideline must prevent annotators succeeding on length alone, and length is reported beside every persona claim. Strongest surface feature `n_chars` 0.6810 — **below** the 0.80 headline bar, so no regular-expression finding. 🎁 **Unexpected:** cluster 1 is **33% shorter yet ~18% richer** in word types at equal budget — formulaic praise vs short specific complaint. Guard reproduced G1's silhouette and ARI to <1e-6. | `results/s2e_regionA_k2_profile.md` | 2026-08-03 |
+| 5i | **S2f — the residual test** (voluntary at Band 1) | ✅ **RUN 2026-08-03.** A: min AUC 0.6115 → length independent of sentiment. B: min \|φ\| 0.3133 → sentiment independent of length in every band. **C: lift +9.80 pp → `RESIDUAL_SURVIVES`** — valence and verbosity do **not** account for the cut — but ⚠️ **0.2 pp from the cutoff, and reported as weak.** D: richness inversion holds in **all 4** bands. Decomposition: sentiment alone +9.28, length alone +5.22, both +9.80 — **length adds only +0.53 pp once sentiment is known.** Test C is a resubstitution upper bound, by deliberate choice. | `results/s2f_regionA_k2_residual.md` | 2026-08-03 |
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
@@ -75,6 +77,13 @@
 | ARI(cluster, Sentiment) @ 0.95 | — | **0.1793** — Band 1, not degenerate |
 | Cosine p99.9 | — | **0.7561** — below every swept threshold, so none cut into the bulk |
 | Final `usable_n` for splitting | — | **still unknown** — blocked by 5c, not by the threshold |
+| Selected K, region A | 3 (design) | **2** — the only K clearing PS ≥ 0.80 (0.860 vs 0.669 at K=3) |
+| `length_auc` of the K=2 cut | — | **0.6764** → `LENGTH_CONFOUNDED`; strongest surface feature `n_chars` 0.6810, below the 0.80 headline bar |
+| φ(cluster_k2, Sentiment) | — | **0.3981** (χ² 300.7, accuracy 69.5% vs 50.2%) — **while ARI is 0.1522**. Both are correct; ARI is the weaker instrument here |
+| Sentiment + length explain (upper bound) | — | **+9.80 pp** over a 60.25% baseline → `RESIDUAL_SURVIVES`, **0.2 pp from the cutoff** — weak, and reported as weak |
+| Length's contribution once sentiment is known | — | **+0.53 pp** (sentiment alone +9.28, both +9.80) — length is largely redundant with sentiment at the level of prediction |
+| Lexical richness inversion | — | cluster 1 is **33% shorter yet ~18% richer** at equal budget, and this **holds in all 4 length bands** — the strongest pre-G-300 evidence of a difference in kind |
+| Tokens in a two-encoding Unicode group | — | **10.44%** of 46,758 (267 collapsing groups). φ(region, encoding form) = **−0.3245** — an independent corroboration of fact (split) from orthography |
 
 > **Correction (2026-07-30).** This file previously recorded the venue/selection
 > confound as *"untestable in principle"* because venue was not retained at
@@ -102,6 +111,7 @@ edited until the final `usable_n` is known (see Open decisions).
 | 5 | Frame the register finding in the **stylometry / authorship** literature or the **machine-generated-text detection** literature? Writing decision, Sabbir's | Ch.2, Ch.4 | Sabbir |
 | ~~7~~ | ~~Three personas or two?~~ | — | ✅ **CLOSED 2026-08-03: TWO.** K=3's prediction strength is 0.669 against a cutoff of 0.80 fixed two days earlier. The design gave way; K=3 is retained as the theory-motivated secondary. |
 | **12** | **Title and framing** — "three personas" appears throughout the pipeline, the pre-defence report and the conference draft. All of it now needs revisiting for two. **And the persona language itself needs qualifying**: what G1 found is a stable 2-way partition of a space with no cluster structure, which is not the same as discovering two audience types. | Ch.1, title, all framing | 🔴 **Sabbir** |
+| **13** | **Unicode encoding variants.** 10.44% of tokens sit in a group where the same word exists in two encodings (অভিনয় as `U+09DF` 188× vs `U+09AF U+09BC` 152×; নায়ক and নায়িকা each appear **twice** in S2e's log-odds table for this reason). The inviolable rule forbids normalising the corpus, and **nothing has been changed**. Two open questions, both Sabbir's: (a) should the *vocabulary tables* additionally be shown NFC-collapsed, as a reporting variant only? (b) LaBSE's tokenizer sees the two forms as different, so the variation is **inside the embedding** — does that go in Limitations, or does it become a measurement (φ(region, encoding) = −0.3245 is already an independent corroboration of the split)? | Ch.4, Limitations | 🔴 **Sabbir** |
 | 8 | If open decision 0 returns "region B was generated", does the thesis **exclude** it, **keep** it as a labelled condition, or **make the contrast the contribution**? Different from 0b, which only settled the corpus | Ch.1 framing | after 0 |
 | ~~6~~ | ~~Should `s2_pilot.py` persist cluster assignments?~~ | — | ✅ done 2026-07-31 |
 | **9** | **Add an inference-cost-matched baseline to §5.1?** Huang et al. §6 require self-correction to be compared against baselines *of comparable inference cost*. Our rows 1–3 are single-call while 4–8 loop, so "row 6 beats row 1" may be partly a call-count effect. They also name **self-consistency / best-of-N at matched calls** as the strong baseline — our table has none. | §5.1 ablation, **the RQ2 headline** | 🔴 **Sabbir** — changes a pre-registered design |
@@ -116,15 +126,18 @@ edited until the final `usable_n` is known (see Open decisions).
 unresolvable, the scope decision is made (full corpus), and the code for the
 next run is written and pre-registered.
 
-0. 🔬 **Re-run the Kaggle notebook for S2e** (new cell 5c, after G1). It reuses
-   G1's embedding cache, so it costs under a minute and no GPU work. **This is
-   now the highest-priority run**, because it decides whether G-300 is worth
-   spending on this partition at all: if `length_auc` ≥ 0.75, RQ1-D forbids
-   running G-300 on the K=2 split as though it were a persona scheme. It also
-   produces the K=2 labels that G-300 stratification needs and that G1 never
-   saved. Interpretation pre-registered in `protocol.md` (RQ1-D) **before the
-   script was written** — read it before the numbers.
-1. 🔬 **Re-run the Kaggle notebook** — now three runs: both S2 configs **plus Gate G1** (one notebook, two runs). Produces
+0. ✅ **S2e and S2f are done** (2026-08-03). `length_auc` 0.6764 →
+   `LENGTH_CONFOUNDED`; the residual test returns `RESIDUAL_SURVIVES` at
+   +9.80 pp, **0.2 pp from its cutoff**. Valence and verbosity do not account
+   for the K=2 cut, and the richness inversion survives a length control in all
+   four bands. **G-300 is now the decisive step**, not a confirmatory one: no
+   cheaper instrument remains that could pre-empt the annotators.
+1. 🔴 **Write the G-300 annotation guideline.** Binding condition fixed in RQ1-D
+   before the numbers were known: it must be written so that **annotators
+   cannot succeed by reading length alone**. Stratify on
+   `s2e_regionA_k2_assignments.csv` (cluster_k2 × Sentiment), 3 annotators,
+   κ/α with the 0.667 / 0.80 bands.
+2. 🔬 **Re-run the Kaggle notebook** — now three runs: both S2 configs **plus Gate G1** (one notebook, two runs). Produces
    `ARI(cluster, region)` and the region-A robustness check, and persists
    cluster assignments. Interpretations are pre-registered in `protocol.md`
    (RQ1-A) **before the run** — re-read that table before reading the numbers.
@@ -155,9 +168,10 @@ referenced nowhere. A result nobody can find is a result nobody can check.
 | `s2_threshold_audit_sheet.csv` | blinded 0.90-vs-0.95 review sheet, 38 items | ⏸ **generated, never annotated.** Parked: the threshold question turned out to be downstream of the region split |
 | `s2_threshold_audit_key.csv` | the blinding key for the above | ⏸ do not open until the sheet is filled |
 | `s2d_ktable_regionA.md` / `.csv` | **Gate G1** — K = 2..8 × seven criteria, PS, bootstrap ARI, gap, GMM-BIC, HDBSCAN, trap band at every K | ✅ current — **selected K = 2**; the only K clearing PS ≥ 0.80 |
-| `s2e_regionA_k2_profile.md` | **what the K = 2 partition is made of** — `length_auc` verdict, surface-feature AUCs, distinctive vocabulary, and the reviews themselves | ⏳ **code written and pre-registered (RQ1-D); awaiting the Kaggle run** |
-| `s2e_regionA_k2_assignments.csv` | per-review K=2 label + centroid distance + margin (n=1,897) | ⏳ awaiting the run — **G-300 stratification needs this**; G1 never persisted its labels |
-| `s2e_regionA_k2_features.csv` / `_logodds.csv` | per-row surface features; Monroe log-odds table | ⏳ awaiting the run — supporting data, **no claim rests on the log-odds list** |
+| `s2e_regionA_k2_profile.md` | **what the K = 2 partition is made of** — `length_auc` 0.6764 → `LENGTH_CONFOUNDED`, surface AUCs, distinctive vocabulary, the reviews themselves | ✅ current — but **read with `s2f`**: its length verdict measures correlation, and s2f shows length adds only +0.53 pp once sentiment is known |
+| `s2e_regionA_k2_assignments.csv` | per-review K=2 label + centroid distance + margin + n_words (n=1,897) | ✅ current — **G-300 stratification comes from HERE**; G1 never persisted its labels |
+| `s2e_regionA_k2_features.csv` / `_logodds.csv` | per-row surface features; Monroe log-odds table | ✅ current — supporting data. **No claim rests on the log-odds list**, and note নায়ক/নায়িকা appear twice in it (open decision 13) |
+| `s2f_regionA_k2_residual.md` / `_cells.csv` | **the residual test** — is the cut just valence × verbosity? Tests A–D, the decomposition, the 8 cells | ✅ current — **`RESIDUAL_SURVIVES`, but 0.2 pp from its cutoff.** Voluntary at Band 1; pre-registered as RQ1-E |
 | `plots_harvest_report.md` | harvest yield, reject reasons, heading tally | ✅ current (4th harvest) |
 | `env_snapshot.json` | local Windows environment | ✅ current |
 | `env_snapshot_s2_kaggle.json` | **the environment S2's numbers came from** — Kaggle T4, scikit-learn 1.6.1 | ✅ current — cite this, not `requirements.lock.txt`, for S2 |

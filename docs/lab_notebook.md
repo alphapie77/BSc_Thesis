@@ -2061,6 +2061,154 @@ made concrete.
 
 ---
 
+---
+
+## 2026-08-03 -- S2e-f: K=2 profile and the residual test
+**Feeds:** Ch.4 RQ1
+**Commit:** `730de20136ae8e572f8340701c405477258a64e9-dirty`
+**Artifacts:** `results/s2e_regionA_k2_profile.md`, `results/s2f_regionA_k2_residual.md`
+
+### Numbers
+
+**S2e — what the K=2 cut is made of** (n = 1,897; clusters 1,143 / 754 =
+60.3% / 39.7%). Guard passed: silhouette 0.053404 and ARI 0.152152 reproduced
+G1's published values to <1e-6, so these are G1's own labels.
+
+- **`length_auc` (n_words) = 0.6764 → `LENGTH_CONFOUNDED`** (band [0.65, 0.75)).
+- Strongest surface feature `n_chars` **0.6810** — below the 0.80 headline
+  threshold, so no regular-expression finding was declared.
+- All other features ≤ 0.574. `has_latin` 0.5004: region A has essentially no
+  code-mixing (1 review in 1,897).
+- Lexical richness at 4,000 tokens: cluster 0 **1,623** types, cluster 1
+  **1,913** — the shorter half is the richer one.
+- Margin: median 0.0644; **15.2%** of reviews within 0.02 of the boundary.
+
+**S2f — the residual test** (voluntary; see Decisions).
+
+| Test | Result | Verdict |
+|---|---|---|
+| A — length within a sentiment class | min AUC **0.6115** (S0 0.6115, S1 0.6567) | independent (threshold 0.60) |
+| B — sentiment within a length band | min \|φ\| **0.3133** (worst band 3–6 words) | independent (threshold 0.20) |
+| **C — what is left over** | lift **+9.80 pp** (70.06% vs 60.25%) | **`RESIDUAL_SURVIVES`** (threshold 10.0) |
+| D — richness inversion under length control | holds in **all 4 bands**, budget 1,100 tokens | inversion survives |
+
+Decomposition of Test C, same estimator, three cell definitions:
+
+| Conditioning on | Accuracy | Lift |
+|---|---|---|
+| nothing (marginal) | 60.25% | — |
+| Sentiment only | 69.53% | +9.28 pp |
+| length band only | 65.47% | +5.22 pp |
+| both (8 cells) | 70.06% | +9.80 pp |
+
+Computed by hand off S2e's crosstab, and the reason S2f was run at all:
+φ(cluster, Sentiment) = **0.3981**, χ² = 300.7, cluster→sentiment accuracy
+**69.5%** vs a 50.2% baseline — against the **ARI of 0.1522** that the
+pre-registration reads.
+
+### Decisions made (and why)
+
+- **Ran the residual test although the pre-registration did not require it.**
+  RQ1 Band 2 triggers it at ARI ≥ 0.20; we are at 0.1522, so nothing was owed.
+  The alternative was to stop at S2e and let Band 1 stand. Rejected because ARI
+  is the wrong instrument for this association and **this project has already
+  been misled by exactly this gap once** — `s2b_register_probe.md` recorded
+  φ 0.565 against V 0.410. Every one of the 12 reviews nearest cluster 0's
+  centre is positive and every one of the 12 nearest cluster 1's is negative;
+  the log-odds lists separate praise terms from complaint terms. A reviewer
+  would demand this test and the data was already on disk. Pre-registered as
+  RQ1-E before the script existed. **It does not move the corpus into Band 2 and
+  revises no band assignment** — recorded as voluntary and additional.
+- **Chose a resubstitution estimator for Test C, knowing it overstates.** The
+  alternative was a held-out or cross-validated estimate. Rejected because the
+  bias direction matters more than the bias size here: resubstitution makes
+  "sentiment and length explain the cut" *easier* to conclude, which is the
+  verdict that kills the persona claim. A **low** lift under an optimistic
+  estimator is therefore strong evidence, whereas a low lift under a
+  conservative one would prove little. The caveat is printed everywhere the
+  number is.
+- **Derived the quartile band edges rather than choosing them.** Hand-picked cut
+  points after seeing the table is how a residual test gets tuned into
+  agreement. Edges are in the output; `n_quantiles: 4` is pinned by a test
+  because the verdict is 0.2 pp from its threshold and re-binning could flip it.
+- **Reported the near-threshold verdict as weak rather than as a result.** 9.80
+  against a cutoff of 10.0 is 0.2 pp. The script emits a boundary warning box
+  automatically whenever the lift lands within 2 pp of a cutoff, so this cannot
+  depend on my remembering to mention it.
+- **Did not normalise the Bangla text**, despite finding that it would change
+  the log-odds table (see Findings). Inviolable rule: preserve the script
+  exactly. Reported instead of fixed. **Whether the vocabulary table should
+  additionally be shown in an NFC-collapsed form is Sabbir's call — not made
+  here.**
+
+### Findings (things we did not expect)
+
+- **The richness inversion, and that it survives a length control.** Cluster 1
+  is 33% shorter yet draws ~18% more word types at an equal budget — and this
+  holds in **all four** length bands, not just in aggregate. Pure length
+  predicts the opposite. Reading the representative reviews explains it: cluster
+  0 is formulaic praise ("অসাধারণ সুন্দর একটা মুভি" with small variations),
+  cluster 1 is short but **specific** complaint (কাহিনী, অভিনয়, নায়ক named
+  individually). **This is the strongest pre-G-300 evidence that the halves
+  differ in kind rather than in size**, and it was not anticipated.
+- **Length is nearly redundant with sentiment at the level of prediction.**
+  Sentiment alone buys +9.28 pp; adding length buys **+0.53 pp more**. S2e's
+  `length_auc` of 0.6764 measures *correlation* and is real, but the
+  `LENGTH_CONFOUNDED` verdict overstates length's independent contribution —
+  long reviews in this corpus are mostly positive ones. This nuance is absent
+  from `s2e_regionA_k2_profile.md` and is recorded here rather than silently
+  correcting that file.
+- **10.44% of all tokens sit in a group where the same word exists in two
+  Unicode encodings.** Found while checking why নায়ক and নায়িকা each appear
+  **twice** in S2e's log-odds table. 267 groups collapse under NFC; e.g. অভিনয়
+  as `U+09DF` (188×) versus `U+09AF U+09BC` (152×). Two consequences: counts in
+  the log-odds table are split and therefore understated for the affected words,
+  and **LaBSE's tokenizer also sees the two forms as different**, so the
+  distinction is inside the embedding, not only in the diagnostic.
+- **The encoding form is itself a provenance signal.** φ(region, encoding form)
+  = **−0.3245** over the 2,780 reviews using exactly one form: region A is 69.1%
+  precomposed, region B is 64.0% decomposed. Different input methods, therefore
+  different sources — an *independent* corroboration of fact (split), obtained
+  from orthography rather than from punctuation or pronouns.
+- **Region A has almost no code-mixing.** `has_latin` fires on 1 review in
+  1,897. Worth knowing before any claim about Bangla-English mixing in the
+  thesis.
+
+### Consequences for downstream steps
+
+- **G-300 proceeds, and it is now the decisive step, not a confirmatory one.**
+  Test C eliminated the two cheapest explanations, so no cheaper instrument
+  remains that could pre-empt the annotators.
+- **The G-300 annotation guideline must be written so that annotators cannot
+  succeed by reading length alone** — a condition fixed in RQ1-D before the
+  number was known, and still binding at `LENGTH_CONFOUNDED`.
+- **G-300 stratification uses `s2e_regionA_k2_assignments.csv`**, not the K=3
+  file. G1 never persisted its labels; this is where they now live.
+- **Every persona claim in the thesis carries both controls** — sentiment and
+  length — in the main text, with the decomposition above, not in a footnote.
+- **The persona language stays qualified.** Nothing here shows the halves *are*
+  personas; it shows valence and verbosity do not account for them. The
+  distinction goes in Ch.4 in those words.
+- **`s2e_regionA_k2_profile.md` is not wrong but is incomplete**: its
+  `LENGTH_CONFOUNDED` verdict stands as computed, while the +0.53 pp
+  decomposition above is the sharper statement. Both are cited together
+  wherever the length confound is discussed.
+- **Open decision 13 opened** (Unicode encoding variants) — see STATUS.
+
+### Citations needed
+
+- **Monroe, Colaresi & Quinn (2008)** — log-odds with an informative Dirichlet
+  prior. **Added** to `related_work.md` (Tier 2) and `references.bib`, with an
+  explicit ⚠️ that the paper has not been read in full and its fields come from
+  the record, not the article.
+- Still **not added**, still unread, unchanged from the G1 entry: Tibshirani &
+  Walther (2005), Tibshirani/Walther/Hastie (2001), Campello et al. (2013).
+- **Nothing new is owed for S2f.** φ, AUC and majority-rule accuracy are
+  textbook; the type-token-at-fixed-budget comparison reuses the S2b method
+  already recorded there.
+
+---
+
 ## Open decisions (resolve before they are needed)
 
 | # | Decision | Blocks | Status |
