@@ -116,6 +116,14 @@ edited until the final `usable_n` is known (see Open decisions).
 unresolvable, the scope decision is made (full corpus), and the code for the
 next run is written and pre-registered.
 
+0. 🔬 **Re-run the Kaggle notebook for S2e** (new cell 5c, after G1). It reuses
+   G1's embedding cache, so it costs under a minute and no GPU work. **This is
+   now the highest-priority run**, because it decides whether G-300 is worth
+   spending on this partition at all: if `length_auc` ≥ 0.75, RQ1-D forbids
+   running G-300 on the K=2 split as though it were a persona scheme. It also
+   produces the K=2 labels that G-300 stratification needs and that G1 never
+   saved. Interpretation pre-registered in `protocol.md` (RQ1-D) **before the
+   script was written** — read it before the numbers.
 1. 🔬 **Re-run the Kaggle notebook** — now three runs: both S2 configs **plus Gate G1** (one notebook, two runs). Produces
    `ARI(cluster, region)` and the region-A robustness check, and persists
    cluster assignments. Interpretations are pre-registered in `protocol.md`
@@ -146,6 +154,10 @@ referenced nowhere. A result nobody can find is a result nobody can check.
 | `s2c_region_split.md` | the two-corpora finding | ✅ current — supersedes `s2b`'s framing |
 | `s2_threshold_audit_sheet.csv` | blinded 0.90-vs-0.95 review sheet, 38 items | ⏸ **generated, never annotated.** Parked: the threshold question turned out to be downstream of the region split |
 | `s2_threshold_audit_key.csv` | the blinding key for the above | ⏸ do not open until the sheet is filled |
+| `s2d_ktable_regionA.md` / `.csv` | **Gate G1** — K = 2..8 × seven criteria, PS, bootstrap ARI, gap, GMM-BIC, HDBSCAN, trap band at every K | ✅ current — **selected K = 2**; the only K clearing PS ≥ 0.80 |
+| `s2e_regionA_k2_profile.md` | **what the K = 2 partition is made of** — `length_auc` verdict, surface-feature AUCs, distinctive vocabulary, and the reviews themselves | ⏳ **code written and pre-registered (RQ1-D); awaiting the Kaggle run** |
+| `s2e_regionA_k2_assignments.csv` | per-review K=2 label + centroid distance + margin (n=1,897) | ⏳ awaiting the run — **G-300 stratification needs this**; G1 never persisted its labels |
+| `s2e_regionA_k2_features.csv` / `_logodds.csv` | per-row surface features; Monroe log-odds table | ⏳ awaiting the run — supporting data, **no claim rests on the log-odds list** |
 | `plots_harvest_report.md` | harvest yield, reject reasons, heading tally | ✅ current (4th harvest) |
 | `env_snapshot.json` | local Windows environment | ✅ current |
 | `env_snapshot_s2_kaggle.json` | **the environment S2's numbers came from** — Kaggle T4, scikit-learn 1.6.1 | ✅ current — cite this, not `requirements.lock.txt`, for S2 |

@@ -294,6 +294,7 @@ ablation is right to separate them.
 | `bender2018datastatement` | Bender & Friedman 2018 | Data statement + Bender Rule |
 | `mitchell2019modelcards` | Mitchell et al. 2019 | Model card |
 | `miller2025multires` | arXiv 2502.17020 | Multi-resolution K alternative |
+| `monroe2008fightinwords` | Monroe, Colaresi & Quinn, *Political Analysis* 16(4) | Log-odds with an informative Dirichlet prior. Defends **two** things: the required provenance probe (protocol.md), and S2e's distinctive-vocabulary lists. Chosen because its prior makes **stopword removal unnecessary** — the alternative would be a hand-built Bangla stopword list, which nothing in this project justifies and inviolable rule 7 forbids. |
 
 ## Tier 3 — Theory grounding for the three personas (§2.3)
 | Key | Source | Use |

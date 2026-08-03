@@ -275,6 +275,84 @@ pre-registered bands as RQ1. A K whose clusters merely reproduce the sentiment
 split is disclosed as such regardless of how stable it is — stability and
 validity are different properties.
 
+## RQ1-D pre-commitment: what the K=2 partition is made of
+
+> **Written 2026-08-03, before `src/cluster/s2e_profile.py` exists.** G1 has run
+> and selected K = 2 (PS 0.860, ARI vs Sentiment 0.152 → Band 1). What has *not*
+> been observed is anything about **what distinguishes the two halves**. No
+> `results/s2e_regionA_k2_profile.md` exists at the commit that introduces this
+> section, and the assignments themselves were never persisted by G1.
+>
+> **Honest framing, as in RQ1-A:** the decision to profile was made after seeing
+> G1, so the *analysis* is exploratory in origin. What is pre-registered is the
+> **interpretation** — fixed before the numbers are known, because the temptation
+> here is specific and strong: with a stable K in hand, any difference found
+> between the halves will look like a persona if nobody wrote down in advance
+> what would *not* count as one.
+
+### Why this step exists
+
+G1 established that the cut is reproducible (PS 0.860, bootstrap ARI 0.940) and
+that it is **not** the sentiment split (ARI 0.152). Three other indicators —
+silhouette 0.053, a gap statistic rising monotonically and satisfying its rule at
+no K, and **HDBSCAN calling 100% of points noise** — say there are no separated
+groups to find. The recorded synthesis is that region A contains *a highly
+reproducible bisection of a space with no separated groups*.
+
+A reproducible bisection of a continuum is exactly what K-Means produces when it
+cuts along the single dominant direction of variation. **The question this step
+asks is what that direction is.** It is answered before G-300, because if the
+direction turns out to be a surface property, annotating 300 items against it
+would be spending the study's scarcest resource on a ruler.
+
+### The decisive diagnostic — fixed now
+
+**`length_auc`** = AUC of raw word count as a predictor of cluster membership,
+taken as `max(auc, 1 - auc)` so direction does not matter. Reviews here average
+~8 words; on L2-normalised LaBSE embeddings of very short text, length is a
+plausible dominant axis, and it is measurable without a model.
+
+| Outcome | Claim |
+|---|---|
+| `length_auc` ≥ 0.75 → **LENGTH_DOMINATED** | The partition is **substantially a length split**. It may not be called a persona structure. Two responses are permitted and both are pre-committed: (a) report RQ1 as a **negative result on data-derived personas**, which RQ1-C already established as publishable; or (b) re-operationalise personas on engagement features with length **explicitly controlled**, reported as a separate, clearly-labelled analysis. **Not permitted:** proceeding to G-300 on this partition as though it were a persona scheme. |
+| 0.65 ≤ `length_auc` < 0.75 → **LENGTH_CONFOUNDED** | Length is a **major but not sole** component. G-300 may proceed, but the annotation guideline must be written so annotators cannot simply be reading length, and **length is reported alongside every persona claim in the thesis**, not in a footnote. |
+| `length_auc` < 0.65 → **NOT_LENGTH** | The cut is not primarily about how much people wrote. This does **not** make it a persona — it only removes the cheapest alternative explanation. G-300 remains the arbiter, exactly as in RQ1 Band 1. |
+
+### The secondary diagnostic
+
+**`max_surface_auc`** = the largest `max(auc, 1-auc)` over *all* measured surface
+features (word count, character count, দাঁড়ি termination, `?`, `!`, ellipsis,
+first-person pronouns, Latin-script characters, digits, type-token ratio).
+
+If **`max_surface_auc` ≥ 0.80 on any single feature**, then a property
+computable with a regular expression separates the halves nearly as well as a
+768-dimensional multilingual encoder. That is reported as a **headline finding
+about the corpus**, whichever feature it is, and it carries the same consequence
+as `LENGTH_DOMINATED` for the feature concerned.
+
+### What may NOT be concluded from this step, in either direction
+
+1. **That the two halves are personas.** No statistic in this file can establish
+   that; only G-300 can. A clean `NOT_LENGTH` result removes an alternative
+   explanation and does nothing more.
+2. **That the halves are *not* personas, because a surface feature separates
+   them.** Real personas plausibly *do* differ in length and punctuation. What
+   `LENGTH_DOMINATED` establishes is that **the persona claim is unsupported**,
+   not that it is false. The distinction is stated wherever this result appears.
+3. **Anything from the distinctive-vocabulary list on its own.** Ranked terms
+   are a **reading aid for a human**, not evidence. They are reported so Sabbir
+   and the examiners can look at the halves directly; no claim in the thesis
+   rests on them.
+
+### Method note — inviolable rule 7
+
+Distinctive terms use the **log-odds ratio with an informative Dirichlet prior**
+(Monroe, Colaresi & Quinn 2008) over whitespace tokens: **no stemming, no
+stopword removal, no TF-IDF.** Monroe's prior exists precisely so that stopword
+removal is unnecessary. Nothing here is trained, nothing enters the RAG index or
+any model, and no feature computed in this step is used as a model input — it is
+a descriptive diagnostic and a reading aid. Rules 7 and 10 are intact.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
@@ -318,5 +396,6 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-07-30 | Provenance — **region split found; supersedes the s2b framing** | `src/preprocess/s2c_region_split.py` → `results/s2c_region_split.md`. The grouping variable is `raw_row`, not `Sentiment`. | The collector answered the s2b question with "collected the same way", so the raw `.xlsx` row order was examined directly (read-only; rule 1 intact). The label sequence has **10 runs in 5,000 rows** — the file was assembled in blocks — and the register signature tracks **position in the file, not label**: rows 3665–4330 are labelled 0 and sit at 99.8% দাঁড়ি / 0% first-person, while rows 499–896, also labelled 0, sit at 32% / 9%. Aggregated, rows 0–1998 (38.7% দাঁড়ি, 13.5% first-person, 255 types/1k) versus rows 1999–4999 (**99.2%, 0.8%, 128**), with a step transition over ~50 rows. **60% of the corpus is in the second region, across all three labels.** Consequences: (i) fact (reg) is superseded by fact (split) in STATUS — class 2 only looked special because all 1,670 neutral rows are nested inside region B; (ii) **every result over the full corpus is confounded, including the S2 trap-check**; (iii) provenance fact (c) cannot describe region B, and this document's pre-commitment that a computed test supersedes the recall-based provenance table is now operative; (iv) region A remains usable at 1,910 cleaned rows, organic, two classes. **Outstanding:** `ARI(cluster, region)` is the decisive number and cannot be computed until `s2_pilot.py` persists cluster assignments. Exploratory throughout. |
 | 2026-08-01 | Split map — **stratified on `Sentiment × region`, not on cluster** | Pipeline §A specifies a *cluster*-stratified gold set. `data/splits/split_map_v1.json` is stratified on `Sentiment × region` (5 non-empty cells; region A holds no class-2 rows). G=300, R1=2,162, R2=2,163, dev=200, over the 4,625 rows surviving near-duplicate removal at the pre-registered t = 0.95. | The cluster instruction predates two findings. **(1)** The corpus is two corpora (`s2c_region_split.md`). **(2)** The full-corpus clustering is a **corpus detector** — 93.3% accuracy at identifying which of the two a review came from (`s2_pilot_ari_trapcheck.md`). Stratifying the gold set on that clustering would stratify it on a file seam. Additionally, **Gate G1 has not run**: the master K-table is outstanding, so any cluster-stratification now goes stale the moment K changes. `region` and `Sentiment` are both known, both stable, and both matter — region because it is the confound the design now controls for, Sentiment because it is the label. Verified: every part matches the corpus on both variables to within 0.1pp, zero overlap between any two parts, union covers the input exactly. Pinned permanently by `tests/test_split_map.py`. **The persona-stratification question moves to the annotation stage, where the scheme will actually be settled.** |
 | 2026-07-31 | Plot corpus — **target reduced from 130 to whatever the source yields.** ⟶ **FINAL: 120 = 30 dev + 90 eval**, frozen the same day. (The estimate below said ~124/94; human review then removed 4 more — BN024 production history, BN042 the director's fatal accident, BN068 commentary about a story rather than the story, BN113 a 3-sentence fragment that sets up and stops. All four had passed every mechanical gate.) | The pipeline's §1.1.7 asks for 130 = 30 dev + 100 eval. bn.wikipedia does not contain 130 Bangla-film articles with a usable plot section. Four harvests: 67 → 110 → 132 → **124**, the last figure lower because a person-article veto removed 8 rows that had been counted as usable — actors' and directors' biographies swept in by the film categories. `N_DEV` stays at **30** (the dev slice tunes the loop threshold and 30 is the smallest defensible size); **eval takes the remainder**, with a hard floor of 80 below which the tool refuses to split. | **Two ways to reach 130 existed and both were refused.** (1) Relax the quality gate to admit two-sentence plots — but it was rejecting only ~20 of 3,135, so it is not the constraint, and thin plots are poor generation inputs. (2) Add the by-year categories, the largest available (২০১৯-এর = 268, ২০২২-এর = 220, ...) — but they are **language-neutral**: Tamil, Hindi, British and Japanese films sit in them, their bn.wikipedia articles are in Bangla, and they would therefore pass every gate in the harvester while quietly making the plot corpus stop being *Bangla cinema*. No check in the pipeline would have caught it. **Losing six eval plots costs a little power in a bootstrap CI; padding the set costs validity, which no n buys back.** 130 was a design choice in the spec, not a statistical requirement, and this is recorded before the number is used rather than after it is convenient. |
+| 2026-08-03 | RQ1-D — **K=2 profile registered as EXPLORATORY IN ORIGIN, pre-registered in interpretation** | New analysis added after G1's table was seen: `src/cluster/s2e_profile.py`, `configs/s2e_profile.yaml` → `results/s2e_regionA_k2_profile.md` (+ assignments, features and log-odds CSVs). Section "RQ1-D pre-commitment" added above, **before the script existed**. | Two gaps in G1, both closed here. **(1)** G1 selected K = 2 and never persisted the labels; G-300 stratification needs them, and they cannot be recovered from `s2d_ktable_regionA.csv`. **(2)** G1 never asked what separates the halves. That question is decisive *before* annotation, not after: G1 reports PS 0.860 and bootstrap ARI 0.940 (a reproducible cut) alongside silhouette 0.053, a monotonically rising gap statistic satisfied at no K, and **HDBSCAN calling 100% of points noise** (no separated groups). A reproducible bisection of a continuum is what K-Means yields when it cuts along the dominant direction of variation — and with ~8-word reviews on L2-normalised LaBSE, **length** is the obvious candidate. If a word count reproduces the encoder's cut, spending 300 annotations on it would buy an expensive confirmation of a ruler. The **decision to profile is post-hoc and is labelled as such in the report itself**; what was fixed in advance is what each `length_auc` band would be taken to mean, including the pre-committed refusal to run G-300 on a `LENGTH_DOMINATED` partition. Guarded in code: `s2e_profile.py` re-derives G1's silhouette and ARI and **aborts** if they differ by more than 1e-6, so it cannot profile a K = 2 solution other than the one G1 selected; `tests/test_s2e_profile.py` (11 tests) additionally fails if the two configs' embedding or K-Means blocks ever diverge. Nothing is trained (AUC and Cliff's delta are rank statistics, the Dirichlet prior is fixed) — rule 10 untouched; whitespace tokens only, no stemming, stopword removal or TF-IDF — rule 7 untouched. New method citation: `monroe2008fightinwords`. |
 | 2026-07-30 | Provenance — `git_hash()` semantics | `-dirty` now reflects **tracked** modifications only (`git status --porcelain -uno`); untracked files are counted separately in `stamp()` as `untracked_files` | The suffix previously came from bare `--porcelain`, which also lists untracked files. Every run creates untracked artifacts — its own outputs, caches, a copied input — so every stamp came out `-dirty` and the flag stopped distinguishing anything; the one case it exists to catch (a result produced from edited but uncommitted source) had become invisible. This is why `results/s2_pilot_ari_trapcheck.md` carries `e3d8e434…-dirty` despite being produced from a **fresh `--depth 1` clone**, in which no tracked file *can* have been modified. The S2 result is therefore attributable to a pristine `e3d8e43`. Untracked files are reported, not ignored — a source file that was never committed is a real provenance gap. |
 | 2026-07-27 | S1 class balance | Post-cleaning class balance is no longer uniform; the R1/R2 split will be sentiment-stratified | Raw 1665/1664/1670 becomes 1513/1599/1618 after S1. Drops concentrate in class 0 (152 of 270 total; 152 of the 269 labelled drops), because duplicates and sub-3-word reviews are over-represented in the negative class. Stratifying the R1/R2 split on `Sentiment` keeps the shifted distribution identical across partitions instead of letting it drift further. Counts in `results/s1_cleaning_log.json` and `docs/dataset_card.md`. |

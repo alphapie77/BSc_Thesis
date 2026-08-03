@@ -1,0 +1,106 @@
+# S2e — WHAT IS THE K=2 PARTITION MADE OF?
+#
+# G1 selected K = 2 on region A: prediction strength 0.860, bootstrap ARI 0.940,
+# ARI vs Sentiment 0.152 (Band 1 — NOT the sentiment split). But silhouette is
+# 0.053, the gap statistic rises monotonically and is satisfied at no K, and
+# HDBSCAN called 100% of points noise. The recorded reading is: a highly
+# reproducible bisection of a space with NO separated groups.
+#
+# A reproducible bisection of a continuum is what K-Means gives you when it cuts
+# along the single dominant direction of variation. This step asks what that
+# direction is — BEFORE spending 300 human annotations on it.
+#
+# ── INTERPRETATION IS PRE-REGISTERED ──────────────────────────────────────────
+# docs/protocol.md, "RQ1-D pre-commitment", written before this file's script
+# existed. The bands below are copied from it and must not be edited here:
+#   length_auc >= 0.75  -> LENGTH_DOMINATED   (may not be called a persona split)
+#   0.65 <= .. < 0.75   -> LENGTH_CONFOUNDED  (G-300 may proceed, with disclosure)
+#   length_auc <  0.65  -> NOT_LENGTH         (cheapest alternative removed only)
+#
+# ── WHAT THIS STEP CANNOT DO ──────────────────────────────────────────────────
+# It cannot show the halves ARE personas. Nothing but G-300 can. A clean
+# NOT_LENGTH removes one alternative explanation and nothing more.
+name: s2e_profile
+seed: 42
+
+# Same inputs as G1, so the K=2 labels are reproduced, not recomputed differently.
+input_assignments: results/s2a_regionA_cluster_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+label_col: Sentiment
+text_col: "Movie Review"
+expected_n: 1897
+
+k: 2
+
+# MUST match configs/s2d_ktable.yaml exactly. If either drifts, this script is
+# profiling a different partition from the one G1 selected, which is worse than
+# not profiling at all — so `guard` below re-derives G1's own numbers and fails
+# loudly on mismatch rather than trusting that the settings still agree.
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: data/cleaned/labse_emb_regionA.npy
+
+kmeans:
+  n_init: 10
+  random_state: 42
+
+# The partition G1 actually selected, taken from results/s2d_ktable_regionA.csv.
+# Recomputed here and compared: same code, same seed, same data => same numbers.
+guard:
+  ktable_csv: results/s2d_ktable_regionA.csv
+  tolerance: 1.0e-6
+
+# ── The decisive diagnostic (RQ1-D) ──────────────────────────────────────────
+length_bands:
+  dominated_at_or_above: 0.75
+  confounded_at_or_above: 0.65
+
+# Any single surface feature reaching this AUC is a headline finding: a regular
+# expression separating the halves as well as a 768-d multilingual encoder.
+surface_auc_headline: 0.80
+
+features:
+  - n_words
+  - n_chars
+  - mean_word_len
+  - n_danda
+  - has_danda
+  - n_comma
+  - has_comma_run
+  - n_exclaim
+  - n_question
+  - punct_per_token
+  - has_latin
+  - has_digit
+  - first_person
+
+length_feature: n_words
+
+lexical_richness:
+  token_budget: 4000     # region A halves are ~750/1,150 rows of ~8 words
+  bootstrap: 30
+
+# Log-odds ratio with an informative Dirichlet prior (Monroe, Colaresi & Quinn
+# 2008). NO stemming, NO stopword removal, NO TF-IDF — Monroe's prior exists so
+# that stopword removal is unnecessary, which is why this method and not another.
+# Inviolable rule 7 intact. A READING AID; no thesis claim rests on it.
+log_odds:
+  prior_strength: 500    # a0 in Monroe et al.; 500 is their own working value
+  min_count: 5           # a word seen 4 times cannot support a z-score
+  top_n: 30
+
+# The part Sabbir actually reads. Everything above is scaffolding for this.
+examples:
+  n_representative: 12   # closest to each centroid — the clearest cases
+  n_boundary: 10         # smallest margin — how continuous the cut really is
+  max_chars: 300
+
+outputs:
+  assignments_csv: results/s2e_regionA_k2_assignments.csv
+  features_csv: results/s2e_regionA_k2_features.csv
+  logodds_csv: results/s2e_regionA_k2_logodds.csv
+  report_md: results/s2e_regionA_k2_profile.md
