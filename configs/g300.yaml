@@ -1,0 +1,86 @@
+# G-300 — the human validation. RQ1's arbiter.
+#
+# S2f eliminated valence and verbosity as explanations of the K=2 cut, so no
+# cheaper instrument remains. Whether the two halves are an audience distinction
+# or an artefact of cutting a continuum is now a question only annotators can
+# answer.
+#
+# ── PRE-REGISTERED IN docs/protocol.md, "RQ1-F" ───────────────────────────────
+# Written before a single item was annotated. Two constraints are baked in:
+#
+#   (1) Only 123 of the frozen G-300 are in region A and therefore carry a K=2
+#       label. The split map is FROZEN (inviolable rule 3) and is NOT being
+#       regenerated. All 300 are annotated; Gate 2 runs on the 123 and reports
+#       its reduced power as a number.
+#
+#   (2) Two annotators, not the three RQ1 states -- logged as a deviation. With
+#       two there is no majority, so the adjudication rule is fixed in advance:
+#       DISAGREEMENTS ARE NOT RESOLVED. The gold value is the mean of the two
+#       ratings and the disagreement rate is reported. Adjudicating after seeing
+#       the data is how an IAA figure gets laundered.
+#
+# ── WHAT ANNOTATORS NEVER SEE ────────────────────────────────────────────────
+# cluster, K, region, Sentiment, word count, or any statistic from this repo.
+# item_id is opaque and the order is shuffled, so nothing can be inferred from
+# position. The key lives in a separate file that is not shipped to them.
+name: g300
+seed: 42
+
+split_map: data/splits/split_map_v1.json
+input_csv: data/cleaned/bn_clean.csv
+assignments: results/s2e_regionA_k2_assignments.csv
+id_col: review_id
+text_col: "Movie Review"
+label_col: Sentiment
+
+scale: [0, 1, 2, 3]          # ordinal: engagement specificity. See the guideline.
+annotators: [A, B]
+
+calibration:
+  n: 20
+  source: dev                # NEVER from G. Excluded from every reported figure.
+  # Items quoted as worked examples in docs/g300_annotation_guideline.md. An
+  # annotator who has just read the guideline would be recalling the answer
+  # rather than judging, so they cannot also be calibration items.
+  exclude_ids: [bn_0360, bn_0252, bn_0567, bn_0246, bn_0368, bn_0421,
+                bn_0659, bn_0912, bn_0047, bn_0283]
+
+# ── Gate 1: can humans agree at all? Krippendorff's alpha, ORDINAL. ──────────
+# Bands are Krippendorff's own and were in RQ1 long before this file existed.
+gate1:
+  reliable_at_or_above: 0.80
+  tentative_at_or_above: 0.667
+
+# ── Gate 2: does the human rating recover the machine's split? ───────────────
+# Directionless AUC of the mean rating against cluster_k2, bootstrap CI, and
+# repeated WITHIN each length band -- because RQ1-D's binding condition
+# ("annotators must not succeed on length alone") has to be measured, not
+# assumed. Instruction is not enforcement.
+gate2:
+  auc_threshold: 0.70
+  # ⚠️ The DECISION comes from a permutation test, not from the bootstrap CI.
+  # directionless_auc = max(a, 1-a), so every bootstrap resample is bounded
+  # below by 0.50 and the lower CI bound essentially never reaches it -- which
+  # made the NEGATIVE verdict nearly unreachable and rigged the test toward
+  # finding an effect. Caught by the smoke test before any annotation existed;
+  # RQ1-F amended while nothing had been observed. The CI is still reported,
+  # for the PRECISION of the estimate; it no longer decides anything.
+  permutations: 5000
+  alpha: 0.05
+  bootstrap: 2000
+  ci: 0.95
+  length_bands: 4
+  # An interval that includes 0.50 while the point estimate sits above this is
+  # reported as INCONCLUSIVE AT THIS N, with the CI width stated -- not written
+  # up as a refutation. n = 123 is small and pretending otherwise cuts both ways.
+  inconclusive_point_estimate_above: 0.65
+
+outputs:
+  sheet_dir: data/annotation
+  key_csv: data/annotation/g300_key.csv          # researchers only
+  report_md: results/g300_agreement.md
+  per_item_csv: results/g300_per_item.csv
+  # Text-free (item_id, annotator, rating). This one IS committed: the sheets
+  # carry licensed corpus text and are regenerable from the frozen split + seed,
+  # but the RATINGS are regenerable by nothing -- two people spent hours on them.
+  ratings_csv: results/g300_ratings.csv

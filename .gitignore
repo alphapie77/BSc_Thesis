@@ -39,3 +39,9 @@ zip/
 data/plots/plots_bn_harvest.csv
 data/plots/.harvest_state.json
 data/plots/review.html
+
+# Annotation sheets carry 300 rows of the licensed corpus and are regenerable
+# from the frozen split + seed 42, so they are NOT committed -- same reason as
+# data/cleaned/. The RATINGS are regenerable by nothing, so g300_score.py
+# extracts them text-free to results/g300_ratings.csv, which IS committed.
+data/annotation/*.csv

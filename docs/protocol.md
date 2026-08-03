@@ -440,6 +440,135 @@ the two cheapest explanations have been eliminated. That is a stronger position
 than S2e left us in and a weaker one than a persona claim requires, and the
 thesis must say so in those words.
 
+## RQ1-F pre-commitment: the G-300 human validation
+
+> **Written 2026-08-03, before a single item has been annotated and before
+> `src/annotate/` exists.** G-300 is now the decisive step for RQ1: S2f
+> eliminated valence and verbosity as explanations of the K=2 cut, so no
+> cheaper instrument remains that could pre-empt the annotators.
+
+### Two constraints discovered before designing, and neither is negotiable away
+
+**(1) Only 123 of the frozen G-300 are in region A.** The split was stratified on
+`Sentiment × region` in August, before G1 chose K, so 177 of the 300 are region-B
+rows that carry **no K=2 label** — G1 and S2e ran on region A only. Composition
+of the usable 123: cluster 0 = 78 (26 neg / 52 pos), cluster 1 = 45 (35 neg /
+10 pos).
+
+**`data/splits/split_map_v1.json` is frozen (inviolable rule 3) and is not being
+regenerated.** All 300 are annotated; the **cluster-validation analysis runs on
+the 123**, and its reduced power is reported as a number, not as a hedge. The
+alternative — drawing a fresh region-A gold set — was rejected because it breaks
+the frozen split, which is the single artifact the whole design rests on.
+
+**(2) Two annotators are available, not three, and one of them is the author.**
+This is a **protocol deviation from RQ1's stated `n = 3 annotators`** and is
+logged as one. Its consequences are fixed here rather than discovered later:
+
+- **Recommendation on record: Sabbir should not annotate.** He designed the
+  study, has read the log-odds lists and the cluster-representative reviews, and
+  cannot unsee them. An author-annotator's agreement with an independent
+  annotator is not evidence about the construct; it is partly evidence about the
+  author's memory. **Recruiting one more independent annotator is worth more to
+  RQ1 than any further statistic in this repository.**
+- **If Sabbir annotates anyway**, then: (i) the fact appears in the abstract's
+  limitations, the Methods section and the dataset card — not a footnote; (ii)
+  α is reported **both** for the full pair and, if a third annotator is ever
+  obtained, for the independent pair alone; (iii) no claim of *independent*
+  human validation may be made, only of *partially independent*.
+- **With two annotators there is no majority**, so the adjudication rule is
+  fixed now: **disagreements are not resolved.** No third-party tie-break, no
+  discussion-to-consensus after the fact. The gold label for a tied item is
+  **the mean of the two ordinal ratings**, and the disagreement rate is
+  reported. Adjudicating after seeing the data is how an IAA figure gets
+  laundered.
+
+### The task: an ordinal rating, never a cluster assignment
+
+Annotators **never see cluster labels, cluster names, K, or any statistic from
+this repository.** They are not asked "which persona is this?" — that would
+require handing them descriptions derived from the clusters, and their agreement
+would then measure how well we wrote the descriptions.
+
+Instead each review is rated on a **4-point ordinal scale of engagement
+specificity**: how far the reviewer goes beyond a global verdict toward naming
+what specifically they are reacting to. This construct was chosen because it is
+what the data suggested — S2e/S2f found formulaic praise on one side and short
+but *specific* complaint on the other, with the richness inversion surviving a
+length control in all four bands — and because it is ordinal, which is what
+RQ1 already pre-registered (Krippendorff's α, ordinal).
+
+### The binding condition from RQ1-D, and how it is enforced
+
+RQ1-D fixed that **annotators must not be able to succeed by reading length
+alone.** Two enforcement mechanisms, because instruction alone is not
+enforcement:
+
+1. The guideline states explicitly that length is not the criterion, and
+   includes **worked counter-examples in both directions**: a long unspecific
+   review and a short highly specific one.
+2. **Measured, not assumed:** the scoring script reports the rating→cluster AUC
+   **within each length band**, the same control S2f used. If the rating's
+   ability to recover the cluster disappears once length is held fixed, the
+   annotators were reading length whatever the guideline said.
+
+### Procedure
+
+- **Calibration first:** 20 items, both annotators, then one discussion. After
+  that, **no communication until all 300 are done.** Calibration items are drawn
+  from `dev`, never from G, and are excluded from every reported figure.
+- Items are **shuffled once with seed 42** and presented in identical order to
+  both annotators, with region, sentiment, cluster and length hidden.
+- **Sentiment is not part of the task.** If an annotator asks, the answer is
+  that a scathing review can be highly specific and a rave can be formulaic.
+
+### What each outcome means — fixed now
+
+**Gate 1 — can humans agree at all?** Krippendorff's α (ordinal) on all 300.
+
+| α | Claim |
+|---|---|
+| ≥ 0.80 | The construct is reliably annotatable. Proceed to Gate 2. |
+| 0.667 – 0.80 | Tentative. Gate 2 proceeds, and every persona claim carries the α with it. |
+| < 0.667 | **The construct is not reliably annotatable by humans.** Gate 2 is not run, because a rating nobody agrees on cannot validate anything. RQ1 is reported as a negative result — publishable under RQ1-C — and the failure is attributed to the construct, not to the annotators. |
+
+**Gate 2 — does the human rating recover the machine's split?** Directionless
+AUC of the mean rating against `cluster_k2`, on the 123 region-A items, tested
+against a **permutation null**, and repeated within each length band.
+
+> **⚠️ Amended 2026-08-03, before any item was annotated.** The first version of
+> this section decided Gate 2 on whether a bootstrap 95% CI excluded 0.50. **That
+> was wrong.** `directionless_auc` is `max(a, 1−a)`, so every bootstrap resample
+> is bounded below by 0.50 and the lower bound essentially never reaches it —
+> the `NEGATIVE` verdict was close to unreachable, and the test was biased
+> toward finding an effect. On the single number that decides RQ1, that is the
+> worst direction to be wrong in. Caught by the scorer's own smoke test.
+> **Nothing had been observed when this changed** — no sheet was filled, no α
+> and no AUC existed — so this is a pre-registration *refinement*, not a
+> post-hoc adjustment, and it is logged in the deviations table with the same
+> standing as the 2026-07-28 band revision. The bootstrap CI is still reported,
+> for the **precision** of the estimate; it no longer decides anything.
+
+The permutation null shuffles cluster membership, preserving class balance and
+the statistic's floor, so it measures where a directionless AUC actually sits
+under chance at n = 123 — which is well above 0.50. `p` is the share of 5,000
+permutations reaching the observed AUC, with the customary +1 correction so a
+permutation p-value is never reported as 0. Cutoff **α = 0.05**.
+
+| Outcome | Claim |
+|---|---|
+| p < 0.05 **and** AUC ≥ 0.70 **and** it survives within every length band | **RQ1 wins.** The K=2 partition corresponds to a distinction humans perceive and agree on, and is not a length artefact. The halves may be called personas — with the qualifications already on record (no cluster structure, silhouette 0.053). |
+| p < 0.05 but AUC < 0.70, **or** it fails within one or more length bands | **Mixed.** Reported band by band; the persona claim is disclosed as length-entangled and the failing band is named. |
+| p ≥ 0.05 and AUC ≤ 0.65 | **RQ1 is a negative result.** Humans agree with each other but not with the machine: the K=2 cut is reproducible, not sentiment, not verbosity — and **not a distinction people make.** This is the most informative negative outcome available and is reported as a finding, not a failure. |
+| p ≥ 0.05 but AUC > 0.65 | **Under-powered is not the same as negative.** Reported as **inconclusive at this n**, with the CI width and the null's own 95th percentile stated, and **not** written up as a refutation. n = 123 is a power limit, not a result. |
+
+### What may not be done
+
+- **No re-annotation of items after seeing Gate 2.** 
+- **No dropping of "hard" items.** The disagreement rate is a result.
+- **No revision of the scale or the bands after calibration.** Calibration
+  aligns annotators to a fixed rubric; it does not rewrite the rubric.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
@@ -485,5 +614,7 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-07-31 | Plot corpus — **target reduced from 130 to whatever the source yields.** ⟶ **FINAL: 120 = 30 dev + 90 eval**, frozen the same day. (The estimate below said ~124/94; human review then removed 4 more — BN024 production history, BN042 the director's fatal accident, BN068 commentary about a story rather than the story, BN113 a 3-sentence fragment that sets up and stops. All four had passed every mechanical gate.) | The pipeline's §1.1.7 asks for 130 = 30 dev + 100 eval. bn.wikipedia does not contain 130 Bangla-film articles with a usable plot section. Four harvests: 67 → 110 → 132 → **124**, the last figure lower because a person-article veto removed 8 rows that had been counted as usable — actors' and directors' biographies swept in by the film categories. `N_DEV` stays at **30** (the dev slice tunes the loop threshold and 30 is the smallest defensible size); **eval takes the remainder**, with a hard floor of 80 below which the tool refuses to split. | **Two ways to reach 130 existed and both were refused.** (1) Relax the quality gate to admit two-sentence plots — but it was rejecting only ~20 of 3,135, so it is not the constraint, and thin plots are poor generation inputs. (2) Add the by-year categories, the largest available (২০১৯-এর = 268, ২০২২-এর = 220, ...) — but they are **language-neutral**: Tamil, Hindi, British and Japanese films sit in them, their bn.wikipedia articles are in Bangla, and they would therefore pass every gate in the harvester while quietly making the plot corpus stop being *Bangla cinema*. No check in the pipeline would have caught it. **Losing six eval plots costs a little power in a bootstrap CI; padding the set costs validity, which no n buys back.** 130 was a design choice in the spec, not a statistical requirement, and this is recorded before the number is used rather than after it is convenient. |
 | 2026-08-03 | RQ1-D — **K=2 profile registered as EXPLORATORY IN ORIGIN, pre-registered in interpretation** | New analysis added after G1's table was seen: `src/cluster/s2e_profile.py`, `configs/s2e_profile.yaml` → `results/s2e_regionA_k2_profile.md` (+ assignments, features and log-odds CSVs). Section "RQ1-D pre-commitment" added above, **before the script existed**. | Two gaps in G1, both closed here. **(1)** G1 selected K = 2 and never persisted the labels; G-300 stratification needs them, and they cannot be recovered from `s2d_ktable_regionA.csv`. **(2)** G1 never asked what separates the halves. That question is decisive *before* annotation, not after: G1 reports PS 0.860 and bootstrap ARI 0.940 (a reproducible cut) alongside silhouette 0.053, a monotonically rising gap statistic satisfied at no K, and **HDBSCAN calling 100% of points noise** (no separated groups). A reproducible bisection of a continuum is what K-Means yields when it cuts along the dominant direction of variation — and with ~8-word reviews on L2-normalised LaBSE, **length** is the obvious candidate. If a word count reproduces the encoder's cut, spending 300 annotations on it would buy an expensive confirmation of a ruler. The **decision to profile is post-hoc and is labelled as such in the report itself**; what was fixed in advance is what each `length_auc` band would be taken to mean, including the pre-committed refusal to run G-300 on a `LENGTH_DOMINATED` partition. Guarded in code: `s2e_profile.py` re-derives G1's silhouette and ARI and **aborts** if they differ by more than 1e-6, so it cannot profile a K = 2 solution other than the one G1 selected; `tests/test_s2e_profile.py` (11 tests) additionally fails if the two configs' embedding or K-Means blocks ever diverge. Nothing is trained (AUC and Cliff's delta are rank statistics, the Dirichlet prior is fixed) — rule 10 untouched; whitespace tokens only, no stemming, stopword removal or TF-IDF — rule 7 untouched. New method citation: `monroe2008fightinwords`. |
 | 2026-08-03 | RQ1-E — **residual test run VOLUNTARILY at Band 1** | New analysis: `src/cluster/s2f_residual.py`, `configs/s2f_residual.yaml` → `results/s2f_regionA_k2_residual.md` + `_cells.csv`. Section "RQ1-E pre-commitment" added above, before the script existed. **No band assignment is revised**: ARI(cluster, Sentiment) = 0.1522 remains Band 1 and the corpus does not move into Band 2. | Band 2 makes a residual test mandatory at ARI ≥ 0.20 and we are below it, so nothing was owed. Run anyway because **ARI is the wrong instrument for this association and this project has already been misled by that gap once** — `s2b_register_probe.md` recorded φ 0.565 against V 0.410. The same 2×2 that yields ARI 0.1522 yields **φ = 0.3981**, χ² = 300.7, and cluster→sentiment accuracy 69.5% against a 50.2% baseline; all 12 reviews nearest cluster 0's centre are positive and all 12 nearest cluster 1's are negative. Skipping on a technicality would leave a question a reviewer will certainly ask, answerable from data already on disk. **Results:** A min AUC 0.6115 (length independent of sentiment), B min \|φ\| 0.3133 (sentiment independent of length in every band), **C lift +9.80 pp → `RESIDUAL_SURVIVES`** — but **0.2 pp from the 10.0 cutoff**, and the script emits an automatic boundary-warning box at ≤2 pp so the weakness cannot depend on anyone remembering it. D: the richness inversion holds in **all four** length bands. Decomposition (added after the first run, before any interpretation was written): Sentiment alone +9.28 pp, length alone +5.22 pp, both +9.80 — so **length adds only 0.53 pp once sentiment is known**, and S2e's `LENGTH_CONFOUNDED` overstates length's independent contribution. Test C is a **resubstitution** estimate and therefore an upper bound; the bias direction was chosen deliberately, since it makes the persona-killing verdict easier to reach. Nothing trained (rule 10); whitespace tokens only (rule 7). Pinned by `tests/test_s2f_residual.py` (9 tests), including one that fails if the 10.0 cutoff or the quartile count moves, because either would flip the published verdict. |
+| 2026-08-03 | RQ1-F — **G-300 registered; 3 annotators → 2; author-as-annotator flagged** | New: `configs/g300.yaml`, `src/annotate/g300_build.py`, `g300_score.py`, `docs/g300_annotation_guideline.md`, `tests/test_g300.py` (18). Section "RQ1-F pre-commitment" added **before any item was annotated**. | Three departures from RQ1 as written, all forced and all recorded rather than absorbed. **(1) n = 2 annotators, not 3.** With two there is no majority, so the adjudication rule is fixed in advance: **disagreements are not resolved** — the gold value is the mean and the disagreement rate is reported, because adjudicating after seeing the data is how an IAA figure gets laundered. **(2) One available annotator is the author.** Recommendation on record: *Sabbir should not annotate* — he designed the study and has read the log-odds lists and the cluster-representative reviews. If he does anyway, no claim of *independent* human validation may be made, only *partially independent*, and it goes in the abstract's limitations and the dataset card, not a footnote. **(3) Only 123 of the frozen G-300 are in region A** and carry a K=2 label, because the split was stratified on `Sentiment × region` in August, before G1 chose K. The split map is **frozen (rule 3) and was not regenerated**; all 300 are annotated and Gate 2 runs on the 123, with its reduced power reported as a number. Task design: annotators rate **engagement specificity** on a 0–3 ordinal scale and **never see cluster, K, region, Sentiment, word count or `review_id`** — `review_id` is ordered by position in the source file, and position *is* the region variable. They are not asked "which persona is this?", which would make their agreement a measure of how well we wrote the cluster descriptions. RQ1-D's binding condition is enforced twice: worked counter-examples in the guideline (`bn_0360`, 12 words → 1; `bn_0252`, 4 words → 2, both from `dev`) **and** a per-length-band AUC in the scorer, because instruction is not enforcement. |
+| 2026-08-03 | RQ1-F Gate 2 — **decision rule changed from a bootstrap CI to a permutation test, before any annotation** | Gate 2 previously fired `NEGATIVE` when the bootstrap 95% CI included 0.50. It now uses a permutation null (5,000 shuffles of cluster membership, α = 0.05); the CI is still reported, for precision only. | **The old rule was broken in the direction that matters most.** `directionless_auc` is `max(a, 1−a)`, so every bootstrap resample is bounded below by 0.50 and the lower bound essentially never reaches it — the `NEGATIVE` verdict was close to unreachable, making the single number that decides RQ1 biased toward finding an effect. Demonstrated rather than asserted: under chance at n = 123 the null's own 95th percentile sits at ≈ **0.60**, not 0.50, so any rule treating 0.50 as the null value is wrong. Found by the scorer's own smoke test. **Nothing had been observed when this changed** — no sheet filled, no α, no AUC — so this is a pre-registration refinement of the same kind as the 2026-07-28 band revision, not a post-hoc adjustment. `tests/test_g300.py::test_the_negative_verdict_is_actually_reachable` now fails if the null verdict ever becomes unreachable again, and `::test_permutation_null_sits_well_above_half_at_this_n` pins the reason. |
 | 2026-07-30 | Provenance — `git_hash()` semantics | `-dirty` now reflects **tracked** modifications only (`git status --porcelain -uno`); untracked files are counted separately in `stamp()` as `untracked_files` | The suffix previously came from bare `--porcelain`, which also lists untracked files. Every run creates untracked artifacts — its own outputs, caches, a copied input — so every stamp came out `-dirty` and the flag stopped distinguishing anything; the one case it exists to catch (a result produced from edited but uncommitted source) had become invisible. This is why `results/s2_pilot_ari_trapcheck.md` carries `e3d8e434…-dirty` despite being produced from a **fresh `--depth 1` clone**, in which no tracked file *can* have been modified. The S2 result is therefore attributable to a pristine `e3d8e43`. Untracked files are reported, not ignored — a source file that was never committed is a real provenance gap. |
 | 2026-07-27 | S1 class balance | Post-cleaning class balance is no longer uniform; the R1/R2 split will be sentiment-stratified | Raw 1665/1664/1670 becomes 1513/1599/1618 after S1. Drops concentrate in class 0 (152 of 270 total; 152 of the 269 labelled drops), because duplicates and sub-3-word reviews are over-represented in the negative class. Stratifying the R1/R2 split on `Sentiment` keeps the shifted distribution identical across partitions instead of letting it drift further. Counts in `results/s1_cleaning_log.json` and `docs/dataset_card.md`. |
