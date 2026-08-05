@@ -2209,15 +2209,18 @@ pre-registration reads.
 
 ---
 
-## Open decisions (resolve before they are needed)
+## Open decisions → **`docs/STATUS.md`**
 
-| # | Decision | Blocks | Status |
-|---|---|---|---|
-| ~~1~~ | ~~Final `usable_n` after near-dup removal~~ | — | ✅ **4,625** at t = 0.95 |
-| ~~2~~ | ~~Near-dup threshold from the sensitivity curve~~ | — | ✅ held at the pre-registered **0.95**; 0.90 disclosed as a sensitivity caveat |
-| ~~3~~ | ~~Do personas survive the trap-check?~~ | — | ✅ **answered**: on the full corpus the clusters are a corpus detector (93.3%); in region A they are Band 1 but sentiment-ordered. G-300 decides. |
-| ~~4~~ | ~~Correct the S0 table in `research_pipeline_en.md`~~ | — | ✅ corrected 2026-08-01, with strikethrough |
-| 5 | Frame the register finding in **stylometry/authorship** or **machine-generated-text detection** literature? | Ch.2, Ch.4 | 🔵 Sabbir's, at writing time |
-| 6 | Should `s2_pilot.py` persist UMAP coordinates too, for the Ch.4 figure? | Ch.4 figures | 🔵 open |
-| 7 | **Three personas or two?** The design posits three; region A has two sentiment classes. Gate G1's master K-table settles K, not the label count | S2 → S3 | 🔴 **next** |
-| 8 | If the provenance question ever reopens, does region B get **excluded**, **kept as a labelled condition**, or become **the contribution**? | Ch.1 framing | ⏸ dormant (decision 0 closed unresolvable) |
+This file used to carry its own copy of the open-decisions table. **It was
+removed on 2026-08-05 because it had gone stale**, and stale in the worst
+possible way: it still listed *"Three personas or two? — 🔴 next"* two days
+after Gate G1 had answered **two** and STATUS had recorded the answer.
+
+`CLAUDE.md` says progress lives in STATUS **and nowhere else**, for exactly this
+reason — two copies of "where are we" means one of them is always wrong, and a
+reader has no way to tell which. The one entry that lived only here (UMAP
+coordinates for the Ch.4 figure) was **migrated** to STATUS as decision 15
+rather than dropped.
+
+**This file states what happened on a given day. STATUS states where things
+stand now.**
