@@ -461,22 +461,27 @@ the 123**, and its reduced power is reported as a number, not as a hedge. The
 alternative — drawing a fresh region-A gold set — was rejected because it breaks
 the frozen split, which is the single artifact the whole design rests on.
 
-**(2) Two annotators are available, not three, and one of them is the author.**
-This is a **protocol deviation from RQ1's stated `n = 3 annotators`** and is
-logged as one. Its consequences are fixed here rather than discovered later:
+**(2) Two annotators, not three — but both independent.** This is a **protocol
+deviation from RQ1's stated `n = 3 annotators`** and is logged as one.
 
-- **Recommendation on record: Sabbir should not annotate.** He designed the
-  study, has read the log-odds lists and the cluster-representative reviews, and
-  cannot unsee them. An author-annotator's agreement with an independent
-  annotator is not evidence about the construct; it is partly evidence about the
-  author's memory. **Recruiting one more independent annotator is worth more to
-  RQ1 than any further statistic in this repository.**
-- **If Sabbir annotates anyway**, then: (i) the fact appears in the abstract's
-  limitations, the Methods section and the dataset card — not a footnote; (ii)
-  α is reported **both** for the full pair and, if a third annotator is ever
-  obtained, for the independent pair alone; (iii) no claim of *independent*
-  human validation may be made, only of *partially independent*.
-- **With two annotators there is no majority**, so the adjudication rule is
+**Resolved 2026-08-04: Sabbir does not annotate.** Two independent annotators
+were recruited, and the author is out of the loop entirely. The version of this
+section written on 2026-08-03 carried a branch for "if Sabbir annotates anyway",
+under which no claim of *independent* human validation would have been
+permitted — only *partially independent*. **That branch is now dead and is
+recorded here rather than deleted**, because the reason it existed is the same
+reason the outcome matters: an author-annotator's agreement with an independent
+one is partly evidence about the author's memory of the log-odds lists and the
+cluster-representative reviews, not about the construct. G-300 now measures the
+construct.
+
+Neither annotator is in CSE or knows what the study is looking for. **They are
+not told about clusters, K, the two halves, or any hypothesis** — only the
+guideline. A rater who knows the expected answer drifts toward it, and the
+agreement then stops being evidence.
+
+- **Remaining consequence — with two annotators there is no majority**, so the
+  adjudication rule is
   fixed now: **disagreements are not resolved.** No third-party tie-break, no
   discussion-to-consensus after the fact. The gold label for a tied item is
   **the mean of the two ordinal ratings**, and the disagreement rate is
