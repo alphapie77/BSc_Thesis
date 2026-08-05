@@ -1,0 +1,78 @@
+# GATE G1, REPLICATION RUN — the master K-table on REGION B.
+#
+# ⚠️ Pre-registered in docs/protocol.md, "RQ1-G pre-commitment", written before
+# this ran. Read it before reading any number this produces.
+#
+# ── WHY ────────────────────────────────────────────────────────────────────────
+# Region A selected K = 2 at PS 0.860. The single strongest thing that could be
+# said about that split is that it appears in a SECOND corpus -- one with a
+# different register, different provenance and possibly different authorship.
+# So the identical instrument is pointed at region B.
+#
+# EVERY numeric setting below is copied from configs/s2d_ktable.yaml unchanged:
+# seed, encoder, max_seq_length, k_range, n_init, PS threshold, bootstrap, gap,
+# GMM, HDBSCAN, and all four trap bands. A replication run with a tweaked
+# instrument replicates nothing. The ONLY differences are the input subset, the
+# embedding cache path, and the output paths.
+name: s2d_ktable_regionB
+seed: 42
+
+input_assignments: results/s2b2_regionB_cluster_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+label_col: Sentiment
+text_col: "Movie Review"
+
+# null on purpose. The post-dedup region-B count is not known until S2-B runs,
+# and inventing a number here would be a guess dressed as an assertion. The
+# script accepts null and PRINTS that the run was unguarded -- then fill it in
+# from the S2-B output, so a later stale input is still caught.
+expected_n: null
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: data/cleaned/labse_emb_regionB.npy
+
+k_range: [2, 3, 4, 5, 6, 7, 8]
+
+kmeans:
+  n_init: 10
+  random_state: 42
+
+prediction_strength:
+  n_splits: 20
+  threshold: 0.80       # ⚠️ PRE-REGISTERED. Identical to region A. Do not move.
+
+bootstrap:
+  n_runs: 100
+  subsample_frac: 0.8
+
+gap_statistic:
+  n_reference: 20
+  pca_components: 50
+
+gmm:
+  covariance_type: diag
+  n_init: 3
+
+hdbscan:
+  # NOTE: region B is larger than region A (~2,700 vs 1,897 post-dedup), so 30 is
+  # a SMALLER fraction of n here (~1.1% vs ~1.6%). Kept at 30 anyway, because
+  # matching the instrument matters more than matching the ratio -- and the
+  # difference is disclosed rather than silently corrected.
+  min_cluster_size: 30
+  min_samples: 5
+
+trap_check:
+  degenerate_cluster_share: {min: 0.05, max: 0.70}
+  bands:
+    not_sentiment_aligned_below: 0.20
+    partial_overlap_range: [0.20, 0.60]
+    persona_claim_fails_above: 0.60
+
+outputs:
+  report_md: results/s2d_ktable_regionB.md
+  table_csv: results/s2d_ktable_regionB.csv

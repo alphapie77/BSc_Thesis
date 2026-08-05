@@ -37,6 +37,27 @@ from src.common.seed import set_seed  # noqa: E402
 NO_STABLE_K = "NO_STABLE_K"
 
 
+def check_n(asg, cfg) -> None:
+    """Assert the input row count, or say out loud that it was not asserted.
+
+    `expected_n` exists to catch a stale or half-regenerated input before an
+    expensive run reads it. A **replication** run on a new subset cannot know
+    that number in advance — it comes out of the run before it — so `null` is
+    permitted and is **reported as an unguarded run** rather than passing
+    silently. A check that can be disabled quietly is not a check.
+    """
+    n = cfg.get("expected_n")
+    if n is None:
+        print(f"⚠️  expected_n is null: {len(asg)} rows accepted UNGUARDED. "
+              f"Fill it in {cfg.get('name', 'this config')} once the number is "
+              f"known, so a later stale input is caught.")
+        return
+    if len(asg) != n:
+        raise AssertionError(
+            f"{cfg['input_assignments']} has {len(asg)} rows, expected {n}."
+        )
+
+
 # --------------------------------------------------------------------------
 # Prediction strength (Tibshirani & Walther 2005)
 # --------------------------------------------------------------------------
@@ -157,11 +178,7 @@ def main() -> int:
 
     # --- rows: region A, post-dedup, exactly as S2-A left them --------------
     asg = pd.read_csv(root / cfg["input_assignments"])
-    if len(asg) != cfg["expected_n"]:
-        raise AssertionError(
-            f"{cfg['input_assignments']} has {len(asg)} rows, expected "
-            f"{cfg['expected_n']}."
-        )
+    check_n(asg, cfg)
     ids = set(asg[cfg["id_col"]])
     df = pd.read_csv(root / cfg["input_csv"])
     df = df[df[cfg["id_col"]].isin(ids)].sort_values(

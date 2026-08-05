@@ -39,6 +39,7 @@ import yaml  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from src.cluster.s2d_ktable import check_n  # noqa: E402
 from src.cluster.s2e_profile import directionless_auc  # noqa: E402
 from src.common.provenance import NEWLINE, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
@@ -100,11 +101,7 @@ def main() -> int:
     rng = np.random.default_rng(int(cfg["seed"]))
 
     a = pd.read_csv(root / cfg["input_assignments"])
-    if len(a) != cfg["expected_n"]:
-        raise AssertionError(
-            f"{cfg['input_assignments']} has {len(a)} rows, expected "
-            f"{cfg['expected_n']}. This must be S2e's own output."
-        )
+    check_n(a, cfg)
     txt = pd.read_csv(root / cfg["input_csv"])[[cfg["id_col"], cfg["text_col"]]]
     df = a.merge(txt, on=cfg["id_col"], how="left")
     assert df[cfg["text_col"]].notna().all(), "a review_id in S2e has no text"

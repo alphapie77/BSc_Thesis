@@ -635,6 +635,67 @@ Pre-committed now, before either is run:
 | Propagated-label verifier performs **better** | Expected, and **not** evidence of a better verifier — the extra labels come from the same geometry the verifier is being scored against. Reported as a **circularity demonstration**, which is the more interesting finding. |
 | Propagated-label verifier performs **worse** | The register gap is large enough that region-B rows are actively harmful as persona training data. Strengthens the primary choice. |
 
+## RQ1-G pre-commitment: independent replication of the K = 2 split in region B
+
+> **Written 2026-08-05, before `configs/*_regionB.yaml` were run.** No region-B
+> K-table, profile or residual test exists at the commit that introduces this
+> section.
+
+### Why this supersedes the reasoning in the scope decision above
+
+The scope decision treats the two-corpus split purely as a liability to be
+contained. **That was the wrong frame, and this section corrects it while the
+correction is still free** — nothing has been trained.
+
+Region B is not only a contaminant. It is a **second, independent corpus in a
+different register**, and the single strongest thing that could be said about a
+discovered structure is that it appears **in both**. So the same instrument —
+identical seed, encoder, K range, thresholds and bands — is pointed at region B
+and asked the same question. Three outcomes, all informative, all pre-committed.
+
+**This does not change the primary line.** Verifier-A and the RAG index still
+train on region A's 804 labelled rows, exactly as decided above. Replication is
+additional evidence, not a substitute.
+
+### What runs
+
+`s2_pilot_regionB.yaml` → `s2d_ktable_regionB.yaml` → `s2e_profile_regionB.yaml`
+→ `s2f_residual_regionB.yaml`. **No script changes**: every one of these already
+takes the region as a config field. Same instrument, different subset.
+
+### Matching rule — fixed now, because this is where the cheating would happen
+
+If region B also selects K = 2, its two clusters must be matched to region A's
+before anything can be compared. **The matching is done on the linguistic
+profile, never on whichever pairing maximises agreement:**
+
+> **Region B's cluster with the higher type count at an equal token budget is
+> matched to region A's cluster 1.** That is S2e's own richness statistic, and
+> it is the signature that survived the length control in all four bands.
+
+The matching is computed and written down **before** any cross-region agreement
+number is looked at. A rule chosen after seeing ARI is not a rule.
+
+### What each outcome means
+
+| Outcome | Claim |
+|---|---|
+| **B selects K = 2, and the matched clusters carry the same specificity signature** (richness inversion holds, length AUC in the same band) | **Independent replication.** The structure appears in two corpora that differ in register, provenance and possibly authorship. This is a far stronger basis for RQ1 than region A alone, and it is the outcome that would most improve the thesis. It also **gives region B its own labels, derived independently** — so RQ1-B recovers its original form and *can* test persona transfer without circularity, and the scope decision's re-scoping to sentiment becomes a fallback rather than the plan. |
+| **B selects K = 2, but the signature does not match** | Two corpora, two different two-way splits. **No replication**, and the persona claim stays confined to region A. Reported as a negative replication, which is more informative than not having looked. |
+| **B selects a different K, or `NO_STABLE_K`** | The region-A structure does not generalise. Reported plainly. **This does not retract anything about region A** — it bounds the claim to the corpus it was found in, which is where the claim already lives. |
+| **B replicates, but region B is later shown to be machine-written** | Then the split is a property of **how film reviews get written**, not of an audience. Still a finding, and a sharper one than silence — but the persona framing would have to give way to something like "a reproducible register axis in Bangla film commentary". Pre-committed here so it cannot be quietly dropped if it happens. |
+
+### What may not be concluded
+
+Replication in region B would **not** show there is cluster structure. G1 already
+established there is none in region A (silhouette 0.053, HDBSCAN 100% noise), and
+the same diagnostics run in B. Replication of a *cut through a continuum* is
+still a cut through a continuum — it would show the cut lands in the same place
+twice, which is a claim about reproducibility across corpora, not about groups.
+
+**G-300 remains the arbiter of whether either split is an audience distinction.**
+No amount of replication substitutes for a human saying the halves differ.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.

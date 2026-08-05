@@ -42,7 +42,7 @@ import yaml  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.cluster.s2d_ktable import embed  # noqa: E402
+from src.cluster.s2d_ktable import check_n, embed  # noqa: E402
 from src.common.provenance import NEWLINE, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 from src.preprocess.s2b_register_probe import (  # noqa: E402
@@ -151,11 +151,7 @@ def main() -> int:
 
     # --- exactly G1's rows, in exactly G1's order ---------------------------
     asg = pd.read_csv(root / cfg["input_assignments"])
-    if len(asg) != cfg["expected_n"]:
-        raise AssertionError(
-            f"{cfg['input_assignments']} has {len(asg)} rows, expected "
-            f"{cfg['expected_n']}."
-        )
+    check_n(asg, cfg)
     ids = set(asg[cfg["id_col"]])
     df = pd.read_csv(root / cfg["input_csv"])
     df = df[df[cfg["id_col"]].isin(ids)].sort_values(

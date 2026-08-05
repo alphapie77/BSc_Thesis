@@ -1,0 +1,93 @@
+# S2e, REPLICATION RUN — what is the region-B K=2 partition made of?
+#
+# ⚠️ Pre-registered in docs/protocol.md, "RQ1-G pre-commitment".
+#
+# ── THE NUMBER THIS RUN EXISTS FOR ────────────────────────────────────────────
+# Not `length_auc`. It is `types_at_budget` per cluster -- the richness figure.
+#
+# RQ1-G fixes the matching rule in advance, and it is this file's output that
+# applies it:
+#
+#   "Region B's cluster with the HIGHER type count at an equal token budget is
+#    matched to region A's cluster 1."
+#
+# That signature was chosen because it is the one that survived the length
+# control in all four bands in region A. The match is computed and written down
+# BEFORE any cross-region agreement number is looked at. A matching rule chosen
+# after seeing ARI is not a rule.
+#
+# Every threshold below is identical to configs/s2e_profile.yaml. Only the
+# subset, the cache and the outputs differ.
+name: s2e_profile_regionB
+seed: 42
+
+input_assignments: results/s2b2_regionB_cluster_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+label_col: Sentiment
+text_col: "Movie Review"
+expected_n: null          # see s2d_ktable_regionB.yaml -- unguarded, and it says so
+
+k: 2
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: data/cleaned/labse_emb_regionB.npy
+
+kmeans:
+  n_init: 10
+  random_state: 42
+
+guard:
+  ktable_csv: results/s2d_ktable_regionB.csv
+  tolerance: 1.0e-6
+
+length_bands:
+  dominated_at_or_above: 0.75
+  confounded_at_or_above: 0.65
+
+surface_auc_headline: 0.80
+
+features:
+  - n_words
+  - n_chars
+  - mean_word_len
+  - n_danda
+  - has_danda
+  - n_comma
+  - has_comma_run
+  - n_exclaim
+  - n_question
+  - punct_per_token
+  - has_latin
+  - has_digit
+  - first_person
+
+length_feature: n_words
+
+lexical_richness:
+  # ⚠️ MUST stay 4000, the region-A value. This is the statistic the matching
+  # rule reads, and type counts are not comparable across different budgets --
+  # changing it here would silently make the two regions incomparable on the one
+  # number the replication turns on.
+  token_budget: 4000
+  bootstrap: 30
+
+log_odds:
+  prior_strength: 500
+  min_count: 5
+  top_n: 30
+
+examples:
+  n_representative: 12
+  n_boundary: 10
+  max_chars: 300
+
+outputs:
+  assignments_csv: results/s2e_regionB_k2_assignments.csv
+  features_csv: results/s2e_regionB_k2_features.csv
+  logodds_csv: results/s2e_regionB_k2_logodds.csv
+  report_md: results/s2e_regionB_k2_profile.md

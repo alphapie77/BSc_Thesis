@@ -1,0 +1,54 @@
+# S2f, REPLICATION RUN — the residual test on REGION B.
+#
+# ⚠️ Pre-registered in docs/protocol.md, "RQ1-G pre-commitment".
+#
+# Region A returned RESIDUAL_SURVIVES at +9.80 pp -- 0.2 pp from its cutoff, and
+# reported as weak. A verdict that close to its own boundary is exactly the kind
+# that a second corpus can firm up or knock down, and neither answer is bad:
+#
+#   * B also RESIDUAL_SURVIVES  -> the region-A result stops resting on 0.2 pp
+#   * B EXPLAINED_BY_...        -> region A's was probably boundary noise, and
+#                                  the honest reading of both weakens
+#   * B PARTIALLY_EXPLAINED     -> reported as the middle case it is
+#
+# All three are reported. The region-A number is NOT revised retrospectively --
+# it stands as computed, with region B beside it.
+#
+# ⚠️ ONE STRUCTURAL DIFFERENCE, stated because it changes what the test means:
+# region B contains ALL THREE sentiment classes (every class-2 row lives here --
+# fact (split)), while region A has two. So Test B's phi and Test C's cells are
+# computed over a 3-class variable here and a 2-class one there. The verdicts
+# remain comparable; the raw phi values do NOT, and must not be put in the same
+# column of a table without that note.
+name: s2f_residual_regionB
+seed: 42
+
+input_assignments: results/s2e_regionB_k2_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+id_col: review_id
+cluster_col: cluster_k2
+label_col: Sentiment
+text_col: "Movie Review"
+length_col: n_words
+expected_n: null          # see s2d_ktable_regionB.yaml -- unguarded, and it says so
+
+length_bands:
+  n_quantiles: 4
+
+test_a:
+  independent_at_or_above: 0.60
+
+test_b:
+  independent_at_or_above: 0.20
+
+test_c:
+  explained_at_or_above: 25.0
+  partial_at_or_above: 10.0
+
+test_d:
+  bootstrap: 200
+  min_budget: 250
+
+outputs:
+  cells_csv: results/s2f_regionB_k2_cells.csv
+  report_md: results/s2f_regionB_k2_residual.md

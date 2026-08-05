@@ -1,0 +1,76 @@
+# S2-B -- the same instrument pointed at REGION B.
+#
+# ⚠️ Interpretation pre-registered in docs/protocol.md, "RQ1-G pre-commitment",
+# written BEFORE this ran. The commit timestamp is the evidence.
+#
+# WHY THIS EXISTS. Every earlier document treats the two-corpus split as a
+# liability to be contained. That framing was too narrow. Region B is also a
+# SECOND INDEPENDENT CORPUS in a different register -- and the strongest thing
+# that can be said about a discovered structure is that it appears in both.
+#
+# So: identical seed, encoder, K, thresholds and bands. Only the subset changes.
+# This is the same instrument pointed elsewhere, not a new instrument -- which is
+# the whole point, because a replication run with a tweaked instrument replicates
+# nothing.
+#
+# This does NOT change the primary line: Verifier-A and the RAG index still train
+# on region A's 804 labelled rows (protocol.md, "Scope decision"). Replication is
+# additional evidence, never a substitute.
+name: s2_pilot_regionB
+seed: 42
+
+input_csv: data/cleaned/bn_clean.csv
+text_col: "Movie Review"
+label_col: "Sentiment"
+id_col: "review_id"
+expected_input_n: 4730          # asserted BEFORE restriction
+
+region:
+  boundary_row: 1999
+  restrict_to: B_uniform
+  # Only one region survives restriction, so there is nothing to score region
+  # against. Stated explicitly rather than left to the automatic fallback.
+  score_against_region: false
+
+embedding:
+  model: sentence-transformers/LaBSE
+  batch_size: 64
+  normalize: true
+  max_seq_length: 64
+  cache_npy: null               # forced null for restricted runs anyway
+
+near_duplicate:
+  primary_threshold: 0.95       # unchanged, deliberately
+  sweep_thresholds: [0.90, 0.95, 0.98]
+  keep: first_by_review_id
+
+clustering:
+  # K = 3 here for the same reason S2-A used it: this run mirrors S2-A exactly,
+  # and S2-A ran at K=3. The K question is settled separately and identically by
+  # the G1 K-table (configs/s2d_ktable_regionB.yaml), which sweeps 2..8 under the
+  # pre-registered PS >= 0.80 rule. Changing K here would make the two region
+  # runs incomparable, which would defeat the purpose.
+  #
+  # NOTE: unlike region A, region B contains all THREE sentiment classes -- every
+  # class-2 row lives here (fact (split)). So the structural ARI cap that
+  # weakened S2-A does not apply, and a low ARI in this run is correspondingly
+  # STRONGER evidence than the same number was there. Stated in advance.
+  algorithm: kmeans
+  k: 3
+  n_init: 10
+  random_state: 42
+  cluster_in_umap_space: false
+
+trap_check:
+  metric: ARI(cluster_labels, Sentiment)
+  degenerate_cluster_share: {min: 0.05, max: 0.70}
+  bands:
+    no_claim: degenerate
+    not_sentiment_aligned_below: 0.20
+    partial_overlap_range: [0.20, 0.60]
+    persona_claim_fails_above: 0.60
+
+outputs:
+  near_dup_pairs_csv: data/cleaned/near_dup_pairs_regionB.csv
+  report_md: results/s2b2_regionB_trapcheck.md
+  cluster_assignments_csv: results/s2b2_regionB_cluster_assignments.csv

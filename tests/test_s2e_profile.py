@@ -153,6 +153,45 @@ def test_s2e_profiles_the_SAME_partition_g1_selected():
     assert CFG["k"] in CFG_G1["k_range"]
 
 
+def test_the_region_B_replication_uses_an_IDENTICAL_instrument():
+    """A replication run with a tweaked instrument replicates nothing.
+
+    RQ1-G's whole claim is "the same instrument, pointed at a second corpus".
+    The moment a threshold, the encoder or K differs between the region-A and
+    region-B configs, a matching result stops being evidence of replication and
+    becomes evidence that two different procedures happened to agree.
+
+    Only three things may differ: the input subset, the embedding cache path,
+    and the output paths.
+    """
+    def load(p):
+        return yaml.safe_load((ROOT / "configs" / p).read_text(encoding="utf-8"))
+
+    a, b = load("s2d_ktable.yaml"), load("s2d_ktable_regionB.yaml")
+    for key in ("seed", "k_range", "kmeans", "prediction_strength", "bootstrap",
+                "gap_statistic", "gmm", "hdbscan", "trap_check", "id_col",
+                "label_col", "text_col"):
+        assert a[key] == b[key], f"G1 differs between regions on `{key}`"
+    ea, eb = dict(a["embedding"]), dict(b["embedding"])
+    ea.pop("cache_npy"), eb.pop("cache_npy")
+    assert ea == eb, "the encoder differs between regions"
+
+    ea, eb = load("s2e_profile.yaml"), load("s2e_profile_regionB.yaml")
+    for key in ("k", "kmeans", "length_bands", "surface_auc_headline",
+                "features", "length_feature", "log_odds"):
+        assert ea[key] == eb[key], f"S2e differs between regions on `{key}`"
+    assert ea["lexical_richness"]["token_budget"] == \
+        eb["lexical_richness"]["token_budget"], (
+        "the token budget differs between regions. RQ1-G's MATCHING RULE reads "
+        "types-at-budget, and type counts are not comparable across different "
+        "budgets — this would silently decide the replication."
+    )
+
+    fa, fb = load("s2f_residual.yaml"), load("s2f_residual_regionB.yaml")
+    for key in ("test_a", "test_b", "test_c", "test_d", "length_bands"):
+        assert fa[key] == fb[key], f"S2f differs between regions on `{key}`"
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
