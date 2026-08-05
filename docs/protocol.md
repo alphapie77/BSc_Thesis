@@ -574,6 +574,67 @@ permutation p-value is never reported as 0. Cutoff **α = 0.05**.
 - **No revision of the scale or the bands after calibration.** Calibration
   aligns annotators to a fixed rubric; it does not rewrite the rubric.
 
+## Scope decision: Verifier-A and the RAG index run on region A only (2026-08-05)
+
+> **Delegated.** Sabbir asked for the best option rather than choosing; the
+> choice and the reasoning below are Claude's, recorded as such so that nobody
+> later reads it as the author's own judgement. **It is reversible** — nothing
+> has been trained — and the alternative is pre-registered below rather than
+> discarded.
+
+Only **804 of 1,962** R1 rows carry a persona label, because the K = 2 partition
+exists only in region A. Three options were open (STATUS decision 14). **Option
+(a) is taken: Verifier-A trains on the 804 labelled region-A rows, and the RAG
+index is built from those rows only.**
+
+### Why, in order of weight
+
+1. **Option (b) re-imports the confound the whole design controls for.**
+   Assigning region-B rows to their nearest region-A centroid would manufacture
+   labels for a corpus that the encoder can already separate from region A with
+   **93.3% accuracy**. Those labels would encode register, not persona, and they
+   would be indistinguishable from real ones inside the training set.
+2. **Option (b) makes RQ1-B circular.** RQ1-B measures the cross-region transfer
+   gap. If region-B labels are *defined* by region-A centroids, then testing
+   A → B measures how well a model reproduces the rule that generated its own
+   test labels. The test would pass for the wrong reason.
+3. **Region B may be machine-written** (open decision 0, closed as
+   unresolvable). Training a persona verifier on it and then reporting realism
+   is the "machine imitating machine" problem this document already flags as
+   unfixable. Option (a) confines that exposure to the evaluation, where it is
+   disclosed, instead of putting it in the training set.
+4. **n = 804 is small, and that is on-message rather than embarrassing.** Kamoi
+   et al. §5.2 name fine-tuning for self-correction with **small training data**
+   as unexplored. A verifier trained on 804 rows is an instance of the gap the
+   thesis claims to address, provided the n is reported plainly and the
+   confidence intervals are honest.
+
+### The cost, stated rather than buried
+
+**RQ1-B as written cannot run.** It trains Verifier-A on one region and tests on
+the other; with no region-B persona labels, both directions are impossible.
+
+**RQ1-B is therefore re-scoped, and its purpose is preserved.** Its actual
+object was never persona transfer — it was *"the register gap, quantified"*. So
+the cross-region transfer test now runs on **sentiment classification**, a task
+both regions support with real labels, and is reported as a measurement of the
+register gap between the two corpora. The three outcome bands (drop > 15 points
+/ 5–15 / < 5) carry over unchanged, and the claim attached to each is unchanged.
+**What may no longer be claimed is anything about persona transfer across
+regions**, and that is stated wherever RQ1-B appears.
+
+### Option (b) survives as a pre-registered robustness check
+
+Nearest-centroid label propagation to region B, Verifier-A retrained on the full
+1,962, **reported beside the primary result and never in place of it.**
+Pre-committed now, before either is run:
+
+| Outcome | Claim |
+|---|---|
+| Propagated-label verifier performs **similarly** | The region restriction costs little; reported as evidence that the primary result is not an artefact of n = 804. |
+| Propagated-label verifier performs **better** | Expected, and **not** evidence of a better verifier — the extra labels come from the same geometry the verifier is being scored against. Reported as a **circularity demonstration**, which is the more interesting finding. |
+| Propagated-label verifier performs **worse** | The register gap is large enough that region-B rows are actively harmful as persona training data. Strengthens the primary choice. |
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
