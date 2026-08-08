@@ -81,17 +81,50 @@ def test_the_sheets_leak_nothing():
         blob = df.to_csv(index=False)
         for banned in ("bn_", "cluster", "intruder", "correct", "n_words"):
             assert banned not in blob, f"'{banned}' appears in {name}"
-        assert df["answer"].isna().all() or (df["answer"].fillna("") == "").all()
 
 
-def test_both_annotators_get_identical_sheets():
+def test_answers_when_present_are_valid_option_letters():
+    """Checks the returned data, not the blank template.
+
+    The first version of this file asserted the `answer` column was empty. That
+    held while the sheets sat unanswered and **failed the moment the annotators
+    returned them** — a test that only passes before the experiment runs is
+    testing the wrong thing. It now validates what actually comes back.
+    """
     if not _built():
         return
-    for stem in ("intrusion", "pairwise"):
+    for name, valid in (("intrusion_A.csv", set("ABCD")),
+                        ("intrusion_B.csv", set("ABCD")),
+                        ("pairwise_A.csv", set("AB")),
+                        ("pairwise_B.csv", set("AB"))):
+        p = DIR / name
+        if not p.exists():
+            continue
+        got = pd.read_csv(p, dtype=str)["answer"].dropna()
+        got = got[got.str.strip() != ""].str.strip().str.upper()
+        bad = sorted(set(got) - valid)
+        assert not bad, f"{name} contains answers outside {sorted(valid)}: {bad}"
+
+
+def test_both_annotators_get_the_same_ITEMS():
+    """Item columns only — the answers are supposed to differ.
+
+    Comparing whole files worked until the sheets came back filled, at which
+    point "A and B differ" became the expected state rather than a defect. What
+    must stay identical is what they were *shown*.
+    """
+    if not _built():
+        return
+    for stem, cols in (("intrusion", list("ABCD")), ("pairwise", list("AB"))):
         a, b = DIR / f"{stem}_A.csv", DIR / f"{stem}_B.csv"
-        if a.exists() and b.exists():
-            assert pd.read_csv(a, dtype=str).equals(pd.read_csv(b, dtype=str)), \
-                f"{stem}: A and B differ"
+        if not (a.exists() and b.exists()):
+            continue
+        da, db = pd.read_csv(a, dtype=str), pd.read_csv(b, dtype=str)
+        idc = "set_id" if stem == "intrusion" else "pair_id"
+        keep = [idc] + cols
+        assert da[keep].equals(db[keep]), (
+            f"{stem}: the two annotators were shown different items"
+        )
 
 
 def test_no_review_is_reused_across_items():
