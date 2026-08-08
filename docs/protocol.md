@@ -696,6 +696,118 @@ twice, which is a claim about reproducibility across corpora, not about groups.
 **G-300 remains the arbiter of whether either split is an audience distinction.**
 No amount of replication substitutes for a human saying the halves differ.
 
+## RQ1-H pre-commitment: human validation, attempt 2 — the intrusion task
+
+> **Written 2026-08-08, before `src/annotate/intrusion_build.py` exists and
+> before any item has been judged.** Attempt 1 (RQ1-F / step 5k) is reported in
+> full and is not superseded, withdrawn or reframed. **This is a second attempt
+> with a different instrument, and it is labelled that way everywhere.**
+
+### What went wrong the first time — both causes, not one
+
+1. **The rating scale collapsed.** 68–76% of ratings landed on the single value
+   "2", so α fell to 0.4970 despite 75.5% exact agreement.
+2. **The construct had to be named in advance, and Claude named it.** The task
+   asked for "engagement specificity". *If that name was wrong, the test fails
+   even when the clusters are real* — and nothing in attempt 1 could tell those
+   two failures apart.
+
+Cause 1 was diagnosed at the time. **Cause 2 was not, and it is the more
+dangerous of the two.**
+
+### Why an intrusion task, and what the literature says
+
+**Chang et al. (NIPS 2009)** established the intrusion task as the way to test
+whether unsupervised structure corresponds to *"natural groupings for humans"*.
+It names no construct: the annotator is asked only which item does not belong.
+
+**Kiritchenko & Mohammad (ACL 2017)** showed empirically that, at equal
+annotation cost, comparative judgements are more reliable than rating scales,
+and attributed rating-scale failure to exactly the inconsistency we hit. **Had
+this been read before attempt 1, attempt 1 would not have used a rating scale.**
+
+**Eklund et al. (2025), CIPHE** criticise intrusion — but specifically
+*keyword* intrusion, showing that keyword abstraction skews cluster
+interpretation in nearly half of instances. Their own method has participants
+**read sample texts**. This design is document-level for that reason, and lands
+on the supported side of that critique rather than the criticised side.
+
+### Design
+
+- **50 sets.** Each is 4 reviews: 3 from one cluster, 1 intruder from the other.
+  25 sets with a cluster-0 majority, 25 with cluster-1.
+- **Length-matched within every set** (max−min ≤ 2 words). RQ1-D's binding
+  condition is thereby satisfied **by construction rather than by measurement** —
+  there is no length signal left to read.
+- **Items drawn from region A but NOT from G-300.** The clustering ran on all
+  1,897 region-A rows, so G was never held out from it and confers no advantage
+  here; drawing outside G means **both annotators see text they have never
+  seen**, which attempt 1's items no longer can offer.
+- Both annotators receive identical sets in identical (seed-42 shuffled) order.
+- **Secondary block: 40 pairwise items**, one review from each cluster,
+  length-matched, asking which goes into more specific detail.
+
+### Gate A — is the split perceptible at all? (primary)
+
+Accuracy at picking the intruder, against a chance rate of **0.25**, one-sided
+exact binomial.
+
+| Outcome | Claim |
+|---|---|
+| accuracy ≥ 0.45 and p < 0.05 | **`HUMANLY_PERCEPTIBLE`.** The K=2 partition corresponds to a distinction people can see without being told what it is. This is the outcome RQ1 needed and attempt 1 could not deliver. |
+| p < 0.05 but accuracy < 0.45 | **`WEAKLY_PERCEPTIBLE`.** Above chance but slight; reported with the interval, and every persona-adjacent claim carries it. |
+| p ≥ 0.05 | **`NOT_PERCEPTIBLE` — and this time it is a real negative.** The instrument cannot collapse and names no construct, so failure here means the split is not one people make. RQ1 is then reported as a **negative result** under RQ1-C, not as inconclusive. |
+
+**Power, computed before running:** at n = 50, detecting 0.45 against 0.25 has
+≈ 97% power (α = 0.05, one-sided); 32 sets would suffice for 80%. The margin is
+deliberate — a second failed attempt on a power technicality would be the worst
+outcome available.
+
+### Gate B — is the distinction *specificity*? (secondary)
+
+Only interpreted if Gate A passes. Accuracy against **0.50**, exact binomial,
+n = 40 (≈ 85% power to detect 0.70).
+
+| Gate A | Gate B | Claim |
+|---|---|---|
+| pass | pass | The split is perceptible **and** the construct is specificity. Strongest available outcome; the S2e/S2f profile is corroborated by humans. |
+| pass | fail | **The split is real and our name for it is wrong.** A genuinely useful result, and one attempt 1 was structurally incapable of producing. The thesis then reports a perceptible distinction whose character is undetermined. |
+| fail | — | Gate B is not interpreted. |
+
+### LLM supplement — large n, and three caveats that are not optional
+
+Following **Miller et al. (2024, Royal Society Open Science)**, who use a
+generative LLM alongside human reviewers to bridge the *validation gap* for
+short-text clusters, the same sets (plus a larger auto-generated pool) are also
+judged by LLMs, multiple models × multiple runs.
+
+**It is a supplement and may never be reported as the validation.** Three
+reasons, all pre-committed:
+
+1. **Nasution et al. (2024, IEEE Access)** find human annotation consistently
+   beats LLMs on complex tasks in **low-resource languages** — and Bangla is
+   one. This cuts directly against us.
+2. **HUME (2025)** benchmarks nine LLMs as annotators on clustering-type tasks
+   and finds them below humans (76.1% vs 81.2%).
+3. **Encoder circularity, which we raise ourselves and did not find in the
+   literature:** the clusters were produced by LaBSE, a neural text encoder, and
+   an LLM is another. Agreement between them may reflect shared training-data
+   statistics rather than a real distinction. **This is why no LLM result can
+   substitute for a human one here**, and it is stated wherever the supplement
+   appears.
+
+**Human–LLM divergence is itself reported as a finding**, per Miller et al., who
+observe intrinsic biases in both and challenge treating human coding as the
+definitive standard.
+
+### What may not be done
+
+- **No third attempt.** If Gate A fails, RQ1 is a negative result and is
+  written up as one. Iterating instruments until one produces a significant
+  number is the failure mode this whole document exists to prevent.
+- **No re-use of attempt-1 items**, which both annotators have seen.
+- **No interpretation of Gate B when Gate A fails.**
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.

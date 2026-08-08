@@ -1,0 +1,67 @@
+# RQ1-H — HUMAN VALIDATION, ATTEMPT 2. The intrusion task.
+#
+# ⚠️ Pre-registered in docs/protocol.md, "RQ1-H pre-commitment", written before
+# this file's script existed. Attempt 1 (step 5k) is reported in full and is NOT
+# superseded. This is a second attempt with a DIFFERENT INSTRUMENT.
+#
+# ── WHY THE INSTRUMENT CHANGED ────────────────────────────────────────────────
+# Attempt 1 failed for two reasons and only one was diagnosed at the time:
+#   (1) the 0-3 rating scale collapsed -- 68-76% of ratings on the value "2";
+#   (2) THE CONSTRUCT HAD TO BE NAMED IN ADVANCE, AND CLAUDE NAMED IT. If the
+#       name was wrong, the test fails even when the clusters are real, and
+#       nothing in attempt 1 could distinguish those two failures.
+#
+# An intrusion task (Chang et al., NIPS 2009) fixes both: no scale to collapse,
+# and no construct named -- the annotator is asked only which item does not
+# belong. CIPHE (Eklund et al. 2025) criticises KEYWORD intrusion specifically;
+# this is document-level, which is the side of that critique their own method
+# sits on.
+#
+# ── THE DESIGN CHOICE THAT MATTERS MOST ──────────────────────────────────────
+# Every set is LENGTH-MATCHED (max - min <= 2 words). RQ1-D's binding condition
+# -- annotators must not succeed on length alone -- is therefore satisfied BY
+# CONSTRUCTION, not by measuring it afterwards. There is no length signal left.
+name: intrusion
+seed: 42
+
+input_assignments: results/s2e_regionA_k2_assignments.csv
+input_csv: data/cleaned/bn_clean.csv
+split_map: data/splits/split_map_v1.json
+id_col: review_id
+text_col: "Movie Review"
+cluster_col: cluster_k2
+length_col: n_words
+
+# G-300's items were seen by both annotators in attempt 1, so they are excluded.
+# The clustering ran on ALL 1,897 region-A rows, so G was never held out from it
+# and confers no advantage here -- excluding it costs nothing and buys unseen text.
+exclude_parts: [G]
+
+# ── Gate A: is the split perceptible at all? (primary) ───────────────────────
+intrusion:
+  n_sets: 50
+  set_size: 4               # 3 from one cluster + 1 intruder -> chance = 0.25
+  max_word_span: 2          # max(words) - min(words) within a set
+  balance: true             # half the sets cluster-0 majority, half cluster-1
+  chance: 0.25
+  strong_at_or_above: 0.45
+  alpha: 0.05
+
+# ── Gate B: is the distinction SPECIFICITY? (secondary) ──────────────────────
+# Interpreted only if Gate A passes. Gate A pass + Gate B fail is a real result:
+# the split is perceptible and our name for it is wrong.
+pairwise:
+  n_pairs: 40
+  max_word_span: 2
+  chance: 0.50
+  strong_at_or_above: 0.70
+  alpha: 0.05
+
+annotators: [A, B]
+max_chars: 300
+
+outputs:
+  sheet_dir: data/annotation/intrusion
+  key_csv: data/annotation/intrusion/intrusion_key.csv      # researchers only
+  report_md: results/intrusion_agreement.md
+  responses_csv: results/intrusion_responses.csv            # text-free, committed
