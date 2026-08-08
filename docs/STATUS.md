@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-08 (G-300 round 1: inconclusive; RQ2-5 decoupled) · **Phase:** 1 COMPLETE → 2 (persona discovery)
+**Last updated:** 2026-08-08 (Phase 3 reality check: label reproduction only) · **Phase:** 1 COMPLETE → 2 (persona discovery)
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -87,6 +87,10 @@
 | Lexical richness inversion | — | cluster 1 is **33% shorter yet ~18% richer** at equal budget, and this **holds in all 4 length bands** — the strongest pre-G-300 evidence of a difference in kind |
 | R1 rows carrying a persona label | — | **804 of 1,962 (41.0%)** — the other 1,158 are region B, which has no K=2 label. Same for R2: **888 of 2,163**. Phase 3 and the RAG index both need labelled rows, so this is a hard input constraint, not a detail |
 | `dev` vs `R1` | "zero overlap between any two parts" | **`dev` ⊂ `R1` by design** (200 rows), stated in the split map's own `_contract`. The parts sum to 4,825 and the union is 4,625; nothing is wrong, but the "zero overlap" phrasing above was imprecise and is corrected here |
+| Verifier-A training n | — | **804** labelled region-A rows (481 / 323), dev held out |
+| Verifier-B training n | — | **888** (531 / 357) — R2, disjoint by the frozen split's contract |
+| Dev slice for the symbolic scorer | 200 | **82** labelled (53 / 29) — §3.5 assumes 200; it has 82 |
+| Gold-300 usable for Phase 3 validity | 300 | **0** — G-300 gave specificity ratings, not cluster labels, and they failed reliability |
 | Tokens in a two-encoding Unicode group | — | **10.44%** of 46,758 (267 collapsing groups). φ(region, encoding form) = **−0.3245** — an independent corroboration of fact (split) from orthography |
 
 > **Correction (2026-07-30).** This file previously recorded the venue/selection
