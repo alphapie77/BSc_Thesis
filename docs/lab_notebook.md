@@ -2347,18 +2347,117 @@ value**.
 
 ---
 
-## Open decisions → **`docs/STATUS.md`**
+---
 
-This file used to carry its own copy of the open-decisions table. **It was
-removed on 2026-08-05 because it had gone stale**, and stale in the worst
-possible way: it still listed *"Three personas or two? — 🔴 next"* two days
-after Gate G1 had answered **two** and STATUS had recorded the answer.
+## 2026-08-08 -- S5m: RQ1-H: the split IS humanly perceptible
+**Feeds:** Ch.4 RQ1 — the headline result
+**Commit:** `75688957a9197a18f40982a619151f299cdf13e3`
+**Artifacts:** `results/intrusion_agreement.md`, `results/intrusion_responses.csv`, `results/s2d_ktable_regionB.md`
 
-`CLAUDE.md` says progress lives in STATUS **and nowhere else**, for exactly this
-reason — two copies of "where are we" means one of them is always wrong, and a
-reader has no way to tell which. The one entry that lived only here (UMAP
-coordinates for the Ch.4 figure) was **migrated** to STATUS as decision 15
-rather than dropped.
+### Numbers
 
-**This file states what happened on a given day. STATUS states where things
-stand now.**
+**RQ1-H, Gate A — intrusion.** 50 length-matched sets, chance = 0.25.
+
+| Annotator | Correct | Accuracy | Exact one-sided binomial p |
+|---|---|---|---|
+| A | 39/50 | **0.780** | < 1e-15 |
+| B | 42/50 | **0.840** | < 1e-15 |
+| pooled | 81/100 | **0.810** | < 1e-15 |
+
+→ **`HUMANLY_PERCEPTIBLE`** (pre-registered threshold 0.45).
+
+**Gate B — pairwise specificity.** 40 length-matched pairs, chance = 0.50.
+Both annotators 34/40 = **0.850**, p < 1e-8. → the construct **is** specificity.
+
+Inter-annotator: same option on **70.0%** of sets, **75.0%** of pairs.
+
+**Verification, run before believing any of it:**
+
+| Check | Result |
+|---|---|
+| Accuracy recomputed by an independent path | 39/50 and 42/50 — identical |
+| Answer-position spread | A 13 · B 15 · C 8 · D 14 — no positional cue |
+| Word span within a set | max **2**, mean **1.62** — matching held |
+| **Length heuristic** (pick the most length-deviant option) | **8/50 = 0.16 — *below* chance.** Length is not merely neutralised, it is useless |
+| Agreement vs. that expected under independent errors | 0.700 observed, 0.667 expected — no lockstep |
+| Both wrong *and* identical | 2 sets of 50 |
+
+**RQ1-G, region B replication** (`s2d_ktable_regionB.md`): n = 2,728. K = 2
+selected, PS **0.818**, bootstrap ARI **0.962 ± 0.036**, shares 49.4/50.6.
+But: silhouette **0.039**, HDBSCAN noise **96.7%**, ARI vs Sentiment **0.011**,
+every surface-feature AUC in 0.50–0.58, `length_auc` **0.550 → NOT_LENGTH**,
+richness inversion holds in **1 of 4** bands. S2f: Test A ENTANGLED, Test B fails
+in band (6,8], Test C +7.2 pp.
+
+### Decisions made (and why)
+
+- **Gate A is read as a win, and Gate B is therefore interpreted.** Both were
+  fixed in RQ1-H before any item was answered; nothing here is a judgement call.
+- **Reported the annotators' own reported difficulty alongside the result.**
+  They both said the items looked alike — and then scored 0.78 and 0.84. That
+  contrast is not an embarrassment to be dropped; it is evidence about the
+  *kind* of distinction this is (see Findings).
+- **RQ1-G is read as outcome 2 — NO REPLICATION.** The rule required K *and*
+  signature to match. K matched; the signature did not (`length_auc` 0.676 vs
+  0.550, different bands; inversion 4/4 vs 1/4). Applied as written.
+- **Did not withdraw or soften the region-A result because region B failed to
+  replicate.** They are different corpora and the pre-registration anticipated
+  exactly this outcome.
+
+### Findings (things we did not expect)
+
+- **The annotators could do it but could not say how.** Both independently
+  reported that the items looked alike, and both then performed far above
+  chance. **That is the signature of an implicit stylistic distinction** — real,
+  perceptible, and not articulable on demand. It also explains attempt 1
+  retrospectively: asking them to *rate* a property they cannot name is a much
+  harder task than asking them to *spot the odd one out*, which is precisely
+  what Kiritchenko & Mohammad (2017) predict and what Chang et al. (2009)
+  designed around. **Attempt 1's failure was a failure of the question, not of
+  the annotators or of the data.**
+- **The length heuristic scores 0.16 — below chance.** Length matching did not
+  merely neutralise the cue; on these sets, following length actively misleads.
+  So Gate A's 0.81 was obtained with the strongest known confound not just
+  controlled but inverted.
+- **Region B's K = 2 split correlates with nothing measurable, and still passes
+  the pre-registered stability rule** (PS 0.818, bootstrap ARI 0.962) at a
+  near-perfect 49.4/50.6 bisection. **Region B is effectively a negative control
+  showing that PS ≥ 0.80 is attainable by a contentless cut** in this regime.
+  That is a methodological finding in its own right and it should be reported as
+  one: prediction strength, our own decision rule, is weak evidence on short-text
+  embeddings.
+- Read together, the two runs say something sharper than either alone: **region
+  A's cut has content (sentiment φ 0.398, length AUC 0.676, a consistent richness
+  inversion, and now human recognition at 0.81); region B's has none.** The
+  contrast is the argument.
+
+### Consequences for downstream steps
+
+- **RQ1 is answered, positively, and the answer is stronger than required** —
+  obtained with length removed and with no construct named to the annotators.
+- **Decision 12 needs revisiting again.** It was closed by force on 2026-08-05,
+  banning the word *persona*, on the basis that human validation was
+  inconclusive. **It is no longer inconclusive.** Whether "persona" is now
+  permitted is Sabbir's call; what the evidence supports is *a humanly
+  recognisable two-way distinction in engagement specificity*. It does **not**
+  support "two audience types", because G1 showed no cluster structure — the
+  object is a cut through a continuum that people can see.
+- **Verifier-A's target label now has human backing**, which Phase 3 could not
+  claim on 2026-08-05. The Phase-3 deviation (label reproduction only) stands
+  for the *verifier's* accuracy, but the **label itself** is no longer merely a
+  weak label.
+- **Region B may not be pooled with region A** for persona-controlled work. Its
+  split is a different object.
+- G-300 attempt 1 remains reported in full. Two attempts, one instrument
+  failure, one success — and the contrast between them is a methods contribution.
+
+### Citations needed
+
+- **Chang et al. (2009)**, intrusion task — now load-bearing, needs a `references.bib`
+  entry and a `related_work.md` entry. ⚠️ not yet added.
+- **Kiritchenko & Mohammad (2017)**, comparative vs rating scales — explains both
+  the attempt-1 failure and the attempt-2 design. ⚠️ not yet added.
+- **Eklund et al. (2025), CIPHE** — the document-vs-keyword intrusion distinction
+  that puts this design on the supported side of the critique. ⚠️ not yet added.
+- Miller et al. (2024), Nasution et al. (2024), El Assadi et al. (2025) — needed
+  only if the LLM supplement is run.
