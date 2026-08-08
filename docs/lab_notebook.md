@@ -2209,6 +2209,115 @@ pre-registration reads.
 
 ---
 
+---
+
+## 2026-08-08 -- S5k: G-300 round 1: the scale collapsed
+**Feeds:** Ch.4 RQ1, Ch.5 Limitations
+**Commit:** `43e6d877b40b9251623747079df0ec180e1f8a6b-dirty`
+**Artifacts:** `results/g300_agreement.md`, `results/g300_ratings.csv`
+
+### Numbers
+
+Two independent annotators, all 300 items; B left 2 blank (G055, G060), so
+**n = 298** rated by both.
+
+| Statistic | Value |
+|---|---|
+| **Krippendorff α (ordinal)** | **0.4970** → `UNRELIABLE` (< 0.667) |
+| Krippendorff α (nominal) | 0.4324 |
+| Cohen's κ (linear weights) | 0.4456 |
+| **Exact agreement** | **75.5%** |
+| **Within 1 point** | **98.7%** |
+| **Gwet's AC1 (linear)** | **0.8705** |
+
+Rating distribution — this is the whole story:
+
+| Rating | A | B |
+|---|---|---|
+| 0 | 0.7% | 0.0% |
+| 1 | 8.1% | 3.7% |
+| **2** | **67.8%** | **76.2%** |
+| 3 | 23.5% | 20.1% |
+
+Rescue attempt, reported because it failed: binary recast at the only boundary
+with real spread (3 vs ≤2) → observed agreement 83.9%, **κ = 0.5285**, still
+below 0.667. Mean-rating spread: SD 0.442, **60.7% of items sit on the modal
+value**.
+
+**Gate 2 was not computed.** RQ1-F fixed that in advance for α < 0.667.
+
+### Decisions made (and why)
+
+- **Reported as INCONCLUSIVE (instrument failure), not as a negative result.**
+  The pre-registered verdict (`UNRELIABLE`) stands and is not revised — what
+  changes is only what it is taken to *mean*. "Negative" would assert that
+  people do not make this distinction. **The data shows the opposite about the
+  people**: 75.5% exact, 98.7% within one, AC1 0.871. What failed is the scale.
+  Both readings are written down side by side so a reader can disagree with the
+  framing while seeing the same numbers.
+- **Attempted a post-hoc rescue, and reported that it failed.** Collapsing to
+  binary at 3-vs-≤2 was the most favourable recoding available and it reaches
+  only κ 0.53. Recorded because "we did not try" and "we tried and it did not
+  work" are different states, and only the second supports an instrument-failure
+  claim.
+- **No round 2 — closed by circumstance, not by judgement.** A repaired rubric
+  was the recommended path; Sabbir has no further annotator time. Written down
+  explicitly so the absence of a second round is never read as a decision that
+  round 1 sufficed.
+- **RQ2–RQ5 decoupled from RQ1's outcome** (deviations log, 2026-08-05). The
+  generation experiments condition on `cluster_k2` as a controlled label. RQ2
+  asks whether an external verifier improves adherence to a **target label**;
+  that needs the label to be well-defined and reproducible (PS 0.860, bootstrap
+  ARI 0.940), not validated as an audience type.
+- **Open decision 12 closed by force.** The word *persona* may no longer describe
+  the K=2 halves anywhere, including the title. **The wording is Sabbir's; the
+  constraint is not.**
+
+### Findings (things we did not expect)
+
+- **High agreement and low α at the same time.** The textbook kappa paradox, met
+  in the wild. `gwet2008ac1` was already sitting in `related_work.md` Tier 2
+  labelled as the guard for exactly this, entered weeks ago for a different
+  reason (class-0 imbalance) — and it is what diagnosed this.
+- **The calibration intervention caused the failure, and it was mine.** Round-1
+  calibration showed annotator A compressed onto "1" (12 of 20). The advice given
+  was *"if the review names an aspect, at least 2"*. **Nearly every review names
+  something**, so both annotators moved almost everything to 2, and the 2-vs-3
+  boundary — where the real discrimination had to live — was never sharpened.
+  One problem was traded for a worse one. Calibration α was 0.744; after the fix
+  it fell to 0.497. **The intervention made it worse, measurably.**
+- **The lesson is transferable and belongs in the thesis, not in a footnote.**
+  A rubric whose lower boundary is easy to satisfy will collapse upward. On
+  ~8-word reviews there is not enough text to support four distinguishable
+  levels of specificity; two or three would have been the honest design, or a
+  forced-choice pairwise task, which cannot collapse at all.
+
+### Consequences for downstream steps
+
+- **RQ1 is reported as inconclusive on human validation.** RQ1-C's negative-result
+  branch is *not* invoked, because this is not that outcome.
+- **`cluster_k2` remains usable** as a controlled label for RQ2–RQ5. Nothing
+  downstream is blocked.
+- **Every use of "persona" in the pipeline spec, the pre-defence report and the
+  conference draft needs a pass.** The title included.
+- **RQ1-G (region-B replication) rises in value.** It needs no annotator time and
+  is now the only remaining external evidence that the split is not an artefact
+  of one corpus. It is **not** a substitute for human validation and is not
+  reported as one.
+- The G-300 items are **spent**: both annotators have seen them, so they cannot
+  serve as a clean gold set for any future round.
+
+### Citations needed
+
+- **Gwet (2008), AC1** — `gwet2008ac1`, already in `related_work.md` Tier 2. It
+  now has a concrete use and must be cited where the paradox is discussed.
+  ⚠️ Still unread; the entry needs filling before the number is defended.
+- **Krippendorff (2019)** — `krippendorff2019`, already listed for the ordinal α
+  and the 0.667/0.80 bands. Same status: listed, unread.
+- Nothing new is owed. Cohen's κ and the binary recast are textbook.
+
+---
+
 ## Open decisions → **`docs/STATUS.md`**
 
 This file used to carry its own copy of the open-decisions table. **It was
