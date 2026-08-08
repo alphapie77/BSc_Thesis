@@ -845,6 +845,140 @@ excuse. **Two readings are possible and the data will not distinguish them:**
 - **No re-use of attempt-1 items**, which both annotators have seen.
 - **No interpretation of Gate B when Gate A fails.**
 
+## S3.2 pre-commitment: the verifier backbone ablation
+
+> **Written 2026-08-08, before any verifier has been trained and before any
+> backbone has been downloaded.** Nothing in this section may be edited after the
+> first run. Pipeline §3.2 specifies this ablation; this section fixes its arms,
+> its decision rule, and what each outcome licenses us to say.
+
+### Why the ablation is load-bearing, not decorative
+
+Pipeline §3.2 frames the ablation as "the empirical answer to *why only
+BanglaBERT?*", with an implied expectation that BanglaBERT wins and the choice
+is thereby justified. **A Consensus search of the 2023–2026 Bangla
+classification literature does not support that expectation, and this is
+recorded before the run rather than discovered after it.** The field disagrees,
+on comparable tasks and comparable data sizes:
+
+| Reported winner | Where |
+|---|---|
+| BanglaBERT | Bangla emotion, 7,200 sentences, 0.83 macro-F1 (Hasan et al. 2025); Bangla sentiment, 10,861 comments (Hasan et al. 2023) |
+| **MuRIL** | Bangla emotion, 92% — beating **both** BanglaBERT and XLM-R (Mitra et al. 2025) |
+| **XLM-R** | BanglaBlend style classification, 94% vs BanglaBERT 93.4% (Hassin et al. 2026); BLP-2023 sentiment shared task (Mukherjee et al. 2023) |
+| **IndicBERTv2** | 95.44% on the *same* BanglaBlend data, above XLM-R and BanglaBERT (Mazumder et al. 2025) |
+
+The last two rows are the sharpest: **the same dataset yields three different
+winners across three papers.** So "BanglaBERT is Bangla-native, therefore it is
+the right verifier backbone" cannot be defended by citation. The ablation is the
+only available justification, and its result is not predictable in advance —
+which is the condition under which pre-registration is worth doing.
+
+### Arms (7, fixed here)
+
+| # | Arm | Why it is a candidate |
+|---|---|---|
+| 1 | `csebuetnlp/banglabert` | Bangla-native ELECTRA; the pipeline's default |
+| 2 | `xlm-roberta-base` | Without beating it, "a Bangla-specific model is needed" collapses |
+| 3 | `google/muril-base-cased` | Indic-specialised; beat both 1 and 2 in Mitra et al. 2025 |
+| 4 | `bert-base-multilingual-cased` | Historical baseline |
+| 5 | **`ai4bharat/IndicBERTv2-MLM-only`** 🆕 | Top scorer in Mazumder et al. 2025 on a Bangla style task, which is close in kind to ours |
+| 6 | **SetFit, LaBSE body** 🆕 | Contrastive few-shot, designed for exactly our n; LaBSE is already in the pipeline (Tunstall et al. 2022) |
+| 7 | **BERT-NLI transfer** 🆕 | Laurer et al. 2023 report +10.7–18.3 pp over classical models at 100–2,500 training texts, and note it works *particularly well on imbalanced data*. We have 804 rows at ~40% minority |
+
+Arms 5–7 are additions to pipeline §3.2 and are logged as a deviation.
+**Arm 6 is registered with a stated expectation of losing:** Beliveau et al.
+(2024), the closest study to our setting (non-English, small, imbalanced,
+domain-specific), found BERT-like models > SetFit > prompted LLMs. It is
+included because it is cheap and because a pre-registered expected loser that
+loses is evidence, while one that wins is a finding.
+
+### Training protocol
+
+- Data: the **804** labelled region-A rows of R1 (481 / 323), per the 2026-08-05
+  scope decision. Dev = the 82 labelled dev rows. **G-300 is not touched.**
+  **R2 is not touched** — it belongs to Verifier-B, and the wall is inviolable
+  rule 6.
+- Identical budget across arms: lr ∈ {2e-5, 3e-5} × 4 epochs, batch 16.
+  Arms 6 and 7 use their own published training procedures at matched wall-clock,
+  and that asymmetry is reported rather than hidden.
+- **5 seeds per arm** (42, 43, 44, 45, 46). Not 3 — see the decision rule below.
+
+### Decision rule — and why it is not "highest mean macro-F1"
+
+Seed variance is reported as a **sensitivity measurement**, which Bethard (2022)
+lists as a safe use of random seeds. It is **not** the decision rule. Bethard's
+survey of 85 ACL Anthology papers names *"varying only the random seed to create
+score distributions for performance comparison"* as a **risky** use, and finds
+more than half of recent papers commit it. Gundersen et al. (2023) show that
+small absolute effect sizes plus few repetitions readily produce wrong
+conclusions; Casola et al. (2022) find only 20% of transformer papers report
+multiple runs at all, and document low robustness to seed and hyperparameters;
+Fu et al. (2023) give the theoretical stability bound behind the phenomenon.
+
+**The winner is therefore decided by a paired bootstrap significance test**
+(10,000 resamples of the dev set, paired across arms, α = 0.05,
+Benjamini–Hochberg across the 21 pairwise comparisons). Precedent: Hasan et al.
+(2025) settle exactly this comparison in exactly this language with a paired
+bootstrap test.
+
+Pre-committed outcomes:
+
+| Outcome | What we may claim |
+|---|---|
+| One arm is significantly best | It becomes the Verifier. The choice is empirically justified and reported with its test statistic. |
+| **A set of arms is statistically indistinguishable** | **Report the tie as the result.** The tie-break is then declared openly and on non-performance grounds — smallest parameter count first, then the pipeline's default (BanglaBERT) — and the thesis says in those words that *the backbone choice was not determined by the data*. This is the outcome the literature's disagreement makes most likely, and it is registered as publishable. |
+| BanglaBERT is significantly beaten | Use the winner. "Monolingual vs multilingual verifier in low-resource" becomes a small finding in its own right, consistent with Mitra et al. 2025 and Mazumder et al. 2025. |
+| Every arm is near chance | The K=2 label is not learnable at n=804 from ~8-word text. **RQ2 cannot proceed as specified**, and that is reported rather than rescued by adding data or relaxing the label. |
+
+### What may not be done
+
+- **The winner is selected on weak-label macro-F1 — label *reproduction*, not
+  validity.** No human-validated accuracy exists for any verifier (deviation of
+  2026-08-08). Every defence of the backbone choice states this.
+- **No arm may be added after seeing a result**, and no arm may be dropped
+  because it performed badly. Arms 5–7 are registered above precisely so that
+  their inclusion cannot later look like a search for a better number.
+- **No hyperparameter search beyond the two learning rates fixed above.**
+- G-300 and R2 are not read by any part of this step.
+
+## S3.4 pre-commitment: calibration is descriptive, not a contribution
+
+> **Written 2026-08-08, before any verifier exists.**
+
+Pipeline §3.4 calls calibration "the hidden contribution": reliability diagram
+(10 bins), ECE, Brier, temperature scaling, ECE before/after. **At our n that
+framing cannot be sustained, and saying so now is cheaper than defending it at
+viva.** The dev slice is **82 rows**. A 10-bin reliability diagram puts ~8
+samples in a bin; the resulting ECE is dominated by binning noise, and a
+before/after ECE improvement computed on 82 rows is not a measurement anyone can
+rely on.
+
+What stands, and why:
+
+- **Temperature scaling is kept, and deliberately not upgraded.** Balanya et al.
+  (2022) show that expressive calibrators outperform simple ones when data is
+  plentiful and **fail when it is scarce**, while simple scaling stays robust.
+  Guo et al. (2025) make the same point from the variance side: methods
+  operating on full logit distributions suffer high variance under insufficient
+  validation data. The single-parameter method is the correct choice here *because*
+  n is small, not despite it.
+- **ECE is reported with fewer bins (5) and a bootstrap CI**, never as a bare
+  scalar, and the bin count is fixed here rather than chosen after seeing which
+  count flatters the result.
+- **The calibration figure is labelled descriptive** in the thesis and in any
+  paper. It illustrates the verifier's confidence behaviour; it does not
+  establish that the verifier is calibrated.
+- τ in §4.5 stands on this confidence. Since the calibration behind it is weak,
+  **τ's sensitivity is reported as a curve, not a point**, and the pipeline's
+  existing requirement to sanity-check the final τ against Verifier-B scores
+  becomes mandatory rather than advisory.
+
+**Pre-committed:** if post-scaling ECE improvement is smaller than its own
+bootstrap CI, the honest statement is *"calibration could not be established at
+this sample size"*, and it is written in those words. That is not a failed step;
+it is the step returning what it can support.
+
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
   persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
@@ -898,3 +1032,6 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-08-08 | Phase 3 — **§3.1's "2-fold swap" superseded by the frozen split; n stated in advance** | §3.1 asks for Verifier-A and Verifier-B to be separated by "different seeds + disjoint train splits (2-fold swap)". Replaced by the frozen split map, which already guarantees disjointness by contract: **Verifier-A ← R1, Verifier-B ← R2**, and G is eval-only. | The split map postdates §3.1 and is the stronger mechanism — disjointness is committed to git and pinned by `tests/test_split_map.py`, rather than depending on a swap being performed correctly at training time. **The usable n is smaller than §3.1 assumed and is recorded now, before any result exists, so a weak number later cannot be blamed on the method:** Verifier-A trains on **804** labelled rows (R1 minus the 82 labelled dev rows; 481/323 across the two clusters), Verifier-B on **888** (531/357), dev tuning has **82** (53/29), and G-300 has **123**. All are region A only, per the scope decision. Binary task, ~40% minority. **Two obligations follow.** Fine-tuning BanglaBERT on 804 rows of ~8-word text is high-variance, so every verifier number is reported as **mean ± SD over ≥3 seeds**, never as a single run. And §3.5's symbolic scorer learns its weights on the dev slice, which is **82 rows, not the 200 the spec assumes** — logistic regression over ~7 features at n=82 is fitted, reported with its n, and treated as the fragile component it is. |
 | 2026-07-30 | Provenance — `git_hash()` semantics | `-dirty` now reflects **tracked** modifications only (`git status --porcelain -uno`); untracked files are counted separately in `stamp()` as `untracked_files` | The suffix previously came from bare `--porcelain`, which also lists untracked files. Every run creates untracked artifacts — its own outputs, caches, a copied input — so every stamp came out `-dirty` and the flag stopped distinguishing anything; the one case it exists to catch (a result produced from edited but uncommitted source) had become invisible. This is why `results/s2_pilot_ari_trapcheck.md` carries `e3d8e434…-dirty` despite being produced from a **fresh `--depth 1` clone**, in which no tracked file *can* have been modified. The S2 result is therefore attributable to a pristine `e3d8e43`. Untracked files are reported, not ignored — a source file that was never committed is a real provenance gap. |
 | 2026-07-27 | S1 class balance | Post-cleaning class balance is no longer uniform; the R1/R2 split will be sentiment-stratified | Raw 1665/1664/1670 becomes 1513/1599/1618 after S1. Drops concentrate in class 0 (152 of 270 total; 152 of the 269 labelled drops), because duplicates and sub-3-word reviews are over-represented in the negative class. Stratifying the R1/R2 split on `Sentiment` keeps the shifted distribution identical across partitions instead of letting it drift further. Counts in `results/s1_cleaning_log.json` and `docs/dataset_card.md`. |
+| 2026-08-08 | S3.2 — **seed count 3 → 5, and seed variance is no longer the decision rule** | The 2026-08-08 Phase 3 entry above committed to "mean ± SD over ≥ 3 seeds". Both halves are amended: **5 seeds**, and the backbone winner is decided by a **paired bootstrap significance test** (10,000 resamples, BH-corrected over 21 pairs), with seed variance reported as sensitivity only. | **The literature contradicted our own protocol, and it was found by searching rather than by a reviewer.** Bethard (2022) surveys 85 ACL Anthology papers and names *"varying only the random seed to create score distributions for performance comparison"* as a **risky** use of seeds — which is precisely what "pick the arm with the best mean ± SD" is — while listing sensitivity measurement as a **safe** use. Gundersen et al. (2023) show small effect sizes plus few repetitions readily yield wrong conclusions; Casola et al. (2022) find only 20% of transformer papers report multiple runs and document low seed robustness; Fu et al. (2023) supply the stability bound. Precedent for the replacement rule exists in-language: Hasan et al. (2025) settle BanglaBERT vs mBERT vs XLM-R on Bangla with a paired bootstrap test. ⬛ **Considered and rejected:** Xue et al. (2023) recommend blocked 3×2 cross-validation over repeated standard splits on SNR grounds. Rejected by Sabbir on 2026-08-08: it re-draws the train/dev boundary inside R1, and **the frozen split map is the thesis's strongest reproducibility claim** -- committed to git, pinned by `tests/test_split_map.py`, never regenerated -- which is not worth disturbing for a statistical improvement. (Wording drafted by Claude and confirmed by Sabbir; endorsed, not authored -- see the lab-notebook entry of the same date.) Recorded here so the rejection is visible rather than absent. |
+| 2026-08-08 | S3.2 — **three arms added to the backbone ablation (4 → 7)** | Added `IndicBERTv2`, **SetFit** (LaBSE body), and **BERT-NLI** transfer to pipeline §3.2's four backbones. Registered in §"S3.2 pre-commitment" before any download or run. | Two independent reasons. **(1) The four specified arms do not span the candidate space the recent literature identifies.** Mazumder et al. (2025) report IndicBERTv2 above both XLM-R and BanglaBERT on a Bangla style-classification task close in kind to ours. **(2) The specified arms are all full fine-tuning, which is the weakest regime at our n.** Laurer et al. (2023, *Political Analysis*) report BERT-NLI beating classical models by 10.7–18.3 pp at 100–2,500 training texts and performing *particularly well on imbalanced data* — 804 rows at ~40% minority is that case exactly. SetFit (Tunstall et al. 2022) is the cheap contrastive alternative built for this n. **SetFit is registered with a pre-stated expectation of losing**: Beliveau et al. (2024), the closest published setting (non-English, small, imbalanced, domain-specific), found BERT-like > SetFit > LLM. Registering the expected loser in advance is what makes either outcome informative. Cost: three extra arms at matched budget, no extra annotation. |
+| 2026-08-08 | S3.4 — **calibration demoted from "hidden contribution" to descriptive** | Pipeline §3.4's reliability diagram keeps 10 bins and treats before/after ECE as a contribution. Amended: **5 bins, bootstrap CI, figure labelled descriptive**, and the pre-committed null statement *"calibration could not be established at this sample size"* if the ECE improvement is smaller than its own CI. Temperature scaling is kept and explicitly **not** upgraded to an adaptive method. | The dev slice is **82 rows** (recorded 2026-08-08, before any result). Ten bins gives ~8 samples per bin, so the ECE estimate is dominated by binning noise and a before/after delta on 82 rows cannot carry a claim. Keeping the *simple* calibrator is the literature's own recommendation at this n, not a concession: Balanya et al. (2022) show expressive calibrators fail under data scarcity while simple scaling stays robust, and Guo et al. (2025) attribute that failure to variance from insufficient validation data. **Consequence carried forward:** τ in §4.5 rests on this confidence, so τ is reported as a sensitivity curve rather than a point, and the existing Verifier-B sanity-check on the final τ becomes mandatory. |

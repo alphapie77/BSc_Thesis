@@ -226,3 +226,218 @@
   url    = {https://arxiv.org/abs/2110.14168},
   note   = {arXiv v2. Abstract + record only as of 2026-08-01.}
 }
+
+% =====================================================================
+% Phase 3 method citations -- added 2026-08-08 via Consensus.
+%
+% ⚠️ PROVENANCE OF THIS BLOCK, STATED ONCE FOR ALL 17 ENTRIES.
+% Every entry below comes from the Consensus index record: title, first
+% author, year, venue, citation count. NONE has been read in full, and
+% none has been opened beyond its abstract. Consequences:
+%   (a) Author lists are TRUNCATED to the first author + "and others".
+%       Co-authors were not in the record and have NOT been guessed.
+%   (b) arXiv eprint IDs, DOIs, volumes, numbers and pages are OMITTED
+%       rather than reconstructed from memory. An invented identifier is
+%       worse than a missing one -- it looks verified.
+%   (c) Every entry must be completed against the actual paper before
+%       submission. `docs/related_work.md` tracks read-status per entry.
+% =====================================================================
+
+@misc{bethard2022seeds,
+  title  = {We need to talk about random seeds},
+  author = {Bethard, Steven},
+  year   = {2022},
+  howpublished = {arXiv preprint},
+  note   = {22 citations. Opinion piece; surveys 85 ACL Anthology papers.
+            Consensus record only as of 2026-08-08 -- NOT read in full.
+            eprint ID and venue unverified.}
+}
+
+@inproceedings{gundersen2023conclusions,
+  title     = {On Reporting Robust and Trustworthy Conclusions from Model
+               Comparison Studies Involving Neural Networks and Randomness},
+  author    = {Gundersen, Odd Erik and others},
+  booktitle = {Proceedings of the 2023 ACM Conference on Reproducibility and
+               Replicability},
+  year      = {2023},
+  note      = {16 citations. Consensus record only as of 2026-08-08 -- NOT read
+               in full. Author list truncated; pages/DOI not recorded.}
+}
+
+@article{casola2022transformers,
+  title   = {Pre-trained transformers: an empirical comparison},
+  author  = {Casola, Silvia and others},
+  journal = {Machine Learning with Applications},
+  year    = {2022},
+  note    = {66 citations. Consensus record only as of 2026-08-08 -- NOT read in
+             full. Volume/pages/DOI not recorded; author list truncated.}
+}
+
+@misc{fu2023stability,
+  title  = {A Stability Analysis of Fine-Tuning a Pre-Trained Model},
+  author = {Fu, Zihao and others},
+  year   = {2023},
+  howpublished = {arXiv preprint},
+  note   = {4 citations. Consensus record only as of 2026-08-08 -- NOT read in
+            full. eprint ID unverified.}
+}
+
+% ⚠️ Venue UNKNOWN in the Consensus record ("Unknown Journal"). Do not state a
+% venue in the thesis until confirmed.
+@misc{xue2023reproducibility,
+  title  = {We Need to Talk About Reproducibility in {NLP} Model Comparison},
+  author = {Xue, Yan and others},
+  year   = {2023},
+  note   = {3 citations. Venue UNVERIFIED. Consensus record only as of
+            2026-08-08 -- NOT read in full. Cited in protocol.md as a
+            CONSIDERED-AND-REJECTED alternative (blocked 3x2 CV), so its
+            argument must be represented accurately before it appears in Ch.3.}
+}
+
+@article{laurer2023bertnli,
+  title   = {Less Annotating, More Classifying: Addressing the Data Scarcity
+             Issue of Supervised Machine Learning with Deep Transfer Learning
+             and {BERT-NLI}},
+  author  = {Laurer, Moritz and others},
+  journal = {Political Analysis},
+  year    = {2023},
+  note    = {266 citations. Consensus record only as of 2026-08-08 -- NOT read
+             in full. ⚠️ This entry justifies ADDING an arm to the S3.2
+             ablation; the +10.7--18.3 pp figure and the imbalanced-data claim
+             must be checked against the paper before either is quoted.}
+}
+
+@misc{tunstall2022setfit,
+  title  = {Efficient Few-Shot Learning Without Prompts},
+  author = {Tunstall, Lewis and others},
+  year   = {2022},
+  howpublished = {arXiv preprint},
+  note   = {312 citations. The SetFit paper. Consensus record only as of
+            2026-08-08 -- NOT read in full. eprint ID unverified.}
+}
+
+@misc{beliveau2024smalldata,
+  title  = {Classification of Radiological Text in Small and Imbalanced Datasets
+            in a Non-English Language},
+  author = {Beliveau, Vincent and others},
+  year   = {2024},
+  howpublished = {arXiv preprint},
+  note   = {2 citations. Closest published setting to ours (non-English, small,
+            imbalanced, domain-specific); reports BERT-like > SetFit > LLM.
+            Consensus record only as of 2026-08-08 -- NOT read in full.
+            ⚠️ Load-bearing: it is the stated basis for pre-registering SetFit
+            as an EXPECTED LOSER. Read before the S3.2 result is written up.}
+}
+
+@article{balanya2022adaptivetemp,
+  title   = {Adaptive temperature scaling for robust calibration of deep neural
+             networks},
+  author  = {Balanya, Sergio A. and others},
+  journal = {Neural Computing and Applications},
+  year    = {2022},
+  note    = {73 citations. Consensus record only as of 2026-08-08 -- NOT read in
+             full. Cited for the claim that expressive calibrators fail under
+             data scarcity while simple scaling stays robust.}
+}
+
+@misc{guo2025smart,
+  title  = {Sample Margin-Aware Recalibration of Temperature Scaling},
+  author = {Guo, Haolan and others},
+  year   = {2025},
+  howpublished = {arXiv preprint},
+  note   = {2 citations. Cited only for its statement of the bias/variance
+            dilemma under insufficient validation data -- we do NOT adopt SMART.
+            Consensus record only as of 2026-08-08 -- NOT read in full.}
+}
+
+@misc{bucher2024finetuned,
+  title  = {Fine-Tuned 'Small' {LLMs} (Still) Significantly Outperform Zero-Shot
+            Generative {AI} Models in Text Classification},
+  author = {Bucher, Martin and others},
+  year   = {2024},
+  howpublished = {arXiv preprint},
+  note   = {122 citations. Consensus record only as of 2026-08-08 -- NOT read in
+            full.}
+}
+
+% --- Bangla backbone comparisons: the four that disagree ---------------
+% These six entries are cited TOGETHER and only together. The point they make
+% is that the field reports different winners, including on the SAME dataset
+% (hassin2026 vs mazumder2025 both use BanglaBlend). No single one of them may
+% be cited as establishing a winner.
+
+@inproceedings{hasan2025banglaemotion,
+  title     = {Emotion Classification in {Bangla}: A Comprehensive Comparison of
+               {BanglaBERT}, {mBERT}, and {XLM-RoBERTa} with Error Analysis and
+               Significance Testing},
+  author    = {Hasan, Md Riaz and others},
+  booktitle = {2025 9th International Symposium on Multidisciplinary Studies and
+               Innovative Technologies (ISMSIT)},
+  year      = {2025},
+  note      = {1 citation. Reports BanglaBERT best (0.83 acc / 0.83 macro-F1) on
+               7,200 sentences, confirmed by PAIRED BOOTSTRAP tests -- the
+               precedent for our S3.2 decision rule. Consensus record only as of
+               2026-08-08 -- NOT read in full.}
+}
+
+@inproceedings{mitra2025muril,
+  title     = {Exploring {MuRIL} for Emotion Detection in {Bangla} Text},
+  author    = {Mitra, Sudipto Kumar and others},
+  booktitle = {2025 IEEE 4th International Conference on Robotics, Automation,
+               Artificial-Intelligence and Internet-of-Things (RAAICON)},
+  year      = {2025},
+  note      = {0 citations. Reports MuRIL at 92%, above BOTH BanglaBERT and
+               XLM-R. Consensus record only as of 2026-08-08 -- NOT read in
+               full. ⚠️ 0 citations and a claimed 92% -- treat the number with
+               caution and do not repeat it without reading the setup.}
+}
+
+@inproceedings{hassin2026banglablend,
+  title     = {Banglablend Based Evaluation of {Bengali} Formal and Colloquial
+               Text Classification},
+  author    = {Hassin, Farhan and others},
+  booktitle = {2026 IEEE 2nd International Conference on Quantum Photonics,
+               Artificial Intelligence \& Networking (QPAIN)},
+  year      = {2026},
+  note      = {0 citations. XLM-R 94% > BanglaBERT 93.4% on BanglaBlend (7,350
+               instances). Consensus record only as of 2026-08-08 -- NOT read in
+               full.}
+}
+
+@inproceedings{mazumder2025banglaforms,
+  title     = {Transformer-Based Approach for Accurately Identifying Saint and
+               Common Forms of {Bangla} Language},
+  author    = {Mazumder, Samiul Karim and others},
+  booktitle = {2025 IEEE International Women in Engineering (WIE) Conference on
+               Electrical and Computer Engineering (WIECON-ECE)},
+  year      = {2025},
+  note      = {0 citations. IndicBERTv2 95.44% > XLM-R 94.63% > BanglaBERT
+               93.61% on the SAME BanglaBlend data as hassin2026, which reports
+               a different ordering. That disagreement is the citation's whole
+               purpose. Consensus record only as of 2026-08-08 -- NOT read in
+               full.}
+}
+
+@article{hasan2023banglawar,
+  title   = {Natural Language Processing and Sentiment Analysis on {Bangla}
+             Social Media Comments on {Russia-Ukraine} War Using Transformers},
+  author  = {Hasan, Mohammad and others},
+  journal = {Vietnam Journal of Computer Science},
+  year    = {2023},
+  note    = {41 citations. BanglaBERT best over XLM-R base/large, DistilmBERT,
+             mBERT on 10,861 comments (86% acc, 0.82 F1). Consensus record only
+             as of 2026-08-08 -- NOT read in full.}
+}
+
+@inproceedings{mukherjee2023blp,
+  title     = {{UFAL-ULD} at {BLP-2023} Task 2: Sentiment Classification in
+               {Bangla} Text},
+  author    = {Mukherjee, Sourabrata and others},
+  booktitle = {Proceedings of the First Workshop on Bangla Language Processing
+               (BLP-2023)},
+  year      = {2023},
+  note      = {0 citations. XLM-R base outperformed BanglaBERT for this team.
+               ⚠️ Ranked 19th of 30 -- a weak system, so this is evidence that
+               the ordering is not stable, NOT evidence that XLM-R is better.
+               Consensus record only as of 2026-08-08 -- NOT read in full.}
+}

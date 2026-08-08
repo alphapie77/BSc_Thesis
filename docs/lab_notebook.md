@@ -2461,3 +2461,150 @@ in band (6,8], Test C +7.2 pp.
   that puts this design on the supported side of the critique. ⚠️ not yet added.
 - Miller et al. (2024), Nasution et al. (2024), El Assadi et al. (2025) — needed
   only if the LLM supplement is run.
+
+---
+
+## 2026-08-08 -- S3.2-prereg: Phase 3 opened: S3.2/S3.4 pre-registered, ablation code written, nothing run
+**Feeds:** Ch.3 methods, RQ2
+**Commit:** `ca88aa8fcd769882574d733e8c6bcd3a90c74444-dirty`
+**Artifacts:** `docs/protocol.md` §"S3.2 pre-commitment" + §"S3.4 pre-commitment";
+`configs/s3_backbone.yaml`; `src/verifier/{split_access,compare,backends,s3_backbone_ablation}.py`;
+`tests/test_s3_backbone.py`; `notebooks/s3_backbone_kaggle.ipynb`.
+**No file in `results/` — nothing has been run.** The dry-run artifacts were
+generated, checked, and deleted; a stub's output does not belong in `results/`.
+
+### Numbers
+
+Four counts were computed directly against the frozen split and the region-A
+K=2 assignments, and **all four match what `STATUS.md` recorded on 2026-08-08**,
+which is the first independent confirmation of them:
+
+| Quantity | Value |
+|---|---|
+| Verifier-A train (R1 ∖ dev, labelled) | **804** — 481 / 323 |
+| dev (⊂ R1, labelled) | **82** — 53 / 29 |
+| Verifier-B train (R2, labelled) | **888** — 531 / 357 |
+| G-300 rows carrying a `cluster_k2` label | **123** — 78 / 45 |
+| R1 rows labelled at all | 886 of 2,162 (**41.0%**) — the rest are region B |
+
+Ablation size: 7 arms × 2 learning rates × 5 seeds = **70 fine-tuning runs**.
+Test suite for this step: **20 tests, all passing**. The dry run completes in
+~29 s on CPU, of which nearly all is the 21 × 10,000 bootstrap resamples.
+
+### Decisions made (and why)
+
+- **The S3.2 winner is decided by a paired bootstrap, not by the best
+  mean ± SD across seeds — reversing what this notebook committed to one day
+  earlier.** Alternative considered and used until today: "mean ± SD over ≥ 3
+  seeds", logged in the 2026-08-08 Phase-3 deviation. Bethard (2022) surveys 85
+  ACL Anthology papers and classifies *varying only the seed to build score
+  distributions for performance comparison* as a **risky** use of seeds, while
+  listing sensitivity measurement as safe. Our rule was the risky one, almost
+  verbatim. Seeds go to 5 (Gundersen et al. 2023 on small effect sizes), variance
+  is reported as sensitivity, and the decision moves to a paired bootstrap with
+  BH correction over the 21 pairs. Reasoning is Claude's; the literature search
+  that produced it was Sabbir's standing instruction.
+- **Three arms added: IndicBERTv2, SetFit (LaBSE body), BERT-NLI.** Approved by
+  Sabbir, 2026-08-08. Alternative was the pipeline's four arms unchanged, which
+  needs no deviation. Claude's argument for the change: the four specified arms
+  are all full fine-tuning, which is the weakest regime at n = 804, and they do
+  not span the candidate space the recent literature names. ⬛ **Sabbir's own
+  reasoning for approving is not recorded here, because he was not asked for it
+  — it was a delegated choice presented with a recommendation. Recorded as
+  delegated, not as his argument.**
+- **Blocked 3×2 cross-validation (Xue et al. 2023) considered and rejected.**
+  Sabbir's call, 2026-08-08. It has the better signal-to-noise property and
+  would relieve the n = 82 dev bottleneck, but re-draws the train/dev boundary
+  inside R1. **The reason, as confirmed by Sabbir on 2026-08-08:** *the frozen
+  split map is the thesis's strongest reproducibility claim — committed to git,
+  pinned by `tests/test_split_map.py`, and never regenerated — and it is not
+  worth disturbing for a statistical improvement.*
+  ⚠️ **Provenance of that sentence, stated so it is not mistaken for
+  spontaneous testimony:** Claude drafted the wording and asked whether it
+  matched his thinking; Sabbir confirmed it. It is his position, in Claude's
+  words, endorsed rather than authored. That distinction matters if he is ever
+  asked to defend it in his own terms.
+- **Calibration (S3.4) demoted from "hidden contribution" to descriptive.**
+  Claude's, uncontested. At 82 dev rows a 10-bin reliability diagram holds ~8
+  samples per bin. Alternative was to keep the pipeline's framing and defend it;
+  that defence does not exist. Temperature scaling is **kept and deliberately
+  not upgraded**, which is the literature's own recommendation at this n
+  (Balanya et al. 2022), not a concession.
+- **`TIE` pre-registered as the most likely S3.2 outcome, and as publishable.**
+  This is a decision, not a hedge: it fixes in advance that a tie is reported as
+  the result and broken on stated non-performance grounds, so that a tie cannot
+  later be quietly resolved by picking whichever arm read best.
+- **The R1/R2/G wall was moved from convention into code.** `split_access.py`
+  takes a *role*, not a partition name, so no caller can request R2 for the
+  in-loop verifier. Alternative was to keep relying on everyone remembering
+  inviolable rules 4 and 6. The rules have held so far; they had no enforcement.
+
+### Findings (things we did not expect)
+
+- 🎁 **The Bangla literature does not agree on a backbone winner, and two papers
+  disagree on the *same dataset*.** `hassin2026banglablend` reports XLM-R 94% >
+  BanglaBERT 93.4% on BanglaBlend; `mazumder2025banglaforms` reports IndicBERTv2
+  95.44% > XLM-R > BanglaBERT on BanglaBlend. `mitra2025muril` has MuRIL beating
+  both. **Pipeline §3.2 framed the ablation as confirming an expected BanglaBERT
+  win; it is not confirmatory, and "BanglaBERT because it is Bangla-native"
+  cannot be defended by citation at all.** This makes the ablation load-bearing
+  and makes its outcome genuinely unknown, which is the condition under which
+  pre-registering was worth the effort.
+- 🔴 **We wrote a protocol rule on 2026-08-07 that the methodology literature
+  had already classified as bad practice.** Found by searching, one day later,
+  before anything ran — but it is the second time the standing Consensus
+  instruction has caught something after the fact rather than before (the first
+  was the G-300 rating scale). The instruction works; the habit of searching
+  *before* writing the rule still does not.
+- ⚠️ **The dry run was not reproducible on its first attempt.** The stub used
+  the builtin `hash()`, which Python randomises per process; `set_seed()`'s
+  `PYTHONHASHSEED` assignment cannot fix that, because the interpreter reads
+  that variable at startup. Fixed with `zlib.crc32`. Nothing scientific
+  depended on it — but the same trap would apply to any future use of `hash()`
+  for a deterministic choice anywhere in this repo, and it was invisible until
+  the dry run was executed **twice**. Running it once would have shown a clean
+  result.
+
+### Consequences for downstream steps
+
+- **S3.2 may not be run until this is committed**, since the pre-registration
+  is only a pre-registration if it precedes the run in the history.
+- **§3.3's dual-accuracy table stays impossible** (deviation of 2026-08-08).
+  The S3.2 winner is selected on **label reproduction, not validity**, and the
+  generated report says so on its own face rather than only in the thesis.
+- **τ in §4.5 now inherits a weakened calibration.** τ becomes a sensitivity
+  curve rather than a point, and §4.2's Verifier-B sanity-check on the final τ
+  is promoted from advisory to mandatory.
+- **Pipeline §3.2 and §3.4 are both now wrong as written** (four arms; ten-bin
+  ECE as a contribution). Deviations are logged; the spec text itself is still
+  unedited, consistent with the existing policy of not editing
+  `research_pipeline_en.md` piecemeal.
+- **`protocol.md` §S3.2 and §S3.4 are frozen from the moment S3.2 runs.**
+  Neither may be edited afterwards.
+- Kaggle budget risk: 70 fine-tuning runs against a 12 h session cap. If split,
+  split **by arm, never by seed** — splitting by seed would put an arm's seeds
+  in two environments and make its SD a mixture of two things.
+
+### Citations needed
+
+17 entries added to `references.bib` and `related_work.md` §Tier 5 on
+2026-08-08. ⚠️ **All 17 are Consensus index records; none has been read in
+full, none carries a DOI or eprint ID, and author lists are truncated to the
+first author.** Nothing was reconstructed from memory. Read-status is `[ ]` for
+every one of them.
+
+Three are **load-bearing** and must be read before the S3.2 result is written up,
+because each is the sole support for a design decision:
+
+- `bethard2022seeds` — why the decision rule is not mean ± SD.
+- `laurer2023bertnli` — why the BERT-NLI arm was added; the +10.7–18.3 pp figure
+  is quoted from an abstract and must be checked.
+- `beliveau2024smalldata` — why SetFit is registered as an expected loser.
+
+⚠️ Four of the six Bangla backbone papers have **0 citations** and are 2025–26
+conference papers. They are adequate to show that *the field disagrees* and are
+used for nothing else; `mukherjee2023blp` in particular ranked 19th of 30 and is
+explicitly not evidence that XLM-R is better.
+
+⬛ Still outstanding from the 2026-08-08 RQ1-H entry above: Chang et al. (2009),
+Kiritchenko & Mohammad (2017), Eklund et al. (2025) — **not yet added**.

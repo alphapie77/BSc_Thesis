@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-08 (**RQ1 WINS** — the split is humanly perceptible) · **Phase:** 1 COMPLETE → 2 (persona discovery)
+**Last updated:** 2026-08-08 (**Phase 3 opened** — S3.2 and S3.4 pre-registered) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -31,6 +31,7 @@
 | 5l | **RQ1-G — region B replication** | ⚠️ **RUN 2026-08-08. NO REPLICATION** (pre-registered outcome 2). K = 2 matched (PS **0.818**, bootstrap ARI **0.962**) but the **signature did not**: `length_auc` 0.550 → `NOT_LENGTH` (A was 0.676 → `LENGTH_CONFOUNDED`), richness inversion holds in **1 of 4** bands (A: 4/4). 🎁 **The more useful finding:** B's cut is a near-perfect 49.4/50.6 bisection correlating with **nothing measurable** — every surface AUC 0.50–0.58, ARI vs Sentiment 0.011, silhouette 0.039, HDBSCAN noise 96.7% — **yet it clears PS ≥ 0.80.** Region B is a **negative control showing the pre-registered stability rule can pass a contentless cut.** | `results/s2d_ktable_regionB.md`, `s2e/s2f_regionB_*` | 2026-08-08 |
 | 5m | **RQ1-H — human validation, attempt 2** | ✅ **RUN 2026-08-08. `HUMANLY_PERCEPTIBLE` — RQ1 WINS.** Gate A: **39/50 (0.780)** and **42/50 (0.840)** against a chance rate of **0.25**, p < 1e-15, far above the pre-registered 0.45. Gate B: both **34/40 (0.850)** vs chance 0.50 → **the construct IS specificity**. Obtained with **length matched to within 2 words** — and a length heuristic scores **0.16, below chance**, so the strongest confound is not merely controlled but inverted. Inter-annotator 70%/75%; agreement matches the 0.667 expected under independent errors, so no lockstep. 🎁 **Both annotators reported the items looked alike — then scored 0.78/0.84.** An implicit stylistic distinction: real, perceptible, not articulable. That is also why attempt 1 failed — rating an unnameable property is far harder than spotting the odd one out. | `results/intrusion_agreement.md`, `results/intrusion_responses.csv` | 2026-08-08 |
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
+| 7 | **S3.2 + S3.4 pre-registration** — Phase 3 opened | ✅ **WRITTEN 2026-08-08, before any backbone was downloaded.** Ablation goes **4 → 7 arms** (+IndicBERTv2, +SetFit, +BERT-NLI), **5 seeds not 3**, and the winner is decided by **paired bootstrap**, not by best mean ± SD. 🔴 **The literature contradicted our own protocol from the day before:** Bethard (2022) names "vary the seed to build a score distribution for model comparison" as a *risky* use of seeds — exactly what we had committed to. Calibration demoted from "hidden contribution" to **descriptive** (dev = 82 rows; 10 bins ≈ 8 samples/bin). 🎁 **The ablation's most likely outcome is pre-registered as a tie**, because the 2025–26 Bangla literature reports **three different winners on the same dataset** — so "BanglaBERT because it is Bangla-native" cannot be defended by citation, and a tie is registered as publishable. | `docs/protocol.md` §S3.2, §S3.4 | 2026-08-08 |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
@@ -114,8 +115,8 @@ edited until the final `usable_n` is known (see Open decisions).
 |---|---|---|---|
 | ~~**0**~~ | ~~Where did rows 1999–4999 come from?~~ **CLOSED 2026-07-30 — unresolvable, and correctly so.** Collector's account: many different sources, all organic user comments, **no memory of which rows came from where and no metadata retained**. Nothing further can be recovered; the file has no venue, thread or timestamp column (fact (c)) and no collection log exists (fact (a)). **The measurement (fact (split)) and the collector's account are both recorded and they are not reconciled** — that is the honest end state, not a failure. Nothing downstream stays blocked on it. | — | closed |
 | ~~**0b**~~ | ~~region A only, full corpus, or the split as the object of study?~~ **CLOSED 2026-07-30 — Sabbir: full corpus.** Conditions are pre-registered in `protocol.md` §"Scope decision": region becomes a **controlled factor**, the split stratifies on `Sentiment × region`, every headline metric is reported full / A / B, and no claim survives that does not survive within-region. Region A is retained as a robustness check, not the main line. | — | closed |
-| 1 | Final `usable_n` after near-dup removal | Step 4 | blocked by 0 |
-| 2 | Near-dup threshold: 0.90 gives Band 2, 0.95 and 0.98 give Band 1. Held at the pre-registered **0.95**; audit sheet generated and parked, since 52% of the contested band is class 2 | Step 4 | blocked by 0 |
+| ~~**1**~~ | ~~Final `usable_n` after near-dup removal~~ ✅ **CLOSED 2026-08-08 — answered, and the answer has been in the file since 2026-08-01.** `usable_n` = **4,625** at the pre-registered t = 0.95 (105 rows removed), which is what the frozen split map partitions. The row said "blocked by 0", but decision 0 closed on 2026-07-30 and the split froze on 2026-08-01; nobody came back to close this. **Housekeeping failure, recorded rather than tidied away** — an open-decision table that lists settled questions is a table people stop reading. | — | ✅ closed |
+| ~~**2**~~ | ~~Near-dup threshold: 0.90 gives Band 2, 0.95 and 0.98 give Band 1~~ ✅ **CLOSED 2026-08-08 — held at the pre-registered 0.95, and never revisited.** The audit sheet (`s2_threshold_audit_sheet.csv`, 38 items) was generated and **deliberately never annotated**: 52% of the contested band is class 2, i.e. region B, and the region split (fact (split)) made the threshold question downstream of a larger one. The threshold was not tuned, and no result depends on the choice between 0.95 and 0.98. Same "blocked by 0" staleness as decision 1. | — | ✅ closed |
 | 3 | ~~Do personas survive the trap-check?~~ **ANSWERED 2026-07-31.** On the full corpus the clusters are a **corpus detector** (93.3% accuracy) — no persona claim stands there. In region A they are non-degenerate, Band 1, but sentiment-ordered with V=0.5455. **Persona discovery moves inside region A; G-300 decides whether the mixed middle cluster is a persona.** | RQ1 claim | closed |
 | 4 | Correct the S0 table in the pipeline spec | — | after 1–2 |
 | 5 | Frame the register finding in the **stylometry / authorship** literature or the **machine-generated-text detection** literature? Writing decision, Sabbir's | Ch.2, Ch.4 | Sabbir |
@@ -126,7 +127,7 @@ edited until the final `usable_n` is known (see Open decisions).
 | ~~**14**~~ | ~~Phase 3 + RAG scope~~ ✅ **CLOSED 2026-08-05 — option (a): region A only, n = 804.** Sabbir delegated the choice; the reasoning is Claude's and is recorded as such in `protocol.md` §"Scope decision: Verifier-A and the RAG index run on region A only". Option (b) survives as a **pre-registered robustness check** with all three outcomes pre-committed. ⚠️ **Cost, stated not buried: RQ1-B as written cannot run** — it needs region-B persona labels, which do not exist. It is **re-scoped to sentiment classification**, a task both regions support with real labels; its purpose (*"the register gap, quantified"*) and its three outcome bands carry over unchanged. **No claim about persona transfer across regions may be made.** | Phase 3, Phase 4, RQ2 | ✅ closed |
 | ~~**14-old**~~ | ~~**Phase 3 + RAG scope: only 41% of R1 has a persona label.**~~ Verifier-A trains on persona labels and the RAG index retrieves *within the same persona label* (pipeline §4.2), but the K=2 partition exists **only in region A** — 804 of 1,962 R1 rows. Three options, and it is a scope call, not a statistic's: **(a)** run Verifier-A and the RAG index on **region A only** (n=804) — clean, consistent with "persona discovery moved inside region A", costs sample size; **(b)** propagate labels to region B by nearest region-A centroid → n=1,962, but every B label is an extrapolation and the register confound re-enters the training set; **(c)** cluster region B separately → different personas, comparability gone. **Recommended: (a), with (b) as a pre-registered robustness check.** Whichever is chosen must be registered *before* Verifier-A is trained. | Phase 3, Phase 4, **RQ2** | 🔴 **Sabbir** |
 | 15 | Should `s2_pilot.py` also persist **UMAP coordinates** for the Ch.4 figure? Cheap to add, and re-running the embedding later just to draw a picture is wasteful. ⚠️ Inviolable rule 9 stands regardless: **UMAP is visualisation-only, never a clustering space.** *(Migrated 2026-08-05 from a duplicate table in `lab_notebook.md`, which was the only place it lived and had already gone stale.)* | Ch.4 figures | 🔵 open |
-| 8 | If open decision 0 returns "region B was generated", does the thesis **exclude** it, **keep** it as a labelled condition, or **make the contrast the contribution**? Different from 0b, which only settled the corpus | Ch.1 framing | after 0 |
+| ~~**8**~~ | ~~If open decision 0 returns "region B was generated", does the thesis exclude it, keep it as a labelled condition, or make the contrast the contribution?~~ ✅ **CLOSED 2026-08-08 — the antecedent can never be satisfied.** Decision 0 closed on 2026-07-30 as *unresolvable*: the collector does not remember which rows came from where, no metadata was kept, and the file has no venue, thread or timestamp column. **"Region B was generated" is a question the evidence cannot answer, so a decision conditioned on that answer cannot be taken.** What actually happened is recorded and is stronger than the conditional: region B is **kept as a labelled condition** (decision 0b, full corpus, region as a controlled factor), and RQ1-G then made the contrast genuinely useful — region B is a **negative control** showing the pre-registered stability rule can pass a contentless cut. The provenance question stays in Limitations, unresolved and labelled as such. | Ch.1 framing | ✅ closed |
 | ~~6~~ | ~~Should `s2_pilot.py` persist cluster assignments?~~ | — | ✅ done 2026-07-31 |
 | **9** | **Add an inference-cost-matched baseline to §5.1?** Huang et al. §6 require self-correction to be compared against baselines *of comparable inference cost*. Our rows 1–3 are single-call while 4–8 loop, so "row 6 beats row 1" may be partly a call-count effect. They also name **self-consistency / best-of-N at matched calls** as the strong baseline — our table has none. | §5.1 ablation, **the RQ2 headline** | 🔴 **Sabbir** — changes a pre-registered design |
 | **11** | **Add row 7b — self-critique under an EXTERNAL role label?** The Self-Correction Illusion (arXiv 2606.05976) reports that relabelling a byte-identical claim from the model's own `<thought>` to a `user`/`tool`/`<memory>` role lifts correction rates by **23–93 pp**, and builds a training-free intervention on it. If 7b ≈ row 6, our trained verifier is not earning its cost — *a publishable negative result we would rather find ourselves*. If 6 > 7b, the contribution survives the cheapest known alternative. | §5.1, **the RQ2 claim** | 🔴 **Sabbir** |
@@ -135,6 +136,34 @@ edited until the final `usable_n` is known (see Open decisions).
 ---
 
 ## Immediate next actions
+
+**Phase 3 is open and pre-registered (2026-08-08).** Order of work:
+
+1. ✅ **S3.2 / S3.4 pre-registration written** — 7 arms, 5 seeds, paired
+   bootstrap, calibration descriptive. Nothing in those two sections may be
+   edited once the first run happens.
+2. ⬛ **Citations** — the 16 method references behind the amendments go into
+   `related_work.md` and `references.bib`, each verified through Consensus.
+3. ⬛ **`src/verifier/s3_backbone_ablation.py` + `configs/s3_backbone.yaml` +
+   tests.** Tests pin the outcome bands to the pre-registration, mirroring
+   `test_s2_verdict.py`. Must draw exactly **804 / 82** rows and must be unable
+   to read R2 or G-300.
+4. ⬛ **CPU dry-run at a tiny budget before any GPU time** — verify the split
+   contract and bit-identical reruns at a fixed seed.
+5. ⬛ **Kaggle runner notebook**, then the real run; `env_snapshot_s3_kaggle.json`
+   is mandatory (fact (env)).
+6. 🟡 **`protocol.md` freeze + supervisor signature** (step 6) is now the oldest
+   outstanding item and nothing blocks it.
+
+⚠️ **Still Sabbir's, and none of it blocks Phase 3:** decision 12 (title and
+whether *persona* is permitted again, reopened by RQ1-H), decision 13 (Unicode),
+decision 5 (stylometry vs MGT framing), decisions 9/10/11 (they block **Phase 5**,
+not Phase 3), the CC BY-SA attribution checklist, and — the highest-risk item in
+this file — **reading the six base papers, none of which Sabbir has read.**
+
+---
+
+### Superseded note (pre-2026-08-08)
 
 **Nothing is blocked any more.** The provenance question is closed as
 unresolvable, the scope decision is made (full corpus), and the code for the

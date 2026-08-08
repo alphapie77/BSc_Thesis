@@ -1,0 +1,84 @@
+# S3.2 -- verifier backbone ablation.
+# Pre-registered in docs/protocol.md section "S3.2 pre-commitment".
+# One config = one YAML = one result file. Editing the arms, seeds, or the
+# decision rule below without first editing protocol.md is a protocol breach,
+# and tests/test_s3_backbone.py checks the two agree.
+
+step: S3.2
+role: A            # trains the in-loop verifier -> R1. "B" would draw R2.
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  # region-A K=2 labels. NOT results/s2_cluster_assignments.csv -- those
+  # clusters are a corpus detector, not the persona-candidate partition.
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+
+expected:
+  # Verified by computation on 2026-08-08. The script asserts these and refuses
+  # to run if the data has moved -- a silently different n would make every
+  # number in the results table incomparable with the pre-registration.
+  train_n: 804
+  train_class_counts: {0: 481, 1: 323}
+  dev_n: 82
+  dev_class_counts: {0: 53, 1: 29}
+
+arms:
+  - key: banglabert
+    model: csebuetnlp/banglabert
+    kind: finetune
+    note: Bangla-native ELECTRA; the pipeline's default.
+  - key: xlmr
+    model: xlm-roberta-base
+    kind: finetune
+    note: without beating it, "a Bangla-specific model is needed" collapses.
+  - key: muril
+    model: google/muril-base-cased
+    kind: finetune
+    note: beat both BanglaBERT and XLM-R in Mitra et al. 2025.
+  - key: mbert
+    model: bert-base-multilingual-cased
+    kind: finetune
+    note: historical baseline.
+  - key: indicbertv2
+    model: ai4bharat/IndicBERTv2-MLM-only
+    kind: finetune
+    note: top scorer in Mazumder et al. 2025 on a Bangla style task.
+  - key: setfit_labse
+    model: sentence-transformers/LaBSE
+    kind: setfit
+    note: >-
+      registered with a PRE-STATED EXPECTATION OF LOSING (Beliveau et al. 2024
+      found BERT-like > SetFit > LLM in the closest published setting). It is
+      here because an expected loser that loses is evidence and one that wins is
+      a finding.
+  - key: bert_nli
+    model: MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7
+    kind: nli_transfer
+    note: >-
+      Laurer et al. 2023 report +10.7-18.3 pp over classical models at
+      100-2500 training texts, particularly on imbalanced data. Ours is 804
+      rows at ~40% minority.
+
+training:
+  seeds: [42, 43, 44, 45, 46]     # 5, not 3 -- see the 2026-08-08 deviation.
+  learning_rates: [2.0e-5, 3.0e-5]
+  epochs: 4
+  batch_size: 16
+  max_length: 128                 # median review is 8 words; 128 is generous.
+
+decision:
+  rule: paired_bootstrap          # NOT best mean +/- SD (Bethard 2022).
+  n_resamples: 10000
+  alpha: 0.05
+  correction: benjamini_hochberg
+  # Pre-registered tie-break, declared before any number exists: smallest
+  # parameter count first, then the pipeline default. Applied ONLY when the
+  # bootstrap returns TIE, and reported as "not determined by the data".
+  tie_break: [smallest_params, banglabert]
+
+outputs:
+  results_md: results/s3_backbone_ablation.md
+  results_json: results/s3_backbone_ablation.json
+  per_seed_csv: results/s3_backbone_per_seed.csv
+  predictions_csv: results/s3_backbone_dev_predictions.csv

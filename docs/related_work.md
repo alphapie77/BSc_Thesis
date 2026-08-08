@@ -310,6 +310,78 @@ ablation is right to separate them.
 | `sentigold2023` | arXiv 2306.06147 | Public-API collection + anonymization + non-commercial academic licence |
 | `toxlexbn2022` | Data in Brief 2022 | Dedupe + anonymize → Mendeley release path |
 
+## Tier 5 — Phase 3 method citations (added 2026-08-08)
+
+> **Read status: every entry below is `[ ]` — not read.** They came from a
+> Consensus search on 2026-08-08 and exist as index records plus abstracts. They
+> are listed here because `protocol.md` §S3.2 and §S3.4 now *rest on them*, and
+> the rule of this file is that nothing is cited without an entry. **The rule
+> that entries are filled only when read still holds** — these are placeholders
+> carrying their own warning, not completed entries.
+>
+> ⚠️ **Three of them are load-bearing and must be read before the S3.2 result is
+> written up**, because each is the sole basis for a design decision:
+> `bethard2022seeds` (why the decision rule is not mean ± SD),
+> `laurer2023bertnli` (why an arm was added), and `beliveau2024smalldata` (why
+> SetFit is registered as an expected loser).
+
+### 5a — Experimental methodology: seeds, variance, model comparison
+
+| Key | Source | What it is used for | Read |
+|---|---|---|---|
+| `bethard2022seeds` | Bethard 2022, arXiv (22 cit.) | 🔴 **Load-bearing.** Names "vary only the seed to build score distributions for performance comparison" a **risky** use, and sensitivity measurement a **safe** one. This is why S3.2's winner is decided by paired bootstrap, not by best mean ± SD. **It contradicted our own protocol of 2026-08-07.** | `[ ]` |
+| `gundersen2023conclusions` | Gundersen et al. 2023, ACM REP (16 cit.) | Small effect sizes + few repetitions → wrong conclusions. Supports 5 seeds over 3. | `[ ]` |
+| `casola2022transformers` | Casola et al. 2022, *Machine Learning with Applications* (66 cit.) | Only ~20% of transformer papers report multiple runs; low robustness to seed and hyperparameters. | `[ ]` |
+| `fu2023stability` | Fu et al. 2023, arXiv (4 cit.) | Theoretical stability bound for full fine-tuning vs head tuning — the mechanism behind the instability we are guarding against at n=804. | `[ ]` |
+| `xue2023reproducibility` | Xue et al. 2023, venue ⚠️ unverified (3 cit.) | **Cited as a rejected alternative.** Recommends blocked 3×2 CV over repeated standard splits on SNR grounds; rejected 2026-08-08 because it re-draws the train/dev boundary inside R1. Must be represented fairly, which means reading it. | `[ ]` |
+
+### 5b — Small-n classification: the two added arms
+
+| Key | Source | What it is used for | Read |
+|---|---|---|---|
+| `laurer2023bertnli` | Laurer et al. 2023, *Political Analysis* (266 cit.) | 🔴 **Load-bearing.** +10.7–18.3 pp over classical models at 100–2,500 training texts, *particularly on imbalanced data*. Sole justification for adding the BERT-NLI arm. Our case: 804 rows, ~40% minority. | `[ ]` |
+| `tunstall2022setfit` | Tunstall et al. 2022, arXiv (312 cit.) | The SetFit method itself — prompt-free contrastive fine-tuning of a Sentence Transformer. Our LaBSE body is already in the pipeline. | `[ ]` |
+| `beliveau2024smalldata` | Beliveau et al. 2024, arXiv (2 cit.) | 🔴 **Load-bearing.** Closest published setting to ours — non-English, small, imbalanced, domain-specific — and finds **BERT-like > SetFit > LLM**. Sole basis for pre-registering SetFit as an *expected loser*, which is what makes either S3.2 outcome informative. | `[ ]` |
+| `bucher2024finetuned` | Bucher et al. 2024, arXiv (122 cit.) | Fine-tuned small models beat zero-shot generative models in classification. Supporting, not load-bearing. | `[ ]` |
+
+### 5c — Calibration at small n
+
+| Key | Source | What it is used for | Read |
+|---|---|---|---|
+| `balanya2022adaptivetemp` | Balanya et al. 2022, *Neural Computing and Applications* (73 cit.) | Expressive calibrators fail under data scarcity; simple scaling stays robust. Why S3.4 **keeps** plain temperature scaling rather than upgrading it. | `[ ]` |
+| `guo2025smart` | Guo et al. 2025, arXiv (2 cit.) | Cited **only** for its statement of the bias/variance dilemma under insufficient validation data. We do not adopt SMART. | `[ ]` |
+
+### 5d — The Bangla backbone disagreement
+
+> **These six are cited together and only together.** Individually each looks
+> like a result; together they are the argument. Two of them (`hassin2026`,
+> `mazumder2025`) use the **same BanglaBlend dataset** and report a **different
+> ordering**. That is the point: "BanglaBERT because it is Bangla-native" cannot
+> be defended by citation, so the S3.2 ablation has to do the work.
+>
+> ⚠️ **Citation-count health check, stated rather than hidden:** four of these
+> six have **0 citations** and are 2025–2026 conference papers. They are
+> adequate as evidence that *the field disagrees* — a disagreement needs only
+> that the claims were made and published. They are **not** adequate as evidence
+> that any particular model is best, and none is used that way.
+
+| Key | Reported winner | Dataset / n | Cit. | Read |
+|---|---|---|---|---|
+| `hasan2025banglaemotion` | BanglaBERT (0.83) | Bangla emotion, 7,200 | 1 | `[ ]` |
+| `hasan2023banglawar` | BanglaBERT (86%) | Bangla sentiment, 10,861 | 41 | `[ ]` |
+| `mitra2025muril` | **MuRIL** (92%) — beats both | Bangla emotion | 0 | `[ ]` |
+| `hassin2026banglablend` | **XLM-R** (94%) > BanglaBERT (93.4%) | **BanglaBlend, 7,350** | 0 | `[ ]` |
+| `mazumder2025banglaforms` | **IndicBERTv2** (95.44%) > XLM-R > BanglaBERT | **BanglaBlend — same data** | 0 | `[ ]` |
+| `mukherjee2023blp` | XLM-R > BanglaBERT | BLP-2023 shared task | 0 | `[ ]` |
+
+⚠️ `mukherjee2023blp` ranked **19th of 30** in that shared task. It is evidence
+that the ordering is unstable across teams, **not** evidence that XLM-R is
+better, and it is never to be cited as the latter.
+
+`hasan2025banglaemotion` additionally supplies the **methodological precedent**
+for our decision rule: it settles the same comparison in the same language with
+a **paired bootstrap test**.
+
 ---
 
 ## Gap table — the sentence Ch.2 must end with
