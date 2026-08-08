@@ -1,4 +1,4 @@
-"""GATE G1 — the master K-table on region A.
+"""GATE G1 — the master K-table on one region.
 
     python -m src.cluster.s2d_ktable --config configs/s2d_ktable.yaml
 
@@ -35,6 +35,22 @@ from src.common.provenance import NEWLINE, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
 NO_STABLE_K = "NO_STABLE_K"
+
+
+def region_label(cfg) -> str:
+    """Which subset this run is about, derived from the config, never hardcoded.
+
+    The first version printed "region A" unconditionally. The region-B
+    replication then produced a report headed *"the master K-table (region A)"*
+    describing region B -- correct numbers under a wrong title, which is the
+    kind of defect a reader has no way to catch and a reviewer certainly would.
+    """
+    name = str(cfg.get("name", ""))
+    if name.endswith("_regionB"):
+        return "region B"
+    if name.endswith("_regionA") or name == "s2d_ktable":
+        return "region A"
+    return name or "this subset"
 
 
 def check_n(asg, cfg) -> None:
@@ -176,7 +192,7 @@ def main() -> int:
     cfg = yaml.safe_load((root / cfg_path).read_text(encoding="utf-8"))
     rng = np.random.default_rng(int(cfg["seed"]))
 
-    # --- rows: region A, post-dedup, exactly as S2-A left them --------------
+    # --- rows: this region, post-dedup, exactly as the S2 run left them -----
     asg = pd.read_csv(root / cfg["input_assignments"])
     check_n(asg, cfg)
     ids = set(asg[cfg["id_col"]])
@@ -185,7 +201,7 @@ def main() -> int:
         cfg["id_col"], kind="mergesort").reset_index(drop=True)
     assert len(df) == len(asg), "id mismatch between assignments and bn_clean"
     labels = df[cfg["label_col"]].to_numpy()
-    print(f"region A: {len(df)} rows, "
+    print(f"{region_label(cfg)}: {len(df)} rows, "
           f"{dict(pd.Series(labels).value_counts().sort_index())}")
 
     emb = embed(df[cfg["text_col"]].astype(str).tolist(), cfg, root)
@@ -314,11 +330,14 @@ Tibshirani & Walther's own and was adopted before this table existed."""
         extra = ""
         if selected == 2:
             extra = ("\n\n⚠️ **K = 2 means the three-persona design gives way.** "
-                     "Region A has two sentiment classes, so the obvious worry is "
-                     "that these clusters *are* the sentiment split — the "
-                     "`ari_vs_sentiment` column settles that and is reported "
-                     "either way. K=3 is retained as the theory-motivated "
-                     "secondary (pipeline §2.2).")
+                     "The obvious worry is that these clusters *are* the "
+                     "sentiment split; the `ari_vs_sentiment` column settles "
+                     "that and is reported either way. K=3 is retained as the "
+                     "theory-motivated secondary (pipeline §2.2). Note the "
+                     "regions differ here: region A carries two sentiment "
+                     "classes, region B all three (fact (split)), so ARI is "
+                     "structurally capped differently in each and the two "
+                     "values are not directly comparable.")
         elif selected >= 4:
             extra = ("\n\n⚠️ **K ≥ 4 is a finding about the audience, not a "
                      "failure** — but check the cluster-share band before "
@@ -329,13 +348,13 @@ Bootstrap ARI {row['bootstrap_ari_mean']:.3f} ± {row['bootstrap_ari_sd']:.3f}.
 Trap-check at this K: **{row['trap_band']}**
 (ARI vs Sentiment = {row['ari_vs_sentiment']:.4f}).{extra}"""
 
-    return f"""# S2d — Gate G1: the master K-table (region A)
+    return f"""# S2d — Gate G1: the master K-table ({region_label(cfg)})
 
 > **Interpretation was pre-registered in `docs/protocol.md` (RQ1-C) before this
 > table existed.** Read that section before reading these numbers. The
 > three-persona design is the hypothesis; this is the test.
 
-- **Config:** `{cfg_path}` · **n:** {n} (region A, post-dedup)
+- **Config:** `{cfg_path}` · **n:** {n} ({region_label(cfg)}, post-dedup)
 - **Generated (UTC):** {prov['timestamp_utc']} · **Commit:** `{prov['git_commit']}`
 - **Seed:** {cfg['seed']} · K range: {cfg['k_range']}
 
