@@ -287,7 +287,7 @@ ablation is right to separate them.
 | `campello2013` / `mcinnes2017` | HDBSCAN | K-free robustness check |
 | `krippendorff2019` | Krippendorff 2019 | Ordinal α; the 0.667/0.80 bands |
 | `artstein2008` | Artstein & Poesio 2008 | Agreement reporting practice |
-| `gwet2008ac1` | Gwet 2008 | AC1 — kappa-paradox guard (needed: class 0 imbalance) |
+| `gwet2008ac1` + `vach2023ac1` | Gwet 2008; **Vach & Gerke 2023** | AC1 as the kappa-paradox guard — **and the 2023 critique showing AC1 is not a kappa substitute: it rises mechanically with prevalence skew, so it must never be quoted alone.** Used in the G-300 round-1 diagnosis |
 | `guo2017calibration` | Guo et al., ICML 2017 | ECE + temperature scaling |
 | `bhattacharjee2022banglabert` | Findings of NAACL 2022 | BanglaBERT backbone choice |
 | `gebru2021datasheets` | Gebru et al. 2021 | Dataset card |

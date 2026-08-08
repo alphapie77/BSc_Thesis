@@ -2,6 +2,128 @@
 % Rule (related_work.md): nothing is cited in the thesis without an entry there,
 % and the BibTeX key must match the heading used there.
 
+% ══════════════════════════════════════════════════════════════════════════════
+% METHOD CITATIONS — Tier 2 of related_work.md.
+%
+% All eight below were VERIFIED VIA CONSENSUS on 2026-08-08 (standing instruction
+% in CLAUDE.md). Title, authors, year and journal come from the search record.
+% Where volume/pages are marked `secondary`, they came from another paper citing
+% this one, not from the article itself -- flagged rather than silently trusted,
+% because "metadata is not the paper" is a lesson this project has already paid
+% for once.
+% ══════════════════════════════════════════════════════════════════════════════
+
+@article{rousseeuw1987,
+  title   = {Silhouettes: A Graphical Aid to the Interpretation and Validation
+             of Cluster Analysis},
+  author  = {Rousseeuw, Peter J.},
+  journal = {Journal of Computational and Applied Mathematics},
+  volume  = {20},
+  pages   = {53--65},
+  year    = {1987},
+  doi     = {10.1016/0377-0427(87)90125-7},
+  note    = {Verified via Consensus 2026-08-08 (20,912 citations).
+             Volume/pages secondary -- verify before submission.}
+}
+
+@article{tibshirani2001gap,
+  title   = {Estimating the Number of Clusters in a Data Set via the Gap
+             Statistic},
+  author  = {Tibshirani, Robert and Walther, Guenther and Hastie, Trevor},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical
+             Methodology)},
+  volume  = {63},
+  number  = {2},
+  pages   = {411--423},
+  year    = {2001},
+  note    = {Verified via Consensus 2026-08-08. Volume/pages corroborated by
+             Yan \& Ye (2007, Biometrics), which cites it as JRSS-B 63,
+             411--423 -- secondary, so verify before submission.}
+}
+
+@article{tibshirani2005ps,
+  title   = {Cluster Validation by Prediction Strength},
+  author  = {Tibshirani, Robert and Walther, Guenther},
+  journal = {Journal of Computational and Graphical Statistics},
+  volume  = {14},
+  number  = {3},
+  pages   = {511--528},
+  year    = {2005},
+  note    = {Source of the PS >= 0.80 rule pre-registered in protocol.md RQ1-C.
+             Verified via Consensus 2026-08-08. ⚠️ AUTHOR CHECK NEEDED: Staples
+             et al. (2023) cite this as "Tibshirani and Guenther", which reads
+             like a first-name/surname error for Guenther Walther. Consensus
+             lists "R. Tibshirani et al.". Confirm the second author from the
+             article itself before submission.}
+}
+
+@article{hubert1985ari,
+  title   = {Comparing Partitions},
+  author  = {Hubert, Lawrence and Arabie, Phipps},
+  journal = {Journal of Classification},
+  volume  = {2},
+  number  = {1},
+  pages   = {193--218},
+  year    = {1985},
+  doi     = {10.1007/BF01908075},
+  note    = {The adjusted Rand index -- used for every trap-check in this
+             thesis. Verified via Consensus 2026-08-08 (2,324 citations).
+             Volume/pages secondary.}
+}
+
+@inproceedings{campello2013,
+  title     = {Density-Based Clustering Based on Hierarchical Density Estimates},
+  author    = {Campello, Ricardo J. G. B. and Moulavi, Davoud and Sander, J{\"o}rg},
+  booktitle = {Advances in Knowledge Discovery and Data Mining (PAKDD)},
+  year      = {2013},
+  note      = {HDBSCAN. Verified via Consensus 2026-08-08 (2,605 citations).
+               The extended treatment is Campello et al. (2015), ACM TKDD --
+               cite that one where the algorithm is described in detail.}
+}
+
+@article{mcinnes2017,
+  title   = {hdbscan: Hierarchical Density Based Clustering},
+  author  = {McInnes, Leland and Healy, John and Astels, Steve},
+  journal = {Journal of Open Source Software},
+  year    = {2017},
+  note    = {The SOFTWARE actually used in Gate G1, as distinct from the method
+             paper (campello2013). Verified via Consensus 2026-08-08.
+             A companion paper, "Accelerated Hierarchical Density Based
+             Clustering" (ICDMW 2017), covers the algorithmic speedup.}
+}
+
+@article{gwet2008ac1,
+  title   = {Computing Inter-Rater Reliability and Its Variance in the Presence
+             of High Agreement},
+  author  = {Gwet, Kilem L.},
+  journal = {British Journal of Mathematical and Statistical Psychology},
+  volume  = {61},
+  number  = {1},
+  pages   = {29--48},
+  year    = {2008},
+  note    = {AC1. Used in the G-300 round-1 diagnosis. Verified via Consensus
+             2026-08-08 (1,855 citations); volume/pages corroborated by Ohyama
+             (2020). ⚠️ MUST be cited together with vach2023ac1 -- see that
+             entry.}
+}
+
+% ⚠️ FOUND 2026-08-08 WHILE VERIFYING gwet2008ac1, AND IT CORRECTS US.
+% This paper shows AC1 is NOT a drop-in replacement for kappa: for a fixed
+% agreement rate, AC1 *increases* as the prevalence of one category departs from
+% 0.5 -- which is exactly the G-300 round-1 situation (68--76% of ratings were
+% the single value "2"). So our AC1 = 0.871 is partly a mechanical consequence
+% of the skew, not independent evidence of rater agreement. It must never be
+% quoted without this caveat, and Landis & Koch's verbal bands must NOT be
+% applied to it. See docs/lab_notebook.md, entry of 2026-08-08.
+@article{vach2023ac1,
+  title   = {Gwet's {AC1} Is Not a Substitute for {Cohen's} Kappa --
+             A Comparison of Basic Properties},
+  author  = {Vach, Werner and Gerke, Oke},
+  journal = {MethodsX},
+  year    = {2023},
+  note    = {Verified via Consensus 2026-08-08 (74 citations).}
+}
+
 % ⚠️ Entry written 2026-08-03 from the published formulation of the method, which
 % is implemented in src/cluster/s2e_profile.py. The PAPER ITSELF HAS NOT BEEN
 % READ in full at this date, so volume/issue/pages are from the record and not

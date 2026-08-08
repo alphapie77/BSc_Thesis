@@ -2228,7 +2228,7 @@ Two independent annotators, all 300 items; B left 2 blank (G055, G060), so
 | Cohen's κ (linear weights) | 0.4456 |
 | **Exact agreement** | **75.5%** |
 | **Within 1 point** | **98.7%** |
-| **Gwet's AC1 (linear)** | **0.8705** |
+| **Gwet's AC1 (linear)** | **0.8705** ⚠️ see the correction below |
 
 Rating distribution — this is the whole story:
 
@@ -2245,6 +2245,35 @@ below 0.667. Mean-rating spread: SD 0.442, **60.7% of items sit on the modal
 value**.
 
 **Gate 2 was not computed.** RQ1-F fixed that in advance for α < 0.667.
+
+> ### ⚠️ Correction, 2026-08-08 — AC1 was over-read, and it was mine to catch
+>
+> Found while verifying `gwet2008ac1` for the bibliography, under the new
+> standing instruction to search Consensus before defending a method.
+>
+> **Vach & Gerke (2023), MethodsX** — *"Gwet's AC1 is not a substitute for
+> Cohen's kappa"* — show that for a **fixed** agreement rate, AC1 **increases**
+> as the prevalence of one category departs from 0.5, while κ decreases. They
+> also show AC1 can be non-zero under no association at all, and state that
+> Landis & Koch's verbal bands must **not** be applied to it.
+>
+> **That is exactly our situation.** 68–76% of ratings were the single value
+> "2". So **AC1 = 0.871 is partly a mechanical consequence of the skew**, not
+> independent evidence that the annotators agreed. Reporting it as "the raters
+> agreed strongly, AC1 0.871" made the skew look like corroboration when it is
+> the same fact twice.
+>
+> **What survives unchanged:** exact agreement **75.5%** and within-1 **98.7%**
+> are raw counts, not chance-corrected, and they do not depend on any of this.
+> The instrument-failure reading rests on those plus the distribution table, and
+> it stands. **What changes:** AC1 is reported *with* this caveat and is never
+> the load-bearing number, and `vach2023ac1` is cited beside `gwet2008ac1`
+> everywhere the paradox is discussed.
+>
+> The general lesson is the same one that produced the standing instruction:
+> `gwet2008ac1` had been sitting in `related_work.md` for weeks as "the kappa-
+> paradox guard", **listed but never read**, and the 2023 critique of it was one
+> search away.
 
 ### Decisions made (and why)
 

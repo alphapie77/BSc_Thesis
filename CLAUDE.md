@@ -73,6 +73,28 @@ Either way, say so out loud rather than silently picking one.
   proposal assumes, **flag the conflict and stop**. Silently overwriting is how
   a verified number gets replaced by an unverified one.
 
+## Literature: search Consensus first, and prefer recent work
+
+**Standing instruction from Sabbir (2026-08-08).** Before proposing or defending
+any method, **search the academic literature with Consensus** — not a plain web
+search. Web search returns the famous paper; Consensus returns the field.
+
+- **Recency is a requirement, not a preference.** This targets a Q1 journal in
+  2026. A method defended only by a 2009 and a 2017 citation looks like it was
+  chosen from memory, because it was. Always check what 2023–2026 says about a
+  method *before* committing to it — the recent work frequently criticises the
+  classic method, and finding that out after building is expensive.
+- **Report what the search changed.** If the literature moved the design, say
+  which paper and how. If it confirmed the design, say that too — a search that
+  changed nothing is still evidence, and silently discarding it hides the check.
+- Foundational citations are still needed for provenance. They are just not
+  sufficient on their own.
+
+This rule exists because it was broken once: the G-300 rating scale was designed
+without checking, and Kiritchenko & Mohammad (ACL 2017) had already shown rating
+scales to be less reliable than comparative judgements. **The failure was
+predictable from the literature and the literature was not read.**
+
 ## How to behave
 
 - **Do not invent numbers.** If a count, metric, or citation is not computed or
