@@ -800,6 +800,43 @@ reasons, all pre-committed:
 observe intrinsic biases in both and challenge treating human coding as the
 definitive standard.
 
+### ⚠️ Recorded 2026-08-08, DURING annotation and BEFORE any answer was scored
+
+Both annotators independently reported that **the items look alike to them** and
+that they are struggling to tell the options apart. **No guidance was given in
+response** beyond "answer anyway, guess if unsure, do not skip" — telling them
+what to look for would destroy the test, and this note exists so that the
+instruction actually given is on record.
+
+This is written now, before the numbers, because afterwards it would read as an
+excuse. **Two readings are possible and the data will not distinguish them:**
+
+1. **The split is not humanly perceptible.** That is the `NOT_PERCEPTIBLE`
+   outcome, it is a real negative, and it is what the instrument was built to be
+   able to say.
+2. **Length matching made the task strictly harder than RQ1 asks.** In region A,
+   `length_auc` is **0.676** — length is a *genuine component* of the cut, not
+   only a confound. By matching every set to within 2 words, this design removes
+   that component entirely and asks whether the **residual, non-length**
+   difference is perceptible. RQ1-D required only that annotators not succeed on
+   length *alone*; matching enforces something stronger. **That was my design
+   choice and it may have over-corrected.**
+
+**Pre-committed reporting, whichever way Gate A lands:**
+
+- If Gate A **passes**, reading 2 is moot and the result is stronger than
+  required, because it was obtained with the length signal removed.
+- If Gate A **fails**, it is reported as `NOT_PERCEPTIBLE` **with reading 2
+  stated beside it in the same paragraph**, in these terms: *the K = 2 split was
+  not recoverable by human annotators once length was held constant, and because
+  length carries part of the split (AUC 0.676), this is a test of the residual
+  distinction rather than of the whole one.* The claim is bounded to what was
+  tested; it is **not** written as "humans cannot perceive the K = 2 split".
+- **A length-unmatched re-run is NOT permitted**, even though it would be easier
+  to pass. That is the third attempt this section forbids, and running it after
+  seeing a failure is the exact move `protocol.md` exists to prevent. It may be
+  proposed in Future Work, where it belongs.
+
 ### What may not be done
 
 - **No third attempt.** If Gate A fails, RQ1 is a negative result and is
