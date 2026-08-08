@@ -139,7 +139,25 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     best_pred: dict[str, list[int]] = {}
     mean_scores: dict[str, float] = {}
 
+    # Checkpoint after every arm. The real run is ~70 fine-tunings against a
+    # 12h session cap, so a crash in arm 6 would otherwise discard five arms'
+    # worth of GPU time -- and Kaggle's weekly quota is 30h, which makes that a
+    # real cost rather than an inconvenience. Resuming is safe because each arm
+    # is trained independently and seeds are fixed: a resumed arm would produce
+    # the same numbers it produced before.
+    ckpt_path = Path(str(out_json := cfg["outputs"]["results_json"]).replace(".json", ".ckpt.json"))
+    done: dict[str, dict] = {}
+    if ckpt_path.exists() and not dry_run:
+        done = json.loads(ckpt_path.read_text(encoding="utf-8"))
+        print(f"resuming: {sorted(done)} already complete (delete {ckpt_path} to force a fresh run)")
+
     for arm in cfg["arms"]:
+        if arm["key"] in done:
+            saved = done[arm["key"]]
+            per_seed.extend(saved["per_seed"])
+            best_pred[arm["key"]] = saved["best_pred"]
+            mean_scores[arm["key"]] = saved["mean_score"]
+            continue
         scores_by_lr: dict[float, list[float]] = {}
         preds_by_lr: dict[float, list[list[int]]] = {}
         for lr, seed in itertools.product(training["learning_rates"], training["seeds"]):
@@ -167,6 +185,16 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         # paired test runs on a typical run rather than a lucky one.
         order = sorted(range(len(seed_scores)), key=lambda i: seed_scores[i])
         best_pred[arm["key"]] = preds_by_lr[best_lr][order[len(order) // 2]]
+
+        if not dry_run:
+            done[arm["key"]] = {
+                "per_seed": [r for r in per_seed if r["arm"] == arm["key"]],
+                "best_pred": best_pred[arm["key"]],
+                "mean_score": mean_scores[arm["key"]],
+            }
+            ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+            provenance.write_text_lf(ckpt_path, json.dumps(done, indent=2) + "\n")
+            print(f"[checkpoint] {arm['key']} done, mean macro-F1 {mean_scores[arm['key']]:.4f}")
 
     arm_keys = [a["key"] for a in cfg["arms"]]
     pairs, p_values = [], []

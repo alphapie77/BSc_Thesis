@@ -92,7 +92,7 @@ def setfit_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> li
     """
     _torch_seed(seed)
     try:
-        from setfit import SetFitModel, SetFitTrainer
+        import setfit
     except ImportError as exc:  # pragma: no cover
         raise RuntimeError(
             "arm 'setfit_labse' needs `pip install setfit`. It is a "
@@ -101,16 +101,31 @@ def setfit_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> li
         ) from exc
     from datasets import Dataset
 
-    model = SetFitModel.from_pretrained(arm["model"])
-    trainer = SetFitTrainer(
-        model=model,
-        train_dataset=Dataset.from_dict({"text": list(train.texts), "label": list(train.labels)}),
-        num_iterations=20,
-        num_epochs=1,
-        batch_size=cfg["training"]["batch_size"],
-        seed=seed,
-    )
-    trainer.train()
+    model = setfit.SetFitModel.from_pretrained(arm["model"])
+    data = Dataset.from_dict({"text": list(train.texts), "label": list(train.labels)})
+
+    # SetFit 1.0 replaced `SetFitTrainer` with `Trainer` + `TrainingArguments`
+    # and later dropped the old alias. Both spellings are attempted so that the
+    # arm cannot die six-sevenths of the way through a four-hour GPU run over an
+    # API rename -- which is what would have happened here, since setfit is the
+    # sixth of seven arms in config order.
+    if hasattr(setfit, "TrainingArguments"):
+        args = setfit.TrainingArguments(
+            batch_size=cfg["training"]["batch_size"],
+            num_iterations=20,
+            num_epochs=1,
+            seed=seed,
+        )
+        setfit.Trainer(model=model, args=args, train_dataset=data).train()
+    else:  # pragma: no cover - older setfit
+        setfit.SetFitTrainer(
+            model=model,
+            train_dataset=data,
+            num_iterations=20,
+            num_epochs=1,
+            batch_size=cfg["training"]["batch_size"],
+            seed=seed,
+        ).train()
     return [int(p) for p in model.predict(list(dev.texts))]
 
 
