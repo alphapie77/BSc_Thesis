@@ -115,6 +115,24 @@ data feels like from the inside.
 Three failures, three different topics, one shape: a plausible answer produced
 from memory, then contradicted by a search that took two minutes.
 
+### How to search — mechanics (Sabbir, 2026-08-09)
+
+- **Consensus returns at most 10 results per call. Do not treat one call as "the
+  search."** Run several narrower queries instead of one broad one, and vary the
+  wording — the same question phrased two ways returns different papers, because
+  the index matches terminology rather than intent. A design decision that rests
+  on a single 10-result call rests on whatever that phrasing happened to surface.
+- **Target 2025–2026 first.** Set `year_min` and read what the current field
+  says before anything else. Older work may then be added for provenance, but it
+  does not get to settle a question on its own.
+- **If the recent window comes back thin, widen it — and say that you widened
+  it.** A method whose only support is a 2017 paper may still be correct; the
+  reader needs to know that is the situation, because "nothing recent exists" and
+  "nothing recent was looked for" are different facts and look identical in a
+  bibliography.
+- Foundational citations still go in the bibliography. They just do not close a
+  question that 2025–2026 work has since reopened.
+
 ---
 
 This rule exists because it was broken once: the G-300 rating scale was designed
