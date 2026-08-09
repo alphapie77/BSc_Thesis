@@ -142,6 +142,10 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     # the selected learning rate, not over all ten runs. See _sd_at_best_lr.
     best_lrs: dict[str, float] = {}
     seed_sds: dict[str, float] = {}
+    # EVERY run's prediction and score (all 10 per arm), kept so the pooled
+    # aggregation can be computed from the same runs at zero extra GPU cost.
+    all_preds: dict[str, list[list[int]]] = {}
+    all_scores: dict[str, list[float]] = {}
 
     # Checkpoint after every arm. The real run is ~70 fine-tunings against a
     # 12h session cap, so a crash in arm 6 would otherwise discard five arms'
@@ -163,6 +167,8 @@ def run(config_path: str, dry_run: bool = False) -> dict:
             mean_scores[arm["key"]] = saved["mean_score"]
             best_lrs[arm["key"]] = saved["best_lr"]
             seed_sds[arm["key"]] = saved["seed_sd"]
+            all_preds[arm["key"]] = saved["all_preds"]
+            all_scores[arm["key"]] = saved["all_scores"]
             continue
         scores_by_lr: dict[float, list[float]] = {}
         preds_by_lr: dict[float, list[list[int]]] = {}
@@ -198,6 +204,11 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         order = sorted(range(len(seed_scores)), key=lambda i: seed_scores[i])
         best_pred[arm["key"]] = preds_by_lr[best_lr][order[len(order) // 2]]
 
+        # Keep EVERY run, both learning rates and all seeds. Costs nothing --
+        # they already happened -- and is what makes the pooled check free.
+        all_preds[arm["key"]] = [p for lr_key in preds_by_lr for p in preds_by_lr[lr_key]]
+        all_scores[arm["key"]] = [x for lr_key in scores_by_lr for x in scores_by_lr[lr_key]]
+
         if not dry_run:
             done[arm["key"]] = {
                 "per_seed": [r for r in per_seed if r["arm"] == arm["key"]],
@@ -205,25 +216,48 @@ def run(config_path: str, dry_run: bool = False) -> dict:
                 "mean_score": mean_scores[arm["key"]],
                 "best_lr": best_lrs[arm["key"]],
                 "seed_sd": seed_sds[arm["key"]],
+                "all_preds": all_preds[arm["key"]],
+                "all_scores": all_scores[arm["key"]],
             }
             ckpt_path.parent.mkdir(parents=True, exist_ok=True)
             provenance.write_text_lf(ckpt_path, json.dumps(done, indent=2) + "\n")
             print(f"[checkpoint] {arm['key']} done, mean macro-F1 {mean_scores[arm['key']]:.4f}")
 
     arm_keys = [a["key"] for a in cfg["arms"]]
-    pairs, p_values = [], []
-    for a, b in itertools.combinations(arm_keys, 2):
-        res = compare.paired_bootstrap(
-            y_true, best_pred[a], best_pred[b],
-            arm_a=a, arm_b=b,
-            n_resamples=decision["n_resamples"],
-        )
-        pairs.append(res)
-        p_values.append(res.p_value)
 
-    rejected = compare.benjamini_hochberg(p_values, alpha=decision["alpha"])
-    significant = {(r.arm_a, r.arm_b) for r, ok in zip(pairs, rejected) if ok}
-    outcome = compare.verdict(arm_keys, mean_scores, significant)
+    def aggregate(preds: dict[str, list[int]], means: dict[str, float]):
+        pairs, p_values = [], []
+        for a, b in itertools.combinations(arm_keys, 2):
+            res = compare.paired_bootstrap(
+                y_true, preds[a], preds[b],
+                arm_a=a, arm_b=b,
+                n_resamples=decision["n_resamples"],
+            )
+            pairs.append(res)
+            p_values.append(res.p_value)
+        rejected = compare.benjamini_hochberg(p_values, alpha=decision["alpha"])
+        sig = {(r.arm_a, r.arm_b) for r, ok in zip(pairs, rejected) if ok}
+        return pairs, rejected, compare.verdict(arm_keys, means, sig)
+
+    # HEADLINE: each arm at its own best learning rate. Fair in Wen et al.
+    # (2025)'s sense -- no arm is judged under another arm's hyperparameter --
+    # but the "best" was measured on dev, so it carries a winner's-curse risk:
+    # an arm whose two LRs happen to be noisier gets a higher maximum for free.
+    pairs, rejected, outcome = aggregate(best_pred, mean_scores)
+
+    # ROBUSTNESS: pool across learning rates instead of selecting. No selection,
+    # so no selection bias and no winner's curse -- at the cost of judging each
+    # arm partly under a rate that may not suit it. The two rules trade the two
+    # risks against each other, which is why BOTH are reported.
+    #
+    # This costs no extra GPU: the runs already exist. Pre-registered rule, and
+    # it is what makes the argument empirical instead of rhetorical -- if the
+    # two verdicts agree, the selection question is settled by evidence. If they
+    # DISAGREE, that is the trigger to spend the ~30% extra compute on inner
+    # k-fold tuning, and only then, because only then is it known to matter.
+    pooled_means = {k: sum(v) / len(v) for k, v in all_scores.items()}
+    pooled_pred = {k: _majority_vote(v) for k, v in all_preds.items()}
+    _, _, pooled_outcome = aggregate(pooled_pred, pooled_means)
 
     result = {
         "dry_run": dry_run,
@@ -233,6 +267,9 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         "train_class_counts": train.class_counts,
         "dev_class_counts": dev.class_counts,
         "gold_ids_touched": 0,
+        "verdict_pooled_lr": pooled_outcome,
+        "verdict_agrees_across_lr_rules": outcome == pooled_outcome,
+        "mean_macro_f1_pooled_lr": {k: round(v, 6) for k, v in sorted(pooled_means.items(), key=lambda kv: -kv[1])},
         "seeds": training["seeds"],
         "mean_macro_f1": {k: round(v, 6) for k, v in sorted(mean_scores.items(), key=lambda kv: -kv[1])},
         "seed_sd": {k: round(seed_sds[k], 6) for k in arm_keys},
@@ -263,6 +300,18 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     return result
 
 
+def _majority_vote(preds: list[list[int]]) -> list[int]:
+    """Element-wise majority over every run of an arm (all seeds x all LRs).
+
+    This is the selection-free counterpart to picking the best learning rate:
+    nothing is chosen by looking at dev, so there is no winner's curse. Ties on
+    an even number of runs resolve to 0, deterministically -- an arbitrary but
+    fixed rule, applied identically to every arm.
+    """
+    n = len(preds[0])
+    return [1 if sum(p[i] for p in preds) * 2 > len(preds) else 0 for i in range(n)]
+
+
 def _sd(xs: list[float]) -> float:
     if len(xs) < 2:
         return 0.0
@@ -288,7 +337,14 @@ def _render_md(result: dict, cfg: dict) -> str:
     lines = [
         "# S3.2 — verifier backbone ablation",
         "",
-        banner + f"**Verdict: `{result['verdict']}`**",
+        banner + f"**Verdict: `{result['verdict']}`**"
+        + (
+            f" · robustness (pooled across learning rates, no selection): "
+            f"`{result['verdict_pooled_lr']}` — "
+            + ("**agree**" if result["verdict_agrees_across_lr_rules"]
+               else "⚠️ **DISAGREE — see below**")
+            if "verdict_pooled_lr" in result else ""
+        ),
         "",
         f"- train n = **{result['n_train']}** {result['train_class_counts']}"
         f" · dev n = **{result['n_dev']}** {result['dev_class_counts']}",
@@ -322,6 +378,20 @@ def _render_md(result: dict, cfg: dict) -> str:
             f"| `{p['arm_a']}` | `{p['arm_b']}` | {p['diff']:+.4f} | "
             f"[{p['ci95'][0]:+.4f}, {p['ci95'][1]:+.4f}] | {p['p']:.4f} | {mark} |"
         )
+    if not result.get("verdict_agrees_across_lr_rules", True):
+        lines += [
+            "",
+            "## ⚠️ The two aggregation rules disagree",
+            "",
+            f"Selecting each arm's best learning rate gives `{result['verdict']}`;",
+            f"pooling across learning rates gives `{result['verdict_pooled_lr']}`.",
+            "",
+            "**Per protocol.md §S3.2 this is the pre-registered trigger to re-run",
+            "with inner k-fold tuning on the 804 training rows** (dev untouched).",
+            "Neither verdict above may be reported as the result until that is done —",
+            "the disagreement means the answer depends on how the learning rate was",
+            "handled, which is exactly the thing the cheap design assumed away.",
+        ]
     if result["verdict"] == "TIE":
         lines += [
             "",

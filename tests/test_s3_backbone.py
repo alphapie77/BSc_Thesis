@@ -260,3 +260,36 @@ def test_report_discloses_that_lr_was_selected_on_the_eval_set():
     assert "not clean held-out estimates" in md
     assert "at the selected learning rate" in md
     assert "label *reproduction*" in md, "the validity caveat must survive too"
+
+
+# ------------------------------- the free robustness check on LR aggregation
+
+def test_majority_vote_is_selection_free_and_deterministic():
+    from src.verifier.s3_backbone_ablation import _majority_vote
+    assert _majority_vote([[1, 0], [1, 0], [0, 0]]) == [1, 0]
+    # An exact tie must resolve the same way every time, for every arm.
+    assert _majority_vote([[1], [0]]) == [0]
+    assert _majority_vote([[1], [0]]) == _majority_vote([[0], [1]])
+
+
+def test_disagreement_between_lr_rules_is_reported_loudly():
+    """If selecting the LR and pooling over LRs give different verdicts, the
+    answer depends on how the hyperparameter was handled -- which is the thing
+    the cheap design assumed away. The report must say so, not average it out.
+    """
+    from src.verifier.s3_backbone_ablation import _render_md
+    cfg = _cfg()
+    result = {
+        "dry_run": False, "verdict": "SINGLE_WINNER", "verdict_pooled_lr": "TIE",
+        "verdict_agrees_across_lr_rules": False,
+        "n_train": 804, "n_dev": 82,
+        "train_class_counts": {0: 481, 1: 323}, "dev_class_counts": {0: 53, 1: 29},
+        "seeds": [42, 43, 44, 45, 46],
+        "mean_macro_f1": {"banglabert": 0.9}, "seed_sd": {"banglabert": 0.01},
+        "selected_lr": {"banglabert": 2e-5}, "lr_selected_on_eval_set": True,
+        "pairwise": [],
+    }
+    md = _render_md(result, cfg)
+    assert "DISAGREE" in md
+    assert "inner k-fold" in md
+    assert "may be reported as the result until" in md
