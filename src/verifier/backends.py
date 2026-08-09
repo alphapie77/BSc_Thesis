@@ -17,6 +17,44 @@ if TYPE_CHECKING:  # pragma: no cover
     from src.verifier.split_access import LabelledRows
 
 
+def check_arm_dependencies(arms: list[dict]) -> list[str]:
+    """Import every backend an arm needs, and return a list of problems.
+
+    Exists because of what happened on 2026-08-08: the run reached arm 6 of 7
+    after roughly four GPU-hours and died on `import setfit`, which is
+    incompatible with the transformers 5.x on the host. Every dependency that
+    could fail was knowable in the first ten seconds. Fail fast, in preflight,
+    on CPU -- not five-sevenths of the way through a session.
+
+    Returns problems rather than raising, so the caller can report all of them
+    at once instead of one per re-run.
+    """
+    problems: list[str] = []
+    kinds = {a.get("kind", "finetune") for a in arms}
+    try:
+        import transformers  # noqa: F401
+    except Exception as exc:
+        problems.append(f"transformers: {exc}")
+    if "setfit" in kinds:
+        try:
+            import setfit  # noqa: F401
+        except Exception as exc:
+            problems.append(
+                f"setfit: {exc}\n"
+                "    setfit's own module chain imports "
+                "`transformers.training_args.default_logdir`, which transformers "
+                "5.x removed. Pin transformers < 5 for the WHOLE run -- not just "
+                "this arm. Mixing environments across arms is invalid: Coakley "
+                "et al. (2022) measured >6 pp of accuracy variation from "
+                "environment alone, and our whole between-arm spread is ~3 pp."
+            )
+        try:
+            import datasets  # noqa: F401
+        except Exception as exc:
+            problems.append(f"datasets (needed by setfit): {exc}")
+    return problems
+
+
 def _torch_seed(seed: int):
     """Seed every RNG a transformer touches. Returns the torch module."""
     from src.common.seed import set_seed

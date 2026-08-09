@@ -314,7 +314,22 @@ def main() -> None:
     ap.add_argument("--config", required=True)
     ap.add_argument("--dry-run", action="store_true",
                     help="stub the models; check plumbing without a GPU")
+    ap.add_argument("--check-arms", action="store_true",
+                    help="import every arm's dependencies and exit; run this "
+                         "in preflight, before any GPU time")
     args = ap.parse_args()
+
+    if args.check_arms:
+        from src.verifier.backends import check_arm_dependencies
+        cfg = _load_yaml(args.config)
+        problems = check_arm_dependencies(cfg["arms"])
+        if problems:
+            raise SystemExit(
+                "arm dependencies are not satisfied:\n  - " + "\n  - ".join(problems)
+            )
+        print(f"all {len(cfg['arms'])} arms' dependencies import cleanly")
+        return
+
     res = run(args.config, dry_run=args.dry_run)
     print(json.dumps({k: res[k] for k in ("dry_run", "verdict", "n_train", "n_dev")}, indent=2))
     print("mean macro-F1:", json.dumps(res["mean_macro_f1"], indent=2))

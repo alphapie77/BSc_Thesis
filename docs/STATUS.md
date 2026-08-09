@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-08 (**Phase 3 opened** — S3.2 and S3.4 pre-registered) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
+**Last updated:** 2026-08-09 (**S3.2 attempt 1 crashed at arm 6; all seven re-run under a pinned environment**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -32,6 +32,7 @@
 | 5m | **RQ1-H — human validation, attempt 2** | ✅ **RUN 2026-08-08. `HUMANLY_PERCEPTIBLE` — RQ1 WINS.** Gate A: **39/50 (0.780)** and **42/50 (0.840)** against a chance rate of **0.25**, p < 1e-15, far above the pre-registered 0.45. Gate B: both **34/40 (0.850)** vs chance 0.50 → **the construct IS specificity**. Obtained with **length matched to within 2 words** — and a length heuristic scores **0.16, below chance**, so the strongest confound is not merely controlled but inverted. Inter-annotator 70%/75%; agreement matches the 0.667 expected under independent errors, so no lockstep. 🎁 **Both annotators reported the items looked alike — then scored 0.78/0.84.** An implicit stylistic distinction: real, perceptible, not articulable. That is also why attempt 1 failed — rating an unnameable property is far harder than spotting the odd one out. | `results/intrusion_agreement.md`, `results/intrusion_responses.csv` | 2026-08-08 |
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
 | 7 | **S3.2 + S3.4 pre-registration** — Phase 3 opened | ✅ **WRITTEN 2026-08-08, before any backbone was downloaded.** Ablation goes **4 → 7 arms** (+IndicBERTv2, +SetFit, +BERT-NLI), **5 seeds not 3**, and the winner is decided by **paired bootstrap**, not by best mean ± SD. 🔴 **The literature contradicted our own protocol from the day before:** Bethard (2022) names "vary the seed to build a score distribution for model comparison" as a *risky* use of seeds — exactly what we had committed to. Calibration demoted from "hidden contribution" to **descriptive** (dev = 82 rows; 10 bins ≈ 8 samples/bin). 🎁 **The ablation's most likely outcome is pre-registered as a tie**, because the 2025–26 Bangla literature reports **three different winners on the same dataset** — so "BanglaBERT because it is Bangla-native" cannot be defended by citation, and a tie is registered as publishable. | `docs/protocol.md` §S3.2, §S3.4 | 2026-08-08 |
+| 8 | **S3.2 attempt 1** — the backbone ablation, first real run | ⚠️ **CRASHED 2026-08-09** (Kaggle T4, commit `a2986db`) at **arm 6 of 7**, on `import setfit`: setfit's module chain imports `transformers.training_args.default_logdir`, removed in transformers 5.x, which Kaggle ships. `bert_nli` never ran. ~4 GPU-hours spent. **The five completed numbers are DISCARDED, not carried forward** — all seven re-run under `transformers<5`, because Coakley et al. (2022) measured **>6 pp** of accuracy variation from environment alone and our whole between-arm spread is **2.98 pp**, so a mixed-environment table would measure library version more than backbone. 🎁 **Not wasted:** the discarded run establishes (i) the task is **highly learnable** — 0.94–0.97 across five backbones, expected for a label derived by clustering LaBSE embeddings, i.e. *label reproduction*, exactly what the 2026-08-08 deviation said this measures; and (ii) **the spread is smaller than documented environment noise**, which is itself evidence for the pre-registered `TIE` and is now reported beside the verdict. **Prevention:** `--check-arms` imports every arm's dependencies on CPU in ten seconds, and the runner calls it as Gate 0. | discarded; no file in `results/` | 2026-08-09 |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
@@ -144,14 +145,16 @@ edited until the final `usable_n` is known (see Open decisions).
    edited once the first run happens.
 2. ⬛ **Citations** — the 16 method references behind the amendments go into
    `related_work.md` and `references.bib`, each verified through Consensus.
-3. ⬛ **`src/verifier/s3_backbone_ablation.py` + `configs/s3_backbone.yaml` +
-   tests.** Tests pin the outcome bands to the pre-registration, mirroring
-   `test_s2_verdict.py`. Must draw exactly **804 / 82** rows and must be unable
-   to read R2 or G-300.
-4. ⬛ **CPU dry-run at a tiny budget before any GPU time** — verify the split
-   contract and bit-identical reruns at a fixed seed.
-5. ⬛ **Kaggle runner notebook**, then the real run; `env_snapshot_s3_kaggle.json`
-   is mandatory (fact (env)).
+3. ✅ **Code, config, tests, runner notebook written** (2026-08-08). 24 tests
+   pass. Dry run is byte-identical on the local sandbox and the Kaggle host.
+4. ⚠️ **Attempt 1 crashed at arm 6** (2026-08-09) — see step 8. Environment now
+   pinned; `--check-arms` added as Gate 0.
+5. 🔬 **Re-run all seven arms** under `transformers<5`, via
+   `notebooks/s3_backbone_kaggle.ipynb`. **Use Save & Run All (Commit), not an
+   interactive session** — the checkpoint file lives in `/kaggle/working` and a
+   fresh commit run re-clones, so checkpoints do *not* survive across sessions.
+   `env_snapshot_s3_kaggle.json` is mandatory (fact (env)), and it must now
+   record transformers 4.x, not the 5.0.0 of the crashed attempt.
 6. 🟡 **`protocol.md` freeze + supervisor signature** (step 6) is now the oldest
    outstanding item and nothing blocks it.
 
