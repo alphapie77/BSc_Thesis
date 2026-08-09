@@ -90,6 +90,33 @@ search. Web search returns the famous paper; Consensus returns the field.
 - Foundational citations are still needed for provenance. They are just not
   sufficient on their own.
 
+### Search BEFORE the decision, not after — standing instruction (Sabbir, 2026-08-09)
+
+The rule above says "before proposing or defending any method". **It is
+strengthened here because the weak reading of it kept failing: search before
+*every* design decision, including ones that feel like engineering rather than
+science.** If a recommendation is about to be made and no search has happened,
+the search happens first. A recommendation offered and then corrected costs more
+than the search would have.
+
+The distinction that kept getting lost: *"I already know this"* is not a reason
+to skip the search. It is the condition under which the search is most likely to
+change something, because unexamined confidence is exactly what stale training
+data feels like from the inside.
+
+**The record, kept because it is the argument for the rule:**
+
+| Date | Decision made without searching first | What the search then said |
+|---|---|---|
+| ~2026-08-04 | G-300 rating scale | Kiritchenko & Mohammad (ACL 2017) had already shown rating scales less reliable than comparative judgements. The instrument failed its reliability gate, and attempt 2 used comparative judgement and worked. |
+| 2026-08-07 | "mean ± SD over ≥3 seeds" as the S3.2 decision rule | Bethard (2022) classifies that exact use of seeds as **risky**, in a survey of 85 ACL Anthology papers. |
+| 2026-08-09 | Recommending a single fixed learning rate for all 7 arms | Wen et al. (2025): blind hyperparameter transfer across methods is **unfair** — and Shehzad et al. (2023) show untuned baselines let *any* method be reported as winning. The recommendation was withdrawn. |
+
+Three failures, three different topics, one shape: a plausible answer produced
+from memory, then contradicted by a search that took two minutes.
+
+---
+
 This rule exists because it was broken once: the G-300 rating scale was designed
 without checking, and Kiritchenko & Mohammad (ACL 2017) had already shown rating
 scales to be less reliable than comparative judgements. **The failure was
