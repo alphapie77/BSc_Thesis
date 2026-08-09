@@ -17,6 +17,23 @@ is stamped `dry_run: true`. A dry-run result must never be read as a result.
 
 from __future__ import annotations
 
+import os
+
+# ⚠️ SET BEFORE ANY TORCH IMPORT. Every arm must see exactly one GPU.
+#
+# Kaggle's "GPU T4 x2" gives two devices. The fine-tuning arms use a plain
+# `model.to(device)` loop and take one; SetFit detects two and switches itself
+# to DataParallel. On 2026-08-09 that made the arms structurally
+# incomparable -- five arms on one GPU, one arm on two -- which is the same
+# unequal-budget failure Wen et al. (2025) describe for hyperparameters, moved
+# to hardware. An ablation that silently varies compute across arms is
+# measuring compute.
+#
+# One device also avoids DataParallel itself, which HuggingFace's own docs
+# describe as leaving GPU 0 doing most of the work and the others idle, and
+# which sentence-transformers has open hang reports against (issue #2844).
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
+
 import argparse
 import csv
 import itertools
@@ -267,6 +284,7 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         "train_class_counts": train.class_counts,
         "dev_class_counts": dev.class_counts,
         "gold_ids_touched": 0,
+        "visible_gpus": _visible_gpu_count(),
         "verdict_pooled_lr": pooled_outcome,
         "verdict_agrees_across_lr_rules": outcome == pooled_outcome,
         "mean_macro_f1_pooled_lr": {k: round(v, 6) for k, v in sorted(pooled_means.items(), key=lambda kv: -kv[1])},
@@ -298,6 +316,15 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     _write_per_seed(out["per_seed_csv"], per_seed)
     provenance.write_text_lf(out["results_md"], _render_md(result, cfg))
     return result
+
+
+def _visible_gpu_count() -> int | None:
+    """Recorded in the result so a reader can confirm every arm saw one device."""
+    try:
+        import torch
+        return torch.cuda.device_count()
+    except Exception:
+        return None
 
 
 def _majority_vote(preds: list[list[int]]) -> list[int]:
