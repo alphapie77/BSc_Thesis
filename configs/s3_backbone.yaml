@@ -44,6 +44,19 @@ arms:
     model: ai4bharat/IndicBERTv2-MLM-only
     kind: finetune
     note: top scorer in Mazumder et al. 2025 on a Bangla style task.
+  - key: bert_nli
+    model: MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7
+    kind: nli_transfer
+    note: >-
+      Laurer et al. 2023 report +10.7-18.3 pp over classical models at
+      100-2500 training texts, particularly on imbalanced data. Ours is 804
+      rows at ~40% minority.
+
+  # ⚠️ ORDER: setfit runs LAST, deliberately. On 2026-08-09 it was sixth of
+  # seven and a hang inside it cost every arm after it. Arm order carries no
+  # scientific meaning -- the arm set, the budget and the decision rule are
+  # unchanged -- so putting the slowest and most fragile arm at the end is free
+  # insurance: a failure there now costs only itself.
   - key: setfit_labse
     model: sentence-transformers/LaBSE
     kind: setfit
@@ -52,13 +65,6 @@ arms:
       found BERT-like > SetFit > LLM in the closest published setting). It is
       here because an expected loser that loses is evidence and one that wins is
       a finding.
-  - key: bert_nli
-    model: MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7
-    kind: nli_transfer
-    note: >-
-      Laurer et al. 2023 report +10.7-18.3 pp over classical models at
-      100-2500 training texts, particularly on imbalanced data. Ours is 804
-      rows at ~40% minority.
 
 training:
   seeds: [42, 43, 44, 45, 46]     # 5, not 3 -- see the 2026-08-08 deviation.
