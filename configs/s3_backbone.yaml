@@ -66,6 +66,12 @@ training:
   epochs: 4
   batch_size: 16
   max_length: 128                 # median review is 8 words; 128 is generous.
+  # SetFit's pair-sampling factor. The published default is 20, which turns 804
+  # rows into 32,160 contrastive pairs -- measured on 2026-08-09 as far slower
+  # than every other arm (>60 min for one run, against ~14 min for a full
+  # fine-tuning arm). Lowering it is a DEVIATION from the published method and
+  # must be logged; raising the other arms' budget instead is not affordable.
+  setfit_num_iterations: 20
 
 decision:
   rule: paired_bootstrap          # NOT best mean +/- SD (Bethard 2022).

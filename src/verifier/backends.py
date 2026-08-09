@@ -11,6 +11,7 @@ function here writes a file, prints a verdict, or knows what a verdict is.
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -128,6 +129,13 @@ def setfit_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> li
     than the shared budget above, and that asymmetry is reported rather than
     hidden -- SetFit at a BERT-shaped budget would be a strawman.
     """
+    # W&B prompts for an account on first use. In an interactive notebook that
+    # is a menu; in a Kaggle commit run there is nobody to answer it, and the
+    # 2026-08-09 run printed that prompt and then sat on arm 6. Disabled here
+    # rather than in the notebook, so the script is safe however it is invoked.
+    os.environ.setdefault("WANDB_DISABLED", "true")
+    os.environ.setdefault("WANDB_MODE", "disabled")
+
     _torch_seed(seed)
     try:
         import setfit
@@ -147,19 +155,27 @@ def setfit_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> li
     # arm cannot die six-sevenths of the way through a four-hour GPU run over an
     # API rename -- which is what would have happened here, since setfit is the
     # sixth of seven arms in config order.
+    # num_iterations is the pair-sampling factor: 20 turns 804 rows into 32,160
+    # contrastive pairs, and at batch 16 that is ~2,010 optimiser steps over a
+    # 471M-parameter LaBSE body -- PER RUN, ten times. Measured on 2026-08-09:
+    # the five fine-tuning arms took ~14 min each, and setfit had not finished
+    # ONE run after 60. The value is configurable so the arm can be brought
+    # into the same budget as the others; the default stays at the published 20.
+    n_iter = int(cfg["training"].get("setfit_num_iterations", 20))
     if hasattr(setfit, "TrainingArguments"):
         args = setfit.TrainingArguments(
             batch_size=cfg["training"]["batch_size"],
-            num_iterations=20,
+            num_iterations=n_iter,
             num_epochs=1,
             seed=seed,
+            report_to="none",
         )
         setfit.Trainer(model=model, args=args, train_dataset=data).train()
     else:  # pragma: no cover - older setfit
         setfit.SetFitTrainer(
             model=model,
             train_dataset=data,
-            num_iterations=20,
+            num_iterations=n_iter,
             num_epochs=1,
             batch_size=cfg["training"]["batch_size"],
             seed=seed,
