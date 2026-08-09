@@ -227,3 +227,36 @@ def test_config_reads_the_regionA_labels_not_the_corpus_detector():
 def test_protocol_registers_setfit_as_an_expected_loser():
     text = PROTOCOL.read_text(encoding="utf-8")
     assert "expectation of losing" in text or "EXPECTED LOSER" in text
+
+
+# ------------------------------------------------------ reporting honesty
+
+def test_sd_matches_a_hand_computed_case():
+    from src.verifier.s3_backbone_ablation import _sd
+    assert _sd([1.0]) == 0.0                     # single run has no spread
+    assert _sd([]) == 0.0
+    assert _sd([0.0, 2.0]) == pytest.approx(2 ** 0.5)
+
+
+def test_report_discloses_that_lr_was_selected_on_the_eval_set():
+    """The learning rate is chosen by best mean on dev, and the arms are then
+    compared on that same dev set. It biases all arms in the same direction, so
+    the comparison survives -- but the LEVELS are not clean held-out estimates,
+    and a reader must be told that on the face of the table, not in a footnote
+    nobody reaches."""
+    from src.verifier.s3_backbone_ablation import _render_md
+    cfg = _cfg()
+    result = {
+        "dry_run": False, "verdict": "TIE", "n_train": 804, "n_dev": 82,
+        "train_class_counts": {0: 481, 1: 323}, "dev_class_counts": {0: 53, 1: 29},
+        "seeds": [42, 43, 44, 45, 46],
+        "mean_macro_f1": {"banglabert": 0.9},
+        "seed_sd": {"banglabert": 0.01},
+        "selected_lr": {"banglabert": 2e-5},
+        "lr_selected_on_eval_set": True,
+        "pairwise": [],
+    }
+    md = _render_md(result, cfg)
+    assert "not clean held-out estimates" in md
+    assert "at the selected learning rate" in md
+    assert "label *reproduction*" in md, "the validity caveat must survive too"

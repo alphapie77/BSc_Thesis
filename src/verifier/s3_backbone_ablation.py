@@ -138,6 +138,10 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     per_seed: list[dict] = []
     best_pred: dict[str, list[int]] = {}
     mean_scores: dict[str, float] = {}
+    # Recorded per arm because the reported SD must be over the FIVE seeds at
+    # the selected learning rate, not over all ten runs. See _sd_at_best_lr.
+    best_lrs: dict[str, float] = {}
+    seed_sds: dict[str, float] = {}
 
     # Checkpoint after every arm. The real run is ~70 fine-tunings against a
     # 12h session cap, so a crash in arm 6 would otherwise discard five arms'
@@ -145,7 +149,7 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     # real cost rather than an inconvenience. Resuming is safe because each arm
     # is trained independently and seeds are fixed: a resumed arm would produce
     # the same numbers it produced before.
-    ckpt_path = Path(str(out_json := cfg["outputs"]["results_json"]).replace(".json", ".ckpt.json"))
+    ckpt_path = Path(str(cfg["outputs"]["results_json"]).replace(".json", ".ckpt.json"))
     done: dict[str, dict] = {}
     if ckpt_path.exists() and not dry_run:
         done = json.loads(ckpt_path.read_text(encoding="utf-8"))
@@ -157,6 +161,8 @@ def run(config_path: str, dry_run: bool = False) -> dict:
             per_seed.extend(saved["per_seed"])
             best_pred[arm["key"]] = saved["best_pred"]
             mean_scores[arm["key"]] = saved["mean_score"]
+            best_lrs[arm["key"]] = saved["best_lr"]
+            seed_sds[arm["key"]] = saved["seed_sd"]
             continue
         scores_by_lr: dict[float, list[float]] = {}
         preds_by_lr: dict[float, list[list[int]]] = {}
@@ -181,6 +187,12 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         best_lr = max(scores_by_lr, key=lambda k: sum(scores_by_lr[k]) / len(scores_by_lr[k]))
         seed_scores = scores_by_lr[best_lr]
         mean_scores[arm["key"]] = sum(seed_scores) / len(seed_scores)
+        best_lrs[arm["key"]] = best_lr
+        # SD over the 5 seeds AT THE SELECTED LR. Computing it over all 10 runs
+        # would fold learning-rate spread into a column headed "SD across
+        # seeds" -- a mislabelled number in a results table, which is worse
+        # than a missing one.
+        seed_sds[arm["key"]] = _sd(seed_scores)
         # Representative prediction = the seed whose score is the median, so the
         # paired test runs on a typical run rather than a lucky one.
         order = sorted(range(len(seed_scores)), key=lambda i: seed_scores[i])
@@ -191,6 +203,8 @@ def run(config_path: str, dry_run: bool = False) -> dict:
                 "per_seed": [r for r in per_seed if r["arm"] == arm["key"]],
                 "best_pred": best_pred[arm["key"]],
                 "mean_score": mean_scores[arm["key"]],
+                "best_lr": best_lrs[arm["key"]],
+                "seed_sd": seed_sds[arm["key"]],
             }
             ckpt_path.parent.mkdir(parents=True, exist_ok=True)
             provenance.write_text_lf(ckpt_path, json.dumps(done, indent=2) + "\n")
@@ -221,10 +235,15 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         "gold_ids_touched": 0,
         "seeds": training["seeds"],
         "mean_macro_f1": {k: round(v, 6) for k, v in sorted(mean_scores.items(), key=lambda kv: -kv[1])},
-        "seed_sd": {
-            k: round(_sd([r["macro_f1"] for r in per_seed if r["arm"] == k]), 6)
-            for k in arm_keys
-        },
+        "seed_sd": {k: round(seed_sds[k], 6) for k in arm_keys},
+        "selected_lr": {k: best_lrs[k] for k in arm_keys},
+        # ⚠️ Disclosed, not buried: the learning rate is chosen by best mean on
+        # dev, and the arms are then compared on that same dev set. Selection
+        # and evaluation share data, which biases every arm's score slightly
+        # upward. It biases them in the same direction, so the COMPARISON is
+        # far less affected than the levels -- but the levels are not clean
+        # held-out estimates and must never be quoted as if they were.
+        "lr_selected_on_eval_set": True,
         "pairwise": [
             {
                 "arm_a": r.arm_a, "arm_b": r.arm_b,
@@ -283,11 +302,18 @@ def _render_md(result: dict, cfg: dict) -> str:
         "",
         "## Mean macro-F1 (± SD across seeds — sensitivity, not the decision rule)",
         "",
-        "| Arm | mean macro-F1 | SD |",
-        "|---|---|---|",
+        "SD is over the 5 seeds **at the selected learning rate**, not over all 10 runs.",
+        "⚠️ The learning rate was selected by best mean on this same dev set, so the",
+        "levels below are **not clean held-out estimates** and must not be quoted as such.",
+        "",
+        "| Arm | mean macro-F1 | SD | selected lr |",
+        "|---|---|---|---|",
     ]
     for arm, score in result["mean_macro_f1"].items():
-        lines.append(f"| `{arm}` | {score:.4f} | {result['seed_sd'][arm]:.4f} |")
+        lines.append(
+            f"| `{arm}` | {score:.4f} | {result['seed_sd'][arm]:.4f} | "
+            f"{result['selected_lr'][arm]:.0e} |"
+        )
     lines += ["", "## Pairwise paired bootstrap", "",
               "| A | B | diff | 95% CI | p | significant (BH) |", "|---|---|---|---|---|---|"]
     for p in result["pairwise"]:
