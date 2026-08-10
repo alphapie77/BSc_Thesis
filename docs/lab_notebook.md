@@ -3081,3 +3081,93 @@ indices does not fully substitute for it. Recorded rather than glossed.
 reruns a *prompted* model at most three times. Their effect sizes are an **upper
 bound** on what our loop can produce, not a prediction. That makes gaming less
 likely *and* a null RQ5 less informative. Both halves belong in Ch.5.
+
+---
+
+## 2026-08-11 -- S3.5-prereg: symbolic feature pool pre-registered; IDF replaces the presence rules
+**Feeds:** Ch.3 Methods sect. 3.5; Phase 4 Critic
+**Artifacts:** `docs/protocol.md` sect."S3.5 pre-commitment", `docs/related_work.md` Tier 8, `docs/references.bib` (+2)
+
+### Numbers
+- Feature families fixed: **6** (F1 IDF, F2 length/shape, F3 normalised orthography,
+  F4 discourse connectives, F5 sentiment fraction, F6 length-corrected richness).
+- Families registered **gameable in advance**: **4 of 6** (F2-F5).
+- `ko2019specificity` on movie reviews: Spearman **0.702** vs length baseline **0.581**.
+- Our `length_auc`: **0.6764** -- independently in the same regime.
+- Deviation rows **48 -> 50**; bib **46 -> 48**.
+- Dev-slice decision load **5 -> 3** (hybrid weight and tau moved to dev-plots).
+
+### Decisions made (and why)
+
+- **The pipeline's sect. 3.5 feature pool is replaced before any code was written.**
+  Its list is almost entirely presence-based, and `mahmoud2026rubric` shows that
+  is the category that gets hacked. **Our sect. 4.2 Reflector names the failing rule
+  to the Writer**, so presence rules under this loop function closer to a gaming
+  instruction than a scorer.
+
+- **IDF (F1) is the load-bearing addition, and the argument is specific:**
+  raising it requires using genuinely rarer, more specific words, which *is* the
+  construct. It cannot be satisfied vacuously -- the exact property Mahmoud et
+  al. find presence criteria lack. Computable from R1 alone; no external
+  resource; rule 7 intact (whitespace tokens, no stemming).
+
+- **Presence rules retained as F2-F5 rather than deleted**, because sect. 3.5
+  mandates them and the Reflector needs human-readable rules to name.
+  **Each is labelled gameable in advance and its weight reported individually**,
+  so a gain arriving only through them is visible as such -- pre-committed as a
+  negative result about the hybrid design.
+
+- **Hybrid weight moved off the 82 rows onto the 30 dev-plots' generations.**
+  Two reasons: at 1 error in 82 the 0.5-0.8 grid is degenerate; and
+  `kapur2026length` show the length-specificity relation is flat or reversed in
+  machine-generated text, so a weight calibrated on real reviews is calibrated
+  on the wrong distribution.
+
+- **Excluded with stated reasons** rather than silently: imageability/familiarity
+  norms (none exist for Bangla), stop-word fraction (no resource; rule 7
+  territory), emoji (zero in corpus), standalone name-mention rule (subsumed by
+  IDF, since names are naturally high-IDF).
+
+### Findings (things we did not expect)
+
+- 🎁 **The construct was never ours to invent.** RQ1 has been treating
+  "engagement specificity" as a project coinage. **Sentence specificity is a
+  named task** with prior art to Louis & Nenkova (2011), and
+  `ko2019specificity` evaluates it **on movie reviews**. Ch.2 can now cite a
+  literature instead of defending a coinage, and **RQ1-H's Gate B becomes
+  corroboration of an existing construct rather than the definition of a new
+  one** -- a materially stronger position.
+
+- **Their length baseline is 0.581 Spearman against a full system at 0.702.**
+  Length being a strong-but-incomplete predictor of specificity is the
+  *expected* state of this construct, not a flaw in our data. `length_auc`
+  0.6764 sits in the same regime and can be reported as such.
+
+- ⚠️ **An uncomfortable correction to the G-300 post-mortem.**
+  `ko2019specificity` reached Cronbach alpha 0.68-0.70 **with nine raters and an
+  exclusion rule below 0.3**. Attempt 1 ran **two** raters with no exclusion
+  rule. The 2026-08-05 diagnosis blamed scale collapse and Claude's calibration
+  advice -- **both stand, but they were not the whole cause.** Specificity
+  rating is known to need many raters and we ran the minimum possible. Recorded
+  because a post-mortem that names only the causes we already knew is not a
+  post-mortem.
+
+### Consequences for downstream steps
+
+- **Ch.2 gains a construct section** citing the specificity literature; RQ1's
+  framing shifts from coinage to adoption.
+- **The Reflector's rule vocabulary is fixed by F2-F5** -- it can only name what
+  the scorer measures, and the gameable families are precisely the nameable ones.
+  That tension is registered, not resolved.
+- **RQ5 gains a third signal**: per-family symbolic scores logged per attempt;
+  presence-family scores rising while Verifier-B stays flat is Mahmoud's
+  signature.
+- `kapur2026length`'s contrast-set specificity measure is a **candidate for
+  sect. 5.4's realism test** -- noted, not adopted, and not to be adopted without
+  its own pre-registration.
+
+### Citations needed
+
+**Tier 8** added: `ko2019specificity` `[x]`, `kapur2026length` `[x]` -- both read
+in full. ⚠️ Found via **alphaXiv + Scite, NOT Consensus** (quota exhausted until
+2026-09-01).

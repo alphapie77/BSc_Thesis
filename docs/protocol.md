@@ -1079,6 +1079,100 @@ it is the step returning what it can support.
 
 ---
 
+## S3.5 pre-commitment: the symbolic scorer's feature pool
+
+> **Written 2026-08-11, before `src/symbolic/` exists and before any feature has
+> been computed on any row.** Pipeline §3.5 specifies this component; this
+> section fixes its **feature families**, why each is there, what is deliberately
+> excluded, and where its weights are fit. **The search that produced it ran
+> before the design, per the standing instruction — and it changed the design.**
+
+### Why the pipeline's list, as written, is the wrong list
+
+§3.5's pool is: intensifier count, positive/negative lexemes, length bucket,
+exclamation, negation, name mentions, specificity terms. **Almost every item is
+"does the text contain X".** `mahmoud2026rubric` shows that **presence-based
+criteria are the category that gets hacked**: under a *strong* verifier, gains
+concentrated in presence-based criteria (+1.07 completeness) while conciseness
+(−2.91), relevance (−1.10) and factual correctness (−0.85) all degraded.
+
+**Our loop makes this worse than theirs**, and the mechanism is in §4.2: the
+Reflector *tells the Writer which rule failed* ("no intensifiers [R1 failed]").
+Their policies had to discover the rubric. Ours is handed it. **A pool of
+presence rules under a loop that names the failing rule is a gaming instruction,
+not a scorer.**
+
+### The construct has prior art, and a validated feature set
+
+**This was not known to the project before 2026-08-11 and it changes the
+framing:** our construct is **sentence specificity**, an established task
+(Louis & Nenkova 2011; Li & Nenkova 2015; `ko2019specificity`), *"the level of
+detail in a sentence."* `ko2019specificity` evaluates on **movie reviews** —
+our domain — reaching Spearman **0.702**, against a **length baseline of 0.581**.
+
+**Length is a strong but incomplete predictor of specificity.** That is their
+result and ours: `length_auc` = **0.6764**. It is registered as expected, not
+as a defect.
+
+### Feature families — fixed here
+
+| # | Family | Members | Gameable? |
+|---|---|---|---|
+| **F1** | **IDF statistics** 🆕 | min / max / mean IDF over whitespace tokens, IDF computed on **R1 only** | 🟢 **Hard.** Raising it requires using genuinely rarer words — which *is* the construct. This is the one family that cannot be satisfied vacuously |
+| F2 | Length & shape | token count, mean characters per word | 🟡 trivially gameable, retained because it is genuinely predictive (0.581 baseline) and its contribution is *reported*, never hidden |
+| F3 | Normalised orthography | punctuation, digits, Latin-script chars, দাঁড়ি termination — each **divided by length** | 🟡 |
+| F4 | Discourse connectives | কিন্তু, তাই, কারণ, যদিও, তবে | 🔴 highly gameable |
+| F5 | Sentiment-bearing fraction | fraction of tokens in a polarity list (ভালো/বাজে/ফালতু), **as a fraction, not a count** | 🔴 highly gameable |
+| F6 | Lexical richness | **length-corrected** richness (Guiraud-type V/√N), never raw type-token ratio | 🟢 harder — S2e's richness inversion survived a length control in **all 4** bands |
+
+**F1 and F6 are the load-bearing pair, and both are distributional.** F2–F5 are
+retained because §3.5 mandates them and because the Reflector needs
+human-readable rules to name — **but every one of them is registered as
+gameable, in advance, and their weights are reported individually.**
+
+### Deliberately EXCLUDED, with reasons
+
+- **Word familiarity / imageability norms** — used by `ko2019specificity`, and
+  **no Bangla norms exist** that we could verify. Not silently dropped: stated.
+- **Stop-word fraction** — would require building a Bangla stop-word list. Rule 7
+  forbids stop-word *removal*; a fraction is not removal, but no resource exists
+  and inventing one is unjustified.
+- **Emoji** — zero in the corpus (S0 verified).
+- **Name mentions** as a standalone rule — §3.5 lists it; retained only inside F1,
+  since names are naturally high-IDF and a separate presence rule adds a gameable
+  surface without adding signal.
+
+### Where the weights are fit — and this is a change
+
+- **Feature weights: logistic regression, never hand-set** (§3.5's own rule),
+  on the **82 labelled dev rows**, reported with that n.
+- 🔴 **The hybrid weight (§3.5's 0.6/0.4) moves OFF the 82 rows onto the 30
+  dev-plots' generations.** At Verifier-A = **0.9866** (1 error in 82) the sweep
+  is degenerate: every weight in §5.1b's 0.5–0.8 grid returns the same answer,
+  and the "<2 points" rule would need to resolve **1.6 dev items**. The weight is
+  a **generation-time** parameter and is fit where the Critic operates.
+  ⚠️ Reinforced by `kapur2026length`: in *human* text longer means more specific,
+  but in **machine-generated text that relation is flat or reversed** — so a
+  weight calibrated on real reviews is not transferable to generated ones.
+- Reported as a **sensitivity curve, never a point** (as for τ).
+
+### Pre-committed outcomes
+
+| Outcome | Claim |
+|---|---|
+| Symbolic adds **≥ 2 points** over neural-only on dev-plots | The hybrid claim (RQ3) stands, and the **per-family weights are reported** so the reader sees whether the gain came from F1/F6 or from the gameable families |
+| Symbolic adds **< 2 points** | **RQ3's own pre-commitment fires: the hybrid claim is softened.** Registered as the expected outcome given Verifier-A's ceiling. The scorer is still built and still used, because §4.2's Reflector cannot name a failing rule without it — *interpretability is a stated purpose, not a consolation* |
+| Gain comes **only** from F2–F5 (the gameable families) | 🔴 Reported as a **negative result about the hybrid design**: the symbolic contribution is exactly the part a generator could fake. Stated in those words |
+
+### Registered gaming diagnostic (feeds RQ5, not RQ3)
+
+Per-family symbolic scores are logged **per attempt**. **Presence-family (F2–F5)
+scores rising across attempts while Verifier-B stays flat is Mahmoud et al.'s
+signature**, and is reported alongside the A−B gap and the invariance check.
+**Symbolic is registered as an instrument for detecting gaming, never as a shield
+against it** — the shield framing was proposed on 2026-08-11 and rejected by the
+same search that produced this section.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 
@@ -1132,3 +1226,5 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-08-11 | ⚠️ **Decision 16 AMENDED: "cross-family" is registered as necessary but NOT sufficient, and independence becomes measurable rather than asserted** | Decision 16 justified the A/B wall on family separation (ELECTRA vs BERT, Bangla-specific vs multilingual, fine-tuned vs frozen). **That argument is weakened by evidence found on 2026-08-11 and the weakening is recorded rather than absorbed.** Added: a pre-registered **entanglement audit** on the dev slice before any Goodhart number is interpreted, following `kuai2026entanglement` — co-failure structure on the failure manifold (BEI / CIG), not score correlation. | `kuai2026entanglement` audits 18 LLMs across 6 families and finds **widespread intra- *and* cross-family behavioural entanglement, including cross-generation**, concluding that *"apparent agreement may reflect a consensus of correlated errors rather than independent verification."* Entanglement tracks judge over-endorsement bias (Spearman **0.64**, p < 0.001; **0.71**, p < 0.01), and — the operationally important part — **plain correlation fails to detect it**; the signal lives in *how models fail together*, weighted toward co-failures on easy items. **This cuts at us harder than at their setting:** our A and B are not two independently-developed frontier models. They are trained on **the same label, derived from the same k-means over the same corpus**, so shared-label entanglement is guaranteed and only its magnitude is unknown. **Pre-committed:** if the audit shows high A/B entanglement, a small A−B gap in RQ5 **may not be read as absence of gaming**, and that is stated wherever the gap appears. |
 | 2026-08-11 | 🔴 **RQ3 — the "symbolic resists gaming" reframing was proposed, searched, and REJECTED BEFORE being written. RQ3 stands unchanged** | S3.2b left RQ3 ("hybrid beats neural-only") nearly unanswerable: Verifier-A now scores **0.9866 = 1 error on 82 dev rows**, so the §5.1b rule *"if symbolic adds < ~2 points, soften the claim"* would need to resolve ~1.6 dev items. Claude proposed reframing RQ3 around gaming-resistance instead. **The search killed it.** RQ3 keeps its original hypothesis and its original pre-commitment. | **This is the standing search-first instruction working as designed, and it is logged as a near-miss rather than quietly dropped.** `mahmoud2026rubric` — already cited here for decision 16, but only from its abstract — studies exactly this claim and refutes it. Rubric/rule-based rewards **are** hacked: under a *strong* verifier, rubric-based judges preferred the RL checkpoint on **85.8%** of prompts while rubric-free judges preferred the **base** model on **78.4%**, with gains concentrated in **presence-based** criteria (completeness **+1.07**) and losses everywhere else (conciseness **−2.91**, relevance **−1.10**, factual correctness **−0.85**, overall **−1.02**). They name the mechanism *"hacking the rubric, not the verifier."* 🔴 **Our §3.5 feature pool is almost entirely presence/count-based** — intensifier count, positive/negative lexemes, exclamation, negation, name mentions, specificity terms — i.e. the exact category that was hacked. **And our design is strictly worse than theirs:** §4.2's Reflector *tells the Writer which symbolic rule failed* ("no intensifiers [R1 failed]"). Their policies had to discover the rubric; ours is handed it. **Conclusion: symbolic is plausibly the MOST gameable component in this system, not a shield against gaming.** Had the reframing been written from memory, it would have been refuted by a paper already in our own bibliography. **What symbolic is retained for, honestly:** (i) §3.5 mandates it and §4.2's Critic cannot exist without it; (ii) **interpretability** — it can say *which* rule failed, which the LaBSE probe cannot, and the Reflector requires exactly that; (iii) a new, testable use registered here — **symbolic as an instrument for detecting gaming rather than preventing it**: presence-based symbolic scores rising across attempts while Verifier-B stays flat is Mahmoud et al.'s signature, and it is added to RQ5's evidence alongside the A−B gap and the invariance check. **Weights are not hand-set** (§3.5 already forbids it) and, per the 82-row resolution limit, the hybrid weight is fit on the **30 dev-plots' generations** — where the Critic actually operates — and reported as a sensitivity curve, never a point. |
 | 2026-08-11 | ⚠️ **Dev-slice reuse counted and disclosed: 82 rows now carry five decisions** | The 82-row labelled dev slice is used for: (1) learning-rate selection in S3.2, (2) temperature scaling / calibration (§3.4), (3) the symbolic scorer's logistic weights (§3.5), (4) the hybrid weight (§3.5, §5.1b), and (5) τ selection (§4.5, via dev-plots). | Recorded as a count rather than a caveat because the number is the argument. §3.4 already demoted calibration to descriptive at this n; the same n is silently carrying four further decisions. Decisions (4) and (5) are moved to the **30 dev-plots** by the RQ3 row above, which removes them from the 82; the remaining three are disclosed together in Ch.5 as a single multiple-use limitation rather than three separate footnotes. |
+| 2026-08-11 | **S3.5 — the symbolic feature pool is REPLACED before a line of it was written; IDF added, presence rules demoted** | Pipeline §3.5's pool (intensifier count, positive/negative lexemes, length bucket, exclamation, negation, name mentions, specificity terms) is **almost entirely presence-based**. Replaced by six families registered in §"S3.5 pre-commitment" above, built on `ko2019specificity`'s validated set: **F1 IDF statistics (min/max/mean)** and **F6 length-corrected lexical richness** as the load-bearing pair, with the pipeline's presence rules retained as F2–F5 and **individually labelled gameable**. Excluded with reasons: imageability/familiarity norms (**none exist for Bangla**), stop-word fraction (no resource, and rule 7 territory), emoji (zero in corpus). | **The search ran before the design and changed it — twice over.** (1) `mahmoud2026rubric` shows presence-based criteria are the category that gets hacked, and §4.2's Reflector *names the failing rule to the Writer*, so a pool of presence rules under this loop is closer to a gaming instruction than a scorer. (2) `ko2019specificity` then supplied the replacement: our construct is **sentence specificity**, a named task with prior art back to Louis & Nenkova (2011), evaluated by them **on movie reviews** at Spearman **0.702** against a **length baseline of 0.581** — which independently reproduces our own `length_auc` 0.6764 and registers length as expected rather than embarrassing. 🔑 **Why IDF is the one that matters: raising it requires using genuinely rarer, more specific words, which *is* the construct.** It cannot be satisfied vacuously, which is exactly the property Mahmoud et al. find presence criteria lack. 🎁 **A framing gain beyond S3.5: the construct is adopted, not invented** — Ch.2 may now cite a literature for it instead of defending a coinage, and RQ1-H's Gate B result becomes corroboration of an existing construct rather than the definition of a new one. ⚠️ **And an uncomfortable correction to the G-300 post-mortem:** `ko2019specificity` reached Cronbach α 0.68–0.70 on this construct with **nine** raters and an exclusion rule for raters below 0.3. Attempt 1 had **two** and no exclusion rule. The 2026-08-05 diagnosis blamed scale collapse and Claude's calibration advice; **both stand, but they were not the whole cause — specificity rating is known to need many raters, and we ran it with the minimum possible.** |
+| 2026-08-11 | **S3.5 — the hybrid weight is fit on dev-plot GENERATIONS, not on the 82 dev rows** | §3.5 and §5.1b tune the 0.6/0.4 neural/symbolic weight on the dev slice (grid 0.5–0.8). Moved to the **30 dev-plots' generated outputs**, and reported as a **sensitivity curve, never a point**. | Two independent reasons. **(1) Resolution.** Verifier-A is now the frozen LaBSE probe at **0.9866 — one error in 82**. Every weight in the 0.5–0.8 grid returns the same answer, and §5.1b's "<2 points" rule would need to resolve **1.6 dev items**. The sweep as specified is degenerate, not informative. **(2) Transfer, which is the deeper reason.** `kapur2026length` show that in **human** text longer means more specific, while in **machine-generated** text the relation is **flat or reversed** — so a weight calibrated on real reviews is calibrated on the wrong distribution. The Critic scores *generated* text; the weight belongs where the Critic operates. This also removes two of the five decisions the 82-row slice was carrying (deviation of 2026-08-11), leaving three. |

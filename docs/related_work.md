@@ -443,6 +443,18 @@ unread load-bearing citation is a debt, not an asset.
 | `mahmoud2026rubric` | Mahmoud et al. 2026, arXiv 2605.12474 (Scale AI) | `[x]` **full body** | 🔴 **Cited twice, for opposite purposes.** (1) It is decision 16's basis for cross-family evaluation. (2) **It refutes the RQ3 gaming-shield reframing before it was written.** Rule-based rewards *are* hacked: under a strong verifier, rubric judges preferred the checkpoint on **85.8%** of prompts while rubric-free judges preferred the **base** on **78.4%**; gains concentrated in **presence-based** criteria (+1.07 completeness) with losses in conciseness (−2.91), relevance (−1.10), factual correctness (−0.85). Mechanism: *"hacking the rubric, not the verifier."* **Our §3.5 features are presence/count-based and our Reflector names the failing rule to the Writer** — strictly easier to game than their setting. ⬛ Their `self-internalization gap` diagnostic is **not usable here**: it needs a training trajectory, and we never fine-tune (rule 10). |
 | `kuai2026entanglement` | Kuai et al. 2026, arXiv 2604.07650 (Texas A&M) | `[x]` **full body** | 🔴 **Amends decision 16.** 18 LLMs × 6 families: entanglement is widespread **intra- and cross-family**, so "different family" does not establish independence. *"Apparent agreement may reflect a consensus of correlated errors rather than independent verification."* Tracks judge over-endorsement (Spearman **0.64**, p<0.001). **Plain correlation fails to detect it** — the signal is in the joint **failure** manifold (BEI, CIG), weighted toward co-failures on easy items. Supplies the dev-slice entanglement audit now pre-registered for RQ5. |
 
+## Tier 8 — Sentence specificity: the construct has prior art (added 2026-08-11)
+
+> **The most consequential thing this tier does is remove an invention.** RQ1's
+> construct was treated throughout as something the project defined. It is a
+> **named task with a fifteen-year literature**, and one of its papers evaluates
+> on **movie reviews**. That changes Ch.2: the construct is *adopted*, not coined.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `ko2019specificity` | Ko, Durrett & Li, AAAI 2019 | `[x]` **full body** | 🔴 **The S3.5 feature pool comes from here, replacing the pipeline's presence-based list.** Validated families: normalised punctuation/digits, mean word length, discourse connectives, sentiment-bearing fraction, and — decisively — **min/max/mean IDF**, the one family that cannot be satisfied vacuously. Evaluates on **movie reviews**: Spearman **0.702** vs a **length baseline of 0.581**, which independently reproduces our `length_auc` **0.6764**. ⚠️ Also reframes G-300 attempt 1: their α of 0.68–0.70 needed **9 raters plus exclusion of raters below 0.3**. We had **2** and no exclusion rule — a second cause of α 0.4970 beside scale collapse. |
+| `kapur2026length` | Kapur, Hawkins & Kreiss 2026, arXiv 2601.04609 (Stanford/UCLA) | `[x]` **full body** | Independent support for **RQ1-H's length-matched design** — with length held constant, humans reliably prefer the more specific option. 🔴 **Forces the hybrid-weight relocation:** in *human* text longer means more specific; in **machine-generated text the relation is flat or reversed**, so a weight calibrated on real reviews will not transfer to generated ones. Their contrast-set specificity measure is also robust to fabricated detail (rank 17.05 → 30.91) — a **candidate for §5.4's realism test, not yet adopted**. |
+
 **The honest asymmetry, recorded because it is the argument for both rows:**
 these papers study policies trained by RL against a reward. **We never train a
 generator** (rule 10) — our loop reruns a *prompted* model up to three times.

@@ -659,3 +659,44 @@
             at them: our A and B share a label derived from one k-means over one
             corpus. Read in full via PDF query.}
 }
+
+@inproceedings{ko2019specificity,
+  title     = {Domain Agnostic Real-Valued Specificity Prediction},
+  author    = {Ko, Wei-Jen and Durrett, Greg and Li, Junyi Jessy},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2019},
+  note      = {\U0001F534 LOAD-BEARING for S3.5 and for RQ1's framing. Establishes
+               that our construct -- "the level of detail in a sentence" -- is a
+               named task with prior art (Louis and Nenkova 2011; Li and Nenkova
+               2015), not something this thesis invented. Evaluates on MOVIE
+               REVIEWS, our domain: Spearman 0.702 against a LENGTH BASELINE of
+               0.581 -- length is strong but incomplete, matching our
+               length_auc 0.6764. Supplies the validated feature set we adopt in
+               place of the pipeline's presence-based list; the decisive
+               addition is min/max/mean IDF, which cannot be satisfied
+               vacuously. Their crowdsourced specificity reached Cronbach alpha
+               0.68-0.70 -- but with NINE raters and exclusion of raters below
+               0.3. G-300 attempt 1 had TWO and no exclusion rule, which is a
+               second cause of its alpha 0.4970 alongside scale collapse.
+               Read in full via PDF query.}
+}
+
+@misc{kapur2026length,
+  title  = {When More Words Say Less: Decoupling Length and Specificity in
+            Image Description Evaluation},
+  author = {Kapur, Rhea and Hawkins, Robert and Kreiss, Elisa},
+  year   = {2026},
+  howpublished = {arXiv preprint arXiv:2601.04609},
+  note   = {Independent support for RQ1-H's length-matched design: with length
+            controlled, humans reliably prefer the more specific option.
+            Defines specificity via a contrast set -- a description is more
+            specific when it picks its target out of more alternatives.
+            \U0001F534 The finding that matters for S3.5: in HUMAN text longer
+            means more specific, but in machine-generated text the relation is
+            FLAT OR REVERSED. So a symbolic weight calibrated on real reviews
+            does not transfer to generated ones -- which is why the hybrid
+            weight is fit on dev-plot generations, not on the 82 dev rows.
+            Their contrast-set measure also proved robust to hallucination
+            (rank 17.05 -> 30.91 when details were fabricated). Candidate for
+            sect. 5.4's realism test; NOT adopted there yet. Read in full.}
+}
