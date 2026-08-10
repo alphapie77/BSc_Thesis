@@ -1,0 +1,41 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-10T12:55:51.659188+00:00",
+    "git_commit": "1a37be13a011e2d3ee68e0b2c68cd12a04ee9fbc",
+    "untracked_files": 0,
+    "config": "configs/s3b_baselines.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "verdict": "CIRCULARITY_CONFIRMED",
+    "n_train": 804,
+    "n_dev": 82,
+    "one_dev_item_in_macro_f1": 0.012195,
+    "baselines": {
+      "majority": 0.392593,
+      "length_rule": 0.619666,
+      "labse_probe": 0.986555
+    },
+    "baseline_detail": {
+      "length_rule": {
+        "threshold": 7,
+        "direction": "<=",
+        "train_macro_f1": 0.663442
+      }
+    },
+    "best_arm": "banglabert",
+    "best_arm_macro_f1": 0.964668,
+    "gap_best_arm_minus_labse_probe": -0.021887,
+    "gap_in_dev_items": -1.79,
+    "arm_means_for_reference": {
+      "banglabert": 0.964668,
+      "setfit_labse": 0.958966,
+      "indicbertv2": 0.956018,
+      "muril": 0.942118,
+      "mbert": 0.940246,
+      "xlmr": 0.935954,
+      "bert_nli": 0.929828
+    }
+  }
+}

@@ -2741,3 +2741,113 @@ deviations and in Ch.4, and it still has no bib entry**, `laurer2023bertnli`
 `teodorescu2025kfold` ⬛ **also not yet added** for the cross-model-class caveat.
 
 ⚠️ Read-status is still `[ ]` for all of them.
+
+---
+
+## 2026-08-10 -- S3.2b: Baselines: a frozen LaBSE probe beats every fine-tuned arm
+**Feeds:** Ch.3 methods, Ch.4 results, Ch.5 limitations, RQ5
+**Commit:** `1a37be13a011e2d3ee68e0b2c68cd12a04ee9fbc-dirty`
+**Artifacts:** `results/s3b_baselines.json`, `results/s3b_baselines.md`
+
+### Numbers
+- `results/s3b_baselines.json`
+  - `verdict` = CIRCULARITY_CONFIRMED
+  - `n_train` = 804
+  - `n_dev` = 82
+  - `one_dev_item_in_macro_f1` = 0.012195
+  - `baselines` = {'majority': 0.392593, 'length_rule': 0.619666, 'labse_probe': 0.986555}
+  - `best_arm` = banglabert
+  - `best_arm_macro_f1` = 0.964668
+  - `gap_best_arm_minus_labse_probe` = -0.021887
+  - `gap_in_dev_items` = -1.79
+  - `arm_means_for_reference` = {'banglabert': 0.964668, 'setfit_labse': 0.958966, 'indicbertv2': 0.956018, 'muril': 0.942118, 'mbert': 0.940246, 'xlmr': 0.935954, 'bert_nli': 0.929828}
+- `results/s3b_baselines.md`
+  - (see file; 1361 bytes)
+
+### Decisions made (and why)
+
+- **The frozen-probe baseline was added at all.** Alternative: proceed to Phase 4
+  on the seven-arm table as it stood. Rejected because the table could not
+  answer *0.96 against what?*, and the specific worry — that `cluster_k2` came
+  from k-means **on LaBSE embeddings**, so a linear probe on those embeddings is
+  the label's own geometry reproducing itself — was cheap to test and expensive
+  to discover later. Sabbir asked whether Phase 3 was satisfactory before
+  Phase 4; this is the answer to that question.
+- **Bands were fixed before the number existed**, in units of one dev item
+  (1/82 = 0.0122), because that is the resolution 82 items have. Band (i) fired,
+  and past its own threshold.
+- **The result was verified before it was believed**, which the pre-registration
+  demanded only for the `NOT_CIRCULAR` outcome — done here anyway because a
+  result this strong is exactly when a bug is most likely to be mistaken for a
+  finding. Train and dev are disjoint, so nothing leaked into the logistic fit;
+  the reported macro-F1 reconstructs exactly at **one error in 82**; and the
+  artifact carries a real provenance stamp (`1a37be1`, genuine UTC timestamp).
+- **Verifier-A is NOT reassigned here.** The probe is now the strongest and
+  cheapest candidate, but making both A and B probes would collapse RQ5, so the
+  choice is opened as decision 16 rather than taken. Registering it before
+  Verifier-A is trained is the point.
+
+### Findings (things we did not expect)
+
+- 🔴 **The frozen probe does not merely match the fine-tuned arms — it beats all
+  seven.** 0.9866 against BanglaBERT's 0.9647: **1.8 dev items ahead**, one error
+  on 82 items, from a logistic regression that fits in seconds. Roughly 4.5
+  GPU-hours of fine-tuning produced something slightly *worse* than a linear head
+  on frozen embeddings.
+- 🔴 **So the seven-arm ablation measured the label's construction, not the
+  backbones.** `cluster_k2` is close to a linear boundary in LaBSE space by
+  construction, and every arm was recovering it. **The table may support no claim
+  about which backbone is better**, and the `TIE` is re-explained: the arms are
+  indistinguishable because the task is near-saturated, not because backbones are
+  interchangeable in general.
+- ⚠️ **Fine-tuning cost accuracy rather than adding it.** This is what Buckmann
+  et al. (2024) predict for the tens-of-shot regime and what Beliveau et al.
+  (2024) imply for small non-English data. Both were already in the
+  bibliography; neither was applied to our own setup until now.
+- 🎁 **The trivial baselines are reassuring and were also unknown.** Majority
+  **0.3926**, best length rule fitted on train (n_words ≤ 7) **0.6197**. The task
+  is not the class prior or the length confound wearing a transformer — which
+  matters, because S2e had measured `length_auc` at 0.6764 and left the worry open.
+- ⚠️ **A consequence the pre-registered bands did not anticipate, and it is the
+  most serious one.** If Verifier-A becomes the probe and Verifier-B is also a
+  probe, the two are near-identical functions on one embedding space, they agree
+  by construction, and **RQ5's Goodhart test — the wall that inviolable rule 6
+  exists to protect — becomes unmeasurable.** Opened as decision 16.
+- 🎁 **A sharper way to state the risk, which may become the more interesting
+  paper.** A verifier that is a linear function of LaBSE may be *trivially
+  gameable* by a generator whose output is scored in that same space. That is
+  precisely the failure mode RQ5 was written to detect, and S3.2b has made it a
+  live hypothesis rather than a formality.
+
+### Consequences for downstream steps
+
+- **Ch.4 rewrites the ablation section.** It becomes: seven backbones are
+  indistinguishable, a frozen linear probe beats all of them, and the reason is
+  that the label is linear in its generating encoder. That is a more honest
+  section and a more interesting one than "BanglaBERT wins".
+- **RQ1 and RQ2 are unaffected.** RQ1-H showed humans perceive the distinction
+  (0.78/0.84 against 0.25 chance), so the label is real — it is simply linear in
+  LaBSE space. RQ2 needs a well-defined reproducible label and has one.
+- **Verifier-A is blocked on decision 16.** It must not be trained before that is
+  registered.
+- **S3.4 may get easier**: logistic regression yields calibrated probabilities
+  natively, which is a better starting point at n=82 than a fine-tuned
+  transformer's logits. Whether that survives depends on decision 16.
+- **Ch.5 Limitations gains the central one**: a cluster-derived label evaluated
+  by models with access to the clustering encoder cannot measure much, and any
+  accuracy reported against it must be read as reproduction of a geometric
+  partition.
+
+### Citations needed
+
+- `buckmann2024logistic` — already in `references.bib` §Tier 5b as a supporting
+  entry. **Promote it: it is now load-bearing**, since it predicted this result
+  in advance and we did not apply it.
+- `beliveau2024smalldata` — already load-bearing for SetFit; its BERT-like >
+  SetFit ordering is unchanged, but its broader point about small non-English
+  data now applies to the whole ablation.
+- ⬛ No new method was used. Logistic regression on frozen sentence embeddings
+  needs no citation beyond Buckmann; the k-means provenance of the label is
+  already documented in S2d/S2e.
+
+⚠️ Read-status remains `[ ]` for both.
