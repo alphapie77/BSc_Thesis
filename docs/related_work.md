@@ -426,6 +426,31 @@ a **paired bootstrap test**.
 warning as Tier 5: listed because `protocol.md` now rests on them, and an
 unread load-bearing citation is a debt, not an asset.
 
+## Tier 7 — Verifier gaming and evaluator independence (added 2026-08-11)
+
+> **Why this tier exists.** RQ5 rests on two assumptions that had never been
+> checked against the literature: that **Verifier-A and Verifier-B are
+> independent enough** for their gap to mean something, and — proposed on
+> 2026-08-11 — that a **symbolic scorer resists gaming**. The first is weaker
+> than decision 16 claimed. The second is false. Both were settled *before*
+> anything was written, which is the standing instruction working.
+>
+> **Source disclosure:** alphaXiv, **not Consensus** (quota exhausted until
+> 2026-09-01).
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `mahmoud2026rubric` | Mahmoud et al. 2026, arXiv 2605.12474 (Scale AI) | `[x]` **full body** | 🔴 **Cited twice, for opposite purposes.** (1) It is decision 16's basis for cross-family evaluation. (2) **It refutes the RQ3 gaming-shield reframing before it was written.** Rule-based rewards *are* hacked: under a strong verifier, rubric judges preferred the checkpoint on **85.8%** of prompts while rubric-free judges preferred the **base** on **78.4%**; gains concentrated in **presence-based** criteria (+1.07 completeness) with losses in conciseness (−2.91), relevance (−1.10), factual correctness (−0.85). Mechanism: *"hacking the rubric, not the verifier."* **Our §3.5 features are presence/count-based and our Reflector names the failing rule to the Writer** — strictly easier to game than their setting. ⬛ Their `self-internalization gap` diagnostic is **not usable here**: it needs a training trajectory, and we never fine-tune (rule 10). |
+| `kuai2026entanglement` | Kuai et al. 2026, arXiv 2604.07650 (Texas A&M) | `[x]` **full body** | 🔴 **Amends decision 16.** 18 LLMs × 6 families: entanglement is widespread **intra- and cross-family**, so "different family" does not establish independence. *"Apparent agreement may reflect a consensus of correlated errors rather than independent verification."* Tracks judge over-endorsement (Spearman **0.64**, p<0.001). **Plain correlation fails to detect it** — the signal is in the joint **failure** manifold (BEI, CIG), weighted toward co-failures on easy items. Supplies the dev-slice entanglement audit now pre-registered for RQ5. |
+
+**The honest asymmetry, recorded because it is the argument for both rows:**
+these papers study policies trained by RL against a reward. **We never train a
+generator** (rule 10) — our loop reruns a *prompted* model up to three times.
+So the optimisation pressure is far weaker than theirs, and their effect sizes
+are an **upper bound** on what our loop could produce, not a prediction. That
+cuts both ways: it makes gaming less likely *and* makes a null RQ5 result less
+informative. Both halves go in Ch.5.
+
 ---
 
 ## Gap table — the sentence Ch.2 must end with

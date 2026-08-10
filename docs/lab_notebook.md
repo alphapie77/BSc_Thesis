@@ -2969,3 +2969,107 @@ Added as **Tier 6** in `related_work.md` and to `references.bib`:
 Consensus quota was exhausted (0 searches until 2026-09-01). The standing
 instruction prefers Consensus; it was unavailable, and searching two replacement
 indices does not fully substitute for it. Recorded rather than glossed.
+
+---
+
+## 2026-08-11 -- S6b: pipeline cross-check -- 10 deviations, and a reframing the search killed
+**Feeds:** Ch.3 Methods; Ch.5 Limitations; Phase 4 planning
+**Artifacts:** `docs/protocol.md` (47 deviation rows), `docs/related_work.md` Tier 7, `docs/references.bib` (+1, +1 upgraded), `docs/STATUS.md` Phase-3 real state
+
+### Numbers
+- Deviation rows **37 -> 47**.
+- Pipeline sect. 3 deliverables: **1 of 5** exist.
+- `grep -rl symbolic src/ configs/` -> **0 files**. `src/agents/`, `src/eval/` -> empty stubs.
+- English arm artifacts (`imdb`, `mpst`, `distilroberta`) in repo -> **0**.
+- sect. 5.1 generation count **2,160 -> 1,440** per language (stale 8 days).
+- Dev-slice decision count: **5** decisions on 82 rows (2 now moved to dev-plots).
+
+### Decisions made (and why)
+
+- **RQ3 is NOT reframed. The gaming-shield idea was proposed, searched, and
+  rejected before a word of it was written.** Claude proposed reframing RQ3 from
+  "does hybrid raise accuracy" to "does symbolic prevent gaming", because S3.2b
+  left the accuracy question unanswerable (Verifier-A at 0.9866 = 1 error in 82).
+  `mahmoud2026rubric` refutes it directly: under a **strong** verifier, rubric
+  judges preferred the RL checkpoint on **85.8%** of prompts while rubric-free
+  judges preferred the **base** on **78.4%**, with gains in **presence-based**
+  criteria (+1.07) and losses in conciseness (-2.91), relevance (-1.10), factual
+  correctness (-0.85). **Our sect. 3.5 features are almost all presence/count-based,
+  and sect. 4.2's Reflector names the failing rule to the Writer** -- our setting is
+  strictly easier to game than theirs. ⬛ **The paper was already in our
+  bibliography, cited from its abstract for decision 16.** Writing the reframing
+  from memory would have produced a claim refuted by our own reference list.
+
+- **Symbolic is retained on honest grounds:** sect. 3.5 mandates it, sect. 4.2's Critic
+  cannot exist without it, and it is the only component that can say *which*
+  rule failed -- which the Reflector requires and a LaBSE probe cannot do.
+  Registered as an **instrument for detecting** gaming (presence-scores rising
+  while Verifier-B stays flat is Mahmoud's signature), never as a shield.
+
+- **Hybrid weight moves off the 82 rows onto the 30 dev-plots.** At 1 error in
+  82 the weight sweep is degenerate -- every weight in sect. 5.1b's 0.5-0.8 grid
+  returns the same answer, and the "<2 points" rule would need to resolve ~1.6
+  dev items. The weight is a generation-time parameter, so it is fit where the
+  Critic operates. Reported as a sensitivity curve, never a point (as for tau).
+
+- **Decision 16 amended, not overturned.** `kuai2026entanglement`: entanglement
+  is widespread intra- AND cross-family, and **plain correlation cannot detect
+  it**. A dev-slice failure-manifold audit (BEI/CIG) is pre-registered before any
+  RQ5 gap is interpreted. Cross-family stays **necessary, not sufficient**.
+
+- **English arm formally deferred** by invoking the charter's own pre-authorised
+  cut rule, rather than letting it lapse by drift. **Cost named: RQ4 cannot be
+  answered in its strong form.**
+
+- **Verifier-B disambiguated: the S3.2 *recipe* retrained on R2, never the S3.2
+  checkpoints.** Sabbir's earlier question about pipeline conformance is what
+  surfaced it.
+
+### Findings (things we did not expect)
+
+- 🔴 **The seal of 2026-08-10 claimed "every departure is logged" without ever
+  opening the document departures are measured against.** `CLAUDE.md` names
+  `research_pipeline_en.md` as normative in its second line. The audit compared
+  `protocol.md` to `STATUS.md` and to itself. **Logged against ourselves;** the
+  seal stands on its four checkable properties, the completeness claim did not.
+
+- 🔴 **Pipeline sect. 2.1 instructs writing a sentence our own results falsify** --
+  *"low silhouette ... not absence of structure; hence we rely on stability"*.
+  Region B cleared PS 0.818 on a contentless cut. The thesis would have asserted
+  in Methods the exact inference its Results disprove. Withdrawn.
+
+- 🔴 **Verifier-B was one training run from voiding rule 6.** "The fine-tuned
+  BanglaBERT from S3.2" -- and S3.2 ran `role: A`, i.e. on R1. Everyone read the
+  sentence correctly, which is why it survived. **Code does not read intent.**
+
+- **Phase 3 is ~20% done and nothing said so.** Progress was tracked against
+  `protocol.md`, which is Bangla-only and silent on sect. 3.5, so two whole
+  workstreams were invisible rather than late.
+
+- **sect. 5.4's mandatory Limitations sentence was broken by yesterday's own fix** --
+  it reads "persona-conditioned", retired 2026-08-10. The sentence defending
+  "Simulation" in the title was collateral damage of the terminology change.
+
+### Consequences for downstream steps
+
+- **Phase 4 is blocked on sect. 3.5**, not on verifier training. No symbolic scorer
+  -> no Critic -> no loop. This is now the top item in STATUS.
+- **RQ4 reduces** to fertility covariate + zero-shot English reference.
+- **RQ5 gains a precondition**: the entanglement audit runs before any A-B gap
+  is interpreted; a small gap under high entanglement is not evidence of safety.
+- **sect. 5.1 is one third smaller** than the spec says (1,440, not 2,160) -- affects
+  cost, runtime, and every bootstrap CI in sect. 5.6.
+- **Ch.5 carries one combined dev-reuse limitation**, not three footnotes.
+
+### Citations needed
+
+**Tier 7** added to `related_work.md`: `mahmoud2026rubric` upgraded `[ ] -> [x]`
+(read in full; the abstract-only reading missed the half that matters), and
+`kuai2026entanglement` added `[x]`.
+
+⚠️ **Found via alphaXiv, NOT Consensus** (quota exhausted until 2026-09-01).
+⚠️ **Recorded because it bounds both citations:** these papers study policies
+**RL-trained** against a reward. We never train a generator (rule 10) -- the loop
+reruns a *prompted* model at most three times. Their effect sizes are an **upper
+bound** on what our loop can produce, not a prediction. That makes gaming less
+likely *and* a null RQ5 less informative. Both halves belong in Ch.5.

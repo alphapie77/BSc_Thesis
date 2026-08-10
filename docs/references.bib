@@ -482,13 +482,27 @@
 
 @misc{mahmoud2026rubric,
   title  = {Reward Hacking in Rubric-Based Reinforcement Learning},
-  author = {Mahmoud, Anas and others},
+  author = {Mahmoud, Anas and Rezaei, MohammadHossein and Wang, Zihao and
+            Gunjal, Anisha and Liu, Bing and He, Yunzhong},
   year   = {2026},
-  howpublished = {arXiv preprint},
-  note   = {7 citations. 🔴 LOAD-BEARING: optimises against a training verifier
-            and evaluates against a CROSS-FAMILY panel, explicitly to reduce
-            dependence on one evaluator. This is the standard S3.2c follows.
-            NOT read in full.}
+  howpublished = {arXiv preprint arXiv:2605.12474},
+  note   = {🔴 LOAD-BEARING, and now READ IN FULL (2026-08-11) -- the
+            abstract-only reading of 2026-08-10 missed the half that matters.
+            Used TWICE and for opposite purposes. (1) Decision 16: it makes
+            cross-family reference panels the standard, and finds weak verifiers
+            produce proxy gains that do not transfer. (2) It REFUTES the proposed
+            RQ3 reframing that symbolic/rule-based scoring resists gaming. Under a
+            STRONG verifier, rubric-based judges preferred the RL checkpoint on
+            85.8% of prompts while rubric-free judges preferred the BASE model on
+            78.4%; gains concentrated in PRESENCE-BASED criteria (completeness
+            +1.07) with losses in conciseness (-2.91), relevance (-1.10), factual
+            correctness (-0.85), overall (-1.02). Mechanism named: "hacking the
+            rubric, not the verifier." Our sect. 3.5 feature pool is almost entirely
+            presence/count-based, and our Reflector TELLS the writer which rule
+            failed -- strictly easier to game than their setting. Also supplies
+            the self-internalization gap diagnostic (r 0.91-0.97 with reference
+            reward), which we cannot use: it needs a training trajectory and we
+            never fine-tune (inviolable rule 10).}
 }
 
 @misc{wang2026rewardhacking,
@@ -621,4 +635,27 @@
                Candidate addition to Ch.4: a direct clusterability test we never
                ran. NOT read in full; bibliographic details need verification
                before citing.}
+}
+
+@misc{kuai2026entanglement,
+  title  = {How Independent are Large Language Models? A Statistical Framework
+            for Auditing Behavioral Entanglement and Reweighting Verifier
+            Ensembles},
+  author = {Kuai, Chenchen and Jiang, Jiwan and Zhu, Zihao and Wang, Hao and
+            Wu, Keshu and Li, Zihao and Zhang, Yunlong and Liu, Chenxi and
+            Tu, Zhengzhong and Fan, Zhiwen and Zhou, Yang},
+  year   = {2026},
+  howpublished = {arXiv preprint arXiv:2604.07650},
+  note   = {🔴 AMENDS decision 16. 18 LLMs, 6 families: behavioural
+            entanglement is widespread INTRA- and CROSS-family, including
+            cross-generation, so "different family" does not establish
+            independence. "Apparent agreement may reflect a consensus of
+            correlated errors rather than independent verification."
+            Entanglement tracks judge over-endorsement bias (Spearman 0.64
+            p<0.001; 0.71 p<0.01). Operationally critical: plain correlation
+            FAILS to detect it -- the signal is in the joint FAILURE manifold,
+            weighted toward co-failures on easy items (BEI, CIG). De-entangled
+            reweighting gains +4.5% over majority vote. Cuts harder at us than
+            at them: our A and B share a label derived from one k-means over one
+            corpus. Read in full via PDF query.}
 }

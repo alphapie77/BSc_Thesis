@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-10 (**decision 12 CLOSED — the axis framing; `protocol.md` sealed for Phases 1–3, awaiting supervisor signature**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
+**Last updated:** 2026-08-11 (**pipeline cross-check: 10 new deviation rows; RQ3 gaming reframe rejected by search; English arm formally deferred; Verifier-B definition disambiguated**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -107,6 +107,10 @@
 | Tokens in a two-encoding Unicode group | — | **10.44%** of 46,758 (267 collapsing groups). φ(region, encoding form) = **−0.3245** — an independent corroboration of fact (split) from orthography |
 | Inferential status of S2e / S2f statistics | treated as tests | 🔴 **DEMOTED to descriptive profiling 2026-08-10.** φ = 0.3981, χ² = 300.7 and every surface AUC are **post-clustering inference on the rows that defined the partition**. Chen & Witten (2023) show this inflates Type I error and produces large between-group differences *even when no population categories exist*. **No p-value from S2e/S2f is evidence that the halves differ.** S2f Test C already self-flagged as a resubstitution bound; the flag simply was never generalised. **RQ1-H does not inherit this** — held-out items, annotators blind to the partition — which is why the human validation, not the profiling, carries RQ1 |
 | What PS ≥ 0.80 establishes | "the K is stable, therefore real" | **necessary, not sufficient.** Region B cleared it at **0.818** on a cut correlating with nothing measurable (RQ1-G) — the exact failure mode von Luxburg (2010) describes and Pinto et al. (2026) reproduce in simulation at ARI 1.00, SD 0.00 |
+| Verifier-B's definition | "the fine-tuned BanglaBERT **from S3.2**" | 🔴 **the S3.2 BanglaBERT *recipe*, RETRAINED on R2 (888 rows).** `configs/s3_backbone.yaml` sets `role: A` → every S3.2 arm trained on **R1**. The literal reading would have put A and B on the same data and voided inviolable rule 6. No result affected; corrected before any training |
+| §5.1 generation count | 90 × 3 personas × 8 = **2,160** per language | **1,440** (90 × **2** × 8). Stale since K=2 was selected on 2026-08-03 — a one-third reduction in experiment size, cost, and CI width |
+| Does symbolic scoring resist gaming? | assumed yes (proposed 2026-08-11) | **NO — refuted before it was written.** Mahmoud et al. (2026): rule-based rewards *are* hacked; **presence-based criteria are the worst case**, and §3.5's features are almost all presence/count-based. Our Reflector also *names the failing rule to the Writer*. Symbolic is plausibly the **most** gameable component here |
+| Does cross-family separation establish verifier independence? | assumed yes (decision 16) | **necessary, not sufficient.** Kuai et al. (2026): entanglement is widespread intra- *and* cross-family; **plain correlation cannot detect it.** A dev-slice failure-manifold audit (BEI/CIG) is now pre-registered before any RQ5 gap is interpreted |
 
 > **Correction (2026-07-30).** This file previously recorded the venue/selection
 > confound as *"untestable in principle"* because venue was not retained at
@@ -147,6 +151,30 @@ edited until the final `usable_n` is known (see Open decisions).
 | **10** | **Prompt parity between row 1 and the loop.** Huang et al. §5 document a reported "self-correction gain" that was really a more informative second prompt (81.8 standard vs 75.1 self-corrected, once the requirement was stated up front). Row 1's zero-shot persona prompt must specify the persona requirement as fully as the verifier feedback does. | §5.1 internal validity | 🔴 **Sabbir** |
 
 ---
+
+## 🔴 Phase 3 real state (added 2026-08-11, after the pipeline cross-check)
+
+Pipeline §3 asks for **five** deliverables. **One exists.** This was not visible
+anywhere before today, because progress was being tracked against `protocol.md`
+(which is Bangla-only and silent on §3.5) rather than against the normative spec.
+
+| Pipeline §3 deliverable | State |
+|---|---|
+| **4 trained verifiers (A/B × bn/en)** | 🔴 **0 trained.** A and B are *designed* (decision 16), not built |
+| Backbone-ablation table | ✅ done — then repurposed; may support no backbone claim (S3.2b) |
+| Dual-accuracy table | ✗ **not producible** — logged 2026-08-08 |
+| Calibration figure | ✗ not started |
+| Rule table / symbolic scorer (§3.5) | 🔴 **not started — no code.** `grep -rl symbolic src/ configs/` returns nothing |
+
+**The binding constraint is §3.5, not the verifiers.** §4.2's Critic is
+`0.6×VerifierA + 0.4×symbolic`; with no symbolic component there is no Critic,
+and with no Critic there is no loop. **Phase 4 cannot start.** `src/agents/` and
+`src/eval/` are empty stubs.
+
+⚠️ **English arm deferred** under the charter's own cut rule (deviation
+2026-08-11). Cost: **RQ4 cannot be answered in its strong form** — the
+cross-lingual claim reduces to the fertility covariate plus a zero-shot
+reference.
 
 ## Immediate next actions
 
