@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-09 (**S3.2 attempt 1 crashed at arm 6; all seven re-run under a pinned environment**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
+**Last updated:** 2026-08-10 (**S3.2 COMPLETE — verdict `TIE`, both aggregation rules agree**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -33,6 +33,7 @@
 | 6 | protocol.md freeze + supervisor signature | 📝 draft; 5c closed, so this can now freeze | `docs/protocol.md` | — |
 | 7 | **S3.2 + S3.4 pre-registration** — Phase 3 opened | ✅ **WRITTEN 2026-08-08, before any backbone was downloaded.** Ablation goes **4 → 7 arms** (+IndicBERTv2, +SetFit, +BERT-NLI), **5 seeds not 3**, and the winner is decided by **paired bootstrap**, not by best mean ± SD. 🔴 **The literature contradicted our own protocol from the day before:** Bethard (2022) names "vary the seed to build a score distribution for model comparison" as a *risky* use of seeds — exactly what we had committed to. Calibration demoted from "hidden contribution" to **descriptive** (dev = 82 rows; 10 bins ≈ 8 samples/bin). 🎁 **The ablation's most likely outcome is pre-registered as a tie**, because the 2025–26 Bangla literature reports **three different winners on the same dataset** — so "BanglaBERT because it is Bangla-native" cannot be defended by citation, and a tie is registered as publishable. | `docs/protocol.md` §S3.2, §S3.4 | 2026-08-08 |
 | 8 | **S3.2 attempt 1** — the backbone ablation, first real run | ⚠️ **CRASHED 2026-08-09** (Kaggle T4, commit `a2986db`) at **arm 6 of 7**, on `import setfit`: setfit's module chain imports `transformers.training_args.default_logdir`, removed in transformers 5.x, which Kaggle ships. `bert_nli` never ran. ~4 GPU-hours spent. **The five completed numbers are DISCARDED, not carried forward** — all seven re-run under `transformers<5`, because Coakley et al. (2022) measured **>6 pp** of accuracy variation from environment alone and our whole between-arm spread is **2.98 pp**, so a mixed-environment table would measure library version more than backbone. 🎁 **Not wasted:** the discarded run establishes (i) the task is **highly learnable** — 0.94–0.97 across five backbones, expected for a label derived by clustering LaBSE embeddings, i.e. *label reproduction*, exactly what the 2026-08-08 deviation said this measures; and (ii) **the spread is smaller than documented environment noise**, which is itself evidence for the pre-registered `TIE` and is now reported beside the verdict. **Prevention:** `--check-arms` imports every arm's dependencies on CPU in ten seconds, and the runner calls it as Gate 0. | discarded; no file in `results/` | 2026-08-09 |
+| 9 | **S3.2 — the backbone ablation, COMPLETE** | ✅ **RUN 2026-08-10** (Kaggle T4 ×1, commit `e3afa71`, transformers 4.57.6). **Verdict `TIE`**, and the pooled-across-learning-rates rule **agrees** — so the winner's-curse question is settled by evidence, not argument, and the ~30% extra compute for inner k-fold is not spent. All **21** pairwise comparisons non-significant after BH; smallest p **0.096**. Tie-break `[smallest_params, banglabert]` → **BanglaBERT** (110M). 🎁 **The tie is a measurement statement, not a shrug:** between-arm spread **0.0348** vs MuRIL's own seed SD **0.0391** — the variation *inside one arm* exceeds the variation *between all seven*, and Coakley et al. (2022) put environment noise alone at >6 pp. ⚠️ **`setfit_labse` contributed ONE configuration, not ten** — its `lr` never reached SetFit and its seed was inert (proved: identical `train_loss` to 18 significant figures across all ten runs, 1 distinct prediction vector out of 10). Its SD of 0.0000 is **not** stability. Code fixed, arm **not** re-run. ⚠️ **No ranking below the top may be quoted** — XLM-R is 6th under one rule and 7th under the other. | `results/s3_backbone_ablation.{md,json}`, `s3_backbone_per_seed.csv`, `env_snapshot_s3_kaggle.json` | 2026-08-10 |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
@@ -95,6 +96,10 @@
 | Verifier-B training n | — | **888** (531 / 357) — R2, disjoint by the frozen split's contract |
 | Dev slice for the symbolic scorer | 200 | **82** labelled (53 / 29) — §3.5 assumes 200; it has 82 |
 | Gold-300 usable for Phase 3 validity | 300 | **0** — G-300 gave specificity ratings, not cluster labels, and they failed reliability |
+| S3.2 verdict | — | **`TIE`** under both aggregation rules (headline and LR-pooled), 21/21 pairs non-significant, min p **0.096** |
+| S3.2 between-arm spread | — | **0.0348** (banglabert 0.9647 → bert_nli 0.9298) — **smaller than MuRIL's own seed SD of 0.0391** |
+| Verifier-A backbone | BanglaBERT (assumed) | **BanglaBERT**, but by the pre-registered **tie-break**, not by performance. The data did not choose. |
+| `setfit_labse` effective runs | 10 | **1** — `lr` never reached SetFit and the seed was inert; SD 0.0000 is an artefact, not stability |
 | Tokens in a two-encoding Unicode group | — | **10.44%** of 46,758 (267 collapsing groups). φ(region, encoding form) = **−0.3245** — an independent corroboration of fact (split) from orthography |
 
 > **Correction (2026-07-30).** This file previously recorded the venue/selection

@@ -330,3 +330,18 @@ def test_a_checkpoint_without_a_fingerprint_needs_an_explicit_opt_in():
     with pytest.raises(SystemExit):
         _check_resume_env(None, allow_unverified=False)
     assert _check_resume_env(None, allow_unverified=True) == "unverified"
+
+
+def test_setfit_receives_the_learning_rate():
+    """The 2026-08-09 run's setfit arm was one configuration run ten times.
+
+    `lr` was never passed to SetFit, so both learning-rate settings were the
+    same computation, and the seed had no effect either: across all ten runs
+    the schedule peaked at the same 1.98e-5, grad_norm matched to sixteen
+    decimals, and train_loss was 0.016336093562370195 every time. A test reads
+    the source, because the alternative way to catch this is two GPU-hours and
+    a suspicious standard deviation of exactly zero.
+    """
+    src = (ROOT / "src" / "verifier" / "backends.py").read_text(encoding="utf-8")
+    assert "body_learning_rate=lr" in src
+    assert "head_learning_rate=lr" in src

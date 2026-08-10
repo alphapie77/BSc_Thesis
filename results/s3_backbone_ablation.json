@@ -1,0 +1,314 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-10T11:48:48.513906+00:00",
+    "git_commit": "e3afa71f627fbbae441b53582621cf94ff42610f",
+    "untracked_files": 30,
+    "config": "configs/s3_backbone.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "dry_run": false,
+    "verdict": "TIE",
+    "n_train": 804,
+    "n_dev": 82,
+    "train_class_counts": {
+      "0": 481,
+      "1": 323
+    },
+    "dev_class_counts": {
+      "0": 53,
+      "1": 29
+    },
+    "gold_ids_touched": 0,
+    "visible_gpus": 1,
+    "env": {
+      "python": "3.12.13",
+      "transformers": "4.57.6",
+      "torch": "2.10.0+cu128",
+      "gpu": "Tesla T4",
+      "n_gpu": 1
+    },
+    "resume_status": "verified",
+    "resumed_from_unverified_checkpoint": false,
+    "verdict_pooled_lr": "TIE",
+    "verdict_agrees_across_lr_rules": true,
+    "mean_macro_f1_pooled_lr": {
+      "banglabert": 0.960792,
+      "setfit_labse": 0.958966,
+      "indicbertv2": 0.955991,
+      "muril": 0.941799,
+      "mbert": 0.934917,
+      "bert_nli": 0.926205,
+      "xlmr": 0.91385
+    },
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "mean_macro_f1": {
+      "banglabert": 0.964668,
+      "setfit_labse": 0.958966,
+      "indicbertv2": 0.956018,
+      "muril": 0.942118,
+      "mbert": 0.940246,
+      "xlmr": 0.935954,
+      "bert_nli": 0.929828
+    },
+    "seed_sd": {
+      "banglabert": 0.020898,
+      "xlmr": 0.02185,
+      "muril": 0.039095,
+      "mbert": 0.012509,
+      "indicbertv2": 0.015585,
+      "bert_nli": 0.016548,
+      "setfit_labse": 0.0
+    },
+    "selected_lr": {
+      "banglabert": 3e-05,
+      "xlmr": 3e-05,
+      "muril": 3e-05,
+      "mbert": 2e-05,
+      "indicbertv2": 3e-05,
+      "bert_nli": 3e-05,
+      "setfit_labse": 2e-05
+    },
+    "lr_selected_on_eval_set": true,
+    "pairwise": [
+      {
+        "arm_a": "banglabert",
+        "arm_b": "xlmr",
+        "diff": 0.042576,
+        "p": 0.096,
+        "ci95": [
+          0.0,
+          0.097297
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "banglabert",
+        "arm_b": "muril",
+        "diff": 0.013918,
+        "p": 0.7338,
+        "ci95": [
+          0.0,
+          0.045676
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "banglabert",
+        "arm_b": "mbert",
+        "diff": 0.041274,
+        "p": 0.0966,
+        "ci95": [
+          0.0,
+          0.094114
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "banglabert",
+        "arm_b": "indicbertv2",
+        "diff": 0.013918,
+        "p": 0.7922,
+        "ci95": [
+          -0.030973,
+          0.0669
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "banglabert",
+        "arm_b": "bert_nli",
+        "diff": 0.040108,
+        "p": 0.096,
+        "ci95": [
+          0.0,
+          0.090784
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "banglabert",
+        "arm_b": "setfit_labse",
+        "diff": 0.013918,
+        "p": 0.7338,
+        "ci95": [
+          0.0,
+          0.045676
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "xlmr",
+        "arm_b": "muril",
+        "diff": -0.028658,
+        "p": 0.2652,
+        "ci95": [
+          -0.074559,
+          0.0
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "xlmr",
+        "arm_b": "mbert",
+        "diff": -0.001302,
+        "p": 0.9486,
+        "ci95": [
+          -0.059251,
+          0.055115
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "xlmr",
+        "arm_b": "indicbertv2",
+        "diff": -0.028658,
+        "p": 0.455,
+        "ci95": [
+          -0.089729,
+          0.027462
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "xlmr",
+        "arm_b": "bert_nli",
+        "diff": -0.002468,
+        "p": 0.8592,
+        "ci95": [
+          -0.070292,
+          0.064896
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "xlmr",
+        "arm_b": "setfit_labse",
+        "diff": -0.028658,
+        "p": 0.2652,
+        "ci95": [
+          -0.074559,
+          0.0
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "muril",
+        "arm_b": "mbert",
+        "diff": 0.027356,
+        "p": 0.2702,
+        "ci95": [
+          0.0,
+          0.072409
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "muril",
+        "arm_b": "indicbertv2",
+        "diff": 0.0,
+        "p": 1.0,
+        "ci95": [
+          -0.056905,
+          0.057465
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "muril",
+        "arm_b": "bert_nli",
+        "diff": 0.02619,
+        "p": 0.4444,
+        "ci95": [
+          -0.026658,
+          0.08276
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "muril",
+        "arm_b": "setfit_labse",
+        "diff": 0.0,
+        "p": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "mbert",
+        "arm_b": "indicbertv2",
+        "diff": -0.027356,
+        "p": 0.4478,
+        "ci95": [
+          -0.085112,
+          0.026658
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "mbert",
+        "arm_b": "bert_nli",
+        "diff": -0.001166,
+        "p": 0.9516,
+        "ci95": [
+          -0.056556,
+          0.054531
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "mbert",
+        "arm_b": "setfit_labse",
+        "diff": -0.027356,
+        "p": 0.2702,
+        "ci95": [
+          -0.072409,
+          0.0
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "indicbertv2",
+        "arm_b": "bert_nli",
+        "diff": 0.02619,
+        "p": 0.5456,
+        "ci95": [
+          -0.040249,
+          0.094061
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "indicbertv2",
+        "arm_b": "setfit_labse",
+        "diff": 0.0,
+        "p": 1.0,
+        "ci95": [
+          -0.057465,
+          0.05692
+        ],
+        "significant_bh": false
+      },
+      {
+        "arm_a": "bert_nli",
+        "arm_b": "setfit_labse",
+        "diff": -0.02619,
+        "p": 0.4444,
+        "ci95": [
+          -0.082729,
+          0.026658
+        ],
+        "significant_bh": false
+      }
+    ]
+  }
+}

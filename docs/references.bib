@@ -441,3 +441,37 @@
                the ordering is not stable, NOT evidence that XLM-R is better.
                Consensus record only as of 2026-08-08 -- NOT read in full.}
 }
+
+% Added 2026-08-10. Same provenance caveat as the block above: Consensus index
+% records only, not read in full, no invented identifiers. These two became
+% load-bearing during S3.2 and had been cited in protocol.md before they had
+% entries here -- recorded as a lapse, not tidied away.
+
+@inproceedings{coakley2022implementation,
+  title     = {Examining the Effect of Implementation Factors on Deep Learning
+               Reproducibility},
+  author    = {Coakley, Kevin L. and others},
+  booktitle = {2022 IEEE 18th International Conference on e-Science},
+  year      = {2022},
+  note      = {4 citations. 780 results across 13 hardware and 4 software
+               environments; >6 pp accuracy range from environment alone on
+               identical deterministic examples. ⚠️ LOAD-BEARING: this figure
+               justifies discarding the first S3.2 attempt, pinning the
+               environment, gating checkpoint resume, and the Ch.4 claim that
+               our 3.5 pp spread sits below measurement resolution. Consensus
+               record only -- NOT read in full. Read before Ch.4 is written.}
+}
+
+@article{teodorescu2025kfold,
+  title   = {Assessing the Validity of k-Fold Cross-Validation for Model
+             Selection: Evidence from Bankruptcy Prediction Using Random Forest
+             and XGBoost},
+  author  = {Teodorescu, Vlad and others},
+  journal = {Computers},
+  year    = {2025},
+  note    = {61 citations. Finds k-fold selection valid WITHIN a model class but
+             unreliable when comparing ACROSS model classes -- our seven arms
+             span three (fine-tuning, SetFit, NLI transfer), so this is the
+             Ch.5 limitation on the ablation. Consensus record only -- NOT read
+             in full.}
+}

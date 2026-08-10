@@ -2608,3 +2608,136 @@ explicitly not evidence that XLM-R is better.
 
 ⬛ Still outstanding from the 2026-08-08 RQ1-H entry above: Chang et al. (2009),
 Kiritchenko & Mohammad (2017), Eklund et al. (2025) — **not yet added**.
+
+---
+
+## 2026-08-10 -- S3.2: Backbone ablation: seven arms, verdict TIE under both aggregation rules
+**Feeds:** Ch.3 methods, Ch.4 results, RQ2
+**Commit:** `e3afa71f627fbbae441b53582621cf94ff42610f-dirty`
+**Artifacts:** `results/s3_backbone_ablation.json`, `results/s3_backbone_ablation.md`, `results/s3_backbone_per_seed.csv`
+
+### Numbers
+- `results/s3_backbone_ablation.json`
+  - `dry_run` = False
+  - `verdict` = TIE
+  - `n_train` = 804
+  - `n_dev` = 82
+  - `train_class_counts` = {'0': 481, '1': 323}
+  - `dev_class_counts` = {'0': 53, '1': 29}
+  - `gold_ids_touched` = 0
+  - `visible_gpus` = 1
+  - `env` = {'python': '3.12.13', 'transformers': '4.57.6', 'torch': '2.10.0+cu128', 'gpu': 'Tesla T4', 'n_gpu': 1}
+  - `resume_status` = verified
+  - `resumed_from_unverified_checkpoint` = False
+  - `verdict_pooled_lr` = TIE
+  - `verdict_agrees_across_lr_rules` = True
+  - `mean_macro_f1_pooled_lr` = {'banglabert': 0.960792, 'setfit_labse': 0.958966, 'indicbertv2': 0.955991, 'muril': 0.941799, 'mbert': 0.934917, 'bert_nli': 0.926205, 'xlmr': 0.91385}
+  - `mean_macro_f1` = {'banglabert': 0.964668, 'setfit_labse': 0.958966, 'indicbertv2': 0.956018, 'muril': 0.942118, 'mbert': 0.940246, 'xlmr': 0.935954, 'bert_nli': 0.929828}
+  - `seed_sd` = {'banglabert': 0.020898, 'xlmr': 0.02185, 'muril': 0.039095, 'mbert': 0.012509, 'indicbertv2': 0.015585, 'bert_nli': 0.016548, 'setfit_labse': 0.0}
+  - `selected_lr` = {'banglabert': 3e-05, 'xlmr': 3e-05, 'muril': 3e-05, 'mbert': 2e-05, 'indicbertv2': 3e-05, 'bert_nli': 3e-05, 'setfit_labse': 2e-05}
+  - `lr_selected_on_eval_set` = True
+- `results/s3_backbone_ablation.md`
+  - (see file; 3238 bytes)
+- `results/s3_backbone_per_seed.csv`
+  - (see file; 1897 bytes)
+
+### Decisions made (and why)
+
+- **The winner is BanglaBERT by the pre-registered TIE-BREAK, not by performance.**
+  Alternative: read the ranking and call BanglaBERT the winner at 0.9647. Rejected
+  because all **21** pairwise comparisons are non-significant after BH and the
+  smallest p is **0.096** — there is no winner to read. The tie-break
+  `[smallest_params, banglabert]` was fixed on 2026-08-08, before any number
+  existed, and selects BanglaBERT on parameter count (110M, smallest of seven).
+  **Every defence of the backbone choice must state that the data did not
+  determine it.**
+- **Inner k-fold tuning is NOT run, and the argument for that is now empirical.**
+  On 2026-08-09 we could not settle whether selecting the learning rate on dev
+  manufactures a winner (winner's curse). Rather than spend ~30% more GPU on
+  nested tuning, the verdict was computed under **two aggregation rules from the
+  same runs** — best-LR per arm, and a selection-free majority vote over all ten
+  runs. **Both return `TIE`.** The pre-registered trigger for the expensive
+  design was disagreement; it did not fire.
+- **The setfit arm is reported as ONE configuration and is NOT re-run.**
+  Alternative: re-run it correctly for ~2h15m. Rejected because the fixed arm
+  cannot change a verdict already agreed by both aggregation rules, while the
+  honest single-configuration report is available at no cost. The code is fixed
+  so the arm is correct if ever re-run, and a test now reads the source for the
+  learning-rate arguments.
+- **No ranking below the top place is quoted anywhere.** The two aggregation
+  rules disagree on the order (XLM-R 6th under the headline rule, 7th under
+  pooling), which is itself the argument: in a tie, order is a property of the
+  aggregation, not of the models.
+
+### Findings (things we did not expect)
+
+- 🎁 **The variation inside one arm exceeds the variation between all seven.**
+  MuRIL's seed-to-seed SD is **0.0391**; the entire between-arm spread is
+  **0.0348** (0.9298–0.9647). Together with Coakley et al. (2022), who measured
+  **>6 pp** of accuracy variation from hardware/software environment alone
+  across 780 runs, this makes the tie a **statement about measurement
+  resolution**, not an absence of effort: *the differences we set out to resolve
+  are smaller than the noise of the apparatus.* This is the sentence Ch.4 should
+  carry, and it was not anticipated.
+- 🔴 **The setfit arm ran one computation ten times, and the log proves it.**
+  Across all ten runs the schedule peaked at the same 1.98e-5 under **both**
+  nominal learning rates, `grad_norm` matched to sixteen decimals
+  (2.8027944564819336), and `train_loss` was **0.016336093562370195** every
+  time. Identical gradients cannot come from different initialisations, so the
+  seed was inert as well. The checkpoint agrees independently: **1 distinct
+  prediction vector out of 10**, against 8/10 for MuRIL and IndicBERTv2. Cause:
+  `setfit_predict` never passed `lr` to SetFit. **Its SD of 0.0000 is an
+  artefact and must never be read as stability** — which is exactly how it would
+  have read in a results table.
+- ⚠️ **SetFit placed second, having been pre-registered as an expected loser.**
+  Beliveau et al. (2024) found BERT-like > SetFit in the closest published
+  setting; here it sits above five of seven arms. In a tie the ordering carries
+  little, and it ran on one configuration, so **this does not overturn
+  Beliveau** — but the expected loser did not visibly underperform, and that is
+  reported rather than passed over.
+- ⚠️ **bert_nli placed last (0.9298).** It was added on the strength of Laurer
+  et al. (2023), who report +10.7–18.3 pp at 100–2,500 training texts and
+  especially on imbalanced data. **That advantage did not appear.** The arm was
+  added on the literature's authority and the result went the other way; that is
+  the honest outcome of adding it.
+- 🎁 **MuRIL and SetFit produced byte-identical predictions** on the 82 dev rows
+  (the zero-width confidence interval in the pairwise table is what exposed it).
+  Six distinct prediction vectors across seven arms. At 82 items and ~95%
+  accuracy, convergence is plausible rather than alarming — but it is another
+  sign that the dev set is small enough for arms to collide.
+- 🎁 **Reproducibility held across sessions.** Five arms returned identical
+  macro-F1 in two separate sessions on different GPU allocations before the
+  environment was pinned, which is what justified resuming rather than
+  re-running them.
+
+### Consequences for downstream steps
+
+- **Verifier-A uses BanglaBERT** — 110M, and the smallest arm, which also makes
+  it the cheapest to run inside the Phase 4 loop. The choice is defensible on
+  cost; it is **not** defensible on measured accuracy, and must not be presented
+  that way.
+- **§3.3's framing is unchanged and now has a number attached**: 0.93–0.96 is
+  **label reproduction**, not validity. No human-validated verifier accuracy
+  exists (deviation of 2026-08-08).
+- **Ch.4 gains a methodological result it did not plan for**: within-arm seed
+  variance exceeding between-arm spread. This belongs beside the ablation table,
+  not in a footnote.
+- **Ch.5 Limitations gains three entries**: the setfit single-configuration
+  defect; the cross-model-class caveat for comparisons spanning fine-tuning,
+  SetFit and NLI transfer (Teodorescu et al. 2025); and the levels being
+  selection-biased because the learning rate was chosen on the same dev set.
+- **S3.4 (calibration) is next**, and its pre-registration already demotes it to
+  descriptive at n = 82.
+
+### Citations needed
+
+No new methods were used in this step. Every citation the run rests on is
+already in `references.bib` and `related_work.md` §Tier 5:
+`bethard2022seeds` (why the decision rule is a bootstrap), `coakley2022implementation`
+⬛ **not yet added — the environment-variation figure is now load-bearing in two
+deviations and in Ch.4, and it still has no bib entry**, `laurer2023bertnli`
+(why bert_nli was added; the result contradicts it), `beliveau2024smalldata`
+(why setfit was an expected loser), `tunstall2022setfit`, and
+`teodorescu2025kfold` ⬛ **also not yet added** for the cross-model-class caveat.
+
+⚠️ Read-status is still `[ ]` for all of them.

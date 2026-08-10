@@ -179,11 +179,26 @@ def setfit_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> li
     # ONE run after 60. The value is configurable so the arm can be brought
     # into the same budget as the others; the default stays at the published 20.
     n_iter = int(cfg["training"].get("setfit_num_iterations", 20))
+
+    # ⚠️ `body_learning_rate` and `head_learning_rate` MUST be passed. The
+    # 2026-08-09 run did not pass them, so SetFit silently used its own default
+    # and the arm's two learning-rate settings were the same computation twice.
+    # The log proved it: across all ten runs the schedule peaked at the same
+    # 1.98e-5, `grad_norm` matched to sixteen decimals, and `train_loss` came
+    # out as 0.016336093562370195 every time. The seed had no effect either --
+    # identical gradients cannot come from different initialisations -- so the
+    # arm contributed ONE configuration, not ten.
+    #
+    # Fixed here so the arm is correct if it is ever re-run. The 2026-08-09
+    # numbers are NOT re-run and are reported as a single configuration; see
+    # the deviations log.
     if hasattr(setfit, "TrainingArguments"):
         args = setfit.TrainingArguments(
             batch_size=cfg["training"]["batch_size"],
             num_iterations=n_iter,
             num_epochs=1,
+            body_learning_rate=lr,
+            head_learning_rate=lr,
             seed=seed,
             report_to="none",
         )
