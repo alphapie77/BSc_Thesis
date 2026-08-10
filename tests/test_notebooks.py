@@ -111,3 +111,35 @@ if __name__ == "__main__":
     print(f"\n{len(fns) - failed}/{len(fns)} passed "
           f"({len(NOTEBOOKS)} notebook(s) checked)")
     raise SystemExit(1 if failed else 0)
+
+
+def test_every_notebook_code_cell_is_syntactically_complete():
+    """A truncated cell is invisible until it runs, and by then it has cost a run.
+
+    Added 2026-08-09 after a patch to the S3.2 runner dropped the last line of
+    the results cell, leaving it ending on a bare `if complete:`. Nothing here
+    checked syntax, so the break survived a commit and was caught by Sabbir
+    reading the notebook -- which is not a check, it is luck.
+
+    IPython magics and shell lines are not Python, so they are blanked first,
+    together with any backslash continuations that belong to them.
+    """
+    import ast
+    import json
+
+    for path in sorted((ROOT / "notebooks").glob("*.ipynb")):
+        nb = json.loads(path.read_text(encoding="utf-8"))
+        for i, cell in enumerate(nb["cells"]):
+            if cell["cell_type"] != "code":
+                continue
+            out, skip = [], False
+            for line in "".join(cell["source"]).split("\n"):
+                if skip or line.lstrip().startswith(("!", "%")):
+                    out.append("pass")
+                    skip = line.rstrip().endswith("\\")
+                else:
+                    out.append(line)
+            try:
+                ast.parse("\n".join(out))
+            except SyntaxError as exc:
+                raise AssertionError(f"{path.name} cell {i} is not valid Python: {exc}")
