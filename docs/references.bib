@@ -475,3 +475,66 @@
              Ch.5 limitation on the ablation. Consensus record only -- NOT read
              in full.}
 }
+
+% Added 2026-08-10 for the S3.2c / RQ5 verifier-independence decision. Same
+% provenance caveat as earlier blocks: Consensus index records, not read in
+% full, no identifiers invented.
+
+@misc{mahmoud2026rubric,
+  title  = {Reward Hacking in Rubric-Based Reinforcement Learning},
+  author = {Mahmoud, Anas and others},
+  year   = {2026},
+  howpublished = {arXiv preprint},
+  note   = {7 citations. 🔴 LOAD-BEARING: optimises against a training verifier
+            and evaluates against a CROSS-FAMILY panel, explicitly to reduce
+            dependence on one evaluator. This is the standard S3.2c follows.
+            NOT read in full.}
+}
+
+@misc{wang2026rewardhacking,
+  title  = {Reward Hacking in the Era of Large Models: Mechanisms, Emergent
+            Misalignment, Challenges},
+  author = {Wang, Xiaohua and others},
+  year   = {2026},
+  howpublished = {arXiv preprint},
+  note   = {16 citations. Names evaluator--policy co-adaptation as a mechanism
+            of reward hacking -- the failure two LaBSE probes would have been.
+            NOT read in full.}
+}
+
+@misc{baker2025monitoring,
+  title  = {Monitoring Reasoning Models for Misbehavior and the Risks of
+            Promoting Obfuscation},
+  author = {Baker, Bowen and others},
+  year   = {2025},
+  howpublished = {arXiv preprint},
+  note   = {277 citations. A weaker model (GPT-4o) monitors a stronger one
+            (o3-mini) effectively. Kills the objection that Verifier-B being
+            weaker than Verifier-A is a flaw. NOT read in full.}
+}
+
+@misc{zhou2026convincing,
+  title  = {More Convincing, Not More Correct: Self-Play Reward Hacking of
+            Reference-Free {LLM} Judges},
+  author = {Zhou, Chenyu},
+  year   = {2026},
+  note   = {🔴 LOAD-BEARING and uncomfortable: judge errors TRANSFER across
+            families and a strict three-judge ensemble still accepts 55%. This
+            is why the A-vs-B gap alone cannot carry RQ5. Its fix -- a judge
+            that commits to its own answer before seeing the candidate, false
+            positives 0.719 -> 0.012 -- is a property our verifiers already
+            have, since they predict the label independently. Venue unverified.
+            NOT read in full.}
+}
+
+@misc{shihab2025est,
+  title  = {Detecting and Mitigating Reward Hacking in Reinforcement Learning
+            Systems: A Comprehensive Empirical Study},
+  author = {Shihab, Ibne Farabi and others},
+  year   = {2025},
+  howpublished = {arXiv preprint},
+  note   = {8 citations. The Evaluator Stress Test: invariance-based detection
+            via controlled perturbations, 74.2% precision / 78.6% recall in LLM
+            alignment, with early warning preceding quality decline. Adopted as
+            RQ5's second signal. NOT read in full.}
+}
