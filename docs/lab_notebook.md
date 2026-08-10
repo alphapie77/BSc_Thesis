@@ -3252,6 +3252,44 @@ in full. ⚠️ Found via **alphaXiv + Scite, NOT Consensus** (quota exhausted u
   not resolved.
 - The hybrid weight is unaffected: it is fit on dev-plot generations, not here.
 
+### Rule-7 pilot (added same day, after the ruling question was raised)
+
+**Decision: F1 stays OFF in the result; run once as an explicitly-labelled
+pilot, which rule 7 itself permits.** ⚠️ Sabbir delegated ("jeta valo hoy
+koro"); the choice and reasoning are Claude's. Reinterpreting an inviolable rule
+is not a delegated-decision-sized act -- "breaking any of these invalidates the
+thesis" -- so it goes to Sabbir AND the supervisor, dated and signed.
+
+**Enforced structurally, not remembered:** `s35_scorer.py` refuses to run with
+`enable_f1: true` unless the config sets `pilot: true` AND the output filename
+contains `pilot`. Verified by running it against a copied non-pilot config,
+which refused.
+
+| | CV macro-F1 | rows/feature |
+|---|---|---|
+| F1 off (committed result) | 0.5150 +/- 0.0713 | 7.45 |
+| F1 on (**pilot, unquotable**) | **0.6949 +/- 0.0532** | 5.86 |
+
+- 🔴 **F1 leave-one-out delta +0.1798** -- 2.5x the CV SD, an order of magnitude
+  above every other family. **Mean rises AND variance falls**, which is not the
+  signature of overfitting.
+- ⚠️ **Claude predicted the opposite and was wrong.** The stated reason for
+  running F1 cautiously was that 14 features on 82 rows (5.86 rows/feature)
+  would likely *lower* CV. It produced the largest effect in the study.
+  Recorded rather than dropped.
+- 🎁 **F1 repairs F2.** Without IDF, removing length *improves* CV by 0.1082 --
+  length is actively harmful. With IDF present, length's delta is **+0.0033**.
+  Length was a poor proxy for what IDF measures directly.
+- 🔑 **The design consequence, which matters more than the accuracy one:** with
+  F1, the top two contributors are the two **non-gameable** families
+  (F1 +0.1798, F6 +0.0213), while the gameable presence families stay negative
+  (F4 -0.0191, F5 -0.0350). **Rule 7 as applied pushes the scorer toward exactly
+  the families `mahmoud2026rubric` identifies as the hacked category.** That is
+  the substantive argument for an amendment, and it is recorded as evidence for
+  a decision, not as one.
+- Ruling request added to `docs/supervisor_seal_packet.md` section 6, to travel with
+  the signature. **Until a ruling is in `protocol.md`, `enable_f1` stays false.**
+
 ### Citations needed
 
 None new. `ko2019specificity` (feature families) and `mahmoud2026rubric`

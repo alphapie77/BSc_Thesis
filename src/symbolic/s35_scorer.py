@@ -82,6 +82,24 @@ def main() -> None:
 
     spec = FeatureSpec(enable_f1=bool(cfg["features"]["enable_f1"]))
     folds = int(cfg["fit"]["cv_folds"])
+    pilot = bool(cfg.get("pilot", False))
+
+    # ---- inviolable rule 7, enforced instead of remembered -----------------
+    # Rule 7: "no TF-IDF in the main pipeline ... allowed ONLY as an
+    # explicitly-labelled cheap proxy in a pilot, NEVER in a result."
+    # F1 is IDF only, but the rule's text governs results, not our reading of
+    # it. So: enabling F1 is permitted *only* under an explicitly pilot-labelled
+    # config writing to a pilot-labelled path. Anything else refuses to run.
+    # This is a guard of the same kind as split_access.py's wall -- the point is
+    # that a copy-pasted config cannot quietly put IDF into a result.
+    if spec.enable_f1:
+        out_json = str(cfg["outputs"]["results_json"])
+        if not pilot or "pilot" not in Path(out_json).name.lower():
+            raise SystemExit(
+                "RULE 7: enable_f1 requires `pilot: true` AND an output filename "
+                f"containing 'pilot'. Got pilot={pilot}, out={out_json!r}. "
+                "TF-IDF-family features may never enter a result file."
+            )
 
     train, dev = load_training_rows(
         "A",
@@ -144,9 +162,21 @@ def main() -> None:
 
     write_result(result, cfg["outputs"]["results_json"], args.config)
 
+    banner = []
+    if pilot:
+        banner = [
+            "> \u26d4 **PILOT, NOT A RESULT.** This run enables **F1 (IDF)**, which "
+            "inviolable rule 7 permits *only* as an explicitly-labelled cheap proxy "
+            "in a pilot, **never in a result**. Nothing in this file may be quoted "
+            "in the thesis, a paper, or a results table. It exists to measure what "
+            "rule 7 costs, so the cost is known rather than assumed.",
+            "",
+        ]
+
     lines = [
-        "# S3.5 -- symbolic scorer",
+        "# S3.5 -- symbolic scorer" + (" (PILOT: F1/IDF enabled)" if pilot else ""),
         "",
+        *banner,
         f"Fitted on **{len(dev)}** dev rows, **{len(names)}** features "
         f"(**{result['rows_per_feature']}** rows per feature). F1/IDF enabled: "
         f"**{spec.enable_f1}**.",

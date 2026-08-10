@@ -1,0 +1,74 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-10T18:40:54.667946+00:00",
+    "git_commit": "9677cebf0ce8c9f30e8ebf7e4319732c1a72b67c-dirty",
+    "untracked_files": 1,
+    "config": "configs/s35_symbolic_pilot_idf.yaml",
+    "python": "3.10.12",
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "n_dev_rows": 82,
+    "n_train_rows_for_idf": 804,
+    "class_counts": {
+      "0": 53,
+      "1": 29
+    },
+    "enable_f1_idf": true,
+    "n_features": 14,
+    "rows_per_feature": 5.86,
+    "macro_f1_resubstitution_OPTIMISTIC": 0.7909229984701682,
+    "macro_f1_cv_mean": 0.6948698161741641,
+    "macro_f1_cv_sd": 0.053189904402527965,
+    "majority_baseline_macro_f1": 0.3925925925925926,
+    "coefficients": {
+      "idf_min": -0.1893593211529444,
+      "idf_max": 0.5596218798666623,
+      "idf_mean": 1.3925110338945903,
+      "n_tokens": -0.28025937912405985,
+      "mean_word_chars": -0.5641873920089918,
+      "punct_per_tok": -0.38775667531883534,
+      "digit_per_tok": -0.10969406094314635,
+      "latin_per_tok": 0.0,
+      "ends_dandi": -0.5840536681676288,
+      "connective_frac": 0.23339679475458142,
+      "pos_frac": 1.0552670542725684,
+      "neg_frac": 0.43441688329007155,
+      "intensifier_frac": -0.300462485022741,
+      "guiraud": -0.6048323249310105
+    },
+    "leave_one_family_out": {
+      "F1_idf": {
+        "cv_macro_f1_without": 0.5150303030303031,
+        "delta": 0.17983951314386104,
+        "registered_gameable": false
+      },
+      "F2_length": {
+        "cv_macro_f1_without": 0.6915945165945165,
+        "delta": 0.0032752995796475615,
+        "registered_gameable": true
+      },
+      "F3_ortho": {
+        "cv_macro_f1_without": 0.685571240353849,
+        "delta": 0.009298575820315125,
+        "registered_gameable": true
+      },
+      "F4_connective": {
+        "cv_macro_f1_without": 0.713982683982684,
+        "delta": -0.01911286780851995,
+        "registered_gameable": true
+      },
+      "F5_sentiment": {
+        "cv_macro_f1_without": 0.7298824846650934,
+        "delta": -0.03501266849092932,
+        "registered_gameable": true
+      },
+      "F6_richness": {
+        "cv_macro_f1_without": 0.6736068762155718,
+        "delta": 0.021262939958592297,
+        "registered_gameable": false
+      }
+    },
+    "gold_touched": 0
+  }
+}

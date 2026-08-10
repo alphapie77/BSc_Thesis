@@ -1,0 +1,30 @@
+# S3.5 PILOT -- F1 (IDF) enabled.
+#
+# ⛔ NOT A RESULT. Inviolable rule 7 permits TF-IDF-family features "only as an
+# explicitly-labelled cheap proxy in a pilot, never in a result". This config is
+# that pilot and nothing else. Its output may not be quoted anywhere.
+#
+# Purpose: measure what rule 7 costs. Decided 2026-08-11 -- Sabbir delegated the
+# call ("jeta valo hoy koro"); the choice and reasoning are Claude's, recorded
+# in docs/protocol.md. Amending rule 7 is NOT a delegated-decision-sized act; if
+# this pilot shows a large gain, that is evidence to put to Sabbir AND the
+# supervisor for a deliberate, dated amendment.
+
+step: S3.5-pilot-idf
+seed: 42
+pilot: true
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+
+features:
+  enable_f1: true
+
+fit:
+  cv_folds: 5
+
+outputs:
+  results_json: results/pilot_s35_idf.json
+  results_md: results/pilot_s35_idf.md

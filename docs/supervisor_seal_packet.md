@@ -110,6 +110,53 @@ answer was scored, so it could not later read as an excuse.
 
 ---
 
+## 6. One ruling requested — inviolable rule 7 vs the symbolic scorer
+
+**This is the only thing in this packet that asks you to decide rather than
+to check.**
+
+Rule 7 of the project's inviolable rules reads: *"No stemming, no stopword
+removal, no TF-IDF in the main pipeline... (TF-IDF is allowed only as an
+explicitly-labelled cheap proxy in a pilot, **never in a result**.)"* Its stated
+reason is that LaBSE and BanglaBERT are contextual encoders and need natural
+text.
+
+The symbolic scorer (§3.5) would benefit from an **IDF** feature family: the
+minimum, maximum and mean inverse document frequency of a review's own words.
+This is **not** TF-IDF vectorisation — it builds no document-term matrix,
+replaces no encoder, and alters no text fed to any model. But IDF is half of
+TF-IDF, and "never in a result" is unambiguous.
+
+**The feature was therefore left disabled, and run once as a labelled pilot,
+which the rule itself permits.** Measured cost:
+
+| | stratified 5-fold CV macro-F1 |
+|---|---|
+| Rule 7 applied literally (IDF off) — **the committed result** | **0.5150 ± 0.0713** |
+| IDF enabled (pilot only, unquotable) | 0.6949 ± 0.0532 |
+
+The gap is **≈ 18 points**, about 2.5× the cross-validation standard deviation,
+with variance *falling* as the mean rises.
+
+**The methodological cost is larger than the accuracy cost.** Without IDF, the
+scorer's contribution comes from surface families — punctuation, cue words,
+sentiment terms — which the 2026 literature on reward hacking identifies as
+precisely the category a generator learns to fake, and which our own refinement
+loop names aloud to the generator. With IDF, the two families that carry the
+signal are the two that cannot be faked vacuously, because raising IDF requires
+using genuinely rarer, more specific words — which is the construct itself.
+
+**What is being asked:** whether IDF-as-a-scalar-feature falls inside or outside
+rule 7. Either answer is workable and both are already implemented; the code
+refuses to enable IDF except under a pilot-labelled config, so the current state
+is the conservative one. **No result in this thesis currently uses IDF.**
+
+Ruling: ☐ IDF is outside rule 7 — enable it  ☐ IDF is inside rule 7 — keep it disabled
+
+Signed: ____________________  Date: __________
+
+---
+
 ## Signature
 
 I have read the pre-analysis record and the deviations log, and I understand
