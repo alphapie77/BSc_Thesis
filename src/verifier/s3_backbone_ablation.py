@@ -38,6 +38,7 @@ import argparse
 import csv
 import itertools
 import json
+import platform
 import sys
 import zlib
 from pathlib import Path
@@ -133,7 +134,7 @@ def _train_and_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -
     raise ValueError(f"unknown arm kind {kind!r} for arm {arm['key']!r}")
 
 
-def run(config_path: str, dry_run: bool = False) -> dict:
+def run(config_path: str, dry_run: bool = False, allow_unverified_resume: bool = False) -> dict:
     cfg = _load_yaml(config_path)
     inputs, training, decision = cfg["inputs"], cfg["training"], cfg["decision"]
 
@@ -172,9 +173,15 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     # the same numbers it produced before.
     ckpt_path = Path(str(cfg["outputs"]["results_json"]).replace(".json", ".ckpt.json"))
     done: dict[str, dict] = {}
+    resume_status = "fresh"
     if ckpt_path.exists() and not dry_run:
-        done = json.loads(ckpt_path.read_text(encoding="utf-8"))
-        print(f"resuming: {sorted(done)} already complete (delete {ckpt_path} to force a fresh run)")
+        raw = json.loads(ckpt_path.read_text(encoding="utf-8"))
+        # Format v2 carries an environment fingerprint; v1 was a bare arm map.
+        done = raw.get("arms", raw) if isinstance(raw, dict) else {}
+        resume_status = _check_resume_env(raw.get("_env") if isinstance(raw, dict) else None,
+                                          allow_unverified_resume)
+        print(f"resuming ({resume_status}): {sorted(done)} already complete "
+              f"-- delete {ckpt_path} to force a fresh run")
 
     for arm in cfg["arms"]:
         if arm["key"] in done:
@@ -237,7 +244,10 @@ def run(config_path: str, dry_run: bool = False) -> dict:
                 "all_scores": all_scores[arm["key"]],
             }
             ckpt_path.parent.mkdir(parents=True, exist_ok=True)
-            provenance.write_text_lf(ckpt_path, json.dumps(done, indent=2) + "\n")
+            provenance.write_text_lf(
+                ckpt_path,
+                json.dumps({"_env": _env_fingerprint(), "arms": done}, indent=2) + "\n",
+            )
             print(f"[checkpoint] {arm['key']} done, mean macro-F1 {mean_scores[arm['key']]:.4f}")
 
     arm_keys = [a["key"] for a in cfg["arms"]]
@@ -285,6 +295,9 @@ def run(config_path: str, dry_run: bool = False) -> dict:
         "dev_class_counts": dev.class_counts,
         "gold_ids_touched": 0,
         "visible_gpus": _visible_gpu_count(),
+        "env": _env_fingerprint(),
+        "resume_status": resume_status,
+        "resumed_from_unverified_checkpoint": resume_status == "unverified",
         "verdict_pooled_lr": pooled_outcome,
         "verdict_agrees_across_lr_rules": outcome == pooled_outcome,
         "mean_macro_f1_pooled_lr": {k: round(v, 6) for k, v in sorted(pooled_means.items(), key=lambda kv: -kv[1])},
@@ -316,6 +329,59 @@ def run(config_path: str, dry_run: bool = False) -> dict:
     _write_per_seed(out["per_seed_csv"], per_seed)
     provenance.write_text_lf(out["results_md"], _render_md(result, cfg))
     return result
+
+
+def _env_fingerprint() -> dict:
+    """What a resumed checkpoint must match before its arms may be reused.
+
+    Coakley et al. (2022) measured >6 pp of accuracy variation from environment
+    alone, across 780 runs on identical deterministic examples, and our whole
+    between-arm spread is under 3 pp. So arms carried over from an earlier
+    session are only comparable if that session had the same environment. This
+    records enough to check, and `_check_resume_env` refuses when it differs.
+    """
+    fp = {"python": platform.python_version()}
+    try:
+        import transformers
+        fp["transformers"] = transformers.__version__
+    except Exception:
+        fp["transformers"] = None
+    try:
+        import torch
+        fp["torch"] = torch.__version__
+        fp["gpu"] = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
+        fp["n_gpu"] = torch.cuda.device_count()
+    except Exception:
+        fp["torch"] = fp["gpu"] = fp["n_gpu"] = None
+    return fp
+
+
+def _check_resume_env(saved: dict, allow_unverified: bool) -> str:
+    """Compare a checkpoint's environment with this one. Returns a status word."""
+    now = _env_fingerprint()
+    if not saved:
+        if not allow_unverified:
+            raise SystemExit(
+                "This checkpoint predates environment fingerprinting, so the arms\n"
+                "in it CANNOT be shown to have run under this environment. Coakley\n"
+                "et al. (2022) measured >6 pp of variation from environment alone\n"
+                "and our between-arm spread is under 3 pp, so silently mixing is\n"
+                "not safe.\n\n"
+                "Either delete the checkpoint and re-run every arm, or pass\n"
+                "--allow-unverified-resume, which records\n"
+                "`resumed_from_unverified_checkpoint: true` in the result file so\n"
+                "the fact travels with the numbers."
+            )
+        return "unverified"
+    differs = {k: (saved.get(k), now.get(k)) for k in now if saved.get(k) != now.get(k)}
+    if differs:
+        raise SystemExit(
+            "Refusing to resume: the checkpoint was produced in a DIFFERENT "
+            f"environment.\n  {differs}\n"
+            "Arms from two environments must not share one results table. "
+            "Delete the checkpoint and re-run all arms."
+        )
+    return "verified"
 
 
 def _visible_gpu_count() -> int | None:
@@ -437,6 +503,9 @@ def main() -> None:
     ap.add_argument("--config", required=True)
     ap.add_argument("--dry-run", action="store_true",
                     help="stub the models; check plumbing without a GPU")
+    ap.add_argument("--allow-unverified-resume", action="store_true",
+                    help="resume from a checkpoint with no environment "
+                         "fingerprint; records the fact in the result file")
     ap.add_argument("--check-arms", action="store_true",
                     help="import every arm's dependencies and exit; run this "
                          "in preflight, before any GPU time")
@@ -453,7 +522,8 @@ def main() -> None:
         print(f"all {len(cfg['arms'])} arms' dependencies import cleanly")
         return
 
-    res = run(args.config, dry_run=args.dry_run)
+    res = run(args.config, dry_run=args.dry_run,
+              allow_unverified_resume=args.allow_unverified_resume)
     print(json.dumps({k: res[k] for k in ("dry_run", "verdict", "n_train", "n_dev")}, indent=2))
     print("mean macro-F1:", json.dumps(res["mean_macro_f1"], indent=2))
 

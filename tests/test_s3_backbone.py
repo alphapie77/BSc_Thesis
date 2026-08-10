@@ -307,3 +307,26 @@ def test_nli_arm_loads_with_a_head_size_mismatch_allowed():
     assert "ignore_mismatched_sizes=True" in src, (
         "the NLI arm cannot load without it, and arms 1-5 are unaffected"
     )
+
+
+# ------------------------------------------------- resuming across sessions
+
+def test_resume_refuses_a_checkpoint_from_a_different_environment():
+    """Arms carried over from another environment may not share a results table.
+
+    Coakley et al. (2022) measured >6 pp of accuracy variation from environment
+    alone; our between-arm spread is under 3 pp. So a resumed checkpoint has to
+    prove it came from the same environment, not merely exist.
+    """
+    from src.verifier.s3_backbone_ablation import _check_resume_env, _env_fingerprint
+    same = _env_fingerprint()
+    assert _check_resume_env(same, allow_unverified=False) == "verified"
+    with pytest.raises(SystemExit):
+        _check_resume_env({**same, "transformers": "0.0.0-not-this"}, allow_unverified=False)
+
+
+def test_a_checkpoint_without_a_fingerprint_needs_an_explicit_opt_in():
+    from src.verifier.s3_backbone_ablation import _check_resume_env
+    with pytest.raises(SystemExit):
+        _check_resume_env(None, allow_unverified=False)
+    assert _check_resume_env(None, allow_unverified=True) == "unverified"
