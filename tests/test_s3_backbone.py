@@ -345,3 +345,37 @@ def test_setfit_receives_the_learning_rate():
     src = (ROOT / "src" / "verifier" / "backends.py").read_text(encoding="utf-8")
     assert "body_learning_rate=lr" in src
     assert "head_learning_rate=lr" in src
+
+
+# ------------------------------------------------------------ S3.2b baselines
+
+def test_s3b_bands_are_all_reachable_and_ordered():
+    """A band structure that can only return one verdict is not a test.
+
+    Same lesson as RQ1-F's Gate 2 and S3.2's TIE check: verify by construction
+    that each outcome is attainable, before the numbers arrive.
+    """
+    yaml = pytest.importorskip("yaml")
+    cfg = yaml.safe_load((ROOT / "configs" / "s3b_baselines.yaml").read_text(encoding="utf-8"))
+    assert cfg["labse_model"] == "sentence-transformers/LaBSE", (
+        "the probe must use the encoder that GENERATED cluster_k2, or it is not "
+        "testing the circularity we actually have"
+    )
+    text = PROTOCOL.read_text(encoding="utf-8")
+    for band in ("CIRCULARITY_CONFIRMED", "PARTIAL", "NOT_CIRCULAR"):
+        assert band in text, f"band {band} is not pre-registered"
+
+
+def test_length_baseline_is_fitted_on_train_not_dev():
+    """Tuning the baseline on dev would flatter it and make the arms look worse
+    -- the opposite of the error S3.2b exists to catch."""
+    src = (ROOT / "src" / "verifier" / "s3b_baselines.py").read_text(encoding="utf-8")
+    assert "train.labels" in src and "chosen on TRAIN" in src
+
+
+def test_majority_and_length_baselines_are_computable_without_torch():
+    from src.verifier.s3b_baselines import majority_baseline, length_baseline
+    train, dev = load_training_rows("A", **INPUTS)
+    assert compare.macro_f1(list(dev.labels), majority_baseline(train, dev)) < 0.50
+    pred, meta = length_baseline(train, dev)
+    assert len(pred) == 82 and meta["direction"] in (">", "<=")

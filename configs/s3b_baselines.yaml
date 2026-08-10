@@ -1,0 +1,21 @@
+# S3.2b -- reference points for the S3.2 ablation.
+# Pre-registered in docs/protocol.md section "S3.2b pre-commitment", written
+# BEFORE the frozen-probe number existed.
+
+step: S3.2b
+role: A
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+  s3_result: results/s3_backbone_ablation.json
+
+# The encoder that GENERATED the cluster_k2 label, frozen. Must be the same
+# model S2/S2e embedded with, or the circularity test is not testing the
+# circularity we actually have.
+labse_model: sentence-transformers/LaBSE
+
+outputs:
+  results_json: results/s3b_baselines.json
+  results_md: results/s3b_baselines.md
