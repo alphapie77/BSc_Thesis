@@ -80,7 +80,24 @@ def finetune_predict(train, dev, arm: dict, seed: int, lr: float, cfg: dict) -> 
 
     t = cfg["training"]
     tok = AutoTokenizer.from_pretrained(arm["model"])
-    model = AutoModelForSequenceClassification.from_pretrained(arm["model"], num_labels=2)
+    # ignore_mismatched_sizes: the NLI arm's checkpoint carries a THREE-class
+    # head (entailment / neutral / contradiction) and ours is binary, so the
+    # classifier weights must be dropped and re-initialised. Without this flag
+    # loading raises `size mismatch ... [3] vs [2]` -- which is exactly what
+    # killed arm 6 on 2026-08-09, after five arms had completed.
+    #
+    # The flag only fires when shapes actually differ, so for arms 1-5 it
+    # changes nothing: their checkpoints have no classification head at all and
+    # the head is newly initialised either way.
+    #
+    # ⚠️ Worth being blunt about how this got through: `nli_transfer_predict`
+    # already CLAIMED in its docstring that "the classification head is
+    # re-initialised for our 2 labels". The comment described behaviour the code
+    # did not implement, and nothing tested the claim. A docstring is not a
+    # mechanism.
+    model = AutoModelForSequenceClassification.from_pretrained(
+        arm["model"], num_labels=2, ignore_mismatched_sizes=True
+    )
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
 

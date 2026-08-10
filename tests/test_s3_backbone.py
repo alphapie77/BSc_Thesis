@@ -293,3 +293,17 @@ def test_disagreement_between_lr_rules_is_reported_loudly():
     assert "DISAGREE" in md
     assert "inner k-fold" in md
     assert "may be reported as the result until" in md
+
+
+def test_nli_arm_loads_with_a_head_size_mismatch_allowed():
+    """The NLI checkpoint is 3-class and our task is binary.
+
+    `nli_transfer_predict`'s docstring claimed the head is re-initialised for
+    two labels; the code did not pass the flag that does it, and the run died on
+    `size mismatch [3] vs [2]` after five arms had completed. This test reads
+    the source, because the alternative is a GPU run.
+    """
+    src = (ROOT / "src" / "verifier" / "backends.py").read_text(encoding="utf-8")
+    assert "ignore_mismatched_sizes=True" in src, (
+        "the NLI arm cannot load without it, and arms 1-5 are unaffected"
+    )
