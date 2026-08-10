@@ -3294,3 +3294,127 @@ which refused.
 
 None new. `ko2019specificity` (feature families) and `mahmoud2026rubric`
 (gameability annotation) were added 2026-08-11 in Tiers 7-8.
+
+---
+
+## 2026-08-11 -- S3.3: Verifier-A and Verifier-B: built, pre-registered, and not yet run
+**Feeds:** Ch.3 Verifier design; Ch.5 RQ5
+**Commit:** `65c9a28605d79f72a90db147fa2b47eaff759890-dirty`
+**Artifacts:** `configs/s3c_verifier_a.yaml`, `configs/s3d_verifier_b.yaml`,
+`src/verifier/train_verifier_a.py`, `src/verifier/train_verifier_b.py`,
+`src/verifier/calibration.py`, `tests/test_s3_verifiers.py`,
+`notebooks/s3d_verifier_b_kaggle.ipynb`, `docs/protocol.md` §S3.3.
+⚠️ **Nothing in `results/`** — see "Numbers" below.
+
+### Numbers
+
+**None yet, and that is the honest state of this entry.** The code, the configs,
+the tests and the pre-registration exist; neither verifier has been trained.
+Only these are established:
+
+- Data contracts, verified by computation, not assumed: Verifier-A draws
+  **804** R1 rows (481/323), Verifier-B draws **888** R2 rows (531/357), both
+  evaluated on the same **82** dev rows (53/29). `train ∩ dev = ∅` for both
+  roles, `A_train ∩ B_train = ∅`, and G-300 reaches neither.
+- **171 tests pass** (150 existing + **21 new**), including the wall assertions.
+- The `--dry-run` path executes end to end on CPU: contracts, walls, provenance
+  stamp and markdown renderer, with no model and no download.
+
+**Why not run:** Verifier-B needs a GPU. Verifier-A does not, but its own
+reproduction check compares against S3.2b's **0.9866**, which was measured on
+Kaggle — and `coakley2022implementation` put environment-only variation at
+**>6 pp**, while half a dev item is **0.6 pp**. Fitting Verifier-A in a third
+environment would risk a spurious "the data moved" stop that means nothing but
+"different host". Both therefore run from
+`notebooks/s3d_verifier_b_kaggle.ipynb`, and `results/env_snapshot_s3d_kaggle.json`
+is mandatory per fact (env).
+
+### Decisions made (and why)
+
+- **Verifier-B's learning rate is fixed at 2e-5 and never selected** — the
+  pipeline §3.1 default, 5 seeds at one lr rather than S3.2's two.
+  ⚠️ **Sabbir's call, 2026-08-11**, taken from three options presented with
+  their costs; the search that produced the options is Claude's.
+  `schneider2025overtuning` re-analyse seven HPO benchmark suites and find
+  **~10% of runs select a configuration that generalises worse than the
+  default**, with the aggravating conditions named as small data, holdout
+  rather than CV, binary classification, accuracy-type metric — **all four
+  describe this run.** Their recommendation is repeated CV; not tuning at all
+  was available and is stronger, so it was taken. Cost accepted: B may be
+  slightly weaker than a tuned B would be.
+- **Both verifiers are evaluated on the same dev-82.** ⚠️ **Sabbir's call.**
+  The alternative was carving B its own slice out of R2, which is closer to the
+  split map's literal wording but drops B's training n below 888 and, more
+  seriously, measures A and B on different items — after which RQ5's A−B gap
+  confounds model difference with item difference and nothing downstream can
+  separate them again. Leakage-free either way: `dev ⊂ R1` is held out of A's
+  804, and `dev ∩ R2 = ∅` by the frozen split's own contract.
+- **The persisted Verifier-B is the seed-42 model, declared before any score
+  exists.** Claude's call, recorded as such. Not best-of-five, which would be
+  selection on the reporting slice. An **ensemble of all five was considered
+  and rejected**: Verifier-A is a single model, and an ensembled B would make
+  part of the RQ5 gap a gap between "one model" and "five" — symmetry is worth
+  more here than the ensemble's calibration gain. The other four seeds are
+  reported as a sensitivity band.
+- **`--dry-run` writes to `results/_dryrun/`, never to `results/`.** Claude's
+  call, and it is a correction rather than a design: the first dry run wrote
+  four files into `results/` containing scores from a random number generator.
+  They were deleted within the minute and nothing cited them, but by this
+  project's own artifact index a file in `results/` is something a reader may
+  check, and "it was obviously a dry run" is not a property the filename
+  carried.
+
+### Findings (things we did not expect)
+
+- 🔴 **`split_access.load_training_rows` returned `dev = None` for role B, so
+  Verifier-B had no registered evaluation slice at all.** Not a bug in any
+  result — no verifier existed — but the gap had survived since the file was
+  written, and `tests/test_s3_backbone.py` was actively *pinning* it with
+  `assert dev is None`. **A test can protect a gap as effectively as it
+  protects a rule**, and this one read as a wall while being an omission. The
+  test is amended, not deleted, with the reason in its docstring.
+- 🔴 **`protocol.md` claimed Verifier-A was "natively calibrated". It has no
+  support.** `zhang2026tabpfn` evaluate nine heads on frozen encoders across
+  **22,820 episodes**: a logistic head takes the **best mean rank on accuracy**
+  and ranks **below kNN and every in-context head on both ECE and NLL** (Top-1
+  ECE 0.069 vs 0.037 / 0.031). The clause is withdrawn and §3.4 temperature
+  scaling becomes **mandatory** for Verifier-A. ✅ The **choice** of Verifier-A
+  survives — the same paper keeps logistic regression appropriate at high
+  dimension and near-ceiling accuracy, which is exactly our regime. ⚠️ Bounded:
+  their grid is 10-class and the gap narrows at C=2, so what is recorded is
+  *"the claim had no support"*, not *"Verifier-A is miscalibrated"*.
+- This is the **fourth** entry in CLAUDE.md's search-first table and the
+  cheapest to have caught: the sentence was one day old and no code depended on
+  it yet. The three earlier entries each cost a rebuilt instrument, a rewritten
+  decision rule, or a withdrawn recommendation.
+- ⚠️ **Search index: alphaXiv, not Consensus** (quota exhausted until
+  2026-09-01). Recorded in `protocol.md`, `related_work.md` and the `.bib`
+  notes, because "searched a different index" and "did not search" are
+  different facts that look identical in a bibliography.
+
+### Consequences for downstream steps
+
+- **Phase 3 is Bangla-complete on paper and not on disk.** Pipeline §3.1 asks
+  for four verifiers (A/B × bn/en); this delivers **two**, and the English pair
+  is scheduled rather than cut (STATUS, 2026-08-11). Phase 3 must be described
+  that way and not as "done".
+- **Phase 4 unblocks only after the Kaggle run.** §4.2's Critic is
+  `0.6×VerifierA + 0.4×symbolic`; the symbolic half was built 2026-08-11, and
+  Verifier-A is the remaining input.
+- **§3.4's calibration figure now has a pre-committed null that can fire.**
+  `test_calibration_reports_the_null_when_there_is_nothing_to_fix` exists
+  specifically because RQ1-F's Gate 2 had to be rewritten mid-protocol when its
+  null verdict turned out to be nearly unreachable by construction. The same
+  failure mode is tested for here rather than discovered later.
+- **§3.3's dual-accuracy table remains not producible** (logged 2026-08-08) and
+  nothing here changes that.
+
+### Citations needed
+
+Two new, both added 2026-08-11 to `related_work.md` **Tier 9** and
+`references.bib`, both read in full:
+
+- `schneider2025overtuning` — Schneider, Bischl & Feurer, AutoML 2025. Cited in
+  Ch.3 beside Verifier-B's learning-rate rule.
+- `zhang2026tabpfn` — Zhang et al. 2026, arXiv 2607.11007. Cited in Ch.3 beside
+  the calibration stage, and in Ch.5 Limitations for the C=2 caveat.

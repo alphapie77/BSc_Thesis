@@ -46,3 +46,4 @@ data/plots/review.html
 # extracts them text-free to results/g300_ratings.csv, which IS committed.
 data/annotation/*.csv
 data/annotation/intrusion/*.csv
+results/_dryrun/

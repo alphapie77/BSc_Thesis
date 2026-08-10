@@ -92,9 +92,20 @@ def load_training_rows(
     """Return (train, dev) for a verifier role. `role` is "A" or "B".
 
     Only rows that carry a K=2 label are returned -- region B has no such label
-    and is therefore absent by construction, not by filtering. `dev` is a subset
-    of R1 by the split map's own contract, so it is held out of Verifier-A's
-    training set and is `None` for Verifier-B.
+    and is therefore absent by construction, not by filtering.
+
+    `dev` is a subset of R1 by the split map's own contract. For role A it is
+    subtracted from the training rows. For role B it is returned *unchanged and
+    untouched*: R2 and dev are disjoint by that same contract, so the 82 dev
+    rows are not in B's training set to begin with, and B is evaluated on them.
+
+    That B is evaluated on dev at all is a widening of the contract's wording
+    ("threshold sweep only") and is registered in protocol.md §S3.3 with a
+    deviation row. It is done because RQ5 measures the gap between A-scores and
+    B-scores: measured on different items, that gap confounds model difference
+    with item difference and nothing downstream can separate them again. Before
+    2026-08-11 this function returned `dev = None` for role B, which meant
+    Verifier-B had no registered evaluation slice at all.
     """
     role = role.upper()
     if role not in ROLE_PARTITION:
@@ -134,7 +145,22 @@ def load_training_rows(
         )
 
     train = build([i for i in ids if i not in dev_ids])
-    dev = build([i for i in ids if i in dev_ids]) if (hold_out_dev and role == "A") else None
+
+    # dev comes from R1's id list regardless of role, because that is where it
+    # lives. For role B this is a pure read of somebody else's partition: the
+    # rows are never added to `train` (they are not in R2) and B never fits
+    # anything on them.
+    if hold_out_dev:
+        dev_source = list(smap["R1"])
+        dev = build([i for i in dev_source if i in dev_ids])
+        if role == "B" and (set(dev.review_ids) & set(train.review_ids)):
+            raise SplitContractError(  # pragma: no cover - defensive
+                "dev rows appear inside Verifier-B's training set. R2 and dev "
+                "are disjoint by the frozen split's contract, so this means the "
+                "split map has changed. Stop and do not train."
+            )
+    else:
+        dev = None
     return train, dev
 
 

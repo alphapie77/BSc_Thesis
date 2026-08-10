@@ -1,0 +1,59 @@
+# S3.3a -- Verifier-A, the in-loop gate.
+# Pre-registered in docs/protocol.md section "S3.3 pre-commitment", written
+# 2026-08-11 before this artifact existed.
+#
+# One config = one YAML = one result file. Editing the model, the role or the
+# evaluation slice without first editing protocol.md is a protocol breach, and
+# tests/test_s3_verifiers.py checks the two agree.
+
+step: S3.3a
+role: A            # trains the IN-LOOP verifier -> R1. Never B.
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  # region-A K=2 labels. NOT results/s2_cluster_assignments.csv -- those
+  # clusters are a corpus detector, not the engagement-specificity axis.
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+
+expected:
+  # Asserted, not assumed. A silently different n would make every number here
+  # incomparable with S3.2b's 0.9866, which is the reference this must reproduce.
+  train_n: 804
+  train_class_counts: {0: 481, 1: 323}
+  dev_n: 82
+  dev_class_counts: {0: 53, 1: 29}
+
+model:
+  # The encoder that GENERATED cluster_k2, frozen. Nothing is fine-tuned:
+  # inviolable rule 10 permits exactly 4 verifiers + 2 logistic regressions +
+  # 4 temperature scalings, and this is one of the logistic regressions.
+  #
+  # Must be the same string as configs/s3b_baselines.yaml. If it is not, this
+  # verifier is not the artifact S3.2b measured at 0.9866 and the CIRCULARITY
+  # verdict does not transfer to it.
+  labse_model: sentence-transformers/LaBSE
+  head: logistic_regression
+  penalty: l2
+  max_iter: 2000
+  # sklearn's default C. NOT tuned -- see the same overtuning argument that
+  # fixes Verifier-B's learning rate (protocol.md S3.3, decision 1). The 82-row
+  # dev slice is a reporting surface, not a selection surface.
+  C: 1.0
+  normalize_embeddings: true
+
+calibration:
+  # S3.4, mandatory for Verifier-A since 2026-08-11: the "natively calibrated"
+  # claim in decision 16 was withdrawn after zhang2026tabpfn measured logistic
+  # heads on frozen encoders at Top-1 ECE 0.069 -- best on accuracy, near-worst
+  # on calibration.
+  enabled: true
+  n_bins: 5          # not 10. 82 rows / 10 bins is ~8 samples per bin.
+  n_resamples: 10000
+  descriptive: true  # the figure carries this label in Ch.4.
+
+outputs:
+  results_json: results/s3c_verifier_a.json
+  results_md: results/s3c_verifier_a.md
+  dev_predictions_csv: results/s3c_verifier_a_dev_predictions.csv
+  artifact: artifacts/verifier_a.joblib

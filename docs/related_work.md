@@ -465,6 +465,31 @@ informative. Both halves go in Ch.5.
 
 ---
 
+## Tier 9 — Not tuning, and not assuming calibration (added 2026-08-11)
+
+> **Both entries were found by a search run *before* the decision they inform,
+> and both changed something.** One fixed a hyperparameter rule; the other
+> deleted a sentence from `protocol.md` that had been written from memory the
+> previous day. ⚠️ **Index used: alphaXiv, not Consensus** — the Consensus quota
+> is exhausted until 1 September 2026. Recorded rather than glossed over,
+> because "searched a different index" and "did not search" must not look alike
+> in a bibliography.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `schneider2025overtuning` | Schneider, Bischl & Feurer, **AutoML 2025** (LMU Munich) | `[x]` **full body** | 🔴 **Fixes Verifier-B's learning rate at the spec default, unselected** (protocol.md §S3.3 decision 1). Reanalysis of seven HPO benchmark suites: in **~10% of runs the validation-optimal configuration generalises *worse* than the default**, and their mixed models name the aggravating conditions as **small data, holdout rather than CV, binary classification, accuracy-type metric** — all four describe Verifier-B (888 rows, 82-row holdout, 2 classes, macro-F1). Their own recommendation is repeated CV; **not tuning at all was available and is strictly stronger**, so it was taken. Also the standing citation for why the 82-row dev slice is a *reporting* surface and never a selection surface. |
+| `zhang2026tabpfn` | Zhang et al. 2026, arXiv 2607.11007 (USC) | `[x]` **full body** | 🔴 **Withdraws the "natively calibrated" defence of Verifier-A and makes §3.4 temperature scaling mandatory for it.** Across **22,820 episodes**, 14 datasets and 11 encoders, a logistic head on a frozen encoder takes the **best mean rank on accuracy** and ranks **below kNN and every in-context head on both ECE and NLL** (Top-1 ECE **0.069** vs 0.037 / 0.031). Their sentence, which is the one that matters: *"strong accuracy does not inherently guarantee well-calibrated probabilities."* ✅ **What survives:** their practical guidance keeps logistic regression appropriate for *"high dimensions, or near-ceiling tasks"* — ours is 768-d LaBSE at 0.9866 — so **the artifact is confirmed and one sentence of its justification is not.** ⚠️ **Bounded:** their canonical grid is 10-class and the calibration gap narrows at C=2; our task is binary, so the recorded correction is *"the claim had no support"*, not *"Verifier-A is miscalibrated"*. |
+
+**Why this tier is one line longer than it needs to be.** `zhang2026tabpfn` is
+the **fourth** entry in CLAUDE.md's table of decisions made without searching
+first, and the cheapest to have caught — the claim was one day old and no code
+depended on it. The three earlier entries each cost a rebuilt instrument, a
+rewritten decision rule, or a withdrawn recommendation. **The table is kept
+because the pattern is the argument for the rule, not because the failures are
+interesting individually.**
+
+---
+
 ## Gap table — the sentence Ch.2 must end with
 
 Fill as entries complete. The claim we must be able to defend is:

@@ -81,11 +81,29 @@ def test_n_matches_the_preregistration():
     assert dev.class_counts == {0: 53, 1: 29}
 
 
-def test_verifier_b_n_matches_and_has_no_dev():
+def test_verifier_b_n_matches_and_receives_the_shared_dev():
+    """Amended 2026-08-11. This test previously asserted `dev is None` for role B.
+
+    That assertion was correct about the *mechanism* and wrong about the
+    *design*, and it pinned a gap rather than a rule: with no dev slice,
+    Verifier-B had no registered evaluation set at all, which nobody noticed
+    until Phase 3 tried to train it. The wall being protected is that R2 and R1
+    stay disjoint in **training** — and that is still asserted, below and in
+    tests/test_s3_verifiers.py.
+
+    B is now evaluated on the same 82 rows as A, because RQ5's Goodhart gap is
+    an A−B comparison and measuring the two on different items confounds model
+    difference with item difference. Registered in protocol.md §S3.3 with a
+    deviation row for widening the split map's `dev` contract.
+    """
     train, dev = load_training_rows("B", **INPUTS)
     assert len(train) == 888
     assert train.class_counts == {0: 531, 1: 357}
-    assert dev is None, "the dev slice belongs to R1; B must not receive one"
+    assert len(dev) == 82, "B is evaluated on the shared dev-82"
+    assert not (set(train.review_ids) & set(dev.review_ids)), (
+        "dev must never be inside B's training set; R2 and dev are disjoint by "
+        "the frozen split's own contract, so this failing means the split moved"
+    )
 
 
 def test_region_b_rows_are_absent_by_construction():

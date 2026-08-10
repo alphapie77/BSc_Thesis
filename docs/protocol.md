@@ -1173,11 +1173,155 @@ signature**, and is reported alongside the A−B gap and the invariance check.
 against it** — the shield framing was proposed on 2026-08-11 and rejected by the
 same search that produced this section.
 
+## S3.3 pre-commitment: training and evaluating Verifier-A and Verifier-B
+
+> **Written 2026-08-11, before either verifier exists.** No checkpoint has been
+> fitted, no dev number computed. Decision 16 (2026-08-10) fixed *what* A and B
+> are; the 2026-08-11 disambiguation fixed *which data* B trains on. **Three
+> things were still unregistered, and are fixed here: B's learning rate, B's
+> evaluation slice, and whether Verifier-A needs calibrating at all.** The
+> search that produced this section ran before the design, per the standing
+> instruction. **Index used: alphaXiv** — Consensus's quota is exhausted until
+> 1 September 2026, and that is recorded rather than worked around, because
+> "searched a different index" and "did not search" must not look alike.
+
+### The two artifacts, restated so no config has to infer them
+
+| | Verifier-A | Verifier-B |
+|---|---|---|
+| Role | In-loop gate (§4.2 Critic) | S6 evaluation only — **never in the loop** (inviolable rule 6) |
+| Model | **Frozen LaBSE + L2 logistic head.** Nothing is fine-tuned | **The S3.2 BanglaBERT *recipe*** — same backbone, budget, seeds — **retrained** |
+| Training data | **R1**, region-A labelled, dev held out: **n = 804** (481/323) | **R2**, region-A labelled: **n = 888** (531/357) |
+| Checkpoint reuse | — | 🔴 **None.** The S3.2 checkpoints are `role: A`, i.e. trained on R1. Loading one as Verifier-B would put A and B on the same data and void rule 6 |
+| Evaluation | dev-82 | dev-82 |
+
+### Registered decision 1 — Verifier-B's learning rate is **fixed at 2e-5**, not selected
+
+S3.2's recipe sweeps `lr ∈ {2e-5, 3e-5}` × 5 seeds. **Verifier-B runs 5 seeds at
+lr = 2e-5 only**, the value pipeline §3.1 specifies as the default. No
+hyperparameter is chosen by looking at a score.
+
+**Why, and the search that decided it.** `schneider2025overtuning` (AutoML 2025)
+re-analyse seven large HPO benchmark suites and define *overtuning*: selecting the
+validation-optimal configuration and thereby generalising **worse than the
+default**. It happens in **~10% of runs** ("severe", relative overtuning > 1.0),
+and their mixed-model analysis names the conditions that make it worse — **small
+datasets, holdout rather than cross-validation, and binary classification under
+an accuracy-type metric**. *All four describe this exact run:* 888 training rows,
+an 82-row holdout, two classes, macro-F1. Their own recommendation is to prefer
+(repeated) CV over holdout at small n. **We take the stronger option available to
+us: do not tune at all.** The claim the thesis may then make is checkable —
+*"Verifier-B's learning rate was taken from the pipeline specification and never
+selected against a score"* — which no amount of CV would buy.
+
+**Cost, named:** Verifier-B may be slightly worse than a tuned Verifier-B would
+be. That is accepted deliberately. **A verifier that is 2 pp weaker is a
+reportable fact; a verifier whose 82-row holdout was reused for selection and
+then for reporting is an unreportable one**, and RQ5 rests on B's number being
+independent of everything A's number touched.
+
+**Sabbir's call, taken 2026-08-11**, from the three options above.
+
+### Registered decision 2 — both verifiers are evaluated on the **same dev-82**
+
+`data/splits/split_map_v1.json`'s `_contract` says `dev` is *"Subset of R1.
+Threshold sweep only."* **That wording is extended here, deliberately and with a
+deviation row**: dev-82 is also the evaluation slice for both verifiers.
+
+**It is leakage-free, and the reason is structural rather than a promise.**
+`dev` ⊂ R1 and is held out of Verifier-A's 804. `dev` ∩ R2 = ∅ by the frozen
+split's own contract, so it is untouched by Verifier-B's 888. **Neither verifier
+has seen any of the 82 rows.** S3.2 and S3.2b already used dev-82 as their
+evaluation set, so this is a continuation, not a new use.
+
+**Why the same slice rather than one each.** RQ5 measures the **gap between
+A-scores and B-scores** as the loop optimises against A. If A and B are measured
+on different items, that gap confounds *model difference* with *item difference*,
+and no amount of care afterwards separates them. Head-to-head on identical items
+is the only configuration in which the Goodhart gap means what RQ5 says it means.
+
+**What dev-82 may NOT be used for**, restated because this section widens its
+use: no hyperparameter selection, no threshold tuning that feeds back into
+training, no arm selection. It is a reporting surface. τ's sweep (§4.5) is the
+one tuning use the contract already allowed and it stands.
+
+**Power, stated in advance so a null is readable.** At n = 82 one item is
+**0.0122** macro-F1. Verifier-A is expected near 0.9866 (1 error) from S3.2b and
+Verifier-B near 0.9647 from S3.2's BanglaBERT arm — **a difference of ~1.8
+items**. 🔴 **Pre-committed: no claim that either verifier is better than the
+other may be made from dev-82.** The A−B comparison this slice supports is
+*"both are competent on the same items"*, which is all the cross-family wall
+requires. RQ5's gap is measured on **generations**, not here.
+
+### Registered decision 3 — 🔴 the "natively calibrated" claim in decision 16 is **withdrawn**
+
+Decision 16 (2026-08-10) justified Verifier-A partly as *"best measured, seconds
+to fit, **natively calibrated**, no GPU in the Phase 4 loop."* **The
+"natively calibrated" clause was written from memory and is wrong.**
+
+`zhang2026tabpfn` evaluate nine classification heads on frozen image, text and
+audio encoders across **22,820 episodes**, 14 datasets and 11 encoders. Logistic
+regression takes the **best mean rank on accuracy** (3.20) — and ranks **below**
+kNN and every in-context head on **both** calibration metrics. At their canonical
+setting its **Top-1 ECE is 0.069**, against kNN 0.037 and TabPFN 0.031, and its
+NLL (0.581) is the second worst of ten heads. Their own summary: *"strong
+accuracy does not inherently guarantee well-calibrated probabilities."*
+
+**What this changes and what it does not.**
+
+- ❌ **Withdrawn:** the assertion that Verifier-A needs no calibration. It has no
+  support, and §3.4's temperature-scaling stage is therefore **mandatory for
+  Verifier-A**, not optional.
+- ✅ **Unchanged:** the choice of Verifier-A itself. The same paper's practical
+  guidance is that *"logistic regression or SVM remains appropriate for extremely
+  low shot counts, high dimensions, or near-ceiling tasks"* — and this task is
+  **high-dimensional (768-d LaBSE) and near-ceiling (0.9866)**, i.e. all three.
+  The literature supports the artifact and refutes one sentence of its defence.
+- ⚠️ **Bounded:** their canonical grid is 10-class; ours is binary, and they note
+  the calibration advantage over classical heads **narrows at C = 2**. The
+  correction is therefore recorded as *"the claim had no support"*, not as
+  *"Verifier-A is definitely miscalibrated"* — a distinction the ECE figure will
+  settle on our own data.
+
+**This is the fourth entry in CLAUDE.md's table of decisions made without
+searching first**, and it is the cheapest one to have caught: the sentence had
+been in `protocol.md` for one day and no code depended on it yet.
+
+### Calibration protocol (inherits the 2026-08-08 S3.4 amendment unchanged)
+
+**5 bins, not 10.** ECE and Brier before and after temperature scaling, each with
+a **bootstrap CI over the 82 rows**, and the figure labelled **descriptive**.
+Pre-committed null statement, unchanged: *"calibration could not be established
+at this sample size"* fires if the ECE improvement is smaller than its own CI.
+The temperature is fitted **on dev-82 and reported as fitted there** — at n = 82
+there is no second slice, and an in-sample temperature reported as in-sample is
+honest where a held-out one would be fictional.
+
+### Three-outcome commitment (Rule 0)
+
+| Outcome | What is claimed |
+|---|---|
+| Both verifiers ≥ ~0.90 macro-F1 on dev-82 | The cross-family wall is built from two competent evaluators; Phase 4 proceeds. **No claim that either is better.** |
+| Verifier-B clearly below A (> 5 items) | Reported as-is. `baker2025monitoring` already establishes that a weaker monitor of a stronger system is documented practice, so this **bounds** RQ5's interpretation rather than voiding it — and the bound is stated in Ch.5 |
+| Verifier-B at or below the S3.2b surface baselines (length rule 0.6197) | 🔴 **Stop.** R2's labels or the retraining are broken, and this is checked for a bug before it is believed — the same rule S3.2b's `NOT_CIRCULAR` band carries |
+
+### Scope of Phase 3 as delivered
+
+Pipeline §3.1 asks for **four** verifiers (A/B × bn/en). **This step delivers
+two.** The English pair is scheduled, not cut (STATUS, 2026-08-11), and runs after
+the Bangla machinery exists. **Phase 3 is therefore closed as "Bangla-complete",
+and the English half is named as outstanding rather than counted as done.**
+§3.3's dual-accuracy table remains **not producible** (logged 2026-08-08): G-300
+returned specificity ratings, not cluster labels, and they failed reliability.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-11 | S3.3 — **Verifier-B's learning rate is fixed at 2e-5 and never selected** | S3.2's recipe sweeps `lr ∈ {2e-5, 3e-5}`. Verifier-B runs **5 seeds at 2e-5 only**, the pipeline §3.1 default. Half the compute, and no hyperparameter is chosen by looking at a score. | **Searched before deciding** (alphaXiv; Consensus quota exhausted until 1 Sep). `schneider2025overtuning` re-analyse seven HPO benchmark suites and find **~10% of runs select a configuration that generalises worse than the default** — and their mixed models name the aggravating conditions as **small data, holdout rather than CV, binary classification, accuracy-type metric**. Verifier-B is all four: 888 rows, an 82-row holdout, two classes, macro-F1. Their recommendation is repeated CV; **not tuning at all is strictly stronger and was available**, so it was taken. Cost accepted and named: B may be a little weaker than a tuned B. **Sabbir's call, 2026-08-11**, from three options presented with their costs. |
+| 2026-08-11 | S3.3 — **the `dev` contract is widened from "threshold sweep only" to "threshold sweep and verifier evaluation"** | `split_map_v1.json`'s `_contract` restricts `dev` to the threshold sweep. Both verifiers are now evaluated on it. `src/verifier/split_access.py` previously returned `dev = None` for role B, so **Verifier-B had no registered evaluation slice at all** — the gap this row closes. | **Leakage-free by construction, not by promise:** `dev` ⊂ R1 and is held out of A's 804; `dev` ∩ R2 = ∅ by the frozen split's contract, so it is untouched by B's 888. Neither verifier has seen any of the 82 rows, and S3.2/S3.2b already used dev-82 as their evaluation set. **The reason it must be the *same* slice is RQ5:** the Goodhart test measures the A−B gap, and measuring A and B on different items confounds model difference with item difference irrecoverably. ⚠️ **Pre-committed limit:** at 1 item = 0.0122 macro-F1 and an expected A−B gap of ~1.8 items, **no claim that either verifier is better may be made from dev-82.** Sabbir's call, 2026-08-11. |
+| 2026-08-11 | 🔴 S3.2c / decision 16 — **the "natively calibrated" justification for Verifier-A is WITHDRAWN; §3.4 temperature scaling becomes mandatory for A** | Decision 16 defended the frozen LaBSE probe as *"best measured, seconds to fit, **natively calibrated**, no GPU in the loop."* The calibration clause is struck. The **choice of Verifier-A is unchanged**; one sentence of its defence is not. | **Written from memory one day earlier, and refuted by the first search that looked.** `zhang2026tabpfn` evaluate nine heads on frozen encoders across **22,820 episodes**: logistic regression takes the **best mean rank on accuracy** and ranks **below kNN and every in-context head on both ECE and NLL** — Top-1 ECE **0.069** vs kNN 0.037 and TabPFN 0.031, NLL 0.581, second worst of ten. Their words: *"strong accuracy does not inherently guarantee well-calibrated probabilities."* **What survives:** the same paper's guidance keeps LR appropriate at *"extremely low shot counts, high dimensions, or near-ceiling tasks"* — ours is 768-d and 0.9866, i.e. two of three. ⚠️ **Bounded honestly:** their grid is 10-class and they note the gap narrows at C = 2, so the correction recorded is *"the claim had no support"*, **not** *"Verifier-A is miscalibrated"*; our own ECE settles that. **This is the fourth entry in CLAUDE.md's search-first table**, and the cheapest — no code depended on the sentence yet. |
 | 2026-07-27 | S0 arithmetic | `null_rows` 1 → 2; `usable_n` 4722 → `n_after_rule_based_cleaning` = 4730 | Two distinct null rows exist (one missing review text, one missing sentiment label), not one. 4722 was produced by treating the three drop sets as disjoint (2+72+204=278 subtracted from 5000), which double-counts the 10 rows in SHORT ∩ DUP. True union under normalized duplicates = 270, giving 4730. **Final `usable_n` pending near-duplicate removal** (cosine ≥ 0.95, deferred to S2). Verified in `results/s0_data_xray.md`. |
 | 2026-07-28 | RQ1 trap-check bands | ARI bands changed from 0.4 / 0.4–0.6 / >0.6 to **DEGENERATE / <0.20 / 0.20–0.60 / >0.60**; old bullet struck through and marked superseded | Written **before any ARI value existed** (S2 has never been run), so this is a pre-registration refinement, not a post-hoc adjustment. Three substantive additions: a degeneracy band (a non-partition scores low ARI by construction and must not be read as independence); a mandatory residual test in the middle band; and the venue/community selection effect named as an untestable alternative explanation in the top band, following provenance fact (c). ⚠️ `configs/s2_pilot.yaml` and `src/cluster/s2_pilot.py` still implement the OLD 0.4/0.6 bands — they must be updated before the pilot is run or its printed verdict will contradict this pre-registration. |
 | 2026-07-28 | RQ1 code/protocol alignment | Code-vs-protocol mismatch **found and closed before the first run**: `configs/s2_pilot.yaml` and `verdict()` in `src/cluster/s2_pilot.py` still implemented the superseded 0.4/0.6 bands and derived the verdict from ARI alone | **No ARI value was ever produced under the old scheme** — the S2 pilot had not been run at any point while the mismatch existed, so nothing was observed, reported, or interpreted under the retired bands. Closure: config now carries the four-band scheme; `verdict()` evaluates **degeneracy as the first gate**, returning `NO_CLAIM` and emitting no PASS/CAVEAT/FAIL when the partition is degenerate, so ARI can no longer be read as independence when K-Means simply failed to partition; Band 2 emits a `RESIDUAL_TEST_REQUIRED` marker; verdict strings map one-to-one onto the protocol band names. Pinned by `tests/test_s2_verdict.py` (8 tests), including one asserting a degenerate partition with near-zero ARI returns `NO_CLAIM` and never a claim verdict. |

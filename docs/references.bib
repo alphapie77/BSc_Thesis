@@ -700,3 +700,44 @@
             (rank 17.05 -> 30.91 when details were fabricated). Candidate for
             sect. 5.4's realism test; NOT adopted there yet. Read in full.}
 }
+
+@inproceedings{schneider2025overtuning,
+  title     = {Overtuning in Hyperparameter Optimization},
+  author    = {Schneider, Lennart and Bischl, Bernd and Feurer, Matthias},
+  booktitle = {AutoML 2025},
+  year      = {2025},
+  eprint    = {2506.19540},
+  archivePrefix = {arXiv},
+  note      = {LMU Munich / Munich Center for Machine Learning. Read in full
+               2026-08-11 via alphaXiv (Consensus quota exhausted until
+               2026-09-01). Reanalysis of seven HPO benchmark suites (FCNet,
+               LCBench, WDTB, TabZilla, TabRepo, reshuffling, PD1). ~10 percent
+               of runs show "severe" overtuning -- the validation-optimal
+               configuration generalises worse than the default. Mixed-model
+               analysis names the aggravating conditions: small datasets,
+               holdout rather than cross-validation, binary classification,
+               accuracy-type metrics. Cited for protocol.md S3.3 decision 1
+               (Verifier-B's learning rate is fixed at the spec default and
+               never selected).}
+}
+
+@article{zhang2026tabpfn,
+  title   = {TabPFN beyond Tabular Data: Calibration and Accuracy on Multimodal
+             Embeddings},
+  author  = {Zhang, Jingxiang and Zhong, Lujia and Zhu, Zijie and Huang, Shuo
+             and Xu, Yuang},
+  journal = {arXiv preprint arXiv:2607.11007},
+  year    = {2026},
+  note    = {University of Southern California. Read in full 2026-08-11 via
+               alphaXiv. 22,820 evaluation episodes over 14 datasets, 11
+               encoders and 3 modalities, comparing nine heads on frozen
+               encoders. Logistic regression takes the BEST mean rank on
+               accuracy (3.20) and ranks below kNN and every in-context head on
+               both ECE and NLL (Top-1 ECE 0.069 vs kNN 0.037, TabPFN 0.031;
+               NLL 0.581, second worst of ten). Cited for withdrawing the
+               "natively calibrated" clause from decision 16, and for the
+               practical guidance that keeps logistic regression appropriate at
+               high dimension and near-ceiling accuracy. Caveat recorded: their
+               canonical grid is 10-class and they note the calibration gap
+               narrows at C=2, while our task is binary.}
+}

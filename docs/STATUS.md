@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-11 (**pipeline cross-check: 10 new deviation rows; RQ3 gaming reframe rejected by search; English arm formally deferred; Verifier-B definition disambiguated**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
+**Last updated:** 2026-08-11 (**S3.3 pre-registered and built: both verifiers coded, tested and dry-run; neither trained yet. Two gaps closed — B had no evaluation slice and A's "natively calibrated" claim was withdrawn**) · **Phase:** 1–2 COMPLETE → **3 (verifier training)**
 **Week:** 3 of 14
 
 > Update this at the same time as the lab notebook entry, at the end of every
@@ -35,6 +35,7 @@
 | 8 | **S3.2 attempt 1** — the backbone ablation, first real run | ⚠️ **CRASHED 2026-08-09** (Kaggle T4, commit `a2986db`) at **arm 6 of 7**, on `import setfit`: setfit's module chain imports `transformers.training_args.default_logdir`, removed in transformers 5.x, which Kaggle ships. `bert_nli` never ran. ~4 GPU-hours spent. **The five completed numbers are DISCARDED, not carried forward** — all seven re-run under `transformers<5`, because Coakley et al. (2022) measured **>6 pp** of accuracy variation from environment alone and our whole between-arm spread is **2.98 pp**, so a mixed-environment table would measure library version more than backbone. 🎁 **Not wasted:** the discarded run establishes (i) the task is **highly learnable** — 0.94–0.97 across five backbones, expected for a label derived by clustering LaBSE embeddings, i.e. *label reproduction*, exactly what the 2026-08-08 deviation said this measures; and (ii) **the spread is smaller than documented environment noise**, which is itself evidence for the pre-registered `TIE` and is now reported beside the verdict. **Prevention:** `--check-arms` imports every arm's dependencies on CPU in ten seconds, and the runner calls it as Gate 0. | discarded; no file in `results/` | 2026-08-09 |
 | 9 | **S3.2 — the backbone ablation, COMPLETE** | ✅ **RUN 2026-08-10** (Kaggle T4 ×1, commit `e3afa71`, transformers 4.57.6). **Verdict `TIE`**, and the pooled-across-learning-rates rule **agrees** — so the winner's-curse question is settled by evidence, not argument, and the ~30% extra compute for inner k-fold is not spent. All **21** pairwise comparisons non-significant after BH; smallest p **0.096**. Tie-break `[smallest_params, banglabert]` → **BanglaBERT** (110M). 🎁 **The tie is a measurement statement, not a shrug:** between-arm spread **0.0348** vs MuRIL's own seed SD **0.0391** — the variation *inside one arm* exceeds the variation *between all seven*, and Coakley et al. (2022) put environment noise alone at >6 pp. ⚠️ **`setfit_labse` contributed ONE configuration, not ten** — its `lr` never reached SetFit and its seed was inert (proved: identical `train_loss` to 18 significant figures across all ten runs, 1 distinct prediction vector out of 10). Its SD of 0.0000 is **not** stability. Code fixed, arm **not** re-run. ⚠️ **No ranking below the top may be quoted** — XLM-R is 6th under one rule and 7th under the other. | `results/s3_backbone_ablation.{md,json}`, `s3_backbone_per_seed.csv`, `env_snapshot_s3_kaggle.json` | 2026-08-10 |
 | 10 | **S3.2b — the baselines the ablation lacked** | 🔴 **RUN 2026-08-10. `CIRCULARITY_CONFIRMED`, past its own threshold.** A **frozen LaBSE + logistic regression** scores **0.9866** against the best fine-tuned arm's **0.9647** — the probe is **1.8 dev items AHEAD**, and makes **one error on 82 items**. Majority **0.3926**, length rule **0.6197**. **Cause is structural, not a bug** (verified: train/dev disjoint, error count reconstructs the F1 exactly): `cluster_k2` came from k-means **on LaBSE embeddings**, so the label is near-linear in that space. **Consequences: the seven-arm table may support NO claim about backbones; the `TIE` is re-explained as near-saturation by construction; and fine-tuning cost accuracy rather than adding it.** Not affected: RQ1-H showed humans perceive the distinction (0.78/0.84 vs 0.25), so the label is real — it is simply linear in LaBSE space. | `results/s3b_baselines.{md,json}` | 2026-08-10 |
+| 11 | **S3.3 — Verifier-A and Verifier-B: pre-registered, built, tested, NOT trained** | ⚠️ **WRITTEN 2026-08-11; zero files in `results/`.** Pre-registration went in before any code (`protocol.md` §S3.3). Contracts verified by computation: A ← **804** R1 rows (481/323), B ← **888** R2 rows (531/357), **both evaluated on the same 82** (53/29); `A_train ∩ B_train = ∅`, `train ∩ dev = ∅` for both, G-300 reaches neither. **171 tests pass** (150 + **21 new**); the CPU `--dry-run` exercises walls, provenance and renderer with no model. 🔴 **Two gaps found, neither visible before today.** (i) `split_access` returned `dev = None` for role B — **Verifier-B had no registered evaluation slice at all**, and `test_s3_backbone.py` was *pinning* that with `assert dev is None`. A test can protect a gap as effectively as a rule. (ii) `protocol.md`'s *"natively calibrated"* defence of Verifier-A is **withdrawn** — see the verified-facts row. **Both verifiers now run from `notebooks/s3d_verifier_b_kaggle.ipynb`**, including A: its reproduction check compares against S3.2b's 0.9866 measured on Kaggle, and at >6 pp of environment-only variation (Coakley et al.) against a half-item tolerance of 0.6 pp, a third host would risk a stop that means only "different machine". | code + configs + tests; **no result files** | 2026-08-11 |
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
@@ -114,6 +115,9 @@
 | Verifier-B's definition | "the fine-tuned BanglaBERT **from S3.2**" | 🔴 **the S3.2 BanglaBERT *recipe*, RETRAINED on R2 (888 rows).** `configs/s3_backbone.yaml` sets `role: A` → every S3.2 arm trained on **R1**. The literal reading would have put A and B on the same data and voided inviolable rule 6. No result affected; corrected before any training |
 | §5.1 generation count | 90 × 3 personas × 8 = **2,160** per language | **1,440** (90 × **2** × 8). Stale since K=2 was selected on 2026-08-03 — a one-third reduction in experiment size, cost, and CI width |
 | Does symbolic scoring resist gaming? | assumed yes (proposed 2026-08-11) | **NO — refuted before it was written.** Mahmoud et al. (2026): rule-based rewards *are* hacked; **presence-based criteria are the worst case**, and §3.5's features are almost all presence/count-based. Our Reflector also *names the failing rule to the Writer*. Symbolic is plausibly the **most** gameable component here |
+| Is Verifier-A "natively calibrated"? | assumed yes (decision 16, 2026-08-10) | 🔴 **NO SUPPORT — the clause is withdrawn.** `zhang2026tabpfn` compare nine heads on frozen encoders over **22,820 episodes**: a logistic head takes the **best mean rank on accuracy** and ranks **below kNN and every in-context head on both ECE and NLL** — Top-1 ECE **0.069** vs kNN 0.037, TabPFN 0.031. §3.4 temperature scaling is therefore **mandatory** for Verifier-A. ✅ The **choice** of Verifier-A stands: the same paper keeps logistic regression appropriate at *"high dimensions, or near-ceiling tasks"*, and ours is 768-d at 0.9866. ⚠️ Bounded — their grid is 10-class and the gap narrows at C=2, so the record is *"the claim had no support"*, **not** *"Verifier-A is miscalibrated"* |
+| Verifier-B's learning rate | S3.2's sweep {2e-5, 3e-5} | **2e-5, fixed and never selected** — pipeline §3.1's own default, 5 seeds × 1 lr. `schneider2025overtuning`: **~10% of tuned HPO runs generalise worse than the default**, worst under small data + holdout + binary + accuracy-type metric — **all four describe this run**. Sabbir's call, 2026-08-11 |
+| Verifier-B's evaluation slice | **none existed** | **dev-82, the same rows as Verifier-A.** `split_access` returned `dev = None` for role B, so B had no registered eval set; a test was pinning that. Leakage-free: `dev ⊂ R1` is out of A's 804 and `dev ∩ R2 = ∅` by contract. 🔴 **Pre-committed: no claim that either verifier is better may be made from dev-82** — 1 item = 0.0122 macro-F1 and the expected gap is under 2 reviews. Sabbir's call, 2026-08-11 |
 | Does cross-family separation establish verifier independence? | assumed yes (decision 16) | **necessary, not sufficient.** Kuai et al. (2026): entanglement is widespread intra- *and* cross-family; **plain correlation cannot detect it.** A dev-slice failure-manifold audit (BEI/CIG) is now pre-registered before any RQ5 gap is interpreted |
 
 > **Correction (2026-07-30).** This file previously recorded the venue/selection
@@ -164,13 +168,15 @@ anywhere before today, because progress was being tracked against `protocol.md`
 
 | Pipeline §3 deliverable | State |
 |---|---|
-| **4 trained verifiers (A/B × bn/en)** | 🔴 **0 trained.** A and B are *designed* (decision 16), not built |
+| **4 trained verifiers (A/B × bn/en)** | ⚠️ **0 trained, 2 built.** bn-A and bn-B are coded, pre-registered, tested and dry-run (step 11) — **one Kaggle commit run away**. The en pair is scheduled, not cut. Phase 3 closes as **"Bangla-complete"**, never as "done" |
 | Backbone-ablation table | ✅ done — then repurposed; may support no backbone claim (S3.2b) |
 | Dual-accuracy table | ✗ **not producible** — logged 2026-08-08 |
-| Calibration figure | ✗ not started |
+| Calibration figure | ⚠️ **code written, no data.** `src/verifier/calibration.py`: 5 bins, bootstrap CI, temperature scaling, and a **pre-committed null verdict with a test that proves it is reachable** — RQ1-F's Gate 2 had to be rewritten mid-protocol when its null turned out to be unreachable by construction, and that failure mode is now tested for rather than discovered |
 | Rule table / symbolic scorer (§3.5) | ✅ **BUILT + FITTED 2026-08-11.** `src/symbolic/`, 22 tests. CV macro-F1 **0.5150 ± 0.0713** (resub 0.6570, majority 0.3926). ⚠️ **F1/IDF disabled pending Sabbir's rule-7 ruling** |
 
-**§3.5 is now unblocked** (2026-08-11); the remaining Phase-4 blocker is Verifier-A itself, which is minutes of work once trained. Original note kept: **the binding constraint was §3.5, not the verifiers.** §4.2's Critic is
+**§3.5 is now unblocked** (2026-08-11), and so is Verifier-A: it is written,
+tested and pre-registered, and needs one Kaggle run. **The remaining Phase-4
+blocker is that run, not any design question.** Original note kept: **the binding constraint was §3.5, not the verifiers.** §4.2's Critic is
 `0.6×VerifierA + 0.4×symbolic`; with no symbolic component there is no Critic,
 and with no Critic there is no loop. **Phase 4 cannot start.** `src/agents/` and
 `src/eval/` are empty stubs.
@@ -214,6 +220,16 @@ rather than voiding it, and is itself reportable.
    record transformers 4.x, not the 5.0.0 of the crashed attempt.
 6. 🟡 **`protocol.md` freeze + supervisor signature** (step 6) is now the oldest
    outstanding item and nothing blocks it.
+7. ✅ **S3.3 pre-registered and built** (2026-08-11) — both verifiers coded,
+   192 tests pass, CPU dry run clean. See step 11.
+8. 🔬 **Run `notebooks/s3d_verifier_b_kaggle.ipynb`** — **the single action that
+   unblocks Phase 4.** GPU T4, Internet On, attach `bn_clean.csv`, and use
+   **Save & Run All (Commit)**. Cell 1 is preflight (minutes, no GPU), cell 2 is
+   Verifier-B (~40 min, 5 seeds × 1 lr), cell 3 is Verifier-A (minutes, CPU).
+   `env_snapshot_s3d_kaggle.json` is mandatory (fact (env)). ⚠️ **Read
+   `protocol.md` §S3.3 before reading the numbers** — in particular the
+   pre-committed limit that **no claim about which verifier is better may be
+   made from 82 rows.**
 
 ⚠️ **Still Sabbir's, and none of it blocks Phase 3:** decision 12 (title and
 whether *persona* is permitted again, reopened by RQ1-H), decision 13 (Unicode),
