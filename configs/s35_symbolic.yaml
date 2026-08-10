@@ -1,0 +1,31 @@
+# S3.5 -- the symbolic scorer.
+# Pre-registered in docs/protocol.md section "S3.5 pre-commitment" (2026-08-11),
+# written BEFORE src/symbolic/ existed.
+
+step: S3.5
+seed: 42
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+
+features:
+  # F1 = min/max/mean IDF. OFF pending Sabbir's ruling on inviolable rule 7,
+  # which forbids TF-IDF "in the main pipeline ... never in a result".
+  # F1 is IDF only -- three scalar summaries, no document-term matrix, no
+  # encoder replaced. Whether that falls inside rule 7 is HIS call, not this
+  # config's assumption. Flipping this to true without that ruling recorded in
+  # docs/protocol.md is a protocol violation.
+  enable_f1: false
+
+fit:
+  # Section 3.5 fits the symbolic weights on the dev slice. That slice is 82 rows,
+  # not the 200 the spec assumes (deviation 2026-08-08), so a cross-validated
+  # estimate is reported beside the resubstitution one and the latter is
+  # labelled optimistic wherever it appears.
+  cv_folds: 5
+
+outputs:
+  results_json: results/s35_symbolic.json
+  results_md: results/s35_symbolic.md

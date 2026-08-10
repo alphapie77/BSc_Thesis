@@ -3171,3 +3171,88 @@ likely *and* a null RQ5 less informative. Both halves belong in Ch.5.
 **Tier 8** added: `ko2019specificity` `[x]`, `kapur2026length` `[x]` -- both read
 in full. ⚠️ Found via **alphaXiv + Scite, NOT Consensus** (quota exhausted until
 2026-09-01).
+
+---
+
+## 2026-08-11 -- S3.5: symbolic scorer fitted -- length HURTS, richness helps, F1 held on a rule-7 question
+**Feeds:** Ch.3 sect. 3.5; Phase 4 Critic; RQ3
+**Artifacts:** `results/s35_symbolic.{json,md}`, `src/symbolic/`, `configs/s35_symbolic.yaml`, `tests/test_symbolic.py`
+
+### Numbers
+- Fitted on **82** dev rows, **11** features -> **7.45 rows per feature**.
+- Resubstitution macro-F1 **0.6570** (optimistic, labelled as such everywhere).
+- **Stratified 5-fold CV 0.5150 +/- 0.0713** -- the honest number.
+- Majority baseline **0.3926**. Verifier-A (frozen LaBSE probe) **0.9866**.
+- Leave-one-family-out (CV delta when the family is REMOVED):
+
+| Family | CV without | Delta | Gameable? |
+|---|---|---|---|
+| F3_ortho | 0.4503 | **+0.0647** | yes |
+| F6_richness | 0.4764 | **+0.0386** | no |
+| F5_sentiment | 0.5338 | -0.0188 | yes |
+| F4_connective | 0.5339 | -0.0189 | yes |
+| F2_length | 0.6232 | **-0.1082** | yes |
+
+- Tests: **22** new, **150** pass overall.
+
+### Decisions made (and why)
+
+- **F1 (IDF) built but DISABLED, and the run reported without it.** Inviolable
+  rule 7 forbids TF-IDF "in the main pipeline ... never in a result". F1 is IDF
+  only -- three scalar summaries, no document-term matrix, no encoder replaced
+  -- but "never in a result" is unambiguous and F1 would be in one. **Flagged to
+  Sabbir rather than decided here**, per CLAUDE.md. `enable_f1` defaults False
+  and a test pins that default, so the compliant setting cannot drift on.
+
+- **Cross-validated estimate reported beside resubstitution, not instead of it.**
+  The 14-point gap (0.6570 vs 0.5150) at 7.45 rows per feature IS the finding
+  about this slice, and hiding either number would hide it.
+
+- **Leave-one-family-out computed on CV only.** Resubstitution deltas at n=82
+  measure fitting capacity, not contribution.
+
+- **IDF table would be built from TRAIN rows only** (804), never dev. Building
+  it on the fitting slice would leak the fitting distribution into a feature --
+  the same shape of error S3.2b found in the label itself.
+
+### Findings (things we did not expect)
+
+- 🔴 **Length HURTS the symbolic scorer.** Removing F2 raises CV from 0.5150 to
+  **0.6232**. This is the only delta that exceeds the CV SD (0.0713), so it is
+  the one result here worth believing. **The pipeline's own feature list
+  includes "length bucket", and at n=82 it is actively harmful** -- almost
+  certainly overfitting, since `length_auc` on the full region-A data is 0.6764
+  and length is genuinely predictive there. Small-n behaviour, not a
+  contradiction of S2e.
+
+- **The two positive contributors are F3_ortho (+0.0647, gameable) and
+  F6_richness (+0.0386, NOT gameable).** F6 earning its place is the one piece
+  of good news for the hybrid design: the non-gameable family contributes.
+
+- 🎁 **The pipeline's presence-based families contribute NEGATIVELY.** F4
+  (connectives) and F5 (sentiment lexemes) both show negative deltas -- removing
+  them *helps*. That is the sect. 3.5 list as written, and it corroborates the
+  2026-08-11 pre-registration's scepticism about presence rules from a direction
+  the search did not supply.
+
+- ⚠️ **Do not over-read any of this.** CV SD is **0.0713** and every delta except
+  F2's is smaller than it. Four of the five family effects are inside noise, and
+  they are reported as such rather than ranked.
+
+### Consequences for downstream steps
+
+- **RQ3's pre-committed "softened" branch is now the likely one.** Symbolic
+  alone is **0.5150** against Verifier-A's **0.9866**; there is no room for a
+  2-point hybrid gain on real reviews. The pre-commitment holds and fires.
+- **Symbolic's retained purpose is interpretability**, exactly as pre-registered
+  -- sect. 4.2's Reflector cannot name a failing rule without it.
+- ⚠️ **The Reflector's nameable rules are F3/F4/F5 -- and F4/F5 are the families
+  that contribute negatively while being the most gameable.** The component the
+  loop can talk about is the component that works least. Registered as a tension,
+  not resolved.
+- The hybrid weight is unaffected: it is fit on dev-plot generations, not here.
+
+### Citations needed
+
+None new. `ko2019specificity` (feature families) and `mahmoud2026rubric`
+(gameability annotation) were added 2026-08-11 in Tiers 7-8.

@@ -107,6 +107,9 @@
 | Tokens in a two-encoding Unicode group | — | **10.44%** of 46,758 (267 collapsing groups). φ(region, encoding form) = **−0.3245** — an independent corroboration of fact (split) from orthography |
 | Inferential status of S2e / S2f statistics | treated as tests | 🔴 **DEMOTED to descriptive profiling 2026-08-10.** φ = 0.3981, χ² = 300.7 and every surface AUC are **post-clustering inference on the rows that defined the partition**. Chen & Witten (2023) show this inflates Type I error and produces large between-group differences *even when no population categories exist*. **No p-value from S2e/S2f is evidence that the halves differ.** S2f Test C already self-flagged as a resubstitution bound; the flag simply was never generalised. **RQ1-H does not inherit this** — held-out items, annotators blind to the partition — which is why the human validation, not the profiling, carries RQ1 |
 | What PS ≥ 0.80 establishes | "the K is stable, therefore real" | **necessary, not sufficient.** Region B cleared it at **0.818** on a cut correlating with nothing measurable (RQ1-G) — the exact failure mode von Luxburg (2010) describes and Pinto et al. (2026) reproduce in simulation at ARI 1.00, SD 0.00 |
+| Symbolic scorer alone (S3.5) | — | **CV macro-F1 0.5150 ± 0.0713** on 82 dev rows, 11 features (7.45 rows/feature). Resubstitution 0.6570 — a **14-point** optimism gap. Majority 0.3926 |
+| Does length help the symbolic scorer? | assumed yes (§3.5 lists "length bucket") | 🔴 **NO — it hurts.** Removing F2 raises CV **0.5150 → 0.6232**. The only family delta exceeding the CV SD, so the only one worth believing. Small-n overfitting, not a contradiction of `length_auc` 0.6764 on full region A |
+| Which symbolic families contribute? | — | Only **F3_ortho (+0.0647, gameable)** and **F6_richness (+0.0386, NOT gameable)**. The pipeline's presence families **F4_connective (−0.0189)** and **F5_sentiment (−0.0188)** contribute *negatively*. ⚠️ All four are inside the CV SD of 0.0713 and are reported as noise-level |
 | Verifier-B's definition | "the fine-tuned BanglaBERT **from S3.2**" | 🔴 **the S3.2 BanglaBERT *recipe*, RETRAINED on R2 (888 rows).** `configs/s3_backbone.yaml` sets `role: A` → every S3.2 arm trained on **R1**. The literal reading would have put A and B on the same data and voided inviolable rule 6. No result affected; corrected before any training |
 | §5.1 generation count | 90 × 3 personas × 8 = **2,160** per language | **1,440** (90 × **2** × 8). Stale since K=2 was selected on 2026-08-03 — a one-third reduction in experiment size, cost, and CI width |
 | Does symbolic scoring resist gaming? | assumed yes (proposed 2026-08-11) | **NO — refuted before it was written.** Mahmoud et al. (2026): rule-based rewards *are* hacked; **presence-based criteria are the worst case**, and §3.5's features are almost all presence/count-based. Our Reflector also *names the failing rule to the Writer*. Symbolic is plausibly the **most** gameable component here |
@@ -164,9 +167,9 @@ anywhere before today, because progress was being tracked against `protocol.md`
 | Backbone-ablation table | ✅ done — then repurposed; may support no backbone claim (S3.2b) |
 | Dual-accuracy table | ✗ **not producible** — logged 2026-08-08 |
 | Calibration figure | ✗ not started |
-| Rule table / symbolic scorer (§3.5) | 🔴 **not started — no code.** `grep -rl symbolic src/ configs/` returns nothing |
+| Rule table / symbolic scorer (§3.5) | ✅ **BUILT + FITTED 2026-08-11.** `src/symbolic/`, 22 tests. CV macro-F1 **0.5150 ± 0.0713** (resub 0.6570, majority 0.3926). ⚠️ **F1/IDF disabled pending Sabbir's rule-7 ruling** |
 
-**The binding constraint is §3.5, not the verifiers.** §4.2's Critic is
+**§3.5 is now unblocked** (2026-08-11); the remaining Phase-4 blocker is Verifier-A itself, which is minutes of work once trained. Original note kept: **the binding constraint was §3.5, not the verifiers.** §4.2's Critic is
 `0.6×VerifierA + 0.4×symbolic`; with no symbolic component there is no Critic,
 and with no Critic there is no loop. **Phase 4 cannot start.** `src/agents/` and
 `src/eval/` are empty stubs.
