@@ -3017,9 +3017,17 @@ indices does not fully substitute for it. Recorded rather than glossed.
   it**. A dev-slice failure-manifold audit (BEI/CIG) is pre-registered before any
   RQ5 gap is interpreted. Cross-family stays **necessary, not sufficient**.
 
-- **English arm formally deferred** by invoking the charter's own pre-authorised
-  cut rule, rather than letting it lapse by drift. **Cost named: RQ4 cannot be
-  answered in its strong form.**
+- ⛔ **CORRECTED SAME DAY -- English arm is SCHEDULED, not reduced.** The first
+  version of this entry said the charter's *"cut to fertility + zero-shot only"*
+  clause had been invoked. **That was Claude exercising a scope decision that
+  belongs to Sabbir**, on the basis of him saying *"pore kori"* -- which is a
+  statement about **order**, not **scope**. Corrected on his instruction:
+  *"english thakbe. cross lingual hobe"*, plus the standing rule *"amader lokkho
+  research pipeline onujayi kaj kora."* **The full sect. 1.2 charter runs and RQ4
+  stays live in its strong form**; the cut clause remains unexercised and
+  available to him. **Lesson, recorded because it generalises: a pipeline escape
+  clause is not mine to invoke.** Ambiguity about scope goes back to Sabbir; it
+  does not get resolved by picking the cheaper reading.
 
 - **Verifier-B disambiguated: the S3.2 *recipe* retrained on R2, never the S3.2
   checkpoints.** Sabbir's earlier question about pipeline conformance is what

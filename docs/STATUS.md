@@ -171,10 +171,23 @@ anywhere before today, because progress was being tracked against `protocol.md`
 and with no Critic there is no loop. **Phase 4 cannot start.** `src/agents/` and
 `src/eval/` are empty stubs.
 
-⚠️ **English arm deferred** under the charter's own cut rule (deviation
-2026-08-11). Cost: **RQ4 cannot be answered in its strong form** — the
-cross-lingual claim reduces to the fertility covariate plus a zero-shot
-reference.
+✅ **English arm: SCHEDULED, not reduced** (Sabbir, 2026-08-11). Full §1.2
+charter runs — IMDB n=4,625, LaBSE clustering, en-A/en-B verifiers, MPST 30+90
+plots, the full 8-condition ablation at 1,440 generations — **sequenced after
+the Bangla machinery exists**, since every config takes the corpus as a field.
+**RQ4 remains live in its strong form.** The charter's "cut to fertility +
+zero-shot" clause is **not** invoked and stays available to Sabbir.
+
+> ⛔ **Corrected the same day.** An earlier version of this line said the arm was
+> *cut* under that clause. That was Claude invoking a scope-reducing decision
+> that is Sabbir's, on the basis of him saying *"pore kori"* — **"later" is
+> about order, not scope.** Struck row kept in `protocol.md`.
+
+⚠️ **Open risk on the English side:** IMDB reviews are long and detailed while
+the Bangla corpus averages ~8 words, so English may yield **no stable K**. The
+charter survives this — its comparison is **Δ over zero-shot per condition**,
+not label correspondence — so a different English structure bounds the claim
+rather than voiding it, and is itself reportable.
 
 ## Immediate next actions
 
