@@ -538,3 +538,87 @@
             alignment, with early warning preceding quality decline. Adopted as
             RQ5's second signal. NOT read in full.}
 }
+
+% ---------------------------------------------------------------------------
+% Tier 6 -- clusterability and post-clustering inference (added 2026-08-10)
+% Found via alphaXiv + Scite, NOT Consensus (quota exhausted until 2026-09-01).
+% ---------------------------------------------------------------------------
+
+@misc{pinto2026drawinglines,
+  title  = {Drawing Lines in Psychological Space: What {K}-means Clustering
+            Reveals in Simulated and Real Psychometric Data},
+  author = {Pinto, Pedro Henrique Ramos and Marques, Maria Jullyanna Ferreira
+            and Lopez, Luiz Carlos Serramo},
+  year   = {2026},
+  howpublished = {arXiv preprint arXiv:2605.06989},
+  note   = {🔴 LOAD-BEARING -- the paper that closed decision 12. Their
+            empirical k=2 solution (silhouette 0.31, ARI 0.999 +/- 0.001, sizes
+            50.6/49.4 over 8,360 respondents) is numerically almost our region B
+            (49.4/50.6, silhouette 0.039, bootstrap ARI 0.962). Verdict:
+            "geometric stratifications of a latent psychological continuum
+            rather than evidence for discrete subtypes", and "Stability,
+            therefore, is not equivalent to validity." Read in full via PDF
+            query, not merely abstracted.}
+}
+
+@misc{cornelissen2026contour,
+  title  = {Melodic contour does not cluster: Reconsidering contour typology},
+  author = {Cornelissen, Bas and Zuidema, Willem and Burgoyne, John Ashley
+            and Honing, Henkjan},
+  year   = {2026},
+  howpublished = {arXiv preprint arXiv:2604.13119},
+  note   = {Precedent that a negative clusterability result is publishable.
+            Shows a previously published four-type typology was an artefact:
+            absent clustering, k-means places centroids near the leading
+            principal axes "for entirely mathematical, not musical reasons."
+            Concludes the character is continuous. Read in full via PDF query.}
+}
+
+@article{chen2023selectiveinference,
+  title   = {Selective inference for {K}-means clustering},
+  author  = {Chen, Yiqun T. and Witten, Daniela M.},
+  journal = {Journal of Machine Learning Research},
+  volume  = {24},
+  year    = {2023},
+  note    = {🔴 Forces the Ch.5 limitation of 2026-08-10: post-hoc tests on
+             cluster-derived groups inflate Type I error because the same data
+             defines and tests the groups, and large differences appear even
+             with no population categories. S2e/S2f are demoted to descriptive
+             profiling. NOT read in full -- cited via pinto2026drawinglines.}
+}
+
+@article{adolfsson2019clusterability,
+  title   = {To Cluster, or Not to Cluster: An Analysis of Clusterability
+             Methods},
+  author  = {Adolfsson, Andreas and Ackerman, Margareta and
+             Brownstein, Naomi C.},
+  journal = {Pattern Recognition},
+  volume  = {88},
+  pages   = {13--26},
+  year    = {2019},
+  note    = {Survey of clusterability methods -- the prior question G1 answered
+             with three ad-hoc indicators. NOT read in full.}
+}
+
+@misc{vonluxburg2010stability,
+  title  = {Clustering Stability: An Overview},
+  author = {von Luxburg, Ulrike},
+  year   = {2010},
+  howpublished = {arXiv preprint arXiv:1007.1075},
+  note   = {The foundational critique of stability-based K selection -- i.e. of
+             our own PS >= 0.80 rule. RQ1-G rediscovered its central warning
+             independently (region B: PS 0.818 on a contentless cut).
+             NOT read in full.}
+}
+
+@inproceedings{kalogeratos2012distdip,
+  title     = {Dip-means: an incremental clustering method for estimating the
+               number of clusters},
+  author    = {Kalogeratos, Argyris and Likas, Aristidis},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2012},
+  note      = {The dist-dip multimodality test, via cornelissen2026contour.
+               Candidate addition to Ch.4: a direct clusterability test we never
+               ran. NOT read in full; bibliographic details need verification
+               before citing.}
+}

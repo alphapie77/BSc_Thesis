@@ -296,7 +296,19 @@ ablation is right to separate them.
 | `miller2025multires` | arXiv 2502.17020 | Multi-resolution K alternative |
 | `monroe2008fightinwords` | Monroe, Colaresi & Quinn, *Political Analysis* 16(4) | Log-odds with an informative Dirichlet prior. Defends **two** things: the required provenance probe (protocol.md), and S2e's distinctive-vocabulary lists. Chosen because its prior makes **stopword removal unnecessary** — the alternative would be a hand-built Bangla stopword list, which nothing in this project justifies and inviolable rule 7 forbids. |
 
-## Tier 3 — Theory grounding for the three personas (§2.3)
+## Tier 3 — Theory grounding for the ~~three personas~~ audience-engagement construct (§2.3)
+
+> ⚠️ **Heading and contents both need a pass (2026-08-10).** This tier was
+> assembled to ground a *three-persona typology*. The typology is gone: K = 2
+> since 2026-08-03, and the terminology deviation of 2026-08-10 retires
+> *persona* and *type* altogether in favour of an **engagement-specificity
+> axis**. `cuadrado1999` in particular was listed as a "near-mirror of our
+> scheme" — it is a **3-cluster** cinema segmentation and is no longer a mirror
+> of anything we claim. These sources may still ground the *construct* of
+> graded audience engagement, which is what Tier 6 says our data supports; they
+> no longer support a claim about discrete audience types. **Not silently
+> deleted — each entry needs a re-read against the axis framing.**
+
 | Key | Source | Use |
 |---|---|---|
 | `abercrombie1998` | Abercrombie & Longhurst, *Audiences* | consumer→fan→cultist→enthusiast |
@@ -383,6 +395,36 @@ better, and it is never to be cited as the latter.
 `hasan2025banglaemotion` additionally supplies the **methodological precedent**
 for our decision rule: it settles the same comparison in the same language with
 a **paired bootstrap test**.
+
+---
+
+## Tier 6 — Clusterability and post-clustering inference (added 2026-08-10)
+
+> **Why this tier exists.** Everything above defends *how* we clustered. Nothing
+> defended the prior question — **whether this data clusters at all** — and G1's
+> own diagnostics (silhouette 0.053, monotone gap statistic, HDBSCAN 100% noise)
+> had been answering "no" since 2026-08-03 without a literature to read it
+> against. These four entries supply it, and they closed STATUS decision 12.
+>
+> **Source disclosure:** found via alphaXiv and Scite on 2026-08-10, **not
+> Consensus** — the Consensus quota was exhausted (0 searches until 1 September).
+> The standing instruction prefers Consensus; it was unavailable, this is
+> recorded rather than glossed, and the searches were re-run across two indices
+> to compensate for using neither the preferred one nor a single one.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `pinto2026drawinglines` | Pinto, Marques & Lopez 2026, arXiv 2605.06989 | `[x]` abstract + full body via PDF query | 🔴 **LOAD-BEARING — this is the paper that retired both *persona* and *cluster*.** k-means on simulated data with no latent groups, and on 8,360 real psychometric respondents. Empirical result: **k = 2, silhouette ≈ 0.31, ARI 0.999 ± 0.001, sizes 50.6/49.4** — numerically almost our region B (49.4/50.6, silhouette 0.039, bootstrap ARI 0.962). Their reading of it: *"geometric stratifications of a latent psychological continuum rather than evidence for discrete subtypes"*, and **"Stability, therefore, is not equivalent to validity."** On correlated Gaussian data: ARI = 1.00, SD 0.00, described as *"an artificial partition of a continuous, anisotropic distribution."* **Our PS ≥ 0.80 rule passing a contentless cut in region B is this phenomenon, not a quirk of our pipeline.** |
+| `cornelissen2026contour` | Cornelissen, Zuidema, Burgoyne & Honing 2026, arXiv 2604.13119 | `[x]` full body via PDF query | **Precedent that a negative clusterability result is publishable**, across three musical traditions, using dist-dip after UMAP. Also the sharpest cautionary case in either paper: with no clustering present, k-means places centroids near the leading principal axes, reproducing a previously *published* four-type typology *"for entirely mathematical, not musical reasons."* Conclusion: treat the character as **continuous**. Direct model for how our Ch.4 should report the K = 2 cut. |
+| `chen2023selectiveinference` | Chen & Witten 2023, *JMLR* 24 | `[ ]` — cited via `pinto2026drawinglines`; **must be read before Ch.4 is written** | 🔴 **Forces a Ch.5 limitation (deviation of 2026-08-10).** Classical post-hoc tests on cluster-derived groups inflate Type I error, because the same data defines and tests the groups — and large between-group differences appear **even when no population categories exist**. S2e/S2f's φ = 0.3981, χ² = 300.7 and surface AUCs are all post-clustering inference on the defining rows. **They are demoted to descriptive profiling; no p-value from them is evidence.** RQ1-H is untouched — held-out items, annotators blind to the partition. |
+| `adolfsson2019clusterability` | Adolfsson, Ackerman & Brownstein 2019, *Pattern Recognition* 88 | `[ ]` | Survey of clusterability methods — the question G1 asked informally and answered with three ad-hoc indicators. Provides the vocabulary (*clusterability*) and the formal tests. |
+| `vonluxburg2010stability` | von Luxburg 2010, arXiv 1007.1075 | `[ ]` | **The foundational critique of stability-based K selection — i.e. of our own PS ≥ 0.80 rule.** RQ1-G rediscovered its central warning independently (region B: PS 0.818 on a cut correlating with nothing). Citing it converts an odd finding into a confirmed known failure mode. |
+| `kalogeratos2012distdip` | Kalogeratos & Likas 2012 | `[ ]` | The dist-dip multimodality test, via `cornelissen2026contour`. **Candidate addition to Ch.4** — a direct clusterability test we never ran; cheaper than anything in G1 and it answers the question G1 only circled. |
+
+⚠️ **Two of these are not yet read in full** (`chen2023selectiveinference`,
+`vonluxburg2010stability`) and both are load-bearing. They carry the same
+warning as Tier 5: listed because `protocol.md` now rests on them, and an
+unread load-bearing citation is a debt, not an asset.
 
 ---
 

@@ -2851,3 +2851,121 @@ deviations and in Ch.4, and it still has no bib entry**, `laurer2023bertnli`
   already documented in S2d/S2e.
 
 ⚠️ Read-status remains `[ ]` for both.
+
+---
+
+## 2026-08-10 -- S6: protocol.md sealed for Phases 1-3; decision 12 closed as the engagement-specificity axis
+**Feeds:** Ch.3 Methods; Ch.4 Results framing; Ch.5 Limitations
+**Commit:** `fee944c9850129a95fb4d50232cb9703205c818c-dirty`
+**Artifacts:** `docs/protocol.md` (1,123 lines, 37 deviation rows), `docs/supervisor_seal_packet.md`, `docs/related_work.md` Tier 6, `docs/references.bib` (+6 keys)
+
+### Numbers
+- `protocol.md`: 1,049 -> **1,123** lines; deviation rows 33 -> **37**.
+- Body corrections against STATUS's verified facts: **5**.
+  - clustering n: `4,422` -> **4,625**
+  - annotators: `3` -> **2**
+  - RQ2 design: `3 personas` -> **2 axis levels** (stale since 2026-08-03)
+  - the venue-confound paragraph's *"untestable in principle"* -> corrected
+  - header: `FROZEN PRE-ANALYSIS PLAN` -> **APPEND-ONLY PRE-ANALYSIS RECORD**
+- Superseded-section banners added: **2** (RQ1-B table, S3.2 premise).
+- Missing deviation rows added: **4** (RQ1-G, RQ1-H, terminology, selective inference).
+- `references.bib`: 39 -> **45** entries.
+- Cross-check: every quantity in the seal packet matches `STATUS.md`;
+  `step_close.py --check` exits 0.
+
+### Decisions made (and why)
+
+- **Decision 12 closed as the engagement-specificity AXIS; both *persona* and
+  *cluster* retired.** ⚠️ **Provenance: Sabbir delegated the call ("you can make
+  the best decision"). The choice and the reasoning are Claude's -- endorsed, not
+  authored.** Three options were live: keep the 2026-08-05 ban and say *cluster*;
+  re-permit *persona* on RQ1-H's warrant; or a third term. The literature moved
+  the answer past all three as posed. `pinto2026drawinglines` obtains k=2,
+  silhouette ~0.31, ARI 0.999+/-0.001, sizes **50.6/49.4** on 8,360 psychometric
+  respondents -- numerically almost our region B (49.4/50.6) -- and reads it as
+  *"geometric stratifications of a latent continuum rather than evidence for
+  discrete subtypes"*. `cornelissen2026contour` publishes a negative
+  clusterability result and shows a prior four-type typology was an artefact of
+  k-means placing centroids on principal axes. **So *cluster* fails for the same
+  reason *persona* did**: both assert structure that silhouette 0.053, a monotone
+  gap statistic and 100% HDBSCAN noise say is absent. `cluster_k2` survives as a
+  frozen *variable name* only -- renaming would break the split map (rule 3).
+  ⬛ **Rejected: re-permitting *persona* on RQ1-H.** Perceptibility of a
+  distinction is not evidence of discrete groups, and separating those two claims
+  is exactly what this literature does.
+
+- **The seal is an append-only record, not a freeze event.** Sabbir chose this
+  form from three offered. The old header promised one freeze after Step 5; Step
+  5 ran 2026-07-30 and 30+ amendments followed, so the promise was already false.
+  Replaced with four properties that `git log` can check: every section dated, no
+  section edited after the run it governs, superseded text struck not deleted,
+  every departure logged. ⬛ **Rejected: filling in a single freeze date** -- 
+  easier to sign, impossible to defend against the document's own history.
+
+- **Pre-registered section bodies were NOT edited.** S3.2 states "nothing in this
+  section may be edited after the first run", and its premise did not survive
+  S3.2b. Resolved with a dated pointer banner rather than a rewrite, following
+  the pattern already in the file at the superseded RQ1 ARI bands. Editing the
+  premise would have destroyed the evidence that it was fixed in advance.
+
+- **Phases 4-6 seal separately.** RQ2-RQ5 are 3-8 lines each and nothing in them
+  has run; sealing them now would attach a signature to text with no evidence
+  behind it.
+
+### Findings (things we did not expect)
+
+- 🎁 **`pinto2026drawinglines` is our region B in another field.** k=2,
+  ARI 0.999, sizes 50.6/49.4, and on correlated Gaussian data ARI = 1.00 SD 0.00
+  described as *"an artificial partition of a continuous, anisotropic
+  distribution."* RQ1-G's negative control was not a quirk of this pipeline; it
+  is the documented behaviour of stability-based K selection, and
+  `vonluxburg2010stability` had said so in 2010. **We rediscovered a known
+  failure mode and did not know it was known.**
+
+- 🔴 **S2e/S2f are post-clustering inference and nobody had noticed.**
+  `chen2023selectiveinference` shows post-hoc tests on cluster-derived groups
+  inflate Type I error, producing large between-group differences *even when no
+  population categories exist*. phi = 0.3981 and chi2 = 300.7 are computed on the
+  rows that defined the partition. S2f Test C already self-flagged as a
+  resubstitution bound -- the instinct was right and simply was never generalised
+  to the neighbouring statistics.
+
+- 🔴 **RQ1-G and RQ1-H had full pre-commitment sections and NO deviation rows.**
+  Five and two days respectively. RQ1-H is the largest departure in the document
+  -- a second human-validation instrument after the first failed -- and its
+  defence sat in a section body rather than in the log where a reviewer checks.
+  Recorded as a process failure rather than backdated.
+
+- **`protocol.md` was still asserting an error that its own deviations log
+  quotes as an error.** The *"untestable in principle"* correction was applied to
+  `STATUS.md` on 2026-07-30 and to this file only on 2026-08-10. A correction
+  applied to one of two files is a correction that has not been made.
+
+### Consequences for downstream steps
+
+- **No p-value from S2e/S2f may be quoted as evidence** that the halves differ.
+  They are descriptive profiling. Ch.4 must say so where the numbers appear.
+  RQ1-H does not inherit this -- held-out items, blind annotators -- which is why
+  the human validation, not the profiling, carries RQ1.
+- **PS >= 0.80 is demoted to necessary-but-not-sufficient** everywhere it appears.
+- **Ch.1, the title, and the conference draft** must follow the axis constraint.
+  ⚠️ The title still says "Audience Simulation" and now contradicts the sealed
+  document. **Sabbir's wording; the constraint is not optional.**
+- **`related_work.md` Tier 3 needs a re-read.** It was assembled to ground three
+  personas; `cuadrado1999` is a 3-cluster cinema segmentation and no longer
+  mirrors any claim we make.
+- **Two unread load-bearing citations** (`chen2023selectiveinference`,
+  `vonluxburg2010stability`) are debts, flagged as such, and must be read before
+  Ch.4 is written.
+
+### Citations needed
+
+Added as **Tier 6** in `related_work.md` and to `references.bib`:
+`pinto2026drawinglines` `[x]`, `cornelissen2026contour` `[x]`,
+`chen2023selectiveinference` `[ ]`, `adolfsson2019clusterability` `[ ]`,
+`vonluxburg2010stability` `[ ]`, `kalogeratos2012distdip` `[ ]`.
+
+⚠️ **Source disclosure: found via alphaXiv and Scite, NOT Consensus** -- the
+Consensus quota was exhausted (0 searches until 2026-09-01). The standing
+instruction prefers Consensus; it was unavailable, and searching two replacement
+indices does not fully substitute for it. Recorded rather than glossed.

@@ -1,11 +1,28 @@
-# protocol.md -- FROZEN PRE-ANALYSIS PLAN
-**Status: DRAFT -- not yet frozen. Freeze after the S2 pilot trap-check (Step 5).**
+# protocol.md -- APPEND-ONLY PRE-ANALYSIS RECORD
+
+**Status: SEALED 2026-08-10 for Phases 1-3.** Phases 4-6 (RQ2-RQ5) remain open
+and are sealed separately when their first run happens.
 
 Signed by supervisor: ____________________  Date: __________
-Frozen at commit: ____________________
+Sealed at commit: ____________________
 
-> Purpose: this document is written BEFORE results exist. It is the defence
-> against "you changed the experiment after seeing the numbers."
+> **What this document is, stated precisely, because the earlier wording
+> oversold it.** The header used to read *"FROZEN PRE-ANALYSIS PLAN ... freeze
+> after the S2 pilot trap-check (Step 5)."* Step 5 ran on 2026-07-30 and the
+> document was amended thirty-plus times afterwards, so that description was
+> false on its face by August. It is replaced rather than quietly repaired.
+>
+> **The claim actually being made, and it is checkable:** this is an
+> **append-only record**. Every section carries the date it was written; no
+> section was edited after the run it governs; superseded text is struck through
+> and marked, never deleted; and every departure is logged in the Deviations
+> table at the end with a date and a reason. `git log --follow docs/protocol.md`
+> against the timestamps in `results/` verifies all four properties
+> independently of anyone's word.
+>
+> That is a narrower claim than "frozen before results existed", and it is the
+> true one. A single freeze date would have been easier to sign and impossible
+> to defend.
 
 ---
 
@@ -16,12 +33,32 @@ For every hypothesis below, the claim made under **win**, **mixed**, and
 ---
 
 ## RQ1 -- Persona discovery
-- **H1:** Audience personas are recoverable from unlabeled Bangla reviews and are
+
+> ⚠️ **SECTION SUPERSEDED IN THREE WAYS. Retained verbatim because it is the
+> original pre-registration and deleting it would destroy the record.** What
+> replaced it, and where: the ARI bands → the four-band scheme immediately below
+> (2026-07-28); the human-validation instrument → **RQ1-H**, the intrusion task
+> (2026-08-08), after the α-based instrument failed its own reliability gate;
+> the word *persona* and the noun *discovery* → the **engagement-specificity
+> axis** framing (2026-08-10, deviations log). **Nothing in this section is
+> operative.** Its stale quantities are struck through below rather than
+> corrected in place, for the same reason.
+
+- **H1:** ~~Audience personas are recoverable from unlabeled Bangla reviews~~
+  → **an engagement-specificity axis is recoverable**, and `cluster_k2` is an
+  imposed two-way cut through it — and it is
   (a) statistically stable and (b) human-recognizable.
 - **Metrics:** bootstrap ARI (80% subsample x 100), prediction strength,
-  Krippendorff's alpha (ordinal) on gold-300.
-- **n:** R ~ 4,422 for clustering; 300 for human validation; 3 annotators.
+  ~~Krippendorff's alpha (ordinal) on gold-300~~ → **intruder-detection accuracy
+  against a 0.25 chance rate (RQ1-H)**; the α instrument returned 0.4970 and is
+  reported as an instrument failure, not as a result.
+- **n:** R ~ ~~4,422~~ **4,625** for clustering; 300 for human validation;
+  ~~3 annotators~~ **2 annotators**, both independent (deviation 2026-08-03).
 - **Test:** PS >= 0.8 rule (Tibshirani & Walther); alpha bands 0.667 / 0.80.
+  ⚠️ **The PS rule is now known to be passable by a contentless cut** — region B
+  cleared it at 0.818 while correlating with nothing measurable (RQ1-G), which
+  is the failure mode von Luxburg (2010) describes. PS is reported as necessary
+  and **not** sufficient.
 - **Pre-committed trap-check:** ARI(cluster, Sentiment).
   **SUPERSEDED 2026-07-28** by the four-band scheme in "RQ1 pre-commitment:
   interpretation of ARI(cluster, Sentiment)" below, which was written before any
@@ -66,10 +103,20 @@ clusters add nothing beyond sentiment and Band 3 applies.
 data cannot distinguish them:
 1. genuine persona/sentiment overlap; or
 2. a **venue/community selection effect** — clusters recovering the source
-   Facebook group or YouTube channel rather than any persona. **This is
+   Facebook group or YouTube channel rather than any persona. ~~**This is
    untestable in principle here**, because venue was not retained at collection
    (provenance fact (c)). It must be stated as an unresolvable alternative
-   explanation, not dismissed.
+   explanation, not dismissed.~~
+   > ⚠️ **CORRECTED 2026-07-30 — this was wrong, and it was wrong in a way worth
+   > keeping visible.** Venue was not retained, but **writing style survives in
+   > the text, and style is measurable.** The confound was therefore testable,
+   > was tested, and the evidence pointed straight at it: fact (split) in
+   > `STATUS.md`, and `results/s2c_region_split.md`. The same correction was
+   > applied to `STATUS.md` on 2026-07-30 and — through an oversight recorded
+   > here rather than tidied away — **not** to this paragraph until 2026-08-10,
+   > so the deviations log has been quoting an error this file was still
+   > asserting. *"Untestable in principle"* is a strong claim and deserved a
+   > harder look before it was written down.
 
 Response: reframe as **"sentiment-anchored engagement tiers"**, or
 re-operationalize personas with engagement features (length / intensity /
@@ -187,6 +234,16 @@ Concretely, and all of it pre-committed here:
 > **Written 2026-07-30, before any verifier exists.** This test does not appear
 > in the original pipeline. It exists because the corpus turned out to be two
 > corpora, and it converts that problem into a measurement.
+
+> ⚠️ **RE-SCOPED 2026-08-05 — read the "Scope decision: Verifier-A and the RAG
+> index run on region A only" section below before using this table.** The test
+> as written here **cannot run**: it needs region-B labels for the axis, and the
+> K=2 cut exists only in region A. The cross-region transfer test therefore runs
+> on **sentiment classification**, which both regions support with real labels.
+> The purpose (*"the register gap, quantified"*) and all three outcome bands
+> carry over unchanged. **No claim about axis transfer across regions may be
+> made.** The table is retained because the bands below are still the operative
+> decision rule; only the task changed.
 
 Verifier-A is trained on R1 restricted to one region and evaluated on the other,
 both directions, alongside the within-region baselines:
@@ -851,6 +908,16 @@ excuse. **Two readings are possible and the data will not distinguish them:**
 > backbone has been downloaded.** Nothing in this section may be edited after the
 > first run. Pipeline §3.2 specifies this ablation; this section fixes its arms,
 > its decision rule, and what each outcome licenses us to say.
+>
+> 🔴 **POINTER ADDED 2026-08-10 — the section body is unedited and stays that
+> way; this note is navigation, not revision.** S3.2b returned
+> `CIRCULARITY_CONFIRMED`: a frozen LaBSE probe scores **0.9866** against the
+> best fine-tuned arm's **0.9647**. **The premise below — that this ablation is
+> "the only available justification" for the backbone choice — did not survive
+> its own result. The table may support NO claim about backbones.** See the
+> three deviation rows of 2026-08-10 (S3.2 `TIE`, S3.2b, S3.2c) for what it may
+> support instead. Read this section as the reasoning that was fixed in advance,
+> not as a conclusion the thesis holds.
 
 ### Why the ablation is load-bearing, not decorative
 
@@ -981,12 +1048,15 @@ it is the step returning what it can support.
 
 ## RQ2 -- Verifier-in-the-loop
 - **H2:** An external trained verifier in a generate-verify-refine loop improves
-  persona-controllability over zero-shot, few-shot, RAG-only, and self-critique.
-- **Metrics:** persona accuracy under **Verifier-B** (never in the loop), MAUVE,
-  length-JS divergence.
-- **n:** 8 conditions x 2 languages x **90** eval-plots x 3 personas, >= 3 seeds.
+  ~~persona-controllability~~ **label-controllability** over zero-shot, few-shot,
+  RAG-only, and self-critique.
+- **Metrics:** ~~persona accuracy~~ **`cluster_k2` label accuracy** under
+  **Verifier-B** (never in the loop), MAUVE, length-JS divergence.
+- **n:** 8 conditions x 2 languages x **90** eval-plots x ~~3 personas~~
+  **2 axis levels**, >= 3 seeds.
   (90, not 100 — the plot corpus froze at 120 = 30 dev + 90 eval on 2026-07-31;
-  see the Deviations entry of that date.)
+  see the Deviations entry of that date. **"3 personas" was stale from
+  2026-08-03**, when Gate G1 selected K = 2; corrected 2026-08-10.)
 - **Test:** bootstrap CIs, Benjamini-Hochberg correction, effect sizes.
 - **Claims:** win = external verification helps; mixed = helps on some personas
   only -> report per-persona; negative = prompting suffices, report honestly.
@@ -1046,4 +1116,8 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-08-10 | S3.2b — **`CIRCULARITY_CONFIRMED`. The frozen probe BEATS every fine-tuned arm, and the seven-arm ablation may support no claim about backbones** | Pre-registered band (i) fires, and beyond its own threshold: **frozen LaBSE + L2 logistic regression scores 0.9866 against the best fine-tuned arm's 0.9647** — the probe is **1.8 dev items *ahead*, not behind**. It makes **one error on 82 items**. Reference points: majority **0.3926**, best length rule fitted on train **0.6197** (threshold: n_words ≤ 7). | **Verified before being believed**: train and dev are disjoint (no leakage into the logistic fit), the error count reconstructs the reported macro-F1 exactly at 1/82, and the artifact carries a real provenance stamp (commit `1a37be1`). **The mechanism is not mysterious and was foreseeable**: `cluster_k2` was produced by k-means **on LaBSE embeddings**, so the label is close to a linear boundary in that space, and a linear probe recovers it almost perfectly. **Three consequences, all binding.** (1) **The seven-arm table may support no claim about backbones.** It is reported as a demonstration that the label is linearly recoverable from its generating encoder. (2) **The `TIE` verdict stands but its explanation changes**: the arms are indistinguishable because the task is near-saturated by construction, not because backbones are interchangeable in general — and the 2026-08-10 tie-break note must be read with this attached. (3) **Fine-tuning did not merely fail to help; it cost accuracy.** Every arm sits below a probe that trains in seconds, which is what Buckmann et al. (2024) predict for the tens-of-shot regime and what Beliveau et al. (2024) imply for small non-English data. **Not affected:** RQ2 needs a well-defined reproducible label, and RQ1-H established that humans perceive the distinction at 0.78/0.84 against 0.25 chance — the label is not an artefact, it is simply *linear in LaBSE space*. **What this does affect is Verifier-A, and that is opened as a decision rather than settled here** (see the next row). |
 | 2026-08-10 | S3.2c — **OPEN DECISION: Verifier-A and Verifier-B can no longer both be the obvious choice, because RQ5 needs them to disagree** | S3.2b makes the frozen LaBSE probe the strongest, cheapest and best-calibrated candidate for Verifier-A. **But if Verifier-B is also a LaBSE probe, A and B become near-identical functions on the same embedding space, and RQ5's Goodhart test — which measures the gap between A-scores and B-scores as the loop optimises against A — is destroyed by construction.** Inviolable rule 6 makes that wall the point of the design, so this cannot be decided on convenience. | **Not settled here, because it is a design call with a real trade-off and it belongs to Sabbir.** Sketch of the options, with what each costs: **(a) A = LaBSE probe, B = fine-tuned BanglaBERT.** Deliberately different model families, so the wall is methodological as well as data-level — arguably *stronger* than the original design, in which A and B differed only by training split. Costs: B is then the weaker model, and "the evaluator is worse than the thing it evaluates" needs defending. **(b) A = B = probes on disjoint splits.** Cheapest and most consistent, but the two verifiers agree by construction and RQ5 becomes unmeasurable; this would have to be declared as abandoning RQ5, not as a detail. **(c) A = fine-tuned BanglaBERT anyway**, on the argument that the in-loop verifier should not be the same object as the label's generating geometry — i.e. accept 2 pp less accuracy to buy independence from LaBSE. This is the option the S3.2b result makes *interesting* rather than obviously wrong: a verifier that is a linear function of LaBSE may be trivially gameable by a generator whose text is scored in that same space, which is exactly the failure RQ5 is looking for. **Whichever is chosen must be registered before Verifier-A is trained**, and the reasoning recorded as Sabbir's or as delegated. |
 | 2026-08-10 | **S3.2c RESOLVED — Verifier-A = frozen LaBSE probe, Verifier-B = fine-tuned BanglaBERT (cross-family)** | Decision 16 is closed. **Verifier-A** (in-loop gate) is the frozen LaBSE + L2 logistic probe: best measured, seconds to fit, natively calibrated, no GPU in the Phase 4 loop. **Verifier-B** (S6 evaluation only, never in the loop) is the fine-tuned BanglaBERT from S3.2. The wall between them is now **methodological as well as data-level**: ELECTRA vs BERT pretraining objective, Bangla-specific vs multilingual corpus, different tokenizer, fine-tuned vs frozen — where the original design separated A and B only by training split. | **⚠️ Provenance, stated so it is not mistaken for Sabbir's own argument: the recommendation and the reasoning below are Claude's; Sabbir delegated the call and endorsed it ("তোমার মতামতই ঠিক আছে"). Endorsed, not authored.** **The literature moved this from a preference to a standard.** Mahmoud et al. (2026) optimise against a training verifier and evaluate against a **cross-family panel**, explicitly to reduce dependence on any single evaluator, and find that weak verifiers produce proxy gains that do not transfer to reference verifiers. Wang et al. (2026) name **evaluator–policy co-adaptation** as one of three mechanisms of reward hacking — which is precisely what two LaBSE probes would have been. **The obvious objection to this configuration is dead:** Baker et al. (2025) show a *weaker* model (GPT-4o) monitoring a stronger one (o3-mini) effectively, so "the evaluator is weaker than what it evaluates" is documented practice rather than a flaw. **A use is also restored for the S3.2 table**: it may support no claim about backbones, but it is the evidence that BanglaBERT is a viable independent evaluator (0.9647, strongest of the fine-tuned family) — the ablation is repurposed honestly rather than discarded. **Cost accepted and named:** Verifier-B is ~2 pp weaker than Verifier-A, and B is the arm whose `lr`/seed handling was correct, so its numbers stand. |
+| 2026-08-05 | RQ1-G — **region-B replication added; not in RQ1 as written, and logged late** | A complete second pass of the instrument (`s2_pilot_regionB` → `s2d` → `s2e` → `s2f`, no script changes) pointed at region B, with a matching rule fixed in advance. Section "RQ1-G pre-commitment" was written 2026-08-05 before any region-B config ran. **This row is added 2026-08-10; the section had no deviations entry for five days, which is a process failure and is recorded as one rather than backdated.** | RQ1 as written analyses one corpus. Replication in a second corpus differing in register and provenance is the strongest available evidence for a discovered structure, and it was free — every script already took the region as a config field. **The outcome justified the addition, though not in the hoped-for direction:** pre-registered outcome 2 fired. B selected K = 2 (PS **0.818**, bootstrap ARI **0.962**) but the signature did **not** match — `length_auc` 0.550 → `NOT_LENGTH` against A's 0.676, richness inversion in **1 of 4** bands against A's 4/4. 🎁 **The useful finding is the negative one:** B's cut is a 49.4/50.6 bisection correlating with *nothing measurable* (every surface AUC 0.50–0.58, ARI vs Sentiment 0.011, silhouette 0.039, HDBSCAN noise 96.7%) **yet it clears PS ≥ 0.80.** Region B is therefore a **negative control demonstrating that the pre-registered stability rule can pass a contentless cut** — which is exactly the failure von Luxburg (2010) describes for stability-based K selection, and which Pinto et al. (2026) reproduce in simulation. The rule is not withdrawn; it is demoted to necessary-but-not-sufficient, and the demotion is reported. |
+| 2026-08-08 | RQ1-H — **human validation attempt 2, a DIFFERENT INSTRUMENT after attempt 1 failed. The single largest departure in this document, and it was not logged until 2026-08-10** | RQ1 pre-registered Krippendorff's α (ordinal) on a 0–3 rating scale over gold-300. Attempt 1 (RQ1-F) returned α = **0.4970** and Gate 2 was not computed. **Attempt 2 replaces the instrument entirely**: a 50-set **intrusion task** (Chang et al. 2009) plus a 40-item pairwise block, length-matched to within 2 words, no construct named to the annotator. Section "RQ1-H pre-commitment" was written before `intrusion_build.py` existed and before any item was judged. **Attempt 1 is reported in full and is not withdrawn, superseded or reframed.** | **This is the departure a reviewer will attack hardest — "they kept running instruments until one worked" — so the defence is stated here, in the log, and not left in the section body where nobody checks.** Four things make it a second *measurement* rather than a second *try*. **(1) The failure was diagnosed before the replacement was designed**, and diagnosed as an instrument failure with a named cause: the scale collapsed (68%/76% of ratings on the single value "2") because Claude's calibration advice — *"names an aspect → at least 2"* — moved everything to 2. Raw agreement was **75.5% exact / 98.7% within-1**; the raters agreed, the scale did not discriminate. That is the kappa paradox, and `gwet2008ac1` was already listed as its guard. **(2) The literature predicted the failure and was read too late.** Kiritchenko & Mohammad (ACL 2017) had already shown comparative judgements more reliable than rating scales at equal cost. Had it been read first, attempt 1 would not have used a rating scale — this is the founding entry of the "search before the decision" standing instruction. **(3) The new instrument can fail.** It names no construct, so it cannot fail merely because *our name* for the construct was wrong — the flaw attempt 1 could not distinguish from a real negative — and `NOT_PERCEPTIBLE` was pre-registered as a genuine negative result. **(4) A third attempt is forbidden in advance**, including the easier length-unmatched re-run, which is confined to Future Work. **Outcome:** Gate A **39/50 and 42/50** against 0.25 chance (p < 1e-15, pre-registered bar 0.45); Gate B **34/40 and 34/40** against 0.50 → the construct **is** specificity. Obtained with length matched to ±2 words and a length heuristic scoring **0.16, below chance**. |
+| 2026-08-10 | **TERMINOLOGY — `persona` and `cluster` are BOTH retired; the object is an engagement-specificity AXIS and `cluster_k2` is an imposed cut through it** | STATUS decision 12 is closed. The K = 2 halves are levels of a **continuous engagement-specificity axis**, not two groups. Permitted: *axis*, *gradient*, *the cut*, *level*, *`cluster_k2` as an operational discretisation*. Forbidden: *persona*, *audience type*, *subgroup*, *typology*, and — new, and the part that changes most — **bare *cluster* as a claim about structure**, though `cluster_k2` stays as the frozen variable name in code and data, where renaming would break the split map. Generation is **axis-level-controlled**. | **⚠️ Provenance: Sabbir delegated the call ("you can make the best decision"); the choice and the reasoning are Claude's. Endorsed, not authored.** **The literature settled this, and it moved the answer past both options that were on the table.** Pinto et al. (2026) run k-means on data with no latent groups and on 8,360 real psychometric respondents, obtaining **k = 2, silhouette ≈ 0.31, ARI 0.999 ± 0.001, cluster sizes 50.6/49.4** — numerically almost our region B (49.4/50.6, silhouette 0.039, bootstrap ARI 0.962). Their verdict on their own result: *"better interpreted as **geometric stratifications of a latent psychological continuum** rather than as evidence for discrete subtypes"*, and, decisively for us, **"Stability, therefore, is not equivalent to validity."** On correlated Gaussian data they obtain ARI = 1.00, SD 0.00 and call it *"an artificial partition of a continuous, anisotropic distribution."* Cornelissen et al. (2026) publish a negative clusterability result across three musical traditions, show that a previously published four-type typology was an artefact — with no clustering present, k-means places centroids near the leading principal axes *"for entirely mathematical, not musical reasons"* — and conclude the character is **continuous**. **Consequence: *persona* was already banned on 2026-08-05, and *cluster* does not survive either**, because the literature reserves it for structure our geometry does not have (silhouette 0.053, monotone gap, HDBSCAN 100% noise). **What makes our position stronger than either paper's, and it must be said in these words: neither of them had human validation.** RQ1-H did — 0.78/0.84 against 0.25 chance, length-matched, length heuristic below chance. So the claim is sharper than "the cut is arbitrary": **geometrically it is a line drawn through a continuum, and people can nonetheless see it.** ⬛ Considered and rejected: keeping *persona* on RQ1-H's warrant — rejected because perceptibility of a distinction is not evidence of discrete groups, and the two claims are exactly what this literature separates. Title and Ch.1 framing follow this constraint; the wording is Sabbir's, the constraint is not. |
+| 2026-08-10 | **Ch.5 LIMITATION registered: S2e and S2f are post-clustering inference on the rows that defined the clusters** | The φ = 0.3981 / χ² = 300.7 association, the surface AUCs, and the distinctive-vocabulary tables in S2e/S2f are all computed on the **same region-A rows that k-means used to form the partition**. No number is withdrawn; the inferential status of all of them is downgraded and stated wherever they appear. | **Found by literature search on 2026-08-10, not by a reviewer, and not by us at the time.** Chen & Witten (2023), *Selective inference for k-means clustering*, show that classical post-hoc tests on cluster-derived groups produce **inflated Type I error**, because the same data both defines and tests the groups — and that substantial between-group differences appear **even when no population categories exist**. S2f's Test C already carried the right instinct, self-flagging as a resubstitution upper bound; the flag simply was not generalised to the other statistics in the same two files. **Consequence: S2e and S2f are descriptive profiling, not hypothesis tests, and no p-value from them may be quoted as evidence that the halves differ.** What survives untouched is RQ1-H, which is computed on **held-out items outside G-300, judged by annotators blind to the partition** — it is not post-clustering inference and does not inherit this limitation. That asymmetry is the reason the human validation, not the profiling, carries the RQ1 claim. |
 | 2026-08-10 | RQ5 — **an invariance test is added; the A-vs-B gap alone is documented to under-detect** | RQ5 keeps its A-score-vs-B-score gap across attempts, and **adds a pre-registered invariance check** in the style of Shihab et al.'s (2025) Evaluator Stress Test: controlled perturbations that leave meaning intact are applied to accepted drafts, and a verifier whose score moves on those perturbations is responding to surface artefacts rather than content. Both signals are reported; **neither alone decides RQ5**. | **Because cross-family separation is necessary but not sufficient, and we now have the number.** Zhou (2026) shows judge errors **transfer across families** (Qwen, Llama, Gemma) and that a strict three-judge ensemble still accepts **55%** of them — so an A-vs-B gap can stay small while gaming is happening. Shihab et al. (2025) report 74.2% precision / 78.6% recall for perturbation-based detection in the LLM-alignment domain, with **early warning that precedes quality decline**, which is the property RQ5 needs. 🎁 **One structural advantage we already have, recorded because it is easy to lose:** Zhou's decisive fix is a judge that **commits to its own answer before seeing the candidate** (false positives 0.719 → 0.012). Our verifiers predict the cluster label **independently** and are never shown a target to agree with — so the S3.x design is **already de-anchored in Zhou's sense**, by accident rather than by foresight, and the thesis should say so in those words. |
