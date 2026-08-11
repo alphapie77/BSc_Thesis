@@ -52,6 +52,12 @@ expected_n: 4625            # asserted; a mismatch means the threshold moved
 sizes:
   gold: 300
   dev_slice: 200            # carved from R1 only -- never from R2, never from G
+  # 🔴 NO RECORDED REASON -- flagged 2026-08-11 by check_constants.py.
+  # This is the ONLY decision constant in the repo with no source in
+  # protocol.md or the pipeline. An equal R1/R2 split is the obvious
+  # default (and yields 2,162 / 2,163), but "obvious" is not a reason,
+  # and the split map is FROZEN -- so this cannot be revised, only
+  # explained. Awaiting Sabbir; deliberately NOT back-filled by Claude.
   r1_fraction: 0.5
 
 output: data/splits/split_map_v1.json

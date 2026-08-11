@@ -46,6 +46,11 @@ guard:
   tolerance: 1.0e-6
 
 length_bands:
+  # ref: protocol.md RQ1-D length-AUC outcome table.
+  # >=0.75 LENGTH_DOMINATED (may not be called a persona structure);
+  # 0.65-0.75 LENGTH_CONFOUNDED (G-300 may proceed, but length is reported
+  # beside every persona claim); <0.65 NOT_LENGTH. Three pre-committed
+  # outcomes, all publishable.
   dominated_at_or_above: 0.75
   confounded_at_or_above: 0.65
 

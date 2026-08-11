@@ -44,6 +44,10 @@ intrusion:
   max_word_span: 2          # max(words) - min(words) within a set
   balance: true             # half the sets cluster-0 majority, half cluster-1
   chance: 0.25
+  # ref: protocol.md "RQ1-H pre-commitment", Gate A outcome table.
+  # 0.45 is not a taste threshold: power was computed BEFORE the run --
+  # "at n = 50, detecting 0.45 against 0.25". Above it -> HUMANLY_PERCEPTIBLE;
+  # significant but below -> WEAKLY_PERCEPTIBLE, reported with the interval.
   strong_at_or_above: 0.45
   alpha: 0.05
 
@@ -54,6 +58,9 @@ pairwise:
   n_pairs: 40
   max_word_span: 2
   chance: 0.50
+  # ref: protocol.md "RQ1-H pre-commitment", Gate B. Chance here is 0.50,
+  # not 0.25, and n = 40 gives ~85% power to detect 0.70. Gate B is only
+  # interpreted if Gate A passes.
   strong_at_or_above: 0.70
   alpha: 0.05
 

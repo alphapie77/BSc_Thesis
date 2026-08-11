@@ -12,6 +12,8 @@ steps:
   - drop_exact_duplicates
   - drop_normalized_duplicates
   - drop_short          # < min_words
+# ref: research_pipeline_en.md S0 table -- "Reviews with <3 words | 72 |
+# Removed". The cut is inherited from the S0 x-ray, not chosen here.
 min_words: 3
 
 # Explicitly NOT done -- contextual encoders need natural text (pipeline 1.1.3)

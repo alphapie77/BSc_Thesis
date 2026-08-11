@@ -36,13 +36,29 @@ length_bands:
   n_quantiles: 4
 
 test_a:
+  # ref: protocol.md RQ1-E Test A. Min directionless AUC of n_words vs
+  # cluster, within each sentiment class. >=0.60 -> length contributes
+  # independently of sentiment; below -> reported as entangled, not additive.
   independent_at_or_above: 0.60
 
 test_b:
   independent_at_or_above: 0.20
 
 test_c:
+  # ref: protocol.md RQ1-E Test C -- "the decisive one". Lift over the 60.3%
+  # marginal baseline, from an 8-cell Sentiment x n_words-quartile
+  # cross-classification.
+  #
+  # ⚠️ Test C is a RESUBSTITUTION estimate -- fitted and scored on the same
+  # rows -- so it is an optimistic UPPER BOUND. The bias direction was chosen
+  # deliberately: it makes the persona-KILLING verdict EASIER to reach, so the
+  # optimism cannot flatter the claim we would prefer.
   explained_at_or_above: 25.0
+  # ref: protocol.md RQ1-E -- "A clean Test C (lift < 10)".
+  # Region A landed at +9.80, i.e. 0.2 pp under this cutoff. The script emits an
+  # automatic boundary-warning box at <=2 pp so the weakness cannot depend on
+  # anyone remembering it, and tests/test_s2f_residual.py FAILS if this number
+  # or the quartile count moves -- either would flip a published verdict.
   partial_at_or_above: 10.0
 
 test_d:

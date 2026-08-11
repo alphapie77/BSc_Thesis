@@ -39,9 +39,21 @@ Any one of:
   * an inline comment on the same line
   * a comment in the 4 lines above
   * the key appearing in `docs/protocol.md` (i.e. pre-registered there)
+  * an explicit `# ref: <where>` pointer within 4 lines
 
-The third is the important one: the reason belongs in protocol.md, and the
-config may simply point at it.
+The last two matter most, and the fourth was added on 2026-08-11 after the
+first run produced a **false alarm that is worth recording**. It reported 29
+constants as having "no reason anywhere". That was wrong for most of them:
+`strong_at_or_above: 0.45` is pre-registered in protocol.md with a power
+calculation behind it (*"at n = 50, detecting 0.45 against 0.25"*), and
+`dominated_at_or_above: 0.75` sits in a full pre-committed outcome table.
+The reasons existed; the **key names** did not appear in the prose, so a
+key-name search could not see them.
+
+The defect was therefore linkage, not absence — but linkage is still a real
+defect, because a reader holding the config cannot get from the number to the
+argument, and neither could this checker. `# ref:` fixes that in the one
+place the reader is actually looking.
 
 Usage:  python src/common/check_constants.py [--strict]
         --strict also fails on KNOB tier (not recommended; noisy)
@@ -79,6 +91,12 @@ KNOB_MARKERS = (
     "bootstrap", "permutations", "n_runs", "n_reference", "pca_components",
     "cv_folds", "n_splits", "request_delay", "category_depth", "top_n",
     "prior_strength", "max_pages", "n_quantiles", "n_bins",
+    # Added 2026-08-11 after the first run misfiled these as DECISION. None
+    # of them changes a verdict: they cap display length, set a display
+    # count, or set a numerical tolerance.
+    "max_chars", "min_count", "min_samples", "n_representative",
+    "n_boundary", "subsample_frac", "min_budget", "tolerance",
+    "length_bands",
 )
 
 NUM_LINE = re.compile(r"^(\s*)([a-z_0-9]+):\s*(-?[0-9][0-9.eE+-]*)\s*(#.*)?$")
@@ -98,11 +116,24 @@ def classify(key: str) -> str:
     return "DECISION"
 
 
+# A comment that ANNOUNCES the absence of a reason must not be counted as one.
+# Second instance of the same loophole in one hour: the first was the audit note
+# in the deviations log, this one is an inline "no reason yet" marker. Both read
+# as prose about the constant, and a substring check cannot tell prose about a
+# reason from a reason. These are surfaced under their own OPEN heading so that
+# flagging a gap can never be the thing that hides it.
+OPEN_MARKERS = ("no recorded reason", "no reason", "awaiting sabbir", "todo")
+
+
 def has_reason(lines: list[str], idx: int, key: str, protocol_text: str) -> str | None:
     """Return the kind of reason found, or None."""
     m = NUM_LINE.match(lines[idx])
     if m and m.group(4):
         return "inline comment"
+    for j in range(max(0, idx - 4), idx + 1):
+        stripped = lines[j].strip()
+        if "# ref:" in stripped.lower():
+            return "explicit ref pointer"
     for j in range(max(0, idx - 4), idx):
         if lines[j].strip().startswith("#"):
             return "comment block above"
@@ -122,12 +153,29 @@ def main() -> int:
         return 2
 
     protocol_text = PROTOCOL.read_text(encoding="utf-8") if PROTOCOL.exists() else ""
+    # 🔴 The Deviations log is CUT OUT before searching.
+    #
+    # Found 2026-08-11, immediately after this checker's first run. The audit
+    # note written into the deviations table names the offending keys --
+    # `independent_at_or_above`, `explained_at_or_above`, `strong_at_or_above`
+    # -- in order to report that they lacked justification. On the next run
+    # the checker found those key names in protocol.md and passed them.
+    #
+    # **Writing about the gap closed the check.** A log entry saying "this
+    # constant has no reason" is the opposite of a reason, and a checker that
+    # cannot tell those apart certifies the exact defect it exists to catch.
+    # Pre-registration means the key was registered BEFORE the run, in a
+    # pre-commitment section -- not mentioned afterwards in an audit note.
+    _dev = protocol_text.find("## Deviations log")
+    if _dev != -1:
+        protocol_text = protocol_text[:_dev]
     if not protocol_text:
         print("WARNING: docs/protocol.md not readable; "
               "pre-registration cannot count as a reason this run.")
 
     failures: list[tuple[str, int, str, str]] = []
     warnings: list[tuple[str, int, str, str]] = []
+    open_items: list[tuple[str, int, str, str]] = []
     ok = 0
 
     for path in sorted(CONFIG_DIR.glob("*.yaml")):
@@ -140,6 +188,11 @@ def main() -> int:
             tier = classify(key)
             if tier == "ASSERTION":
                 continue
+            ctx = " ".join(lines[max(0, i - 6):i + 1]).lower()
+            if any(mk in ctx for mk in OPEN_MARKERS):
+                open_items.append((path.relative_to(REPO).as_posix(),
+                                   i + 1, key, val))
+                continue
             reason = has_reason(lines, i, key, protocol_text)
             if reason:
                 ok += 1
@@ -149,6 +202,12 @@ def main() -> int:
                 failures.append((rel, i + 1, key, val))
             else:
                 warnings.append((rel, i + 1, key, val))
+
+    if open_items:
+        print(f"\n{len(open_items)} constants EXPLICITLY FLAGGED as having no "
+              f"reason yet (open, not silent):")
+        for rel, n, key, val in open_items:
+            print(f"  {rel}:{n}  {key} = {val}")
 
     if warnings:
         print(f"\n{len(warnings)} KNOB-tier constants with no stated reason "
@@ -172,7 +231,12 @@ def main() -> int:
     n_bad = len(failures) + (len(warnings) if args.strict else 0)
     print(f"\n{ok} constants carry a reason. "
           f"{len(failures)} DECISION-tier do not. "
-          f"{len(warnings)} KNOB-tier do not.")
+          f"{len(warnings)} KNOB-tier do not. "
+          f"{len(open_items)} are openly flagged as unresolved.")
+    if open_items and not failures:
+        print("\nExit 0: nothing is SILENTLY unjustified. The open items above "
+              "are\nawaiting an answer and say so, which is the intended state "
+              "-- not a pass.")
     return 1 if n_bad else 0
 
 

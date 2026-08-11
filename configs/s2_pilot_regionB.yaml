@@ -66,7 +66,13 @@ trap_check:
   degenerate_cluster_share: {min: 0.05, max: 0.70}
   bands:
     no_claim: degenerate
-    not_sentiment_aligned_below: 0.20
+    # ref: protocol.md "RQ1 bands" -- Band 2 is 0.20 <= ARI <= 0.60.
+  # These two constants ARE that band's boundaries, not separate choices:
+  # below 0.20 the clusters are not sentiment-aligned; above 0.60 the
+  # persona claim fails, per the mandatory trap-check in pipeline S2.4
+  # ("If >0.6, either re-operationalize ... or present them as
+  # sentiment-anchored engagement tiers").
+  not_sentiment_aligned_below: 0.20
     partial_overlap_range: [0.20, 0.60]
     persona_claim_fails_above: 0.60
 
