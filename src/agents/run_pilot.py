@@ -155,15 +155,34 @@ def main() -> int:
     for g in all_gens:
         cells[(g["model"], g["arm"])].append(g)
 
+    # Every indexed review, to detect a generation that is a retrieved exemplar
+    # copied verbatim. Spotted in the first run: BN016 L0 returned
+    # "বাংলা সিনেমার মধ্যে ভালো একটা সিনেমা।", which is `bn_0230` exactly.
+    # At level 0 copying is the cheap path -- short formulaic comments are easy
+    # to echo and the Critic would pass them -- but a copied exemplar is not a
+    # generation, and any realism metric computed over copies is measuring
+    # retrieval. Counted rather than assumed, and reported per cell.
+    corpus = {
+        r["Movie Review"].strip()
+        for r in csv.DictReader(open("data/cleaned/bn_clean.csv", encoding="utf-8"))
+    }
+
     summary = {}
     for (model, arm), gens in sorted(cells.items()):
         fracs = [latin_fraction(g["text"]) for g in gens]
         confused = [f for f in fracs if f > baseline]
+        copied = [g for g in gens if g["text"].strip() in corpus]
+        by_level: dict[str, int] = {}
+        for g in copied:
+            k = f"L{g['target_level']}"
+            by_level[k] = by_level.get(k, 0) + 1
         summary[f"{model}|{arm}"] = {
             "n": len(gens),
             "n_latin_above_baseline": len(confused),
             "max_latin_fraction": max(fracs) if fracs else 0.0,
             "mean_chars": sum(len(g["text"]) for g in gens) / len(gens) if gens else 0,
+            "n_verbatim_corpus_copies": len(copied),
+            "verbatim_copies_by_level": by_level,
             "verdict": "LANG_CONFUSION" if confused else "CLEAN",
         }
 
@@ -190,14 +209,15 @@ def main() -> int:
         "results table. Decision rule pre-registered in `docs/protocol.md` "
         "§S4 decision 3, **before** any generation existed.",
         "",
-        "| model | prompt arm | n | Latin above baseline | max Latin frac | mean chars | verdict |",
-        "|---|---|---|---|---|---|---|",
+        "| model | prompt arm | n | Latin above baseline | max Latin frac | mean chars | **verbatim corpus copies** | verdict |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for k, v in sorted(summary.items()):
         model, arm = k.split("|")
         lines.append(
             f"| `{model}` | {arm} | {v['n']} | {v['n_latin_above_baseline']} | "
             f"{v['max_latin_fraction']:.4f} | {v['mean_chars']:.0f} | "
+            f"**{v['n_verbatim_corpus_copies']}** {v['verbatim_copies_by_level'] or ''} | "
             f"**{v['verdict']}** |"
         )
     lines += [
@@ -216,6 +236,19 @@ def main() -> int:
         "- **The model tie-break is a declared non-performance rule**: on `TIE`, "
         "lower cost and higher rate limit, and the thesis states that the data "
         "did not choose.",
+        "",
+        "",
+        "## ⚠️ Verbatim corpus copies",
+        "",
+        "A generation whose text appears **exactly** in `bn_clean.csv` is a "
+        "retrieved exemplar echoed back, not a generation. At level 0 this is "
+        "the cheap path — short formulaic comments are easy to copy and the "
+        "Critic would pass them — so the count is reported **by level**. Any "
+        "realism metric computed over copies is measuring retrieval.",
+        "",
+        "🔴 **This is a pilot observation, not a measured rate.** It counts "
+        "exact matches only; a near-copy with one word changed is not caught "
+        "and would need an edit-distance check before Phase 5.",
         "",
         f"Observed rate limits: `{limits or 'none returned'}`",
     ]
