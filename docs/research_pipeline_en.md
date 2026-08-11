@@ -5,7 +5,9 @@
 **Core claim (one sentence):** An external, cheap, task-trained verifier embedded in a generate–verify–refine loop measurably improves persona-controllability of LLM generation in a low-resource language (Bangla), compared to prompting alone — demonstrated against a matched English reference.
 
 **Timeline:** ~14 weeks | **Compute:** free Colab/Kaggle GPU | **API cost:** ৳0 (Groq free tier primary; Gemini free tier secondary)
-~~**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**~~ 🔴 **FALSE as of 2026-08-11 — `research_pipeline_bn.md` does not exist and never did (see MAINTENANCE STATE below). Until open decision 18 is settled, THIS FILE IS THE ONLY NORMATIVE PIPELINE.**
+~~**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**~~
+
+✅ **STRUCK 2026-08-11 — Sabbir's ruling (decision 18, option b): "bangla ar english to same e. dorkar ki bangla alada kore likhar."** `research_pipeline_bn.md` never existed, and it will not be written. **THIS FILE IS THE ONLY NORMATIVE PIPELINE.** Bangla stays in use for explanation and teaching — per Sabbir's standing request — but no Bangla document is normative, so there is no second file to keep in sync and no second file to go stale.
 
 ---
 
@@ -37,19 +39,15 @@
 > version said *"`research_pipeline_bn.md` has NOT received this pass"* and called
 > the mirrors out of sync. **That was wrong, and wrong in the way this project
 > keeps warning about: it was written from line 8 rather than from the disk.**
+> `research_pipeline_bn.md` does not exist and never has -- not in `docs/`, not in
+> the repo, not in git history. Line 8 asserted a second normative document that
+> was never written, and it survived since v7 because **nobody ever tried to
+> follow the reference.**
 >
-> **`research_pipeline_bn.md` does not exist and never has** — not in `docs/`, not
-> anywhere in the repo, and not in git history. Line 8 above declares this file
-> "the English mirror" of a document that was never written. So the problem is not
-> that two files disagree; it is that **line 8 asserts a second normative document
-> that is not there**, and has done since v7.
->
-> That is worse than staleness. A reader is told the authority is split across two
-> files and instructed to fix both on conflict; one of them cannot be consulted,
-> and nobody noticed because nobody went looking for it. **Left standing and
-> flagged rather than quietly deleted** — the fix is Sabbir's call: either the
-> Bangla mirror gets written, or line 8 is struck and this file is simply the
-> pipeline. See STATUS open decision 18.
+> ✅ **RESOLVED the same day. Sabbir's ruling: no Bangla mirror will be written**
+> ("bangla ar english to same e"). Line 8 is struck; this file is the sole
+> normative pipeline. Bangla remains the language of explanation, not of record.
+> STATUS decision 18 is closed.
 
 ---
 
@@ -125,7 +123,7 @@
 
 **Week 1 — Foundations**
 ☑ 1. Create the repo (§0.1 layout), requirements.txt, global seed=42 — `src/common/seed.py`, `requirements.lock.txt`
-☑ 2. Draft `protocol.md` (§0.2) — written and running; **53 rows in its Deviations log.** ⚠️ **supervisor sign-off: still not recorded anywhere.** If it happened, it is undocumented; if it did not, it is outstanding. 🔴 **Sabbir — this is the one Week-1 item that never closed**
+☑ 2. Draft `protocol.md` (§0.2) — written and running; **53 rows in its Deviations log.** ✅ **supervisor sign-off OBTAINED** — Sabbir, 2026-08-11. `docs/supervisor_seal_packet.md` (prepared 2026-08-10, Phases 1–3) was signed; the signed copy is not held in the repo at Sabbir's instruction, so it is recorded as a student report rather than a repo artifact. **Week 1 is now fully closed.** Phases 4–6 seal separately
 ☑ 3. Core base papers (§0.3) — superseded in practice by `docs/related_work.md` (9 tiers) and the CLAUDE.md search-first rule, which is stricter than "read these first"
 
 **Weeks 2–3 — Data (S1)**
