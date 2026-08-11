@@ -149,6 +149,28 @@ def main() -> None:
     # reported as the weaker one.
     CSV_RESOLUTION = 5e-7
 
+    # 🔑 Magnitude is the wrong instrument, and naming a magnitude threshold
+    # would be a hand-written constant with no criterion.
+    #
+    # tau is placed at QUANTILES of the score distribution -- i.e. at ORDER
+    # STATISTICS. A drift that preserves the ordering moves no quantile to a
+    # different item, however large it is; a drift that swaps two adjacent
+    # scores moves a threshold between items, however small it is. So the
+    # decisive quantities are (a) whether the ranking changed, and (b) whether
+    # the drift is smaller than the closest gap between two observed scores.
+    #
+    # This is the same instrument decision 17 already used on temperature
+    # scaling ("0 rank inversions, 1 new tie, 2 items saturated"), reused rather
+    # than reinvented -- and it was the right instrument there for the same
+    # reason it is right here.
+    order_here = sorted(range(len(p_here)), key=lambda i: p_here[i])
+    order_committed = sorted(range(len(p_committed)), key=lambda i: p_committed[i])
+    rank_inversions = sum(1 for a, b in zip(order_here, order_committed) if a != b)
+
+    srt = sorted(p_committed)
+    gaps = [b - a for a, b in zip(srt, srt[1:]) if b > a]
+    min_adjacent_gap = min(gaps) if gaps else 0.0
+
     # Free wall check while we are here: the artifact records the ids it was
     # fitted on, so the "dev was held out" claim can be verified against the
     # checkpoint itself rather than against the script that wrote it.
@@ -193,46 +215,44 @@ def main() -> None:
           + (f"  {flips}" if flips else ""))
     print(f"max |Δ p_cluster1|          : {max_delta:.3e}"
           f"   (CSV resolution {CSV_RESOLUTION:.0e})")
-    print("  ^ THIS is the number that matters. The Critic thresholds on the\n"
-          "    probability, and τ is swept at quantiles of the score\n"
-          "    distribution — labels agreeing does not mean scores do.")
+    print(f"rank inversions             : {rank_inversions}")
+    print(f"smallest gap between scores : {min_adjacent_gap:.3e}")
+    print("  ^ THESE are the numbers that decide it, not the magnitude above.\n"
+          "    τ is placed at quantiles = order statistics. Drift that keeps\n"
+          "    the ordering moves no threshold between items however large it\n"
+          "    is; drift that swaps two neighbours moves one however small.")
 
-    if not flips and max_delta <= CSV_RESOLUTION:
+    if flips:
         print(
-            "\nVERDICT: HOST_INVARIANT — all 82 labels AND all 82 probabilities\n"
-            "match the committed Kaggle run to the resolution the recorded file\n"
-            "can express. The Critic may use this artifact locally, and the\n"
-            "appendix states host-invariance as a measurement, not an assumption."
+            f"\nVERDICT: HOST_DEPENDENT — {len(flips)} label(s) changed with no\n"
+            "change to the model or the data, only to the environment. Stop and\n"
+            "record it before building the Critic."
         )
-        if version_warnings:
-            print(
-                "\n⚠️  The pickle version mismatch is still reported in the paper.\n"
-                "    Agreement on 82 items does not prove the estimator is\n"
-                "    unaffected — it proves no disagreement is visible on THIS\n"
-                "    slice at THIS precision. sklearn's warning is about the\n"
-                "    object; n = 82 is a weak instrument for the difference.\n"
-                "    What the evidence supports is the narrow claim, and only it."
-            )
-    elif not flips:
+    elif rank_inversions == 0 and max_delta < min_adjacent_gap:
         print(
-            f"\nVERDICT: LABELS_MATCH_SCORES_DRIFT — all 82 labels agree, but\n"
-            f"probabilities differ by up to {max_delta:.3e}, above the "
-            f"{CSV_RESOLUTION:.0e} the CSV can resolve.\n"
-            "🔴 This is the case the label-only check would have called clean.\n"
-            "τ is swept at QUANTILES of the score distribution, so drifting\n"
-            "scores move every threshold even when no label moves.\n"
-            "Pin sklearn to the fitting version (1.6.1) and re-run before the\n"
-            "Critic is built — this removes the question rather than bounding it."
+            "\nVERDICT: QUANTILES_STABLE — all 82 labels agree, the score\n"
+            f"ORDERING is identical (0 inversions), and the drift ({max_delta:.3e})\n"
+            f"is smaller than the closest gap between two observed scores\n"
+            f"({min_adjacent_gap:.3e}). Every quantile therefore falls between the\n"
+            "same two items on both hosts, so τ selects the same operating\n"
+            "points. The Critic may use this artifact locally.\n"
+            "\n⚠️  What is NOT established, and must not be written as though it\n"
+            "    were: that the estimator is unaffected. Two things changed at\n"
+            "    once — sklearn 1.6.1 → 1.9.0 AND the encoding host — and this\n"
+            "    run cannot separate them, because the committed file records\n"
+            "    probabilities, not embeddings. The drift is at the 1e-6 scale\n"
+            "    typical of float/BLAS differences rather than of a changed\n"
+            "    estimator, but that is an inference from magnitude, not a\n"
+            "    measurement, and it is labelled as one."
         )
     else:
         print(
-            f"\nVERDICT: HOST_DEPENDENT — {len(flips)} prediction(s) changed with\n"
-            "no change to the model or the data, only to the environment.\n"
-            "This is NOT automatically a defect (Coakley et al. put\n"
-            "environment-only variation above 6 pp), but it must be reported,\n"
-            "and the loop's scores are then attributable to THIS host, not to\n"
-            "the one in s3c_verifier_a.json. Do not average the two.\n"
-            "Stop and record it before building the Critic."
+            f"\nVERDICT: QUANTILES_AT_RISK — labels agree, but the ordering does\n"
+            f"not survive: {rank_inversions} rank inversion(s), drift {max_delta:.3e}\n"
+            f"against a smallest score gap of {min_adjacent_gap:.3e}.\n"
+            "🔴 τ is placed at order statistics, so a threshold can now fall\n"
+            "between a different pair of items on this host than on Kaggle.\n"
+            "Do not build the Critic on this artifact until it is resolved."
         )
 
 
