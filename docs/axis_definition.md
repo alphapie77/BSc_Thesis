@@ -65,32 +65,33 @@ The wording deliberately reuses the G-300 guideline's validated 0–3 language
 is what RQ1-H validated and inventing fresh wording would discard the validation.
 
 <!-- AXIS_DEFINITION_BEGIN -->
-### স্তর ০ — রায়, কিন্তু নির্দিষ্ট কিছু নয়
+### স্তর ০ — মত আছে, নির্দিষ্ট কিছু নেই
 
-লেখক ছবিটি ভালো বা খারাপ বলছেন, এবং সেই রায়ের উপরেই থেমে আছেন। আবেগ থাকতে
-পারে — বারবার বলা, তীব্র শব্দ, নিজের অনুভূতির কথা — কিন্তু **ছবির কোনো একটি
-নির্দিষ্ট অংশের নাম আসে না**। গল্প, অভিনয়, গান, পরিচালনা, কোনো চরিত্র বা কোনো
-দৃশ্য — এর কোনোটিই আলাদা করে ধরা হয় না।
+মন্তব্যটা ছবিটাকে ভালো বা খারাপ বলে, আর ওখানেই থেমে যায়। জোর থাকতে পারে — একই
+কথা বারবার, তীব্র শব্দ, নিজের অনুভূতির কথা — কিন্তু ছবির কোনো একটা জিনিসের নাম
+ওঠে না। গল্প, অভিনয়, গান, পরিচালনা, কোনো চরিত্র, কোনো দৃশ্য — কিছুই আলাদা করে
+ধরা হয় না।
 
-এই স্তরের ভাষা প্রায়ই চেনা ছাঁচে চলে: একই ধরনের প্রশংসা বা নিন্দা, যা প্রায়
-যেকোনো ছবির সম্পর্কেই লেখা যেত।
+**চেনার সহজ উপায়:** এই মন্তব্য প্রায় যেকোনো ছবির নিচে বসিয়ে দেওয়া যায়, আর
+তাতে কিছুই বদলায় না।
 
-### স্তর ১ — নির্দিষ্ট কিছুর কথা
+### স্তর ১ — নির্দিষ্ট কিছু ধরে বলা
 
-লেখক ছবির **কোনো একটি অংশ ধরে** কথা বলছেন — গল্প, অভিনয়, গান, নায়ক-নায়িকা,
-পরিচালনা, শেষটা, একটি দৃশ্য, বা কারও নাম। সেই নির্দিষ্ট জিনিসটির সাথে তাঁর
-প্রতিক্রিয়া যুক্ত — কেন এমন মনে হলো, কীসের সাথে তুলনা, কী আশা করেছিলেন, বা
-দেখার পর ঠিক কী ঘটল।
+মন্তব্যটা ছবির কোনো একটা জিনিস ধরে কথা বলে — গল্প, অভিনয়, গান, নায়ক বা নায়িকা,
+পরিচালনা, শেষটা, একটা দৃশ্য, কারও নাম। শুধু নাম করেই থামে না; সেই জিনিসটার সাথে
+নিজের প্রতিক্রিয়াও জুড়ে দেয় — কেন এমন লাগল, কীসের সাথে তুলনা, কী আশা
+করেছিল, দেখে ঠিক কী হলো।
 
-এই স্তরের মন্তব্য **এই ছবিটি সম্পর্কেই**; অন্য ছবির গায়ে বসিয়ে দিলে আর খাটে না।
+**চেনার সহজ উপায়:** এই মন্তব্য অন্য ছবির নিচে বসালে আর খাটে না।
 
 ### দুই স্তরেই যা স্বাভাবিক
 
-- **প্রশংসা এবং নিন্দা — দুটোই।** দুই স্তরেই লেখক ছবিটি পছন্দ করতে পারেন, আবার
-  অপছন্দও করতে পারেন।
-- **ছোট মন্তব্য, বড় মন্তব্য — দুটোই।** এক লাইনের মন্তব্যও কোনো নির্দিষ্ট
-  জিনিসের নাম করতে পারে; কয়েক লাইনের মন্তব্যও চেনা ছাঁচে থেকে যেতে পারে।
-- **সাধারণ মানুষের মুখের বাংলা।** যেভাবে দর্শক আসলে লেখেন, সেভাবেই।
+- **প্রশংসা আর সমালোচনা — দুটোই।** দুই স্তরেই মানুষ ছবি পছন্দ করে, আবার
+  অপছন্দও করে।
+- **ছোট মন্তব্য, বড় মন্তব্য — দুটোই।** এক লাইনেও নির্দিষ্ট কিছুর নাম আসতে
+  পারে; কয়েক লাইনও চেনা ছাঁচে থেকে যেতে পারে।
+- **সাধারণ দর্শকের চলিত বাংলা** — যেভাবে ফেসবুক বা ইউটিউবের মন্তব্যে মানুষ
+  লেখেন।
 <!-- AXIS_DEFINITION_END -->
 
 ## 3b. Why the "what it is NOT" section was removed — the search attacked this file
@@ -126,6 +127,65 @@ on humans.** Negative framing is fine for a human annotator reading a guideline
 and is a documented hazard for a model reading a prompt. **The validation
 transfers to the *construct*, not to the *prompt format*** — and I had treated
 one as the other.
+
+## 3d. The language pass — what the search changed, and what it did not settle
+
+**Delegated by Sabbir (*"vasha aro valo koro research kore"*). Index: alphaXiv.**
+
+⚠️ **First, the honest negative.** The question I had silently assumed away —
+*should the definition be in Bangla at all, or in English?* — **came back thin.**
+The cross-lingual searches returned work on alignment, steering and transfer,
+but nothing that settles whether native-language or English instructions produce
+better *generation* in a low-resource target language. **So this is not settled
+by evidence; the definition stays in Bangla, and the reason is the weaker one
+that a Bangla instruction is less likely to induce translationese than an
+English one.** That is an inference, not a finding, and it is labelled as one.
+"Nothing recent exists" and "nothing recent was found" look identical in a
+bibliography, so: this was looked for and not found.
+
+**What the search did establish is about the output, and it changed the third
+block.**
+
+- **`2410.15956` — *Do Large Language Models Have an English Accent?*** reports
+  that multilingual LLMs carry English-centric bias into the *naturalness* of
+  their non-English output, lexically and syntactically. Our Writer must produce
+  text that passes as a real viewer comment; an "English accent" is a specific,
+  named failure mode for exactly that.
+- **`2503.04369` — *Lost in Literalism*** documents translationese as a trained-in
+  tendency, which is the same hazard from the training side.
+- **`2603.15949` — BANGLASOCIALBENCH** is the sharpest: *"fluency alone does not
+  guarantee socially appropriate language use"* in **high-context languages**,
+  evaluated on **Bangladeshi social interaction**. Our corpus is Bangladeshi
+  social-media film comments, so this is our setting rather than an analogy.
+- **`2512.13487`** notes informal Bangla is specifically under-resourced, and
+  **`2603.21359` / `2512.14179`** report LLM bias against Bengali regional
+  varieties.
+
+**Changes made:**
+
+1. **Register is anchored positively and concretely** — *"সাধারণ দর্শকের চলিত
+   বাংলা — যেভাবে ফেসবুক বা ইউটিউবের মন্তব্যে মানুষ লেখেন"* — replacing the
+   vaguer *"মুখের বাংলা"*. Naming চলিত and naming the venue targets the exact
+   axis the "English accent" and translationese work identifies. ⚠️ **The venue
+   naming rests on the collector's account, which STATUS records as
+   recall-based (medium confidence)** — no venue column exists. It is used here
+   as a register anchor, never as a provenance claim.
+2. **A swap test replaces abstract description.** Each level now ends with a
+   concrete operation: level 0 *"can be pasted under almost any film and nothing
+   changes"*; level 1 *"stops working under a different film"*. **A test a model
+   can apply beats a property it has to interpret**, and it states the construct
+   without naming length or sentiment.
+3. **Prose moved to চলিত throughout** — *ছবিটি → ছবিটা*, *লেখক → মন্তব্যটা* —
+   so the definition is written in the register it is asking for. A সাধু-flavoured
+   instruction asking for চলিত output is itself a small instruction–induction
+   conflict.
+
+🎁 **And a design strength worth stating rather than assuming: the register is
+mostly carried by the 10 retrieved exemplars, not by this text.** They are real
+comments from R1. Where §3c warns that pattern-completion may *fight* the
+instruction on length, here it *helps* — the exemplars demonstrate the register
+that `2410.15956` says a model will otherwise drift away from. Same mechanism,
+opposite sign, and both are now on the record.
 
 ## 3c. Pre-registered diagnostic — did the Writer learn specificity or length?
 
