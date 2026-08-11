@@ -42,7 +42,6 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.agents.critic import Critic  # noqa: E402
 from src.agents.prompts import render  # noqa: E402
 from src.agents.researcher import Researcher  # noqa: E402
 from src.agents.writer import Writer, completed_keys, generation_key  # noqa: E402
