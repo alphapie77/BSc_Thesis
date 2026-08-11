@@ -75,10 +75,20 @@ BACKOFF_BASE_SECONDS = 2.0
 #: generation is already on disk, stopping costs nothing but the current call.
 MAX_HONOURED_RETRY_AFTER = 120.0
 
-#: Free-tier tokens per minute, measured rather than assumed: the pilot's
-#: observed throughput matched 6,000 TPM and not the developer tier's 250,000.
-#: ref: results/s4_groq_preflight.json + the 2026-08-11 rate-limit deviation.
+#: Starting guess only. The real per-minute limit is READ FROM THE RESPONSE
+#: HEADERS (`x-ratelimit-limit-tokens`) and replaces this on the first call.
+#: Hard-coding it was wrong twice over: the observed header said 12,000, not
+#: the 6,000 assumed, so the pacer slept 59 s it did not need to -- and a
+#: provider is entitled to change the number without telling us.
 FREE_TIER_TPM = 6000
+
+#: Characters per token for our prompts. **MEASURED, not assumed**: 3,434
+#: prompt chars produced 3,710 prompt tokens across the pilot's first 27
+#: generations, i.e. **0.93 chars/token -- roughly one token per Bangla
+#: character**. The earlier value of 2.5 under-estimated spend by 2.7x, which
+#: is why the pacer could not keep the run inside the budget.
+#: ref: docs/protocol.md, 2026-08-11 tokenizer-fertility deviation.
+CHARS_PER_TOKEN = 0.93
 
 #: Spend at most this share of the budget, so a burst does not trip the limit
 #: on the boundary. Not tuned -- it is headroom, and the cost of being wrong in
@@ -233,7 +243,7 @@ class Writer:
         # ~2.5 chars per token is deliberately pessimistic for Bangla: the
         # tokenizer fertility is an unmeasured covariate of our own (SS1.2), so
         # the pacer over-estimates rather than under-estimates its spend.
-        estimated = len(prompt) // 2 + max_tokens
+        estimated = int(len(prompt) / CHARS_PER_TOKEN) + max_tokens
         slept = self._pace(estimated)
         if slept > 1.0:
             print(f"    pacing: slept {slept:.0f}s to stay under "
@@ -299,6 +309,12 @@ class Writer:
 
         data = resp.json()
         choice = data["choices"][0]
+        # Adopt the provider's own limit once it tells us. Reading beats
+        # guessing, and this is the number the pacer is trying to respect.
+        header_tpm = resp.headers.get("x-ratelimit-limit-tokens")
+        if header_tpm and header_tpm.isdigit():
+            self._tpm = int(header_tpm)
+
         usage = data.get("usage", {})
         self._spend.append((time.monotonic(), int(usage.get("total_tokens", estimated))))
 
