@@ -73,6 +73,14 @@ def main() -> int:
     ap.add_argument("--config", default="configs/s4_pilot.yaml")
     ap.add_argument("--dry-run", action="store_true",
                     help="Build every prompt and print the grid; make no API call.")
+    ap.add_argument("--model-path", action="append", default=[],
+                    metavar="ARM=PATH",
+                    help="Override WHERE an arm's weights load from (e.g. "
+                         "arm_a=/kaggle/input/gemma-3/transformers/gemma-3-12b-it/1). "
+                         "Load location only -- the model's identity, and every "
+                         "generation key, still comes from the config's model id. "
+                         "Needed because a Kaggle Models mount path only exists "
+                         "inside the session and cannot be committed to a config.")
     args = ap.parse_args()
 
     set_seed()
@@ -126,9 +134,34 @@ def main() -> int:
     import time as _time
     started = _time.monotonic()
     n_done = len(done)
+    # provider: "local" loads the model in-process (LocalWriter); anything else
+    # is the hosted-API Writer. Before 2026-08-12 this loop ignored the config's
+    # `provider:` field entirely and always constructed the API Writer -- so the
+    # re-registered local pilot would have silently run on Groq. Caught reading
+    # the code against the config before any run; logged as a deviation.
+    provider = cfg.get("provider", "groq")
+    model_paths = dict(cfg.get("model_paths") or {})
+    for spec in args.model_path:
+        role, _, path = spec.partition("=")
+        if not path:
+            raise SystemExit(f"--model-path expects ARM=PATH, got: {spec!r}")
+        if role not in models:
+            raise SystemExit(f"--model-path role {role!r} not in config models "
+                             f"{sorted(models)}")
+        model_paths[role] = path
     for role, model in models.items():
         for arm in arms:
-            writer = Writer(model, arm=arm, jsonl_path=out["generations_jsonl"])
+            if provider == "local":
+                from src.agents.local_writer import LocalWriter  # heavy import; deferred
+                writer = LocalWriter(
+                    model, arm=arm, jsonl_path=out["generations_jsonl"],
+                    batch_size=int(cfg["batch_size"]),
+                    quantization=cfg.get("quantization"),
+                    max_new_tokens=int(cfg["max_new_tokens"]),
+                    model_path=model_paths.get(role),
+                )
+            else:
+                writer = Writer(model, arm=arm, jsonl_path=out["generations_jsonl"])
             for p in plots:
                 for level in levels:
                     key = generation_key(p["plot_id"], level, 1, arm, model)

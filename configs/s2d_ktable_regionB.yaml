@@ -75,7 +75,7 @@ trap_check:
   # persona claim fails, per the mandatory trap-check in pipeline S2.4
   # ("If >0.6, either re-operationalize ... or present them as
   # sentiment-anchored engagement tiers").
-  not_sentiment_aligned_below: 0.20
+    not_sentiment_aligned_below: 0.20
     partial_overlap_range: [0.20, 0.60]
     persona_claim_fails_above: 0.60
 

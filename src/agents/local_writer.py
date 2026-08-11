@@ -66,6 +66,7 @@ class LocalWriter:
         dtype: str = "float16",
         quantization: str | None = None,
         max_new_tokens: int = 80,
+        model_path: str | None = None,
     ):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -84,7 +85,12 @@ class LocalWriter:
         self._dtype = getattr(torch, dtype)
         torch.manual_seed(SEED)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        # `model_path` separates WHERE the weights load from (a Kaggle Models
+        # mount, a local cache) from WHAT the model IS (`model_id`, which is the
+        # provenance and part of every generation key). The JSONL always records
+        # model_id; the load location is an environment fact and goes in _env.
+        load_src = model_path or model_id
+        self.tokenizer = AutoTokenizer.from_pretrained(load_src)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         # Left padding: with right padding a batched generate() continues from
@@ -105,12 +111,13 @@ class LocalWriter:
                 bnb_4bit_use_double_quant=True,
             )
             kw.pop("dtype")
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, **kw)
+        self.model = AutoModelForCausalLM.from_pretrained(load_src, **kw)
         self.model.eval()
 
         self._env = {
             "provider": "local",
             "model_id": model_id,
+            "model_path": model_path,
             "dtype": dtype,
             "quantization": quantization,
             "batch_size": batch_size,
