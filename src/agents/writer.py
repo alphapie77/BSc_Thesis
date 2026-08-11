@@ -66,7 +66,35 @@ PROVIDERS = {
         "models_url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
         "key_env": "GOOGLE_API_KEY",
     },
+    "mistral": {
+        "url": "https://api.mistral.ai/v1/chat/completions",
+        "models_url": "https://api.mistral.ai/v1/models",
+        "key_env": "MISTRAL_API_KEY",
+    },
+    "nvidia": {
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        "models_url": "https://integrate.api.nvidia.com/v1/models",
+        "key_env": "NVIDIA_API_KEY",
+    },
+    "cerebras": {
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "models_url": "https://api.cerebras.ai/v1/models",
+        "key_env": "CEREBRAS_API_KEY",
+    },
 }
+
+#: ⚠️ FREE-TIER LIMITS ARE NOT RECORDED HERE, ON PURPOSE.
+#:
+#: On 2026-08-11/12 three separate blog claims about free tiers failed against
+#: the vendor's own documentation: Groq's Llama models were reported deprecated
+#: and are Production; Cerebras was reported at "1M tokens/day free" and its
+#: pricing page says a $5 trial; Mistral was reported at "1B tokens/month" and
+#: its own docs say only "a free API tier with restrictive rate limits".
+#:
+#: **This corner of the ecosystem is documented by blogs, not by vendors.** So
+#: no number from a secondary source enters this file. `provider_preflight.py`
+#: reads the real limits from the account's own response headers, and those are
+#: what any plan is built on.
 
 #: Kept for the existing call sites; the provider table is the source of truth.
 COMPLETIONS_URL = PROVIDERS["groq"]["url"]
