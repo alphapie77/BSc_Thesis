@@ -824,3 +824,48 @@
              rule 7a to say that part (a) of the rule is under-evidenced but
              nearly free to keep, which is why the amendment keeps it.}
 }
+
+@article{mattei2026welltempered,
+  title   = {The Well-Tempered Classifier: Some Elementary Properties of
+             Temperature Scaling},
+  author  = {Mattei, Pierre-Alexandre and Loureiro, Bruno},
+  journal = {arXiv preprint arXiv:2602.14862},
+  year    = {2026},
+  note    = {Inria / ENS-PSL. Read in full 2026-08-11 via alphaXiv.
+             SETTLES OPEN DECISION 17. Because the inverse temperature beta>0,
+             "the coefficients of beta*z are ordered in the same way as those
+             of z", so temperature scaling is ACCURACY-PRESERVING -- it cannot
+             change the ordering, therefore cannot change which items fall
+             either side of ANY threshold. Their Theorem 5.1 / Corollary 1
+             strengthen this to a characterisation: temperature scaling is the
+             ONLY accuracy-preserving linear scaler, which is why matrix
+             scaling and Dirichlet calibration can move hard predictions and
+             it cannot. CONSEQUENCE FOR US: "calibrated or uncalibrated tau"
+             is not a choice about information -- every tau on the calibrated
+             scale maps to exactly one tau on the raw scale with an identical
+             PASS/FAIL partition. Confirmed on our own dev-82: 0 rank
+             inversions, 1 new tie, 2 items saturated to exactly 1.0.}
+}
+
+@article{kotte2026ucci,
+  title   = {UCCI: Calibrated Uncertainty for Cost-Optimal LLM Cascade
+             Routing},
+  author  = {Kotte, Varun},
+  journal = {arXiv preprint arXiv:2605.18796},
+  year    = {2026},
+  note    = {Read in full 2026-08-11 via alphaXiv. The applied counterpart to
+             mattei2026welltempered, and it argues FOR thresholding on the
+             calibrated scale: their Theorem 1 shows threshold policies on
+             calibrated error probability are cost-optimal under three stated
+             assumptions, and their headline is that "calibration, not
+             threshold tuning, is the part of the pipeline worth engineering"
+             (ECE 0.12 -> 0.03, cost -31% at fixed F1 on 75,000 queries).
+             TWO POINTS THAT BITE ON US. (1) They chose ISOTONIC regression
+             over temperature scaling because temperature is "constrained to a
+             single-parameter monotone rescaling, which is too rigid" --
+             ECE 0.03 vs 0.08 on their workload. Our T = 0.109 is a single
+             parameter fitted on 82 rows. (2) Their threshold is selected by
+             CONSTRAINED COST MINIMISATION against an explicit objective;
+             our pipeline SS4.5 names only a target pass rate of 60-70%, which
+             is a proxy, not an objective. Cited in SS4.5 and in Ch.5.}
+}
