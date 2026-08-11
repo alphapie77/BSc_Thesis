@@ -29,6 +29,23 @@ are trained and committed.
 different models** from the current plan and may not be merged with anything new.
 They are kept because they are what measured Llama's Bangla tokenizer fertility.
 
+## Standing instruction: maintain the pipeline
+
+`docs/research_pipeline_en.md` is the **sole normative pipeline** — the
+step-by-step process of this project — and **you must keep it current as we go.**
+
+This is not housekeeping. `CLAUDE.md` gives that file precedence on questions of
+method, so if it goes stale the document that wins arguments becomes the
+stalest one in the repo. It has already happened: it went **10 days and 55
+commits** without an update while remaining normative, and the failure is logged
+in `protocol.md`. A second pass on 2026-08-11 then found **four** places where
+text struck in one paragraph was still live as an instruction elsewhere in the
+same file.
+
+So: when a step completes or a decision changes, update the pipeline in the same
+commit — tick the checklist, strike superseded text in place rather than
+deleting it, and grep the whole file for any number you strike.
+
 ## The task
 
 **Run the pilot on Kaggle, then §4.5's τ sweep.**
