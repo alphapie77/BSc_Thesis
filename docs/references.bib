@@ -741,3 +741,25 @@
                canonical grid is 10-class and they note the calibration gap
                narrows at C=2, while our task is binary.}
 }
+
+@inproceedings{guo2017calibration,
+  title     = {On Calibration of Modern Neural Networks},
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q.},
+  booktitle = {Proceedings of the 34th International Conference on Machine
+               Learning (ICML)},
+  pages     = {1321--1330},
+  year      = {2017},
+  note      = {ADDED 2026-08-11. It was listed in related_work.md's method table
+               but had NO .bib entry -- an undefined citation that would have
+               surfaced only at compile time. Source of ECE (equal-width binned
+               reliability) and temperature scaling, both used in S3.4.
+               !! CITE FOR THE METHOD, NOT THE FINDING. Their headline result is
+               that modern networks are OVER-confident, corrected by T > 1.
+               Verifier-A here is the opposite: T = 0.10918 (< 1), i.e. UNDER-
+               confident, because L2 shrinkage at C=1.0 over 768-d normalised
+               LaBSE embeddings compresses logits while the decision is right
+               81/82. Verifier-B does match their direction (T = 1.09949) but
+               its improvement is not established (CI straddles zero).
+               Citing this paper without that distinction would misreport our
+               own result as an instance of theirs.}
+}

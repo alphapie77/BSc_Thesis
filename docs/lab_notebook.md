@@ -3418,3 +3418,160 @@ Two new, both added 2026-08-11 to `related_work.md` **Tier 9** and
   Ch.3 beside Verifier-B's learning-rate rule.
 - `zhang2026tabpfn` — Zhang et al. 2026, arXiv 2607.11007. Cited in Ch.3 beside
   the calibration stage, and in Ch.5 Limitations for the C=2 caveat.
+
+---
+
+## 2026-08-11 -- S3.3: Verifier A/B fitted on Kaggle: A reproduces S3.2b, calibration null fires for B
+**Feeds:** Ch.3 §3.3-3.4; Ch.4 §4.2 Critic
+**Commit:** `d8b1f5deeb54499e43775a985dd60e054898aa70`
+**Artifacts:** `results/s3c_verifier_a.json`, `results/s3d_verifier_b.json`, `results/s3c_verifier_a.md`, `results/s3d_verifier_b.md`
+
+### Numbers
+- `results/s3c_verifier_a.json`
+  - `role` = A
+  - `model` = frozen sentence-transformers/LaBSE + L2 logistic
+  - `n_train` = 804
+  - `train_class_counts` = {'0': 481, '1': 323}
+  - `n_dev` = 82
+  - `dev_class_counts` = {'0': 53, '1': 29}
+  - `dev_macro_f1` = 0.986555
+  - `dev_errors` = 1
+  - `one_dev_item_in_macro_f1` = 0.012195
+  - `s3b_reference_macro_f1` = 0.9866
+  - `reproduces_s3b` = True
+  - `artifact` = artifacts/verifier_a.joblib
+  - `hyperparameters_selected` = none -- C, penalty and max_iter are library defaults fixed in the config, per protocol.md S3.3 decision 1
+- `results/s3d_verifier_b.json`
+  - `role` = B
+  - `verdict` = COMPETENT_EVALUATOR
+  - `dry_run` = False
+  - `model` = csebuetnlp/banglabert
+  - `n_train` = 888
+  - `train_class_counts` = {'0': 531, '1': 357}
+  - `n_dev` = 82
+  - `dev_class_counts` = {'0': 53, '1': 29}
+  - `learning_rate` = 2e-05
+  - `hyperparameters_selected` = none — one lr, taken from pipeline §3.1
+  - `artifact_seed` = 42
+  - `artifact_selection_rule` = global_seed, pre-declared; NOT best-of-five
+  - `dev_macro_f1_artifact` = 0.959666
+  - `dev_macro_f1_mean_over_seeds` = 0.967442
+  - `dev_macro_f1_sd_over_seeds` = 0.015839
+  - `one_dev_item_in_macro_f1` = 0.012195
+  - `s3_banglabert_on_R1_for_context` = 0.9647
+  - `artifact` = artifacts/verifier_b.joblib
+- `results/s3c_verifier_a.md`
+  - (see file; 2017 bytes)
+- `results/s3d_verifier_b.md`
+  - (see file; 2095 bytes)
+
+**Calibration (§3.4), both verifiers, n = 82, 5 bins, temperature fitted in-sample:**
+
+| | Verifier-A (frozen LaBSE + L2 logistic) | Verifier-B (BanglaBERT, fine-tuned) |
+|---|---|---|
+| Temperature | **0.10918** (T < 1 -> sharpens) | **1.09949** (T > 1 -> softens) |
+| ECE before | **0.11836** | **0.01644** |
+| ECE after | 0.00537 | 0.00996 |
+| ΔECE | +0.11299 | +0.00649 |
+| ΔECE 95% CI | **[+0.07431, +0.13489]** | **[-0.00661, +0.00705]** |
+| Brier before -> after | 0.03056 -> 0.00934 | 0.02777 -> 0.02733 |
+| NLL before -> after | 0.15154 -> 0.02823 | (see file) |
+| Verdict | **CALIBRATION_IMPROVED** | **CALIBRATION_NOT_ESTABLISHED** |
+
+Verifier-A reliability bins, before: `[0.4,0.6)` n=5 conf 0.543 acc 0.800;
+`[0.6,0.8)` n=7 conf 0.721 acc 1.000; `[0.8,1.0)` n=70 conf 0.908 acc 1.000.
+After: `[0.6,0.8)` n=3 conf 0.750 acc 0.667; `[0.8,1.0)` n=79 conf 0.998 acc 1.000.
+
+Verifier-B per-seed macro-F1 (lr 2e-05): 42 -> 0.959666 (3 errors), 43 -> 0.972884 (2),
+44 -> 0.973325 (2), 45 -> 0.944781 (4), 46 -> 0.986555 (1).
+
+### Decisions made (and why)
+- **None -- mechanical execution of the S3.3 build committed in `d8b1f5d`.** Every
+  choice that governs this run (Verifier-A's C/penalty/max_iter as config-fixed
+  library defaults; Verifier-B's single lr from pipeline §3.1 with no tuning;
+  seed 42 pre-declared as the shipped artifact rather than best-of-five) was made
+  and justified in the preceding entry. Recorded here explicitly because a run
+  that decides nothing is a different object from a run whose decisions went
+  unwritten, and the two look identical in a diff.
+- The one thing worth naming as *held*, not decided: `artifact_selection_rule` =
+  `global_seed, pre-declared; NOT best-of-five`. Seed 46 reached 0.986555 -- equal
+  to Verifier-A -- and was not shipped. That is the rule costing us the better
+  number, which is the only circumstance under which the rule is evidence of
+  anything.
+
+### Findings (things we did not expect)
+- 🔴 **Verifier-A was badly miscalibrated: ECE 0.11836, the largest miscalibration
+  quantity in Phase 3.** The withdrawal of protocol.md's "natively calibrated"
+  clause one day earlier was therefore not a documentation tidy-up -- it removed a
+  claim that the very next run refuted by ~12 points. `zhang2026tabpfn` predicted
+  the direction of this from 22,820 episodes, and the search that surfaced it ran
+  *before* the code existed. Fourth entry in CLAUDE.md's search-first table, and
+  the first one where the search's payoff can be quantified.
+- 🔴 **The miscalibration is UNDER-confidence, not over-confidence.** T = 0.109
+  multiplies the logits by ~9.2. The bins say it plainly: 70 of 82 items sat at
+  mean confidence 0.908 while being 100% correct. Cause is not mysterious --
+  L2 shrinkage at C=1.0 over 768-d normalised embeddings compresses the logits,
+  while the underlying decision is right 81 times in 82. **This matters for how
+  Ch.3 is written:** `guo2017calibration`'s entire framing is that modern networks
+  are over-confident (T > 1). Ours is the opposite, and citing that paper for the
+  *method* while implying its *finding* would misreport it.
+- ✅ **The A/B asymmetry is the cleanest result in this step, and it runs in the
+  textbook direction.** Verifier-B -- fine-tuned -- had ECE 0.01644 and needed
+  T = 1.099, i.e. it was mildly *over*-confident in the classic sense and already
+  near-calibrated. The frozen probe was the badly-calibrated one. That is exactly
+  `zhang2026tabpfn`'s ranking of logistic heads against fine-tuned alternatives,
+  reproduced on our own data without being aimed at.
+- ✅ **The pre-committed calibration null fired, on B.** ΔECE CI
+  [-0.00661, +0.00705] straddles zero -> `CALIBRATION_NOT_ESTABLISHED`, and
+  Brier barely moved (0.02777 -> 0.02733), independently agreeing. This is the
+  outcome `test_calibration_reports_the_null_when_there_is_nothing_to_fix` was
+  written for after RQ1-F's Gate 2 had to be rewritten mid-protocol for having a
+  null that was nearly unreachable by construction. **This null was reachable and
+  it was reached.** A null that can fire and does is worth more than the positive
+  result beside it.
+- ⚠️ **The bootstrap CI does not propagate uncertainty in T.** It resamples the 82
+  dev items while holding T fixed at the value fitted on all 82. So
+  [+0.07431, +0.13489] is an interval on ΔECE *given this temperature*, not given
+  the procedure -- and +0.11299 is an **upper bound** on what a held-out T would
+  deliver. `calibration.py` already records that T is in-sample; this specific
+  consequence for the interval was not stated and must be, in Ch.3 and Ch.5.
+- ⚠️ **T = 0.10918 is a ~9x logit multiplier fitted on 82 rows containing one
+  error.** The NLL objective sharpens as far as the near-absence of errors lets
+  it. If the true error rate is even 3-4%, this temperature will be over-confident
+  out of sample. 82 rows cannot do better; the honest report is the number plus
+  this sentence, not the number alone.
+- ✅ Verifier-A reproduced S3.2b **exactly** (0.986555 vs 0.9866 reference,
+  `reproduces_s3b` = True), so the reproduction gate passes and the artifact is
+  the same object S3.2b measured.
+
+### Consequences for downstream steps
+- 🔴 **New open decision for §4.5: does the τ sweep run on calibrated or
+  uncalibrated Verifier-A scores?** This is no longer hypothetical -- the
+  post-scaling bins show **79 of 82 items at mean confidence 0.998**. Calibrated
+  Verifier-A output is very nearly binary, so a threshold sweep over it has almost
+  no resolution left to sweep. §3.4 was demoted to descriptive on 2026-08-08, but
+  the same amendment said τ "rests on this confidence", so the two halves now
+  pull in opposite directions. **Registered in STATUS as open; to be settled by a
+  literature search before Phase 4 begins, not in passing.**
+- **Phase 4's Critic (§4.2, `0.6xVerifierA + 0.4xsymbolic`) is unblocked.** Both
+  inputs now exist on disk: the symbolic half from 2026-08-11 and Verifier-A here.
+  The open decision above governs *which* Verifier-A score it consumes.
+- **Verifier-B's wall holds and is now load-bearing.** B scores S6 only and never
+  enters the loop (CLAUDE.md rule 6). Its calibration null is a property of the
+  scorer, so it must be reported in Ch.5 beside the Goodhart test rather than
+  folded into the Ch.3 calibration figure.
+- **Phase 3 remains Bangla-only.** This delivers the two Bangla verifiers; the
+  English pair (§3.1's A/B x bn/en) is still scheduled, not cut. Nothing here
+  changes that, and Phase 3 must not be described as "done".
+- **§3.3's dual-accuracy table remains not producible** (logged 2026-08-08).
+
+### Citations needed
+- `guo2017calibration` -- already in `references.bib`. **Its Ch.3 annotation needs
+  amending**: cite it for temperature scaling as a *method*, with an explicit note
+  that our observed direction (T < 1, under-confidence) is opposite to its
+  reported finding. Cited as-is it would misdescribe our own result.
+- `zhang2026tabpfn` -- already added 2026-08-11 (Tier 9). Its Ch.3 placement beside
+  the calibration stage is now supported by a measured number rather than an
+  anticipated one; update the annotation to say so.
+- ⚠️ **No new search was run for this entry** -- it executes an already-searched
+  design. The §4.5 τ decision above *does* require one and has not had it.

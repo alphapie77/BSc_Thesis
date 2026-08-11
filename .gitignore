@@ -47,3 +47,12 @@ data/plots/review.html
 data/annotation/*.csv
 data/annotation/intrusion/*.csv
 results/_dryrun/
+
+# --- Trained artifacts (S3.3) ---
+# The two small joblibs ARE committed: verifier_a.joblib is the in-loop
+# verifier itself (logistic coefficients, 15K) and losing it means the S3.2b
+# number cannot be re-checked against the object that produced it.
+# The BanglaBERT checkpoint dir is 424M and is NOT committed -- it is
+# reproducible from configs/s3d_verifier_b.yaml + seed 42, and a 424M blob in
+# a thesis repo is a mistake that cannot be undone by a later commit.
+artifacts/verifier_b/

@@ -288,7 +288,7 @@ ablation is right to separate them.
 | `krippendorff2019` | Krippendorff 2019 | Ordinal α; the 0.667/0.80 bands |
 | `artstein2008` | Artstein & Poesio 2008 | Agreement reporting practice |
 | `gwet2008ac1` + `vach2023ac1` | Gwet 2008; **Vach & Gerke 2023** | AC1 as the kappa-paradox guard — **and the 2023 critique showing AC1 is not a kappa substitute: it rises mechanically with prevalence skew, so it must never be quoted alone.** Used in the G-300 round-1 diagnosis |
-| `guo2017calibration` | Guo et al., ICML 2017 | ECE + temperature scaling |
+| `guo2017calibration` | Guo et al., ICML 2017 | ECE + temperature scaling. 🔴 **`.bib` entry was MISSING until 2026-08-11** — listed here, never defined, would have failed only at compile. ⚠️ **Cite for the METHOD, not the finding:** their result is over-confidence corrected by T > 1; measured Verifier-A is **under**-confident (T = 0.10918 < 1, ECE 0.11836 → 0.00537). Verifier-B matches their direction (T = 1.09949) but its ΔECE CI straddles zero |
 | `bhattacharjee2022banglabert` | Findings of NAACL 2022 | BanglaBERT backbone choice |
 | `gebru2021datasheets` | Gebru et al. 2021 | Dataset card |
 | `bender2018datastatement` | Bender & Friedman 2018 | Data statement + Bender Rule |
