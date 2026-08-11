@@ -65,6 +65,16 @@ SEED = 42
 MAX_TRANSPORT_RETRIES = 6
 BACKOFF_BASE_SECONDS = 2.0
 
+#: The longest `Retry-After` this will obey before giving up instead.
+#:
+#: Honouring the provider's own number is right for a per-minute limit and
+#: WRONG for a per-DAY one: an exhausted daily budget can return a Retry-After
+#: of an hour or more, and sleeping on it turns a run into a silent hang with no
+#: output and no way to tell it apart from a crash. That happened on
+#: 2026-08-11. Above this the run STOPS and says why -- and because every
+#: generation is already on disk, stopping costs nothing but the current call.
+MAX_HONOURED_RETRY_AFTER = 120.0
+
 #: Free-tier tokens per minute, measured rather than assumed: the pilot's
 #: observed throughput matched 6,000 TPM and not the developer tier's 250,000.
 #: ref: results/s4_groq_preflight.json + the 2026-08-11 rate-limit deviation.
@@ -224,7 +234,10 @@ class Writer:
         # tokenizer fertility is an unmeasured covariate of our own (SS1.2), so
         # the pacer over-estimates rather than under-estimates its spend.
         estimated = len(prompt) // 2 + max_tokens
-        self._pace(estimated)
+        slept = self._pace(estimated)
+        if slept > 1.0:
+            print(f"    pacing: slept {slept:.0f}s to stay under "
+                  f"{self._tpm} TPM", flush=True)
         body = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
@@ -251,13 +264,31 @@ class Writer:
                 # Honour the provider's own Retry-After when given; guessing a
                 # shorter wait just spends the next request on another 429.
                 wait = resp.headers.get("retry-after")
-                delay = (
+                asked = (
                     float(wait)
                     if wait and wait.replace(".", "", 1).isdigit()
-                    else BACKOFF_BASE_SECONDS * (2**retries)
+                    else None
                 )
+                if asked is not None and asked > MAX_HONOURED_RETRY_AFTER:
+                    limits = {h: resp.headers.get(h) for h in LIMIT_HEADERS
+                              if resp.headers.get(h)}
+                    raise RuntimeError(
+                        f"Groq asked for a {asked:.0f}s wait ({asked/60:.0f} min). "
+                        "That is a per-DAY budget, not a per-minute one -- a "
+                        "per-minute limit resets in under a minute.\n"
+                        f"  headers: {limits}\n"
+                        "  Every generation so far is already on disk; re-running "
+                        "the same command resumes from there.\n"
+                        "  Options: wait for the daily reset, or move to the Groq "
+                        "Developer plan (zero minimum spend, ~40x the limits)."
+                    )
+                delay = asked if asked is not None else BACKOFF_BASE_SECONDS * (2**retries)
                 # Jitter: a fixed schedule makes every worker retry in lockstep.
                 delay += random.uniform(0, 0.5)
+                # Say so. Silence during a long sleep is indistinguishable from
+                # a hang, which is exactly how this failure presented.
+                print(f"    [{resp.status_code}] waiting {delay:.0f}s "
+                      f"(retry {retries + 1}/{MAX_TRANSPORT_RETRIES})", flush=True)
                 time.sleep(delay)
                 retries += 1
                 continue
