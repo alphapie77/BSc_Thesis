@@ -65,6 +65,17 @@ SEED = 42
 MAX_TRANSPORT_RETRIES = 6
 BACKOFF_BASE_SECONDS = 2.0
 
+#: Free-tier tokens per minute, measured rather than assumed: the pilot's
+#: observed throughput matched 6,000 TPM and not the developer tier's 250,000.
+#: ref: results/s4_groq_preflight.json + the 2026-08-11 rate-limit deviation.
+FREE_TIER_TPM = 6000
+
+#: Spend at most this share of the budget, so a burst does not trip the limit
+#: on the boundary. Not tuned -- it is headroom, and the cost of being wrong in
+#: the generous direction is a 429 and an exponential backoff, which is strictly
+#: worse than waiting a few seconds.
+TPM_SAFETY_FRACTION = 0.85
+
 #: Rate-limit headers Groq returns on completions. Captured on every call
 #: because the account tier is still unknown and it changes the runtime plan by
 #: ~40x -- the /models endpoint does not report them (s4_groq_preflight).
@@ -153,11 +164,41 @@ def append_generation(gen: Generation, jsonl_path: str | Path) -> None:
 class Writer:
     """One generative call per invocation. No loop logic lives here."""
 
-    def __init__(self, model: str, *, arm: str = "bn", jsonl_path: str | Path):
+    def __init__(
+        self,
+        model: str,
+        *,
+        arm: str = "bn",
+        jsonl_path: str | Path,
+        tpm_budget: int | None = FREE_TIER_TPM,
+    ):
         self.model = model
         self.arm = arm
         self.jsonl_path = Path(jsonl_path)
         self._key = require("GROQ_API_KEY")
+        self._tpm = tpm_budget
+        # (timestamp, tokens) for the last minute. Pacing PROACTIVELY is much
+        # cheaper than reacting to 429s: the reactive path costs a wasted
+        # request plus an exponential backoff that quickly reaches 32 and 64
+        # seconds, so a run that trips the limit repeatedly spends most of its
+        # wall clock asleep having already been refused.
+        self._spend: list[tuple[float, int]] = []
+
+    def _pace(self, estimated_tokens: int) -> float:
+        """Sleep just long enough to stay inside the budget. Returns seconds."""
+        if not self._tpm:
+            return 0.0
+        budget = self._tpm * TPM_SAFETY_FRACTION
+        now = time.monotonic()
+        self._spend = [(t, n) for t, n in self._spend if now - t < 60.0]
+        used = sum(n for _, n in self._spend)
+        if used + estimated_tokens <= budget or not self._spend:
+            return 0.0
+        # Wait until the oldest entry falls out of the window.
+        wait = 60.0 - (now - self._spend[0][0]) + 0.25
+        if wait > 0:
+            time.sleep(wait)
+        return max(wait, 0.0)
 
     def generate(
         self,
@@ -166,11 +207,24 @@ class Writer:
         plot_id: str,
         target_level: int,
         attempt: int = 1,
-        max_tokens: int = 512,
+        max_tokens: int = 200,
     ) -> Generation:
+        """`max_tokens` is 200, not 512.
+
+        A viewer comment is tens of tokens; the corpus median is 8 WORDS. 512
+        was generous for no reason, and on a token-metered free tier generosity
+        is paid for in wall clock. It is still several times the longest thing
+        the corpus contains, so it cannot truncate a plausible generation --
+        `finish_reason` is recorded per generation and would show it if it did.
+        """
         import requests
 
         key = generation_key(plot_id, target_level, attempt, self.arm, self.model)
+        # ~2.5 chars per token is deliberately pessimistic for Bangla: the
+        # tokenizer fertility is an unmeasured covariate of our own (SS1.2), so
+        # the pacer over-estimates rather than under-estimates its spend.
+        estimated = len(prompt) // 2 + max_tokens
+        self._pace(estimated)
         body = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
@@ -214,6 +268,9 @@ class Writer:
 
         data = resp.json()
         choice = data["choices"][0]
+        usage = data.get("usage", {})
+        self._spend.append((time.monotonic(), int(usage.get("total_tokens", estimated))))
+
         gen = Generation(
             key=key,
             plot_id=plot_id,
@@ -227,7 +284,7 @@ class Writer:
             top_p=TOP_P,
             seed=SEED,
             finish_reason=choice.get("finish_reason"),
-            usage=data.get("usage", {}),
+            usage=usage,
             response_id=data.get("id"),
             system_fingerprint=data.get("system_fingerprint"),
             rate_limits={h: resp.headers.get(h) for h in LIMIT_HEADERS if resp.headers.get(h)},

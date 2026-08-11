@@ -123,6 +123,9 @@ def main() -> int:
         print(f"resuming: {len(done)} generations already on disk")
 
     records: list[dict] = []
+    import time as _time
+    started = _time.monotonic()
+    n_done = len(done)
     for role, model in models.items():
         for arm in arms:
             writer = Writer(model, arm=arm, jsonl_path=out["generations_jsonl"])
@@ -139,8 +142,19 @@ def main() -> int:
                     records.append({"role": role, "model": model, "arm": arm,
                                     "key": gen.key, "text": gen.text,
                                     "rate_limits": gen.rate_limits})
-                    print(f"  {role:6s} {arm} {p['plot_id']} L{level}  "
-                          f"{gen.text[:44]!r}")
+                    n_done += 1
+                    # Progress with an ETA, because "is it stuck or slow?" was a
+                    # real question during the first run and the output gave no
+                    # way to tell. At free-tier pacing this is minutes of
+                    # silence between lines.
+                    elapsed = _time.monotonic() - started
+                    rate = (n_done - len(done)) / max(elapsed, 1e-9)
+                    remaining = (total - n_done) / rate if rate > 0 else 0
+                    tok = gen.usage.get("total_tokens", "?")
+                    print(f"  [{n_done:2d}/{total}] {role:6s} {arm} "
+                          f"{p['plot_id']} L{level}  {tok} tok  "
+                          f"eta {remaining/60:4.1f}m  {gen.text[:40]!r}",
+                          flush=True)
 
     # Re-read the whole archive so a resumed run scores everything, not only
     # what this invocation produced.
