@@ -89,16 +89,56 @@ def main() -> None:
         for row in csv.DictReader(fh):
             committed[row["review_id"]] = row
 
+    import warnings
+
     import joblib
+    import sklearn
     from sentence_transformers import SentenceTransformer
 
-    clf = joblib.load(out["artifact"])
-    encoder = SentenceTransformer(cfg["model"]["labse_model"])
+    # Capture rather than let scroll past. sklearn's InconsistentVersionWarning
+    # is the single most informative line this script can print: it is the
+    # pickling library itself saying the artifact was written by a different
+    # version, with "may lead to ... invalid results" in its own words. A
+    # warning that flies past above a progress bar is not a disclosure.
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        art = joblib.load(out["artifact"])
+    version_warnings = [
+        str(w.message) for w in caught if "Version" in type(w.message).__name__
+    ]
+
+    if not isinstance(art, dict) or "head" not in art:
+        raise SystemExit(
+            f"artifact {out['artifact']} is not the expected dict "
+            f"(keys: {sorted(art) if isinstance(art, dict) else type(art)}). "
+            "train_verifier_a.py dumps {'role','encoder','head',...}."
+        )
+
+    clf = art["head"]
+
+    # Use the ARTIFACT's own recorded encoder and normalisation, not the
+    # config's. The question is whether this checkpoint reproduces itself, and
+    # a config edited since the fit would silently change what is being tested.
+    encoder = SentenceTransformer(art["encoder"])
     vecs = encoder.encode(
-        list(dev.texts), batch_size=64, show_progress_bar=False,
-        normalize_embeddings=True,
+        list(dev.texts),
+        batch_size=64,
+        show_progress_bar=False,
+        normalize_embeddings=bool(art.get("normalize_embeddings", True)),
     )
     here = [int(p) for p in clf.predict(vecs)]
+
+    # Free wall check while we are here: the artifact records the ids it was
+    # fitted on, so the "dev was held out" claim can be verified against the
+    # checkpoint itself rather than against the script that wrote it.
+    trained_ids = set(art.get("trained_on", {}).get("ids", []))
+    overlap = trained_ids & set(dev.review_ids)
+    if overlap:
+        raise SystemExit(
+            f"REFUSED: {len(overlap)} dev ids appear in Verifier-A's recorded "
+            "training ids. The 0.9866 is then measured on training data and "
+            "nothing downstream is interpretable. Stop."
+        )
 
     y_true = list(dev.labels)
     f1_here = macro_f1(y_true, here)
@@ -112,6 +152,16 @@ def main() -> None:
         if int(committed[rid]["y_pred"]) != p
     ]
 
+    print(f"\nartifact                    : {out['artifact']}")
+    print(f"encoder (from artifact)     : {art['encoder']}")
+    print(f"dev ids in training set     : {len(overlap)}  (must be 0)")
+    print(f"sklearn here                : {sklearn.__version__}")
+    if version_warnings:
+        print("PICKLE VERSION MISMATCH     : " + version_warnings[0].split("\n")[0])
+        print("  ^ sklearn's own words. This is the environment risk, stated by")
+        print("    the library rather than inferred by us.")
+    else:
+        print("pickle version mismatch     : none reported")
     print(f"\ndev rows compared           : {len(dev)}")
     print(f"macro-F1 recorded on Kaggle : {f1_committed:.4f}")
     print(f"macro-F1 recomputed here    : {f1_here:.4f}")
@@ -128,6 +178,17 @@ def main() -> None:
             "artifact locally, and the appendix can say so as a measurement\n"
             "rather than an assumption."
         )
+        if version_warnings:
+            print(
+                "\n⚠️  BUT the pickle version mismatch above still gets reported.\n"
+                "    Identical predictions on 82 items do not prove the estimator\n"
+                "    is unaffected — they prove no item crossed the boundary on\n"
+                "    THIS slice. sklearn's warning is about the object, not the\n"
+                "    sample, and n = 82 is a weak instrument for the difference.\n"
+                "    Fix available and cheap: pin sklearn to the fitting version\n"
+                "    (1.6.1) locally, which removes the question instead of\n"
+                "    bounding it."
+            )
     else:
         print(
             f"\nVERDICT: HOST_DEPENDENT — {len(flips)} prediction(s) changed with\n"
