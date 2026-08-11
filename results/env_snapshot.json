@@ -1,10 +1,15 @@
 {
   "_provenance": {
-    "timestamp_utc": "2026-07-27T13:47:55.455704+00:00",
-    "git_commit": "unknown",
+    "timestamp_utc": "2026-08-11T13:25:21.841176+00:00",
+    "git_commit": "14d3170dd989d37ad04b212a21866f40c90f0a9b-dirty",
+    "untracked_files": 3,
     "config": null,
     "python": "3.13.3",
-    "platform": "Windows-11-10.0.26200-SP0"
+    "platform": "Windows-11-10.0.26200-SP0",
+    "accelerator": {
+      "torch": "2.13.0+cpu",
+      "cuda_available": false
+    }
   },
   "key_versions": {
     "chromadb": "1.5.9",

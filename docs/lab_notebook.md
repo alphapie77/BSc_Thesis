@@ -3705,9 +3705,19 @@ after the build runs in an environment that has `chromadb` and
 
 
 ### Numbers
-- Dry-run only. **The index has NOT been built** — `chromadb` and
-  `sentence-transformers` are absent from this session's sandbox, so no vector
-  was written and `results/s4_index_manifest.*` do not exist.
+- ✅ **RUN 2026-08-11 on Sabbir's host** (Windows-11, Python 3.13.3), commit
+  `14d3170`. `results/s4_index_manifest.{json,md}` exist.
+- **886 rows indexed**, partition **R1**, axis levels **534 / 352**, encoder
+  `sentence-transformers/LaBSE`, cosine, collection `r1_regionA_k2`.
+- **`r2_ids_present` = 0, `gold_ids_present` = 0.**
+- Row-set digest (SHA-256 over sorted ids):
+  `85fc2d7d7ad3281b9dd99a7a0a01f8221a5e7ab762d1c69a0924bbc4468b45bb`
+  — **byte-identical to the pre-run dry-run's digest**, so the build indexed
+  exactly the rows the contract check had already cleared. That equality is the
+  point of computing the digest in both places.
+- ⬛ superseded: ~~Dry-run only. **The index has NOT been built** — `chromadb`
+  and `sentence-transformers` are absent from this session's sandbox.~~ True
+  when written; the build ran within the hour.
 - What the dry-run resolves, which is the part that matters for the wall:
   **886 R1 region-A rows**, axis levels **534 / 352**, row-set digest
   `85fc2d7d7ad3281b...`, **0 R2 ids, 0 Gold-300 ids**.
@@ -3771,8 +3781,53 @@ after the build runs in an environment that has `chromadb` and
   then told a fresh session Phase 4 was blocked — **the correction earlier today
   is the reason this entry is explicit about which half is true.**
 
+### 🔴 Post-run addendum — two provenance problems the lock file exposed
+
+Neither is the index's fault; both surfaced because `env_snapshot.py` printed
+the local versions, and both bind on the **Critic**, not on this step.
+
+1. **`results/env_snapshot_s3d_kaggle.json` does not exist.** STATUS's own
+   next-action item called it *mandatory (fact (env))*. Both verifiers were
+   trained on Kaggle and **no environment snapshot was captured for that run** —
+   `results/s3c_verifier_a.json` records only `Linux-6.12.90+`, Python 3.12.13.
+   Fact (env) obliges us to state which environment produced which result; for
+   S3.3 we currently cannot. **Not recoverable without re-running**, and the
+   artifacts are committed, so what is available is the disclosure.
+2. **The loop will run in a materially different environment from the one its
+   in-loop judge was measured in.** Here: Windows-11, Python 3.13.3,
+   **transformers 5.14.1**, sentence-transformers 5.6.1, sklearn 1.9.0, numpy
+   2.4.6. There: Linux, Python 3.12.13 — and S3.2 was *deliberately* pinned to
+   **transformers < 5** after 5.x broke an arm. **Coakley et al. put
+   environment-only variation above 6 pp; Verifier-A's reproduction gate is
+   0.6 pp.** An order of magnitude apart.
+   ⚠️ Noted while checking: `requirements.lock.txt` has recorded transformers
+   **5.14.1 since 2026-07-30** and is unchanged by today's install — so the
+   committed lock has never described the environment that produced the S3
+   numbers. Consistent with fact (env)'s two-environment disclosure, but worth
+   saying plainly rather than leaving implied.
+
+**`src/agents/preflight.py` answers (2) by measurement rather than argument**,
+and is **read-only by construction**: it loads the committed artifact and the
+committed per-item predictions and diffs them against predictions recomputed
+here. It never refits and never writes to `artifacts/` or `results/s3c_*`.
+🔑 **That restraint is the whole design** — re-running `train_verifier_a.py`
+locally would overwrite the Kaggle artifacts with locally-fitted ones and then
+agree with itself, **which would look exactly like success**. Verdict is
+pre-committed and two-outcome (`HOST_INVARIANT` / `HOST_DEPENDENT`), reported in
+**items** (1 item = 0.0122 macro-F1). `HOST_DEPENDENT` is not automatically a
+defect, but it makes the loop's scores attributable to this host rather than to
+`s3c_verifier_a.json`, and the two may not be averaged.
+
+⚠️ **`data/rag/` is gitignored.** The 4.7 MB Chroma SQLite is a build artifact
+fully regenerable from `data/cleaned` + the frozen split + the config. What is
+committed is the **manifest and its digest** — strictly better evidence than the
+blob, because a digest is readable and a binary is not.
+
 ### Citations needed
 - None new. This step implements already-registered contracts (inviolable rules
   4, 5, 6; pipeline §4.2; `protocol.md` §S4). **No search was run for it, and
   none was needed** — recorded rather than omitted, since a silent absence and a
   considered one look identical.
+- `coakley2022environment` — already cited for S3.2's environment argument; the
+  addendum above is its second load-bearing use, now about the *inference* host
+  rather than the training host. Its `related_work.md` annotation should say so.

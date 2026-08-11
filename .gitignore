@@ -7,6 +7,18 @@ data/raw/*
 data/cleaned/*
 !data/cleaned/.gitkeep
 
+# --- The RAG index (S4.1) is a build artifact, not a record ---
+# 4.7 MB of Chroma SQLite, fully regenerable from data/cleaned + the frozen
+# split + configs/s4_index.yaml. Committing it would put a binary blob in the
+# history that no reviewer can read and no diff can check.
+#
+# What IS committed is the evidence about it: results/s4_index_manifest.json
+# carries the row count, the axis-level counts, and a SHA-256 digest over the
+# sorted review_ids. A rebuild claiming to be identical is checked against that
+# digest rather than believed -- which is strictly better than storing the blob,
+# because the digest is human-readable and the blob is not.
+data/rag/
+
 # !!! EXCEPTION: plot synopses ARE committed. They are hand-collected primary
 # data -- no script can regenerate them, and re-collecting means re-reading the
 # sources by hand. They are also the only held-out element of the evaluation, so

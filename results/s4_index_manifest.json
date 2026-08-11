@@ -1,0 +1,25 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-11T13:24:07.082550+00:00",
+    "git_commit": "14d3170dd989d37ad04b212a21866f40c90f0a9b",
+    "untracked_files": 1,
+    "config": "configs/s4_index.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "n_indexed": 886,
+    "partition": "R1",
+    "axis_level_counts": {
+      "0": 534,
+      "1": 352
+    },
+    "encoder": "sentence-transformers/LaBSE",
+    "metric": "cosine",
+    "collection": "r1_regionA_k2",
+    "persist_dir": "data\\rag\\r1_index",
+    "id_digest_sha256": "85fc2d7d7ad3281b9dd99a7a0a01f8221a5e7ab762d1c69a0924bbc4468b45bb",
+    "r2_ids_present": 0,
+    "gold_ids_present": 0
+  }
+}
