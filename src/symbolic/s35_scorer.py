@@ -100,6 +100,20 @@ def main() -> None:
                 f"containing 'pilot'. Got pilot={pilot}, out={out_json!r}. "
                 "TF-IDF-family features may never enter a result file."
             )
+        # The artifact is the newer hole in the same wall. A result file is
+        # read by a human; an artifact is loaded by the Critic and its contents
+        # never appear anywhere. So an IDF-enabled scorer reaching the default
+        # artifact path would put rule-7 features into every generation's score
+        # with nothing on screen to show it. Same guard, applied to the path
+        # that is harder to notice.
+        out_art = str(cfg["outputs"].get("artifact", ""))
+        if out_art and "pilot" not in Path(out_art).name.lower():
+            raise SystemExit(
+                "RULE 7: an F1/IDF-enabled scorer may not be written to a "
+                f"non-pilot artifact path. Got artifact={out_art!r}. The Critic "
+                "loads artifacts silently; this is the path where a violation "
+                "would leave no visible trace."
+            )
 
     train, dev = load_training_rows(
         "A",
@@ -161,6 +175,51 @@ def main() -> None:
     }
 
     write_result(result, cfg["outputs"]["results_json"], args.config)
+
+    # ---- persist the fitted scorer -----------------------------------------
+    # Added 2026-08-11, and the reason is worth recording rather than treating
+    # as an oversight: this script fitted a model, reported its numbers, and
+    # then DISCARDED it. `results/s35_symbolic.json` carries the 11
+    # coefficients -- but the estimator is a StandardScaler + LogisticRegression
+    # pipeline, so without the scaler's mean/scale and the intercept the fitted
+    # scorer is NOT reconstructable from anything committed.
+    #
+    # SS4.2's Critic is `w x VerifierA + (1-w) x symbolic`. Verifier-A had an
+    # artifact; symbolic did not. The Critic was therefore unbuildable, and
+    # nothing said so -- the S3.5 row in STATUS reads "BUILT + FITTED".
+    # Found by inventory before writing the Critic, which is the only reason it
+    # was not found by the Critic failing to load something.
+    if cfg["outputs"].get("artifact"):
+        import joblib
+
+        art_path = Path(cfg["outputs"]["artifact"])
+        art_path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(
+            {
+                "kind": "symbolic_scorer",
+                "pipeline": model,
+                "feature_names": names,
+                # The Critic must rebuild features in EXACTLY this order and
+                # with exactly this spec. Storing the names beside the pipeline
+                # means a mismatch raises instead of silently scoring a
+                # permuted vector, which would look like a working Critic.
+                "enable_f1": spec.enable_f1,
+                "idf": idf,
+                "fitted_on": {
+                    "slice": "dev",
+                    "n": len(dev),
+                    "ids": list(dev.review_ids),
+                },
+                "cv_macro_f1_mean": cv_mean,
+                "note": (
+                    "Symbolic half of the SS4.2 Critic. If enable_f1 is True this "
+                    "is a RULE 7 PILOT artifact and must never enter the loop -- "
+                    "the Critic is required to refuse it."
+                ),
+            },
+            art_path,
+        )
+        print(f"artifact -> {art_path}")
 
     banner = []
     if pilot:

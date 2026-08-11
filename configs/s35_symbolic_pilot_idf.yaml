@@ -28,3 +28,8 @@ fit:
 outputs:
   results_json: results/pilot_s35_idf.json
   results_md: results/pilot_s35_idf.md
+  # The fitted scorer itself. Added 2026-08-11: this script used to
+  # report its numbers and discard the model, and the SS4.2 Critic needs the
+  # OBJECT -- the 11 coefficients in the JSON cannot reconstruct a
+  # StandardScaler+LogisticRegression pipeline (no intercept, no scaler stats).
+  artifact: artifacts/pilot_symbolic_scorer_idf.joblib

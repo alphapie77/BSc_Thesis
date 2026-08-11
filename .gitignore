@@ -68,3 +68,11 @@ results/_dryrun/
 # reproducible from configs/s3d_verifier_b.yaml + seed 42, and a 424M blob in
 # a thesis repo is a mistake that cannot be undone by a later commit.
 artifacts/verifier_b/
+
+# --- Rule-7 PILOT artifacts are NOT committed, on purpose ---
+# The IDF-enabled symbolic scorer is a pilot object: rule 7 permits it as an
+# explicitly-labelled cheap proxy and NEVER in a result. A committed pilot
+# artifact is a file a future session can load by path without ever seeing the
+# banner that explains what it is -- so it does not travel with the repo.
+# Regenerable from configs/s35_symbolic_pilot_idf.yaml in one command.
+artifacts/pilot_*
