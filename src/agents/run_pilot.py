@@ -162,7 +162,8 @@ def main() -> int:
             pending = [
                 (arm, p, level)
                 for arm in arms for p in plots for level in levels
-                if generation_key(p["plot_id"], level, 1, arm, model) not in done
+                if generation_key(p["plot_id"], level, 1, arm, model,
+                                          provider=provider) not in done
             ]
             if not pending:
                 print(f"{role}: all generations on disk; model not loaded")
@@ -183,7 +184,8 @@ def main() -> int:
                 writer = Writer(model, arm=arm, jsonl_path=out["generations_jsonl"])
             for p in plots:
                 for level in levels:
-                    key = generation_key(p["plot_id"], level, 1, arm, model)
+                    key = generation_key(p["plot_id"], level, 1, arm, model,
+                                          provider=provider)
                     if key in done:
                         continue
                     r = researcher.retrieve(p["synopsis"], level)
