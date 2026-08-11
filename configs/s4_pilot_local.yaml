@@ -1,0 +1,80 @@
+# S4 -- the 20-generation generator pilot.
+# Pre-registered in docs/protocol.md section "S4 pre-commitment", decision 3,
+# BEFORE any generation existed. Read that section before reading any output.
+#
+# ⛔ NOT A RESULT. Nothing produced by this config may be quoted in the thesis,
+# a paper, or a results table. It selects a generator; it measures nothing.
+
+step: S4.pilot.local
+seed: 42
+
+provider: local   # ref: docs/protocol.md 2026-08-12 -- generation moves off the
+                  # hosted API onto our own GPU. Not a cost measure that happens
+                  # to help: 2601.17768 traces API non-determinism to dynamic
+                  # batching over other tenants' traffic, which we cannot control
+                  # or record. Locally we choose the batch and set the seed.
+
+# Part of the PROVENANCE, not a tuning knob: batch size fixes the order of
+# floating-point reductions. Must not vary within a comparison.
+batch_size: 8
+
+# --- the arms -------------------------------------------------------------
+# Re-registered 2026-08-12. Verified from each model's own config.json, not from
+# the paper and not from memory: BOTH are Gemma3ForCausalLM, hidden_size 1152,
+# 26 layers, vocab 262144 -- identical architecture and size. arm_b is arm_a with
+# Bangla adaptation, so the comparison has ONE variable, where "Llama vs GPT-OSS"
+# differed in architecture, size and training data at once and could not have
+# attributed any difference it found.
+#
+# The contrast also sits on the thesis's own question -- is external verification
+# needed in a low-resource language, or does a language-adapted model suffice? --
+# rather than being a model beauty contest.
+#
+# ⚠️ arXiv 2503.10995 states TigerLLM-1B is built on LLaMA-3.2. The uploaded
+# weights are Gemma-3. The paper's benchmark table therefore does not describe
+# these weights, and NO claim here rests on it. Logged as a deviation.
+# ⚠️ google/gemma-3-1b-it is gated: accept the licence once on HF (free).
+models:
+  arm_a: google/gemma-3-1b-it
+  arm_b: md-nishat-008/TigerLLM-1B-it
+
+# Prompt language is a pilot FACTOR, not a decision.
+# ref: docs/axis_definition.md section 3e. Sabbir's hypothesis (English may be
+# understood better) is supported by 2502.15603 / 2402.10588 and complicated by
+# 2606.08994 (language confusion) and 2606.19668 (mixing degrades). Measured,
+# not assumed.
+prompt_arms: [bn, en]
+
+# --- the sample -----------------------------------------------------------
+# 20 generations = 10 dev-plots x 2 axis levels, per SS4.4's budget.
+# The plots are the FIRST TEN dev plots in the frozen split order -- chosen by
+# order rather than by inspection, so no plot is picked for looking suitable.
+sample:
+  split: dev
+  n_plots: 10
+  levels: [0, 1]
+
+# --- what is measured, and what is not ------------------------------------
+# The criterion is a FAILURE RATE, not a quality score, and that is what makes
+# it decidable at n=20. A quality difference would need hundreds of generations
+# -- the same power problem that makes TIE the registered default for the model
+# comparison. ref: docs/axis_definition.md section 3e.
+#
+# LANG_CONFUSION fires if an arm emits output that is not Bangla, or is
+# Bangla-English code-mixed beyond the corpus's own baseline. That baseline is
+# effectively zero: has_latin is 0.09% / 0.00% in region A (results/
+# s2e_regionA_k2_profile.md), so any Latin script in a generation is signal.
+criterion:
+  latin_char_baseline_pct: 0.09   # ref: results/s2e_regionA_k2_profile.md
+  # Pre-committed tie-break, a DECLARED NON-PERFORMANCE RULE exactly as S3.2's
+  # was: on TIE, take the model with the lower cost and higher rate limit, and
+  # state in the thesis that the data did not choose.
+  # ref: docs/protocol.md section S4 decision 3.
+  tie_break: [lower_cost, higher_rate_limit]
+
+outputs:
+  # Separate files from the Groq run. Archives from two backends may never be
+  # merged: provider is part of the generation key for the same reason.
+  generations_jsonl: results/pilot_s4_local_generations.jsonl
+  report_md: results/pilot_s4_local_model_choice.md
+  report_json: results/pilot_s4_local_model_choice.json
