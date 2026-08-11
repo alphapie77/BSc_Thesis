@@ -128,6 +128,27 @@ def main() -> None:
     )
     here = [int(p) for p in clf.predict(vecs)]
 
+    # 🔑 The load-bearing comparison, and NOT the hard predictions above.
+    #
+    # The Critic never calls .predict(). It calls predict_proba, mixes the
+    # result with the symbolic score, and compares the mixture to tau -- and
+    # tau is swept at QUANTILES of the observed score distribution (decision
+    # 17). So the object that has to be host-invariant is the SCORE, not the
+    # argmax. Two runs can agree on all 82 labels while their probabilities
+    # differ enough to reshuffle the quantiles every threshold is placed at.
+    #
+    # Comparing only labels was this script's first version, and it would have
+    # returned HOST_INVARIANT while leaving the question that matters unasked.
+    p_here = [float(p) for p in clf.predict_proba(vecs)[:, 1]]
+    p_committed = [float(committed[i]["p_cluster1"]) for i in dev.review_ids]
+    deltas = [abs(a - b) for a, b in zip(p_here, p_committed)]
+    max_delta = max(deltas)
+    # The committed CSV stores 6 decimals, so agreement can never be measured
+    # finer than 5e-7. A delta at or below that is "identical as far as the
+    # recorded file can say", which is a weaker claim than "identical" and is
+    # reported as the weaker one.
+    CSV_RESOLUTION = 5e-7
+
     # Free wall check while we are here: the artifact records the ids it was
     # fitted on, so the "dev was held out" claim can be verified against the
     # checkpoint itself rather than against the script that wrote it.
@@ -170,25 +191,39 @@ def main() -> None:
     print(f"gap                         : {gap_items:.2f} dev items")
     print(f"per-item prediction flips   : {len(flips)}"
           + (f"  {flips}" if flips else ""))
+    print(f"max |Δ p_cluster1|          : {max_delta:.3e}"
+          f"   (CSV resolution {CSV_RESOLUTION:.0e})")
+    print("  ^ THIS is the number that matters. The Critic thresholds on the\n"
+          "    probability, and τ is swept at quantiles of the score\n"
+          "    distribution — labels agreeing does not mean scores do.")
 
-    if not flips:
+    if not flips and max_delta <= CSV_RESOLUTION:
         print(
-            "\nVERDICT: HOST_INVARIANT — every one of the 82 predictions is\n"
-            "identical to the committed Kaggle run. The Critic may use this\n"
-            "artifact locally, and the appendix can say so as a measurement\n"
-            "rather than an assumption."
+            "\nVERDICT: HOST_INVARIANT — all 82 labels AND all 82 probabilities\n"
+            "match the committed Kaggle run to the resolution the recorded file\n"
+            "can express. The Critic may use this artifact locally, and the\n"
+            "appendix states host-invariance as a measurement, not an assumption."
         )
         if version_warnings:
             print(
-                "\n⚠️  BUT the pickle version mismatch above still gets reported.\n"
-                "    Identical predictions on 82 items do not prove the estimator\n"
-                "    is unaffected — they prove no item crossed the boundary on\n"
-                "    THIS slice. sklearn's warning is about the object, not the\n"
-                "    sample, and n = 82 is a weak instrument for the difference.\n"
-                "    Fix available and cheap: pin sklearn to the fitting version\n"
-                "    (1.6.1) locally, which removes the question instead of\n"
-                "    bounding it."
+                "\n⚠️  The pickle version mismatch is still reported in the paper.\n"
+                "    Agreement on 82 items does not prove the estimator is\n"
+                "    unaffected — it proves no disagreement is visible on THIS\n"
+                "    slice at THIS precision. sklearn's warning is about the\n"
+                "    object; n = 82 is a weak instrument for the difference.\n"
+                "    What the evidence supports is the narrow claim, and only it."
             )
+    elif not flips:
+        print(
+            f"\nVERDICT: LABELS_MATCH_SCORES_DRIFT — all 82 labels agree, but\n"
+            f"probabilities differ by up to {max_delta:.3e}, above the "
+            f"{CSV_RESOLUTION:.0e} the CSV can resolve.\n"
+            "🔴 This is the case the label-only check would have called clean.\n"
+            "τ is swept at QUANTILES of the score distribution, so drifting\n"
+            "scores move every threshold even when no label moves.\n"
+            "Pin sklearn to the fitting version (1.6.1) and re-run before the\n"
+            "Critic is built — this removes the question rather than bounding it."
+        )
     else:
         print(
             f"\nVERDICT: HOST_DEPENDENT — {len(flips)} prediction(s) changed with\n"
