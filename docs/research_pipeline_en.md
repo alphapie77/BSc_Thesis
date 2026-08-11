@@ -9,6 +9,36 @@
 
 ---
 
+> ## 🔧 MAINTENANCE STATE — corrected 2026-08-11
+>
+> **This file had not been touched since 2026-08-01 — 55 commits.** Sabbir asked
+> why the pipeline was not being maintained, and the answer is that it was not:
+> progress was being written to `docs/STATUS.md` only, on the assumption that one
+> "where are we" file was enough. It is not. **STATUS says where we are; this file
+> says what we are supposed to do, and CLAUDE.md gives *this* file precedence on
+> method.** A normative document that is the stalest document in the repo cannot
+> perform that job, and anyone opening it cold — a supervisor, a reviewer, a
+> future reader — would have seen a plan that died a week earlier.
+>
+> **Fixed in this pass:** the execution checklist below (8 steps were complete and
+> unticked), the §5.1 generation count, and the persona-count arithmetic in the S6
+> contract and §4.5.
+>
+> **Deliberately NOT fixed, because it is not Claude's to fix:** every occurrence
+> of *persona* / *three personas* as **framing language** (§2.3 heading, §8.1,
+> §8.2, the Ch.1 blueprint). That is **open decision 12 — Sabbir's wording call.**
+> Each is flagged inline with 🔴 **[D12]** rather than silently rewritten. The
+> *constraint* is already fixed and is not optional: K = 2, and the words
+> *persona* and *cluster* are both retired in favour of **axis / gradient / the
+> cut / level** (STATUS decision 12, 2026-08-10). Only the replacement wording is
+> open.
+>
+> ⚠️ **`research_pipeline_bn.md` has NOT received this pass.** The two mirrors are
+> therefore out of sync as of 2026-08-11, which line 8 above forbids. Recorded
+> here rather than left to be discovered.
+
+---
+
 ## 📊 S0 — X-ray of the actual data file (ground truth for everything below)
 
 > ## ⛔ CORRECTED 2026-08-01 — read this before the table
@@ -62,36 +92,49 @@
 
 **⚠️ New scientific risk:** with 8-word reviews, the easiest thing for LaBSE clustering to capture is sentiment itself — the "3 personas" could be a rediscovery of the 3 sentiment classes. Hence a **mandatory trap-check (§2.4): ARI(cluster labels, Sentiment)**. If >0.6, either re-operationalize personas with engagement features (length/intensity/specificity) or honestly present them as "sentiment-anchored engagement tiers." Hiding it is forbidden; the result is reported either way.
 
+> ✅ **ANSWERED 2026-07-31 (step 10), and the risk was real but not the one feared.**
+> ARI(cluster, Sentiment) = **0.1793** on the full corpus — well under 0.6, so the
+> clusters are *not* a sentiment rediscovery. **But ARI(cluster, region) = 0.4813**:
+> they were detecting which of the two corpora a review came from. The trap-check
+> caught a trap the pipeline had not anticipated, which is the argument for running
+> checks whose outcome you think you can predict.
+
 ---
 
 ## 🚀 START HERE — Step-by-step execution order (complete each ☐ before the next)
 
+> **Tick discipline (added 2026-08-11).** ☑ means *the result file exists and its
+> lab-notebook entry is written*. ⚠️ means partly done, with the gap named. ✗ means
+> **established as not producible** — those are not pending work and must stop
+> being read as pending. Every ☑ below names the file that justifies it, so the
+> tick can be checked rather than trusted.
+
 **Week 1 — Foundations**
-☐ 1. Create the repo (§0.1 layout), requirements.txt, global seed=42
-☐ 2. Draft `protocol.md` (§0.2) → supervisor sign-off
-☐ 3. Begin the core base papers (§0.3 — at minimum MoP + Huang first)
+☑ 1. Create the repo (§0.1 layout), requirements.txt, global seed=42 — `src/common/seed.py`, `requirements.lock.txt`
+☑ 2. Draft `protocol.md` (§0.2) — written and running; **53 rows in its Deviations log.** ⚠️ **supervisor sign-off: still not recorded anywhere.** If it happened, it is undocumented; if it did not, it is outstanding. 🔴 **Sabbir — this is the one Week-1 item that never closed**
+☑ 3. Core base papers (§0.3) — superseded in practice by `docs/related_work.md` (9 tiers) and the CLAUDE.md search-first rule, which is stricter than "read these first"
 
 **Weeks 2–3 — Data (S1)**
-☑ 4. xlsx → clean → `bn_clean.csv` — **n = 4,730**, not 4,722 (see corrected S0) [§1.1]
-☐ 5. Freeze the split file — **stratify on `Sentiment × region`** (6 strata), not on Sentiment alone. G-placeholder + R1/R2. One commit, never touched again
+☑ 4. xlsx → clean → `bn_clean.csv` — **n = 4,730**, not 4,722 (see corrected S0) [§1.1] — `results/s0_data_xray.md`, `results/s1_cleaning_log.json`
+☑ 5. Freeze the split file — **FROZEN 2026-08-01**, `data/splits/split_map_v1.json`, committed. **G 300 / R1 2,162 / R2 2,163 = 4,625** after near-dup removal at t = 0.95; `dev` = 200 is a **subset of R1**, not a fourth partition. Stratified on `Sentiment × region` as required. Never regenerated
 ☑ 6. Bangla plots — **120 = 30 dev + 90 eval**, harvested from bn.wikipedia and FROZEN 2026-07-31. Not 130: the source does not hold 130 Bangla films with usable plot sections, and both routes to 130 were refused (deviation logged) [§1.1.7]
-☐ 7. English arm: IMDB subsample **matched to the Bangla n actually used** (4,730, or 1,910 if the arm mirrors region A) + MPST plots **30+90** + tokenizer-fertility table [§1.2]
+☐ 7. English arm: IMDB subsample **matched to the Bangla n actually used** (4,730, or 1,910 if the arm mirrors region A) + MPST plots **30+90** + tokenizer-fertility table [§1.2] — ✅ **SCHEDULED, not cut** (Sabbir 2026-08-11): full §1.2 charter runs after the Bangla machinery exists, since every config takes the corpus as a field. RQ4 stays live in its strong form
 
-**Weeks 3–5 — Personas (S2–S3)**
-☐ 8. LaBSE embed → master K-table (7 criteria, K=2..8) [§2.1–2.2]
-☐ 9. GMM-BIC + HDBSCAN + multi-encoder ARI [§2.2]
+**Weeks 3–5 — The engagement-specificity axis (S2–S3)** 🔴 **[D12]** *section title still says "Personas" in the bn mirror*
+☑ 8. LaBSE embed → master K-table (7 criteria, K=2..8) [§2.1–2.2] — `results/s2d_ktable_regionA.md`, `s2d_ktable_regionB.md`. 🔴 **Outcome: K = 2, not 3** — K=3's prediction strength was 0.669 against a cutoff of 0.80 fixed two days earlier (decision 7, closed 2026-08-03)
+☑ 9. GMM-BIC + HDBSCAN + multi-encoder ARI [§2.2] — 🔴 **Outcome: there is no cluster structure.** Silhouette **0.053**, gap statistic monotone, **HDBSCAN labels 100% noise**. Region B additionally cleared PS at **0.818** on a cut correlating with nothing measurable → kept as a **negative control** (RQ1-G). *Stability is not validity*
 ☑ 10. **ARI(cluster, Sentiment) trap-check** [§2.4] — DONE. Full corpus 0.1793 but ARI(cluster, **region**) 0.4813 → the clusters are a corpus detector. Region A alone: 0.1804, Band 1, not degenerate. **Also score every future clustering against `region`.**
-☐ 11. Verify Gate G1 → persona definitions + linguistic profiling [§2.3–2.4]
-☐ 12. Stratify G-300 **on the region-A clustering** → annotation guideline → 3 annotators → κ+α **reported per region** [§2.5] → Gate G2
+☑ 11. Gate G1 → profiling [§2.3–2.4] — `results/s2e_*`, `s2f_*`. ⚠️ **G1 FAILED in the informative direction** (see step 9), and 🔴 **all S2e/S2f inferential statistics were DEMOTED to descriptive on 2026-08-10**: φ = 0.3981 and χ² = 300.7 are post-clustering inference on the very rows that defined the partition (Chen & Witten 2023). **No p-value here is evidence that the halves differ**
+☑ 12. G-300 → annotation → Gate G2 [§2.5] — ⚠️ **round 1 FAILED** (ordinal α = 0.4970, rating scale). **Attempt 2 used comparative judgement and worked** — this is CLAUDE.md's search-first entry #1 (Kiritchenko & Mohammad, ACL 2017, had already shown rating scales less reliable). 🎁 **RQ1-H is the single non-circular result in the thesis: 0.78 / 0.84 against 0.25 chance, length-matched, length heuristic below chance**
 
 **Weeks 5–7 — Verifiers (S4)**
-☐ 13. Backbone ablation (4 models × gold-300) [§3.2] → pick the winner
-☐ 14. Train Verifier-A + B (bn, en) → dual accuracy [§3.1, 3.3] → Gate G3
-☐ 15. Calibration (ECE + temperature scaling) [§3.4] + LR-learned symbolic rules [§3.5]
+☑ 13. Backbone ablation (4 models × gold-300) [§3.2] — done, **then repurposed.** 🔴 `results/s3b_baselines.md` verdict = **`CIRCULARITY_CONFIRMED`**: a frozen linear probe on the encoder that *generated* the label matches the best fine-tuned arm to within one dev item (0.9866 vs 0.9647). **The table may support NO claim about backbones**; it is reported as a demonstration that the label is linearly recoverable. "Pick the winner" is void as written
+⚠️ 14. Train Verifier-A + B (bn, en) → dual accuracy [§3.1, 3.3] → Gate G3 — **bn pair DONE 2026-08-11** (`results/s3c_verifier_a.json`, `s3d_verifier_b.json`): A 0.986555 (1 error in 82, reproduces S3.2b), B `COMPETENT_EVALUATOR` 0.959666, mean 0.967442 ± 0.015839 over 5 seeds. **en pair not built** (step 7). ✗ **the dual-accuracy table is NOT PRODUCIBLE** — established 2026-08-08. 🔴 **Pre-committed: no claim that either verifier is better may be made from dev-82** (1 item = 0.0122 macro-F1)
+☑ 15. Calibration (ECE + temperature scaling) [§3.4] + LR-learned symbolic rules [§3.5] — **both done 2026-08-11.** 🔴 **Verifier-A was miscalibrated: ECE 0.11836 → 0.00537**, and the direction is **UNDER-confidence** (T = 0.10918 < 1), opposite to `guo2017calibration`'s finding. ✅ **Verifier-B's pre-committed null FIRED** (ΔECE CI [−0.00661, +0.00705] straddles zero). ⚠️ Symbolic scorer is weak and gameable: CV **0.5150 ± 0.0713** vs majority 0.3926, features almost all presence-based. 🔴 **F1/IDF disabled pending Sabbir's rule-7 ruling — measured cost ~18 macro-F1 points**
 
-**Weeks 7–9 — Loop (S5)**
-☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → choose Llama vs Qwen
-☐ 17. τ sweep → operating point (first-pass 60–70%) [§4.5] → Gate G4
+**Weeks 7–9 — Loop (S5)** — ⛔ **NOT STARTED. `src/agents/` and `src/eval/` are empty stubs.** This is Phase 4, and it is where the title's *"Multi-Agent"* and *"Verifier-in-the-Loop"* live
+☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → choose Llama vs Qwen — **unblocked as of 2026-08-11**: §4.2's Critic is `0.6×VerifierA + 0.4×symbolic` and both inputs now exist
+☐ 17. τ sweep → operating point (first-pass 60–70%) [§4.5] → Gate G4 — 🔴 **blocked by open decision 17**: after temperature scaling **79 of 82 dev items sit at confidence 0.998**, so a sweep over calibrated Verifier-A scores has almost no resolution. Calibrated or uncalibrated must be settled *by a literature search* before this step, not during it
 ☐ 18. Loop dynamics + failure taxonomy [§4.6]
 
 **Weeks 9–12 — Experiments (S6)**
@@ -142,7 +185,7 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable = 4,730
 | **S3** Human gold | nothing | **region-A-**stratified 300 → gold labels + Fleiss κ **and** Krippendorff's α (ordinal) | **G2:** α < 0.667 → revise guideline + re-annotate; failing twice → reframe claim ("theory-driven scheme, validated learnability") |
 | **S4** Verifier training | **bn-A, bn-B, en-A, en-B** (4 classifiers) + symbolic-weight LR ×2 + temperature scaling ×4 | R1/R2 → dual accuracy (weak-label **and** gold), calibration (ECE before/after) | **G3:** gold accuracy < ~55% (chance=33%) → verifier too weak; increase symbolic weight / inspect data |
 | **S5** Loop build + τ sweep | nothing (calibration only) | Verifier-A + R1-RAG → LangGraph loop, τ sweep 0.30–0.95 on dev-plots, operating point | **G4:** if first-attempt pass rate doesn't reach 60–70%, raise τ — "everything passes" means the loop is dead (the old mistake) |
-| **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × **90 eval-plots** (disjoint from dev-30) × 3 personas → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only |
+| **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × **90 eval-plots** (disjoint from dev-30) × ~~3 personas~~ **2 axis levels** (corrected 2026-08-11) → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only. ⚠️ **Verifier-B's calibration improvement is NOT established** (null fired 2026-08-11) — report that beside the Goodhart test, since B is the scorer here |
 
 **Total trained artifacts: 10** (4 verifiers + 2 LR + 4 temperature scalings) — all small, all free-Colab. **No LLM is ever trained** — generation is prompted only.
 
@@ -259,7 +302,15 @@ Source, collection dates, per-step attrition, length distributions, license, the
 - **Multi-encoder check (bn only):** LaBSE vs BanglaBERT mean-pooled vs multilingual-E5 → pairwise ARI/AMI.
 - **If criteria disagree** (e.g., silhouette→2, gap→4): (1) report the full table — no cherry-picking; (2) **stability > compactness**; (3) human validation + theory are the tie-break, stated explicitly; (4) acknowledge the disagreement in Limitations.
 
-### 2.3 Theory grounding — "three personas" did not fall from the sky
+### 2.3 Theory grounding — ~~"three personas"~~ did not fall from the sky
+
+> 🔴 **[D12] WORDING IS SABBIR'S — 2026-08-11.** K = 2, not 3 (decision 7), and the
+> words *persona* and *cluster* are both retired (decision 12): the literature
+> reserves *cluster* for structure we do not have (silhouette 0.053, monotone gap,
+> HDBSCAN 100% noise). Permitted: **axis, gradient, the cut, level**. The theory
+> grounding below still matters — but it now grounds **a two-level engagement-
+> specificity axis**, and the section must be rewritten to say so. Claude has not
+> rewritten it, because the replacement wording is Sabbir's call.
 The three tiers are a collapse of established engagement continua. Cite:
 - **Abercrombie & Longhurst (1998), *Audiences*** — consumer → fan → cultist → enthusiast
 - **Hunt, Bristol & Bashaw (1999), *J. Services Marketing* 13(6)** — five fan types (⚠️ often mis-attributed — verify authorship before citing)
@@ -383,7 +434,7 @@ Be honest: two of four components are deterministic. Three defences, written exp
 Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate of dynamics analysis + failure taxonomy. RAG index = R1 only; G never (leakage). Generator: Groq primary (20-generation pilot → Llama vs Qwen); Gemini secondary on a subset.
 
 ### 4.5 Threshold sweep — the central task
-- τ = 0.30 → 0.95 (step 0.05), each τ on the **30 dev-plots** (disjoint from eval-100) × 3 personas; the 20-generation model pilot uses this dev set too.
+- τ = 0.30 → 0.95 (step 0.05), each τ on the **30 dev-plots** (disjoint from eval-100) × ~~3 personas~~ **2 axis levels** (corrected 2026-08-11); the 20-generation model pilot uses this dev set too. 🔴 **Before running this sweep, settle open decision 17** — calibrated Verifier-A output is near-binary (79/82 items at confidence 0.998) and a 14-point τ grid over it will not resolve 14 distinct operating points.
 - Plot: first-attempt pass rate, avg attempts, final acceptance, and **Verifier-B score** (independent quality).
 - **Pick the operating point where first-attempt pass ≈ 60–70%** → the Reflector fires on 30–40% of cases → the loop's behavior becomes measurable.
 - **Temperature schedule (ablation only):** retry temps 0.8→0.9→1.0 — a published diversity mechanism for escaping mode-collapsed drafts; measure in §5.1b, do not bake in.
@@ -410,7 +461,7 @@ Attempt distribution (1/2/3), hybrid-score growth per attempt, persona-wise retr
 | 7 | ⭐ Self-critique (same LLM critiques itself) | **Intrinsic vs extrinsic — the headline baseline** |
 | 8 | LLM-as-judge critic (Gemini judges) | Cheap trained verifier vs large LLM judge |
 
-- **Scale:** **90** eval-plots (never dev-plots) × 3 personas × 8 conditions = **2,160 generations per language** (৳0 on Groq; overnight batches).
+- **Scale:** **90** eval-plots (never dev-plots) × ~~3 personas~~ **2 axis levels** × 8 conditions = ~~2,160~~ **1,440 generations per language** (৳0 on Groq; overnight batches). 🔴 **Corrected 2026-08-11.** Stale since K = 2 was selected on 2026-08-03 — **a one-third reduction in experiment size, cost and CI width** that sat unrecorded in the normative spec for eight days.
 - Row 7 < Row 6 → external verification is necessary in low-resource — **the headline, a direct extension of Huang et al.**
 - Row 8 ≈ Row 6 at 1/40th the cost → the efficiency claim. (Note LLM-judge biases to discuss: position, verbosity, self-preference; degraded reliability in lower-resource languages — further motivation for a *trained* critic.)
 
@@ -505,10 +556,10 @@ Code + configs on GitHub; model on HuggingFace; gold-300 release (with annotator
 > ⚠️ Wrappers, not contributions — not one day here before S6 is done.
 
 ### 8.1 Streamlit "Audience Simulator" v2 (2–3 days)
-Rebuild the existing app (movie-review-agent.streamlit.app) on the new LangGraph backend: plot in → 3 persona reviews + hybrid scores + attempt counts + **the Reflector's feedback trace made visible** — self-correction you can watch; the defence show-piece. Hosting: Streamlit Community Cloud or HF Spaces (both free); if the 110M verifier is heavy, call it via HF Inference API. In the paper, one line: "A publicly accessible demonstration is available at <URL>."
+Rebuild the existing app (movie-review-agent.streamlit.app) on the new LangGraph backend: plot in → ~~3 persona reviews~~ **2 axis-level reviews** 🔴 **[D12 wording]** + hybrid scores + attempt counts + **the Reflector's feedback trace made visible** — self-correction you can watch; the defence show-piece. Hosting: Streamlit Community Cloud or HF Spaces (both free); if the 110M verifier is heavy, call it via HF Inference API. In the paper, one line: "A publicly accessible demonstration is available at <URL>."
 
 ### 8.2 Defence package (2 days)
-Slide order = problem → the writer-examiner metaphor → split-map figure → master K-table → ablation table → Goodhart figure → live demo. Memorize the 2-minute summary; prepare the four expected questions: "why 3 personas" (§2.1–2.3), "why only BanglaBERT" (§3.2), "is this really multi-agent" (§4.0/4.3), "did you validate simulation?" (§5.4 + Limitations).
+Slide order = problem → the writer-examiner metaphor → split-map figure → master K-table → ablation table → Goodhart figure → live demo. Memorize the 2-minute summary; prepare the four expected questions: ~~"why 3 personas"~~ 🔴 **[D12]** **"why 2 levels, and why not clusters"** — the honest answer is §2.1–2.3 *plus* the negative results in steps 9 and 11, which is a stronger answer than the original question expected (§2.1–2.3), "why only BanglaBERT" (§3.2), "is this really multi-agent" (§4.0/4.3), "did you validate simulation?" (§5.4 + Limitations).
 
 ### 8.3 Dissemination (2 days)
 Public GitHub (code + configs + timestamped protocol.md), updated HF model card, new Mendeley dataset version (gold-300 labels + guideline, under §7.2 licensing rules).
@@ -550,7 +601,7 @@ Public GitHub (code + configs + timestamped protocol.md), updated HF model card,
 
 **1.6 Contributions (seven):** ① a human-validated, persona-labeled Bangla review dataset with a 300-item gold set and released guidelines; ② a convergence-validated persona-discovery protocol (7 criteria + stability + theory); ③ a calibrated, cheap persona verifier with dual-accuracy reporting (weak-label vs gold); ④ a compound AI system implementing the evaluator-optimizer workflow with a trained-classifier gate — *to our knowledge* the first for persona control in a low-resource language; ⑤ an A/B held-out-verifier evaluation design for detecting Goodhart effects in refinement loops; ⑥ cross-lingual evidence (Δ_bn vs Δ_en) on where verification matters most; ⑦ full open release: code, model, traces, demo.
 
-**1.7 Scope & limitations preview:** "simulation" = persona-conditioned generation (per-film prediction is not validated — the data lacks review-to-film mapping); the three-persona scheme is theory-motivated and data-confirmed, with 3-vs-4 acknowledged as a modeling choice.
+**1.7 Scope & limitations preview:** "simulation" = persona-conditioned generation (per-film prediction is not validated — the data lacks review-to-film mapping); ~~the three-persona scheme is theory-motivated and data-confirmed, with 3-vs-4 acknowledged as a modeling choice.~~ 🔴 **[D12] REPLACE — this sentence is now false in two ways.** K = 2, and the scheme is **not** "data-confirmed": G1 found no cluster structure. What the data supports is *a two-level cut through a continuum that human annotators can nonetheless recognise* (RQ1-H: 0.78/0.84 vs 0.25 chance). 🎁 State the advantage plainly — **Pinto et al. (2026) and Cornelissen et al. (2026) report the same geometric finding and neither ran human validation.**
 
 **1.8 Thesis organization:** per the §6.1 chapter map.
 
