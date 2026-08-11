@@ -763,3 +763,64 @@
                Citing this paper without that distinction would misreport our
                own result as an instance of theirs.}
 }
+
+@article{clavie2026latentterms,
+  title   = {Latent Terms: Dense Retrievers Contain Trivially Extractable
+             BM25-ready Zipfian Vocabularies},
+  author  = {Clavi{\'e}, Benjamin and Lee, Sean and Shakir, Aamir and
+             Kato, Makoto P.},
+  journal = {arXiv preprint arXiv:2605.29384},
+  year    = {2026},
+  note    = {Mixedbread AI / NII / U. Tsukuba. Read in full 2026-08-11 via
+             alphaXiv (Consensus quota exhausted until 2026-09-01).
+             Sparse autoencoders on FROZEN dense retrievers yield features with
+             quasi-Zipfian collection statistics, so BM25 -- i.e. IDF -- scores
+             them unmodified; their audit finds ~1/3 of features purely
+             lexical, ~10% narrow semantic, the rest broad topical.
+             CITED FOR THE RULE-7 AMENDMENT: the premise "contextual encoders
+             need natural text, therefore IDF is alien to them" is backwards.
+             The encoder has already internalised lexical frequency structure.
+             ALSO CITED IN Ch.5 AS A RISK: if IDF signal is already inside
+             LaBSE, adding IDF to the symbolic scorer may INCREASE its
+             correlation with Verifier-A, which is the opposite of what the
+             hybrid Critic needs. Retrieval paper, not a scoring paper --
+             the transfer gap is stated wherever it is cited.}
+}
+
+@article{barata2026hybrid,
+  title   = {Do Static Embeddings Add Value to Hybrid Dutch Retrieval?
+             Cross-Validated Weighted RRF with Paired Inference and
+             Cross-Domain Transfer},
+  author  = {Barata, Ant{\'o}nio Pereira},
+  journal = {arXiv preprint arXiv:2608.02112},
+  year    = {2026},
+  note    = {Read in full 2026-08-11 via alphaXiv. THE COUNTERWEIGHT PAPER,
+             cited against our own preferred conclusion. 5 datasets, 14,500
+             queries, 786,573 documents, exhaustive scoring. The cheap third
+             component received ZERO weight in all 50 fold-level selections,
+             and forcing it in reduced held-out MRR (0.010-0.036, significant
+             after Holm). Their sentence is the one that binds us: "standalone
+             benchmark performance is insufficient to establish marginal value
+             in hybrid retrieval." Our F1 pilot's +18 points is a STANDALONE
+             number. Supplies the design for S3.5's weight and for the rule-7
+             gate: training-fold-only selection, held-out evaluation, paired
+             bootstrap + multiplicity correction, and a forced-inclusion check.
+             Also the model for our hybrid weight w being reported as a
+             sensitivity curve rather than a point.}
+}
+
+@article{magsarjav2026preprocessing,
+  title   = {Best Preprocessing Techniques for Sentiment Analysis},
+  author  = {Magsarjav, Saranzaya and Humphries, Melissa and Tuke, Jonathan},
+  journal = {arXiv preprint arXiv:2606.24055},
+  year    = {2026},
+  doi     = {10.48550/arxiv.2606.24055},
+  note    = {Found 2026-08-11 via scite. Cited for what it does NOT cover:
+             it states it "will primarily focus on word-based sentiment
+             analysis" rather than BERT-class models, so the 2026 preprocessing
+             literature still has not tested rule 7's premise on contextual
+             encoders. Studies it reviews report stopword removal and stemming
+             as "not so important" -- LOW IMPACT, not harmful. Cited beside
+             rule 7a to say that part (a) of the rule is under-evidenced but
+             nearly free to keep, which is why the amendment keeps it.}
+}
