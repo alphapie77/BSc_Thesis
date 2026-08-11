@@ -1314,3 +1314,105 @@
              resource levels. The citation for "there is no universal answer to
              import", and therefore for measuring rather than adopting.}
 }
+
+@article{axiv2601_17768_llm42,
+  title   = {LLM-42: Enabling Determinism in LLM Inference with Verified
+             Speculation},
+  author  = {AUTHORS UNRESOLVED -- University of Washington / Microsoft per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2601.17768},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. THE PAPER THAT BREAKS OUR
+             REPRODUCIBILITY ASSUMPTION FOR PHASE 4. "In LLM inference, the same
+             prompt may yield different outputs across different runs. At the
+             system level, this non-determinism arises from floating-point
+             non-associativity combined with DYNAMIC BATCHING." Dynamic batching
+             means batch composition depends on other tenants' traffic on the
+             provider, so a hosted API generation is not reproducible by
+             re-running it, whatever seed is logged. SS4.2's "seed logged" is
+             necessary and NOT sufficient, and the thesis must say so.}
+}
+
+@article{axiv2604_22411_backgroundtemp,
+  title   = {Introducing Background Temperature to Characterise Hidden
+             Randomness in Large Language Models},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2604.22411},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. "Even when decoding with
+             temperature T=0, LLMs can produce divergent outputs for identical
+             inputs." Rules out the obvious workaround -- dropping to greedy
+             decoding does NOT buy determinism -- and names the effect
+             "background temperature", which is a usable term for Ch.5's
+             limitation paragraph.}
+}
+
+@article{axiv2605_19537_silenthyperparameter,
+  title   = {The Silent Hyperparameter: Quantifying the Impact of Inference
+             Backends on LLM Reproducibility},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2605.19537},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. The inference BACKEND is an
+             unreported hyperparameter affecting reproducibility, at a scale
+             comparable to the fractions of a point that separate benchmark
+             results. Exactly parallel to coakley2022environment, which this
+             project already uses for the training side (>6 pp from environment
+             alone) -- the same argument, now for the inference side, and it
+             lands on Groq's LPU hardware which we do not control.}
+}
+
+@article{axiv2602_14349_samepromptdifferent,
+  title   = {Same Prompt, Different Outcomes: Evaluating the Reproducibility of
+             Data Analysis by LLMs},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2602.14349},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Systematic measurement
+             across six models, four temperature settings and ten independent
+             runs. Cited as the empirical companion to axiv2601_17768_llm42's
+             mechanism: the non-determinism is not a corner case.}
+}
+
+@article{axiv2408_13586_diversityrisk,
+  title   = {Balancing Diversity and Risk in LLM Sampling: How to Select Your
+             Method and Parameter for Open-Ended Text Generation},
+  author  = {AUTHORS UNRESOLVED -- Mannheim / MPI-INF / CISPA per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2408.13586},
+  year    = {2024},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. The citation for HOW a
+             temperature/top-p pair should be chosen for open-ended generation,
+             which is what SS4.2's temp 0.8 / top_p 0.9 is. Our values are
+             spec-fixed and pre-registered, so this is cited as the standard our
+             choice is CONVENTIONAL against, not as a justification derived
+             here -- the distinction matters because no tuning was done.}
+}
+
+@article{axiv2407_01082_minp,
+  title   = {Turning Up the Heat: Min-p Sampling for Creative and Coherent LLM
+             Outputs},
+  author  = {AUTHORS UNRESOLVED -- Apart Research per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2407.01082},
+  year    = {2024},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Criticises top-p (nucleus)
+             sampling and proposes min-p for creative-yet-coherent output --
+             i.e. the field has moved past the setting SS4.2 fixes. Recorded as a
+             KNOWN LIMITATION rather than adopted: min-p is not exposed by the
+             Groq chat-completions API, so this is not a free choice, and
+             changing the decoder would also change a pre-registered condition.
+             See also axiv2602_18292_decodingoptimisation, which argues decoding
+             is still "treated as a heuristic knob-tuning exercise".}
+}
+
+@article{axiv2602_18292_decodingoptimisation,
+  title   = {Decoding as Optimisation on the Probability Simplex: From Top-K to
+             Top-P (Nucleus) to Best-of-K Samplers},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2602.18292},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Argues decoding is treated
+             as heuristic knob-tuning and should be understood as principled
+             optimisation. Cited in Ch.5 beside our unTUNED 0.8/0.9: the honest
+             statement is that the decoder was fixed by the protocol and never
+             optimised, which this paper frames as the field's normal (and
+             criticised) practice rather than as our idiosyncrasy.}
+}
