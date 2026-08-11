@@ -1,11 +1,11 @@
 {
   "_provenance": {
-    "timestamp_utc": "2026-08-10T18:36:42.300137+00:00",
-    "git_commit": "bc9f1461f7fd7561b977ca7fccaf091b3cc97997",
-    "untracked_files": 5,
+    "timestamp_utc": "2026-08-11T13:51:33.335518+00:00",
+    "git_commit": "e6b8ce1559c613123e81723cfaa32f03be36298f",
+    "untracked_files": 1,
     "config": "configs/s35_symbolic.yaml",
-    "python": "3.10.12",
-    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35"
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
   },
   "result": {
     "n_dev_rows": 82,
@@ -22,17 +22,17 @@
     "macro_f1_cv_sd": 0.07125600481805267,
     "majority_baseline_macro_f1": 0.3925925925925926,
     "coefficients": {
-      "n_tokens": -0.25529511713748515,
-      "mean_word_chars": 0.02853035523069566,
-      "punct_per_tok": -0.14712503123983917,
-      "digit_per_tok": -0.18967657183012526,
+      "n_tokens": -0.25529511713750447,
+      "mean_word_chars": 0.028530355230695702,
+      "punct_per_tok": -0.14712503123984283,
+      "digit_per_tok": -0.1896765718301415,
       "latin_per_tok": 0.0,
-      "ends_dandi": -0.5892244215204174,
-      "connective_frac": 0.2638020812113861,
-      "pos_frac": 0.39871473219147674,
-      "neg_frac": 0.1070755154187443,
-      "intensifier_frac": -0.8351863619295374,
-      "guiraud": -0.4346241256777174
+      "ends_dandi": -0.5892244215204095,
+      "connective_frac": 0.2638020812113871,
+      "pos_frac": 0.3987147321914803,
+      "neg_frac": 0.10707551541873819,
+      "intensifier_frac": -0.835186361929537,
+      "guiraud": -0.4346241256776994
     },
     "leave_one_family_out": {
       "F2_length": {

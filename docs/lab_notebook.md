@@ -3831,3 +3831,78 @@ blob, because a digest is readable and a binary is not.
 - `coakley2022environment` — already cited for S3.2's environment argument; the
   addendum above is its second load-bearing use, now about the *inference* host
   rather than the training host. Its `related_work.md` annotation should say so.
+
+---
+
+## 2026-08-11 -- S3.5b: persist the symbolic scorer; and the S3.5 numbers reproduce across a THIRD environment
+**Feeds:** Ch.3 SS3.5, Ch.4 SS4.2 Critic
+**Commit:** `e6b8ce1559c613123e81723cfaa32f03be36298f-dirty`
+**Artifacts:** `artifacts/symbolic_scorer.joblib`, `results/s35_symbolic.json` (re-run, numbers identical), `src/symbolic/s35_scorer.py`, `configs/s35_symbolic*.yaml`, `.gitignore`
+
+
+### Numbers
+- **Every headline number is IDENTICAL** to the 2026-08-10 run: resubstitution
+  **0.657028550645572**, CV **0.5150303030303031 ± 0.07125600481805267**,
+  majority **0.3925925925925926**, 11 features, `enable_f1 = False`. The whole
+  `leave_one_family_out` table compares equal as a dict.
+- **max |Δ coefficient| = 1.932e-14** — float noise, ~11 orders of magnitude
+  below the 1e-3 at which any coefficient would be read differently.
+- New artifact: `artifacts/symbolic_scorer.joblib`.
+
+### Decisions made (and why)
+- **Persist the fitted pipeline as a joblib artifact**, keyed alongside the
+  feature names in fitted order. Alternative was to rebuild the scorer from the
+  11 coefficients in `results/s35_symbolic.json`. **That alternative does not
+  work**: the estimator is `StandardScaler + LogisticRegression`, and the JSON
+  has no intercept and no scaler mean/scale. The fitted object was not
+  recoverable from anything committed.
+- **Feature names travel inside the artifact.** Reason: the Critic must rebuild
+  the feature vector in exactly the fitted order, and a mismatch must raise
+  rather than score a permuted vector — which would look like a working Critic.
+- **Rule 7's guard extended to the artifact path.** Reason: the existing guard
+  covered the *result* path only. A result file is read by a human; an artifact
+  is loaded silently and its contents never appear on screen, so an IDF-enabled
+  scorer at the default artifact path would put rule-7 features into every
+  generation's score with nothing visible to show it. `enable_f1` is also
+  recorded *inside* the artifact, and the Critic will refuse an artifact
+  carrying `True`.
+- **`artifacts/pilot_*` is gitignored.** Reason: a committed pilot artifact is a
+  file a future session can load by path without ever seeing the banner that
+  explains what it is.
+
+### Findings (things we did not expect)
+- 🔴 **S3.5's original numbers were produced in a THIRD environment, and it was
+  never disclosed.** The superseded provenance block reads
+  **`Linux-6.8.0-124-generic`, Python 3.10.12** — which is neither Kaggle
+  (Python 3.12.13, where both verifiers were fitted) nor Sabbir's thesis machine
+  (Windows-11, Python 3.13.3). It is the assistant's own sandbox. **Fact (env)
+  commits us to reporting *two* environments and stating which produced which
+  result; there have been at least three.**
+- 🎁 **And the same run is the reassurance.** Re-fitted on Windows / Python
+  3.13.3 / sklearn 1.9.0, every reported metric reproduces **exactly** and the
+  coefficients move by 1.9e-14. So the symbolic scorer is **host-invariant at
+  the precision anything is read at** — unlike Verifier-A, whose probabilities
+  moved by 1.07e-06 across hosts. The difference is expected (11 hand-computed
+  text features vs a 768-d neural encoder) but it is now measured rather than
+  assumed, on both halves of the Critic.
+- ⚠️ The re-run **overwrote** `results/s35_symbolic.json`. No number changed, so
+  nothing is lost — but the pre-commit hook caught the staged `results/` diff
+  and forced this entry, which is the second time today the hook has been the
+  thing that noticed.
+
+### Consequences for downstream steps
+- **The Critic is now buildable**: both halves have loadable artifacts.
+- **`docs/dataset_card.md` / Ch.5's environment disclosure must name three
+  environments, not two**, and say which produced which result: Kaggle
+  (verifiers, backbone ablation), the assistant sandbox (S3.5's original fit —
+  now superseded by the Windows re-fit), and the thesis machine (RAG index,
+  S3.5 as committed, and the whole Phase 4 loop). Fact (env) as written is
+  already violated by the file it governs.
+- **A rule to carry forward:** every remaining Phase 4 artifact should be
+  produced on the machine that will run the loop, and the reason is now
+  measured rather than argued.
+
+### Citations needed
+- None new. `coakley2022environment` gains a third use — its >6 pp
+  environment-only variation is the reason these two host comparisons were run
+  at all, and both came back far below it.
