@@ -52,12 +52,30 @@ expected_n: 4625            # asserted; a mismatch means the threshold moved
 sizes:
   gold: 300
   dev_slice: 200            # carved from R1 only -- never from R2, never from G
-  # 🔴 NO RECORDED REASON -- flagged 2026-08-11 by check_constants.py.
-  # This is the ONLY decision constant in the repo with no source in
-  # protocol.md or the pipeline. An equal R1/R2 split is the obvious
-  # default (and yields 2,162 / 2,163), but "obvious" is not a reason,
-  # and the split map is FROZEN -- so this cannot be revised, only
-  # explained. Awaiting Sabbir; deliberately NOT back-filled by Claude.
+  # ref: research_pipeline_en.md, "FROZEN EXECUTION CONTRACT" section A --
+  # the Day-1 split diagram specifies "R1 (~2,211)  R2 (~2,211)", i.e. the
+  # remainder after G-300 divided into equal halves. This config IMPLEMENTS
+  # that contract; the 0.5 was not chosen here.
+  #
+  # ⚠️ What section A does NOT state is WHY the halves are equal, and that
+  # was checked for on 2026-08-11 rather than assumed: git log on this file,
+  # the split-freeze commit message (69eaee1, which is otherwise unusually
+  # detailed), protocol.md and the lab notebook. The instruction is recorded;
+  # the argument behind it is not, anywhere.
+  #
+  # The reconstructible reason -- offered as a reconstruction, NOT recorded as
+  # Sabbir's, who does not remember: inviolable rule 6 makes RQ5 an A-vs-B
+  # comparison, so if one verifier trained on materially more data than the
+  # other, any A-B gap would be confounded with training-set size rather than
+  # measuring what the wall exists to measure. Equal halves make A and B
+  # differ by split and model family, not by n.
+  #
+  # ⚠️ And that reconstruction has a wrinkle worth stating: decision 14 later
+  # scoped Verifier-A to region A only, so the verifiers ended at n = 804 and
+  # n = 888 anyway. If comparability was the reason, the split delivered it
+  # and a later scoping decision partly spent it.
+  #
+  # Not revisable regardless: the split map is FROZEN (inviolable rule 3).
   r1_fraction: 0.5
 
 output: data/splits/split_map_v1.json
