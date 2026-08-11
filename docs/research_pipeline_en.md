@@ -5,7 +5,7 @@
 **Core claim (one sentence):** An external, cheap, task-trained verifier embedded in a generate–verify–refine loop measurably improves persona-controllability of LLM generation in a low-resource language (Bangla), compared to prompting alone — demonstrated against a matched English reference.
 
 **Timeline:** ~14 weeks | **Compute:** free Colab/Kaggle GPU | **API cost:** ৳0 (Groq free tier primary; Gemini free tier secondary)
-**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**
+~~**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**~~ 🔴 **FALSE as of 2026-08-11 — `research_pipeline_bn.md` does not exist and never did (see MAINTENANCE STATE below). Until open decision 18 is settled, THIS FILE IS THE ONLY NORMATIVE PIPELINE.**
 
 ---
 
@@ -33,9 +33,23 @@
 > cut / level** (STATUS decision 12, 2026-08-10). Only the replacement wording is
 > open.
 >
-> ⚠️ **`research_pipeline_bn.md` has NOT received this pass.** The two mirrors are
-> therefore out of sync as of 2026-08-11, which line 8 above forbids. Recorded
-> here rather than left to be discovered.
+> ⛔ **CORRECTION TO THIS BOX, same day, before Sabbir acted on it.** The first
+> version said *"`research_pipeline_bn.md` has NOT received this pass"* and called
+> the mirrors out of sync. **That was wrong, and wrong in the way this project
+> keeps warning about: it was written from line 8 rather than from the disk.**
+>
+> **`research_pipeline_bn.md` does not exist and never has** — not in `docs/`, not
+> anywhere in the repo, and not in git history. Line 8 above declares this file
+> "the English mirror" of a document that was never written. So the problem is not
+> that two files disagree; it is that **line 8 asserts a second normative document
+> that is not there**, and has done since v7.
+>
+> That is worse than staleness. A reader is told the authority is split across two
+> files and instructed to fix both on conflict; one of them cannot be consulted,
+> and nobody noticed because nobody went looking for it. **Left standing and
+> flagged rather than quietly deleted** — the fix is Sabbir's call: either the
+> Bangla mirror gets written, or line 8 is struck and this file is simply the
+> pipeline. See STATUS open decision 18.
 
 ---
 
