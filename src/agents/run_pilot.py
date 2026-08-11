@@ -150,16 +150,35 @@ def main() -> int:
                              f"{sorted(models)}")
         model_paths[role] = path
     for role, model in models.items():
+        # A local model is ~14 GB of a 16 GB T4: load it ONCE per role and share
+        # it across prompt arms (the arm changes the prompt text, not the
+        # weights). The first version constructed a fresh LocalWriter per
+        # (role, arm) without freeing the previous one -- the second load then
+        # spilled to CPU and bitsandbytes aborted. Found by the crash at
+        # generation 21/80 on 2026-08-12; the 20 completed generations were
+        # safe on disk and the resume path skipped them, as designed.
+        local_writer = None
+        if provider == "local":
+            pending = [
+                (arm, p, level)
+                for arm in arms for p in plots for level in levels
+                if generation_key(p["plot_id"], level, 1, arm, model) not in done
+            ]
+            if not pending:
+                print(f"{role}: all generations on disk; model not loaded")
+                continue
+            from src.agents.local_writer import LocalWriter  # heavy import; deferred
+            local_writer = LocalWriter(
+                model, arm=arms[0], jsonl_path=out["generations_jsonl"],
+                batch_size=int(cfg["batch_size"]),
+                quantization=cfg.get("quantization"),
+                max_new_tokens=int(cfg["max_new_tokens"]),
+                model_path=model_paths.get(role),
+            )
         for arm in arms:
             if provider == "local":
-                from src.agents.local_writer import LocalWriter  # heavy import; deferred
-                writer = LocalWriter(
-                    model, arm=arm, jsonl_path=out["generations_jsonl"],
-                    batch_size=int(cfg["batch_size"]),
-                    quantization=cfg.get("quantization"),
-                    max_new_tokens=int(cfg["max_new_tokens"]),
-                    model_path=model_paths.get(role),
-                )
+                writer = local_writer
+                writer.arm = arm
             else:
                 writer = Writer(model, arm=arm, jsonl_path=out["generations_jsonl"])
             for p in plots:
@@ -188,6 +207,14 @@ def main() -> int:
                           f"{p['plot_id']} L{level}  {tok} tok  "
                           f"eta {remaining/60:4.1f}m  {gen.text[:40]!r}",
                           flush=True)
+        if local_writer is not None:
+            # Free this role's model BEFORE the next role loads its own; two
+            # 4-bit 12B models do not fit on one T4 together.
+            import gc
+            import torch
+            del writer, local_writer
+            gc.collect()
+            torch.cuda.empty_cache()
 
     # Re-read the whole archive so a resumed run scores everything, not only
     # what this invocation produced.
