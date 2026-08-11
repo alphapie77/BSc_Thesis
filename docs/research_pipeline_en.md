@@ -4,7 +4,7 @@
 **Starting assets:** ~5,000 raw Bangla movie reviews (Mendeley) + the locked title. No code, no labels.
 **Core claim (one sentence):** An external, cheap, task-trained verifier embedded in a generate–verify–refine loop measurably improves persona-controllability of LLM generation in a low-resource language (Bangla), compared to prompting alone — demonstrated against a matched English reference.
 
-**Timeline:** ~14 weeks | **Compute:** free Colab/Kaggle GPU | **API cost:** ৳0 (Groq free tier primary; Gemini free tier secondary)
+**Timeline:** ~14 weeks | **Compute:** free Colab/Kaggle GPU | **API cost:** ~~৳0 (Groq free tier primary; Gemini free tier secondary)~~ **৳0 — generation local on Kaggle T4 as of 2026-08-12 (§4.4 box); Gemini secondary unchanged**
 ~~**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**~~
 
 ✅ **STRUCK 2026-08-11 — Sabbir's ruling (decision 18, option b): "bangla ar english to same e. dorkar ki bangla alada kore likhar."** `research_pipeline_bn.md` never existed, and it will not be written. **THIS FILE IS THE ONLY NORMATIVE PIPELINE.** Bangla stays in use for explanation and teaching — per Sabbir's standing request — but no Bangla document is normative, so there is no second file to keep in sync and no second file to go stale.
@@ -173,7 +173,7 @@
 ☑ 15. Calibration (ECE + temperature scaling) [§3.4] + LR-learned symbolic rules [§3.5] — **both done 2026-08-11.** 🔴 **Verifier-A was miscalibrated: ECE 0.11836 → 0.00537**, and the direction is **UNDER-confidence** (T = 0.10918 < 1), opposite to `guo2017calibration`'s finding. ✅ **Verifier-B's pre-committed null FIRED** (ΔECE CI [−0.00661, +0.00705] straddles zero). ⚠️ Symbolic scorer is weak and gameable: CV **0.5150 ± 0.0713** vs majority 0.3926, features almost all presence-based. 🔴 **F1/IDF disabled pending Sabbir's rule-7 ruling — measured cost ~18 macro-F1 points**
 
 **Weeks 7–9 — Loop (S5)** — 🔨 **PRE-REGISTERED 2026-08-11 (`protocol.md` §S4), no code yet.** `src/agents/` is an empty stub; `src/eval/` holds `tau_objective.py` only. This is Phase 4, and it is where the title's *"Multi-Agent"* and *"Verifier-in-the-Loop"* live
-☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → choose Llama vs Qwen — **unblocked as of 2026-08-11**: §4.2's Critic is `w×VerifierA + (1−w)×symbolic` and both inputs now exist (`artifacts/verifier_a.joblib`, `results/s35_symbolic.*`). ⚠️ ~~`0.6×VerifierA + 0.4×symbolic`~~ **STRUCK** — `w` has no value and is fit on the 30 dev-plots' generations as a sensitivity curve (protocol.md §S4). The pilot's decision rule, with `TIE` pre-committed, is registered in the same section
+☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → ~~choose Llama vs Qwen~~ **choose gemma-3-12b-it vs TigerLLM-9B-it, local T4 (corrected 2026-08-12; §4.4 box)** — **unblocked as of 2026-08-11**: §4.2's Critic is `w×VerifierA + (1−w)×symbolic` and both inputs now exist (`artifacts/verifier_a.joblib`, `results/s35_symbolic.*`). ⚠️ ~~`0.6×VerifierA + 0.4×symbolic`~~ **STRUCK** — `w` has no value and is fit on the 30 dev-plots' generations as a sensitivity curve (protocol.md §S4). The pilot's decision rule, with `TIE` pre-committed, is registered in the same section
 ☐ 17. τ sweep → operating point [§4.5] → Gate G4 — ✅ **unblocked.** ~~first-pass 60–70%~~ **STRUCK** (decision 19): the operating point is **τ\* = argmax [quality(τ) − α_lo] / E[calls](τ)**, derived, with the full Pareto frontier reported regardless. ~~🔴 blocked by open decision 17: after temperature scaling **79 of 82 dev items sit at confidence 0.998**, so a sweep over calibrated Verifier-A scores has almost no resolution.~~ **CLOSED 2026-08-11 and the premise was FALSE** — temperature scaling is accuracy-preserving (`mattei2026welltempered`), so calibrated and raw τ are reparametrisations of the same partition; the defect was the uniform grid, not the scores. τ is swept at **quantiles of the observed score distribution**, and scoped **hierarchically across the two axis levels** (protocol.md §S4, decision 2)
 ☐ 18. Loop dynamics + failure taxonomy [§4.6]
 
@@ -233,8 +233,8 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable = 4,730
 
 | Layer | Tool | Note |
 |---|---|---|
-| Generator (primary) | **Llama-3.1-8B-Instruct or Qwen2.5-7B @ Groq free tier** | Open-weight = reproducible; choose via a 20-generation Bangla pilot; version-pinned checkpoint goes in the paper |
-| Generator (secondary) | Gemini 2.x Flash free tier | "Results hold across a proprietary model" robustness check |
+| Generator (primary) | ~~**Llama-3.1-8B-Instruct or Qwen2.5-7B @ Groq free tier**~~ ⛔ **CORRECTED 2026-08-12: local T4, `gemma-3-12b-it` vs `TigerLLM-9B-it` — see the §4.4 correction box** | Open-weight = reproducible; choose via a 20-generation Bangla pilot; version-pinned checkpoint goes in the paper |
+| Generator (secondary) | Gemini 2.x Flash free tier ⚠️ still scheduled as the robustness subset; unaffected by the 2026-08-12 provider move | "Results hold across a proprietary model" robustness check |
 | Orchestration | **LangGraph** (version pinned) | Explicit graph+state; CrewAI/AutoGen forbidden (over-abstraction, hard to log) |
 | RAG | ChromaDB + LaBSE | Index = R1 only |
 | Verifiers | `csebuetnlp/banglabert` (110M) / `distilroberta-base` (82M) | Deliberately small — the claim *is* "cheap verifier"; a large English model would poison the cross-lingual comparison |
@@ -259,7 +259,7 @@ thesis/
 ├── results/         # auto-logged, never hand-edited
 └── protocol.md      # frozen BEFORE experiments
 ```
-Python 3.10+, `sentence-transformers`, `transformers`, `scikit-learn`, `langgraph`, `chromadb`, `groq`, `google-generativeai` (secondary). Global seed=42; every result carries timestamp + git hash. Tracking: W&B free tier or a CSV logger.
+Python 3.10+, `sentence-transformers`, `transformers`, `scikit-learn`, `langgraph`, `chromadb`, ~~`groq`~~ **`bitsandbytes` (local 4-bit generation, 2026-08-12)**, `google-generativeai` (secondary). Global seed=42; every result carries timestamp + git hash. Tracking: W&B free tier or a CSV logger.
 
 ### 0.2 protocol.md — write and freeze now
 Contents: (a) every hypothesis, (b) its metric, (c) sample size, (d) statistical test, (e) what will be claimed under each of three outcomes (win / mixed / negative). Get the supervisor's signature — it is your shield at the defence.
@@ -479,7 +479,9 @@ Be honest: two of four components are deterministic. Three defences, written exp
 3. The ablation table proves each component earns its place (rows 3 vs 4 vs 6 vs 7) — none is decorative.
 
 ### 4.4 Instrumentation
-Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate of dynamics analysis + failure taxonomy. RAG index = R1 only; G never (leakage). Generator: Groq primary (20-generation pilot → Llama vs Qwen); Gemini secondary on a subset.
+Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate of dynamics analysis + failure taxonomy. RAG index = R1 only; G never (leakage). ~~Generator: Groq primary (20-generation pilot → Llama vs Qwen); Gemini secondary on a subset.~~
+
+> ⛔ **CORRECTED 2026-08-12 (protocol.md, four rows dated 2026-08-12).** Generation runs on **our own GPU (Kaggle T4), not a hosted API** — no free API supplies ~10M tokens of Bangla (eight checked); the cause is budget and is logged as budget, and it narrows the `2601.17768` reproducibility concession: locally the batch is chosen and the seed set (**batch size 8 = provenance, not a knob**). Pilot arms re-registered: **`google/gemma-3-12b-it` vs `md-nishat-008/TigerLLM-9B-it`** — same base (both Gemma3ForCausalLM, verified from each `config.json`), one variable: Bangla adaptation. The 1B pair was tried and failed (1 of 3 usable; hand-read, n=3, NOT A RESULT). "Llama vs Qwen" was already dead on 2026-08-11 (Qwen is a Groq Preview model); its replacement "Llama vs GPT-OSS" differed in three ways at once and is superseded. arXiv 2503.10995 does **not** describe the TigerLLM uploads (paper says LLaMA-3.2/Gemma-2; weights are Gemma-3, "9B" = 12.19B) — no claim may rest on its benchmark table. The 27 Groq generations (`results/pilot_s4_generations.jsonl`) are retained for the Llama fertility measurement (0.93 chars/token; Gemma-3: 3.71) and may never be merged with local generations. Runner: `notebooks/s4_pilot_kaggle.ipynb` + `configs/s4_pilot_local.yaml`.
 
 ### 4.5 Threshold sweep — the central task
 - ~~τ = 0.30 → 0.95 (step 0.05)~~ **τ swept at QUANTILES of the observed score distribution** (corrected 2026-08-11, decision 17), each τ on the **30 dev-plots** × **2 axis levels**; the 20-generation model pilot uses this dev set too.
@@ -523,7 +525,7 @@ Attempt distribution (1/2/3), hybrid-score growth per attempt, persona-wise retr
 | 7 | ⭐ Self-critique (same LLM critiques itself) | **Intrinsic vs extrinsic — the headline baseline** |
 | 8 | LLM-as-judge critic (Gemini judges) | Cheap trained verifier vs large LLM judge |
 
-- **Scale:** **90** eval-plots (never dev-plots) × ~~3 personas~~ **2 axis levels** × 8 conditions = ~~2,160~~ **1,440 generations per language** (৳0 on Groq; overnight batches). 🔴 **Corrected 2026-08-11.** Stale since K = 2 was selected on 2026-08-03 — **a one-third reduction in experiment size, cost and CI width** that sat unrecorded in the normative spec for eight days.
+- **Scale:** **90** eval-plots (never dev-plots) × ~~3 personas~~ **2 axis levels** × 8 conditions = ~~2,160~~ **1,440 generations per language** (~~৳0 on Groq~~ ৳0, local T4 — 2026-08-12; overnight batches). 🔴 **Corrected 2026-08-11.** Stale since K = 2 was selected on 2026-08-03 — **a one-third reduction in experiment size, cost and CI width** that sat unrecorded in the normative spec for eight days.
 - Row 7 < Row 6 → external verification is necessary in low-resource — **the headline, a direct extension of Huang et al.**
 - Row 8 ≈ Row 6 at 1/40th the cost → the efficiency claim. (Note LLM-judge biases to discuss: position, verbosity, self-preference; degraded reliability in lower-resource languages — further motivation for a *trained* critic.)
 
@@ -673,7 +675,7 @@ Public GitHub (code + configs + timestamped protocol.md), updated HF model card,
 | Item | Source | Cost |
 |---|---|---|
 | GPU | Colab/Kaggle free | ৳0 |
-| Groq API (primary) + Gemini (secondary) | Both free tier | ৳0 |
+| ~~Groq API (primary)~~ **Local generation on Kaggle T4 (2026-08-12)** + Gemini (secondary) | free | ৳0 |
 | 3 Bangla annotators × ~300+100 items | Batchmates | honorarium optional |
 | IMDB dataset | HuggingFace `imdb` | free |
 | MPST v2 (English plot synopses — generation input, required) | ritual.uh.edu/mpst-2018 | free |
@@ -687,6 +689,6 @@ Public GitHub (code + configs + timestamped protocol.md), updated HF model card,
 | Loop activation drops accuracy | That is the real number — report it; the old one was an artifact |
 | Goodhart detected (B flat) | Reframe headline: "verifier gaming in low-resource" — a high-citation finding |
 | English arm exceeds one week | Cut to fertility + zero-shot reference |
-| Groq/Gemini rate limits | Batch + sleep + retry; fallback local Ollama (8B 4-bit) on Colab |
+| ~~Groq/Gemini rate limits~~ **Kaggle session caps (12 h, weekly GPU quota)** | ~~Batch + sleep + retry; fallback local Ollama (8B 4-bit) on Colab~~ **resumable JSONL: re-run skips completed keys (2026-08-12). Multi-accounting declined twice — appendix states how generations were produced** |
 | ARI(cluster, sentiment) > 0.6 — personas ≈ sentiment | Engagement-feature re-operationalization, or honest "sentiment-anchored engagement tiers" reframe — both publishable |
 | Symbolic adds <~2 points over neural-only (§5.1b) | Soften the hybrid claim; report the sensitivity curve regardless |
