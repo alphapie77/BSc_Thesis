@@ -3906,3 +3906,89 @@ blob, because a digest is readable and a binary is not.
 - None new. `coakley2022environment` gains a third use — its >6 pp
   environment-only variation is the reason these two host comparisons were run
   at all, and both came back far below it.
+
+---
+
+## 2026-08-11 -- S4.5: generator preflight, secrets, the Researcher and the one prompt renderer
+**Feeds:** Ch.3 Methods SS4.2, appendix (prompt templates verbatim)
+**Commit:** `933e719ceff947ecb8f4f4f32dd2b42c50e23815-dirty`
+**Artifacts:** `src/agents/{researcher,prompts,groq_preflight}.py`, `src/common/secrets.py`, `tests/test_s4_{researcher,prompts}.py`, `tests/test_secrets.py`, `.env.example`, `results/s4_groq_preflight.json`
+
+
+### Numbers
+- **Groq auth OK; 15 models served to this account.** All three registered IDs
+  present: `llama-3.3-70b-versatile` (arm A), `openai/gpt-oss-20b` (arm B),
+  `llama-3.1-8b-instant` (fallback).
+- ⚠️ **No rate-limit headers on `/models`** — so **the account tier is still
+  unknown**, and the whole runtime plan (6,000 TPM free vs 250K TPM developer,
+  ~40×) rests on it. Resolved by the first generation call, not before.
+- Prompt size, measured on real data: synopsis **695** chars mean, ten exemplars
+  **~640**, definition **1,079** → **~2,416 chars**. Tokens **not** computed:
+  Bangla fertility is an unmeasured covariate of our own (§1.2).
+- Tests: `test_s4_researcher` 6/6, `test_s4_prompts` 10/10, `test_secrets` 6/6,
+  `test_s4_index` 6/6, `test_s4_state` 7/7.
+- 🔴 `pytest` is absent from the assistant sandbox, so `test_s3_backbone`,
+  `test_s3_verifiers` and `test_symbolic` were **not** run.
+
+### Decisions made (and why)
+- **Secrets in `.env` with a ten-line reader, not `python-dotenv`.** Sabbir's
+  call on location; the reader is mine. Adding a dependency would edit
+  `requirements.in`, force a reinstall, and regenerate `requirements.lock.txt`
+  — a provenance artifact that appears in the appendix. Not worth it for this.
+- **`redact()` runs on everything written.** The JSONL trace is *designed* to
+  record everything, which is exactly what makes it the likeliest place for a
+  key to reach git — and a committed key is not removed by deleting it later.
+- **The Researcher embeds the whole synopsis** rather than key-phrases. Forced:
+  TF-IDF extraction is rule 7, an LLM call would break its own contract and add
+  an uncounted call to E[calls]. Deviation logged.
+- **One prompt renderer.** Row 1 is `render(exemplars=(), feedback=None)`, so
+  decision 10 is a property of the code rather than a thing to remember.
+- **The target-level line goes AFTER the definition.** Naming the target first
+  would have the model read the two-level contrast already knowing its side,
+  turning the other level's description into a list of things to avoid — the
+  negative constraint `2601.08070` warns about, arriving by ordering instead of
+  by wording.
+
+### Findings (things we did not expect)
+- 🔴 **Two prompt bugs, both found by PRINTING the rendered prompt and reading
+  it — neither by the eight tests that were already passing.**
+  (i) `target_level` was validated and then **discarded**; the prompt never said
+  which level to write, while the definition describes both. Every generation
+  would have looked well-formed, the Critic would have scored it against a level
+  nobody asked for, and **the axis-control result would have been noise with no
+  visible cause.**
+  (ii) The target line used an ASCII digit — *"স্তর 1"* — while the definition's
+  own headings use Bengali digits, *"স্তর ১"*. **The prompt pointed at a section
+  by a name that section does not have.**
+  🔑 **The lesson is about the method, not the bugs: tests check the properties
+  you thought of. Reading the artifact catches the ones you did not.** The
+  rendered prompt is now printed and inspected before any generation runs, and
+  both bugs have tests so they cannot return.
+- 🎁 **My own test caught my own bug in the Researcher** — `build_query(["", " "])`
+  appended a trailing space, because an all-whitespace list is still truthy.
+  That query differs from attempt 1's by whitespace alone, which is enough to
+  change the embedding and make *"re-retrieval changed the exemplars"* true for
+  no reason.
+- **The search summary about Groq deprecations was wrong** and the authoritative
+  docs disagreed with it — logged in `protocol.md`; §S4 decision 3's *"never from
+  memory"* now reads *"never from a search summary either"*.
+
+### Consequences for downstream steps
+- **The tier question blocks any firm runtime plan** and is answered by the
+  first generation call. Until then the ~30-hour estimate for Phase 5 stands as
+  a free-tier worst case.
+- **Bangla tokenizer fertility (§1.2) is now on the critical path** for the same
+  reason — it converts a chars→tokens range into a number.
+- **The Writer is the next component** and must carry 429 backoff plus
+  per-generation JSONL append. S3.2 attempt 1 lost ~4 GPU-hours at arm 6 of 7
+  because a long run could not resume; a ~30-hour API run has the same shape.
+- **`enable_f1` remains false**; the Critic must refuse a symbolic artifact
+  carrying `enable_f1=True`, which is not yet written.
+
+### Citations needed
+- No new references. The prompt design cites already-recorded work:
+  `2601.08070` (ordering of the target line), `2502.15603` / `2402.10588` /
+  `2606.08994` / `2606.19668` (the two language arms), `huang2024selfcorrect`
+  (§5, why parity is structural). **No search was run for this step and none was
+  needed** — it implements already-searched decisions, recorded rather than
+  omitted so that a silent absence and a considered one do not look alike.
