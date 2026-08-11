@@ -1,7 +1,8 @@
 # The engagement-specificity axis — operational definition
 
 > **Status: DRAFT by Claude, 2026-08-11. NOT APPROVED.** §4.2 requires the
-> Writer's prompt to carry the axis-level operational definition *"verbatim from
+> Writer's prompt to carry the axis-level ope
+rational definition *"verbatim from
 > Phase 2"*, and no such text existed as an artifact — only as description
 > inside the pipeline spec. This file is that artifact.
 >

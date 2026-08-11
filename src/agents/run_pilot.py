@@ -91,12 +91,31 @@ def main() -> int:
           f"{len(plots)} plots x {len(levels)} levels = {total} calls")
 
     if args.dry_run:
+        # Print the WHOLE prompt, not a slice. An earlier version truncated at
+        # 1200 chars, which cut exactly the sections nobody had inspected yet --
+        # the exemplars, the plot and the closing instruction. Two of the three
+        # bugs found on 2026-08-11 were caught by reading a rendered artifact,
+        # and a truncated artifact cannot be read.
         p = plots[0]
-        r = researcher.retrieve(p["synopsis"], levels[0])
-        print(f"\nretrieved {len(r.review_ids)} exemplars for {p['plot_id']}")
-        print("\n--- sample prompt (arm bn, level 0) ---")
-        print(render(plot=p["synopsis"], target_level=levels[0], arm="bn",
-                     exemplars=r.texts)[:1200])
+        for level in levels:
+            r = researcher.retrieve(p["synopsis"], level)
+
+            print(f"\n{'='*72}\nRETRIEVAL — {p['plot_id']} ({p['title_bn']}), level {level}")
+            print(f"{'='*72}")
+            print(f"synopsis: {len(p['synopsis'])} chars")
+            print(f"retrieved {len(r.review_ids)} exemplars, "
+                  f"mean {sum(len(t) for t in r.texts)/max(len(r.texts),1):.0f} chars:")
+            for rid, t in zip(r.review_ids, r.texts):
+                print(f"   {rid:12s} {t}")
+
+            for arm in arms:
+                prompt = render(plot=p["synopsis"], target_level=level,
+                                arm=arm, exemplars=r.texts)
+                print(f"\n{'-'*72}\nFULL PROMPT — arm {arm}, level {level} "
+                      f"({len(prompt)} chars)\n{'-'*72}")
+                print(prompt)
+        print(f"\n{'='*72}")
+        print("No API call made. Nothing written.")
         return 0
 
     done = completed_keys(out["generations_jsonl"])
