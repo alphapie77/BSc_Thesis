@@ -1,0 +1,58 @@
+# S4 -- the 20-generation generator pilot.
+# Pre-registered in docs/protocol.md section "S4 pre-commitment", decision 3,
+# BEFORE any generation existed. Read that section before reading any output.
+#
+# ⛔ NOT A RESULT. Nothing produced by this config may be quoted in the thesis,
+# a paper, or a results table. It selects a generator; it measures nothing.
+
+step: S4.pilot
+seed: 42
+
+# --- the arms -------------------------------------------------------------
+# ref: docs/protocol.md deviations 2026-08-11 -- "SS4.4's pilot pair 'Llama vs
+# Qwen' is NOT instantiable as written: Qwen on Groq is a PREVIEW model".
+# Model IDs read from console.groq.com/docs/models.md on 2026-08-11 and
+# confirmed present on this account by src/agents/groq_preflight.py.
+# Never write a model ID from memory, and never from a search summary.
+models:
+  arm_a: llama-3.3-70b-versatile
+  arm_b: openai/gpt-oss-20b
+
+# Prompt language is a pilot FACTOR, not a decision.
+# ref: docs/axis_definition.md section 3e. Sabbir's hypothesis (English may be
+# understood better) is supported by 2502.15603 / 2402.10588 and complicated by
+# 2606.08994 (language confusion) and 2606.19668 (mixing degrades). Measured,
+# not assumed.
+prompt_arms: [bn, en]
+
+# --- the sample -----------------------------------------------------------
+# 20 generations = 10 dev-plots x 2 axis levels, per SS4.4's budget.
+# The plots are the FIRST TEN dev plots in the frozen split order -- chosen by
+# order rather than by inspection, so no plot is picked for looking suitable.
+sample:
+  split: dev
+  n_plots: 10
+  levels: [0, 1]
+
+# --- what is measured, and what is not ------------------------------------
+# The criterion is a FAILURE RATE, not a quality score, and that is what makes
+# it decidable at n=20. A quality difference would need hundreds of generations
+# -- the same power problem that makes TIE the registered default for the model
+# comparison. ref: docs/axis_definition.md section 3e.
+#
+# LANG_CONFUSION fires if an arm emits output that is not Bangla, or is
+# Bangla-English code-mixed beyond the corpus's own baseline. That baseline is
+# effectively zero: has_latin is 0.09% / 0.00% in region A (results/
+# s2e_regionA_k2_profile.md), so any Latin script in a generation is signal.
+criterion:
+  latin_char_baseline_pct: 0.09   # ref: results/s2e_regionA_k2_profile.md
+  # Pre-committed tie-break, a DECLARED NON-PERFORMANCE RULE exactly as S3.2's
+  # was: on TIE, take the model with the lower cost and higher rate limit, and
+  # state in the thesis that the data did not choose.
+  # ref: docs/protocol.md section S4 decision 3.
+  tie_break: [lower_cost, higher_rate_limit]
+
+outputs:
+  generations_jsonl: results/pilot_s4_generations.jsonl
+  report_md: results/pilot_s4_model_choice.md
+  report_json: results/pilot_s4_model_choice.json
