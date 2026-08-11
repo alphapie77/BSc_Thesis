@@ -1,0 +1,45 @@
+# S4 step 1 -- the retrieval index the Researcher queries.
+# Pre-registered in docs/protocol.md section "S4 pre-commitment" (2026-08-11),
+# written BEFORE src/agents/ contained a line of code.
+#
+# This config builds the ONLY index Phase 4 is allowed to retrieve from.
+# Inviolable rule 5: RAG index = R1 only. R2 must never appear in retrieval.
+# Inviolable rule 4: Gold-300 is eval-only and never enters the RAG index.
+# Both are enforced by src/agents/build_index.py, which refuses rather than
+# warns, and pinned by tests/test_s4_index.py.
+
+step: S4.1
+seed: 42
+
+inputs:
+  split_map: data/splits/split_map_v1.json
+  # The region-A K=2 assignments, NOT results/s2_cluster_assignments.csv.
+  # ref: docs/protocol.md "Scope decision: Verifier-A and the RAG index run on
+  # region A only (2026-08-05)" -- the full-corpus clustering is a corpus
+  # detector (93.3% accuracy at identifying which corpus a row came from) and
+  # is the wrong file for every Phase 3/4 label.
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+
+index:
+  # Same encoder as everything else in the pipeline. Not a choice made here:
+  # ref: pipeline SS2.1 fixes LaBSE as the encoder for both languages, and
+  # Verifier-A is a frozen probe on this exact space, so retrieving in a
+  # different space would put the Researcher and the Critic in disagreement
+  # about what "similar" means.
+  encoder: sentence-transformers/LaBSE
+
+  # Persisted so the index is built once and read many times. A rebuild must
+  # reproduce it exactly; the manifest's row count and id digest are what a
+  # reviewer checks that against.
+  persist_dir: data/rag/r1_index
+  collection: r1_regionA_k2
+
+  # ref: pipeline SS4.2 -- "cosine, top-10, within same persona label".
+  # The retrieval depth belongs to the component contract, not to this file;
+  # it is repeated here only so the built index and the query agree.
+  metric: cosine
+
+outputs:
+  manifest_json: results/s4_index_manifest.json
+  manifest_md: results/s4_index_manifest.md

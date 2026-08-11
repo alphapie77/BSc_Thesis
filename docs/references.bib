@@ -1014,3 +1014,90 @@
              currently "wrong sentiment / too short / off-topic / template
              repeat" and has no register category at all.}
 }
+
+@article{axiv2606_23196_intrinsicsc,
+  title   = {When Does Intrinsic Self-Correction Help? A Task-Sensitive
+             Analysis},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2606.23196},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Cited for a SCOPE
+             distinction that protects this thesis rather than threatens it:
+             the paper studies INTRINSIC self-correction -- a model revisiting
+             its own answer "without external feedback" -- and reports that
+             recent studies question its reliability. Our loop is EXTRINSIC by
+             construction (trained external verifier; the Critic is never the
+             Writer's model). So this literature does not refute the design; it
+             characterises the design ours was built to avoid. Ch.2 must make
+             that distinction explicitly rather than either ignoring the
+             sceptical literature or over-claiming against it.}
+}
+
+@article{axiv2606_13156_scmirage,
+  title   = {Iterative Visual Thinking and the Self-Correction Mirage in VLM
+             Grounding},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2606.13156},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Same scope caveat as
+             axiv2606_23196_intrinsicsc, in a vision-language setting. Cited
+             alongside huang2024selfcorrect as evidence that apparent
+             self-correction gains are frequently measurement artefacts --
+             which is the argument for closing prompt parity BY CONSTRUCTION
+             (protocol.md SS4 decision 5) rather than by audit.}
+}
+
+@article{axiv2604_22273_scfeedbackcontrol,
+  title   = {Self-Correction as Feedback Control: Error Dynamics, Stability
+             Thresholds, and Prompt Interventions in LLMs},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2604.22273},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Recasts iterative
+             self-correction as feedback control with STABILITY THRESHOLDS past
+             which repeated refinement degrades rather than improves. Bears
+             directly on SS4.6's requirement that max-retry = 3 be EARNED by the
+             per-iteration pass-rate/score curves rather than assumed, and on
+             the SS5.1b retry-temperature ablation. Read in full before the
+             SS4.6 dynamics report is written.}
+}
+
+@article{axiv2604_18490_lqm,
+  title   = {LQM: Linguistically Motivated Multidimensional Quality Metrics for
+             Machine Translation},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2604.18490},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. The general argument behind
+             protocol.md SS4 decision 6: established evaluation schemes
+             (including MQM) are "largely language-agnostic" and fail to capture
+             language-specific phenomena. That is the abstract form of our
+             concrete gap -- SS4.6's four failure categories inherit a generic
+             list and cannot name a Bangla register or honorific failure.}
+}
+
+@article{axiv2606_10765_arabigee,
+  title   = {ArabiGEE: A Hierarchical Taxonomy for Arabic Grammatical Error
+             Explanation},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2606.10765},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Precedent for a
+             language-specific hierarchical error taxonomy in a non-English
+             language, cited in protocol.md SS4 decision 6 as evidence that
+             extending SS4.6's category list for Bangla is normal practice
+             rather than an ad hoc departure.}
+}
+
+@article{axiv2608_03966_hallutruthqa,
+  title   = {HalluTruthQA-4K: A Fine-Grained Corpus and Annotation Process for
+             Arabic Hallucination Detection and Truth Verification},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2608.03966},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Cited in protocol.md SS4
+             decision 6 for one point: existing resources in a comparable
+             low-resource setting "often assign a binary label", and a
+             fine-grained scheme is the improvement. Supports a multi-category
+             taxonomy with a reported `other` rate over a pass/fail coding.}
+}

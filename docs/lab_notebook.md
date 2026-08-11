@@ -3691,3 +3691,88 @@ is the point of the entry.
   must be closed before the bibliography enters the thesis. Guessing an author
   list from memory is the defect CLAUDE.md's do-not-invent rule names, and it
   would look identical to a correct one.
+
+---
+
+## 2026-08-11 -- S4.1: the R1-only RAG index: built, tested, NOT yet run
+**Feeds:** Ch.3 Methods SS4.2 (Researcher)
+**Commit:** `ffe34444fa98f6b4d39f86244796f8982cb5f1ad-dirty`
+**Artifacts:** `src/agents/build_index.py`, `configs/s4_index.yaml`,
+`tests/test_s4_index.py`, `requirements.in` (Phase-4 block enabled).
+🔴 **No result files.** `results/s4_index_manifest.{json,md}` will exist only
+after the build runs in an environment that has `chromadb` and
+`sentence-transformers`; this session's sandbox has neither.
+
+
+### Numbers
+- Dry-run only. **The index has NOT been built** — `chromadb` and
+  `sentence-transformers` are absent from this session's sandbox, so no vector
+  was written and `results/s4_index_manifest.*` do not exist.
+- What the dry-run resolves, which is the part that matters for the wall:
+  **886 R1 region-A rows**, axis levels **534 / 352**, row-set digest
+  `85fc2d7d7ad3281b...`, **0 R2 ids, 0 Gold-300 ids**.
+- 886 = **804** (Verifier-A's training rows) + **82** (dev). See the decision
+  below — that is deliberate, not an off-by-something.
+- `tests/test_s4_index.py`: **6/6 pass.** Full suite could not be run:
+  `pytest` is not installed here, and `test_s3_backbone`, `test_s3_verifiers`
+  and `test_symbolic` require it. Of the tests that run standalone, all pass.
+
+### Decisions made (and why)
+- **The dev-82 reviews ARE in the RAG index** (`hold_out_dev=False`). Alternative
+  was to hold them out, costing 82 of 886 exemplars. Reason: the index is not a
+  fitted object — nothing is estimated from those rows — and the τ sweep operates
+  on **dev-plots** (Bangla film synopses), not dev reviews, so no threshold is
+  tuned on anything the index supplies. ⚠️ **The residue is real and is
+  disclosed, not buried:** a dev review can appear as a Writer exemplar while
+  also being in the slice Verifier-A's temperature was fitted on. Logged as a
+  sixth use of the 82 rows under the dev-reuse deviation. Reversible in one
+  config line if that disclosure is judged insufficient.
+- **Rules 4 and 5 are enforced twice, by two different mechanisms.**
+  `split_access` takes a **role**, so no config can name R2; then
+  `assert_rag_contract` re-checks resolved ids against the split map directly.
+  Alternative was to trust `split_access` alone. Reason: the frozen split is a
+  *promise* (inviolable rule 3) and the second check is a *mechanism*, and they
+  fail differently — if the map is ever edited, only the second one notices.
+- **Rule 6 is enforced by an AST scan, not a substring search.** Alternative was
+  a grep. Reason: a grep passes a file containing `# never import verifier_b`
+  and fails one that mentions it in a docstring — wrong in both directions. The
+  precedent is `check_constants.py`'s two loopholes from earlier today, where
+  **writing about the gap closed the check**.
+- **The import guard has a twin test proving it can fail.** Reason: RQ1-F's
+  Gate 2 was rewritten mid-protocol when its null verdict turned out unreachable
+  by construction. A guard whose failure branch cannot fire certifies nothing.
+- **Building and querying are separated into different modules.** Reason: so
+  that *"the index contains the wrong rows"* and *"the query is wrong"* can never
+  be the same bug.
+
+### Findings (things we did not expect)
+- 🔴 **The RAG index §4.2 assumes did not exist in any form** — no index, no
+  config, no script. §4.2 reads *"queries ChromaDB, top-10, within same persona
+  label, R1 index only"*, which is written as a description of an existing
+  system, and that is why nobody noticed. **Step 16's real prerequisite, found
+  only when the Researcher was about to be written.**
+- 🔑 **The general form, recorded because it may hide elsewhere in §4:
+  a contract that names a resource does not create it.** §4.2 also names
+  prompt templates, an exemplar-overlap log and a feedback renderer in the same
+  register. Each should be checked for existence before it is assumed.
+
+### Consequences for downstream steps
+- **The Researcher cannot be written until the index is actually built**, and
+  the build needs `chromadb` + `sentence-transformers` in a real environment.
+  This is now the top of the Phase 4 queue.
+- **`requirements.in`'s Phase-4 block is uncommented** (`langgraph`, `chromadb`,
+  `groq`, `google-generativeai`). ⚠️ **`requirements.lock.txt` is NOT
+  regenerated** — it must be produced by `env_snapshot.py` in Sabbir's own
+  environment, because a lock written from this sandbox would pin the wrong
+  machine. Fact (env) already requires two environments to be disclosed in the
+  appendix; this would have quietly added a third.
+- **This step is deliberately recorded as "built, NOT run"**, and `STATUS.md`
+  says so in the same words. The S3.3 row said exactly that, was completed, and
+  then told a fresh session Phase 4 was blocked — **the correction earlier today
+  is the reason this entry is explicit about which half is true.**
+
+### Citations needed
+- None new. This step implements already-registered contracts (inviolable rules
+  4, 5, 6; pipeline §4.2; `protocol.md` §S4). **No search was run for it, and
+  none was needed** — recorded rather than omitted, since a silent absence and a
+  considered one look identical.

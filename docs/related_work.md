@@ -526,6 +526,20 @@ interesting individually.**
 | `axiv2605_31483_benhallueval` | arXiv 2605.31483, 2026-05-29 | `[~]` **abstract only** | First systematic Bengali hallucination evaluation of LLMs. **Registers Bangla generation quality as a documented risk before the Writer produces a single review**, rather than as an assumption. 🎁 Its framing — *no prior work has systematically evaluated hallucination in LLMs for Bengali, despite Bengali being the sixth most spoken language* — is independent 2026 support for the low-resource gap Ch.1 claims. |
 | `axiv2605_22487_banglahonorific` | arXiv 2605.22487, 2026-05-21 | `[~]` **abstract only** | 🔑 **The one with a direct line to our construct.** Honorifics and register are not garnish in Bangla, and the engagement-specificity axis is partly a register distinction — S2b's probe separated the two corpora on first-person pronouns, exclamation and comma-runs. **A generator that mishandles Bangla honorifics fails on the dimension the Critic scores.** ⚠️ Flagged for §4.6: the pre-specified failure taxonomy is *wrong sentiment / too short / off-topic / template repeat* and has **no register or honorific category at all**. |
 
+### Tier 10b — Prompt parity and the failure taxonomy (added 2026-08-11, same pass)
+
+> Same index (alphaXiv), same depth caveat: **abstracts only, authors
+> unresolved**. These six close **open decision 10** and extend §4.6.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `axiv2606_23196_intrinsicsc` | arXiv 2606.23196, 2026-06-22 | `[~]` **abstract only** | 🎁 **A scope distinction that protects the thesis rather than threatening it.** Studies **intrinsic** self-correction — a model revisiting its own answer *"without external feedback"* — and reports its reliability is contested. **Ours is extrinsic by construction**: a trained external verifier, and a Critic that is never the Writer's model. **So this literature does not refute the design; it characterises the design ours was built to avoid.** ⚠️ Ch.2 must draw that line explicitly — ignoring the sceptical literature and over-claiming against it are both worse than naming the boundary. |
+| `axiv2606_13156_scmirage` | arXiv 2606.13156, 2026-06-11 | `[~]` **abstract only** | Same scope caveat in a vision-language setting. Cited beside `huang2024selfcorrect` as evidence that apparent self-correction gains are **routinely measurement artefacts** — the argument for closing prompt parity **by construction** (§S4 decision 5) rather than by audit. |
+| `axiv2604_22273_scfeedbackcontrol` | arXiv 2604.22273, 2026-04-24 | `[~]` **abstract only** | Recasts refinement as feedback control with **stability thresholds past which repeated correction degrades**. 🔴 Bears on §4.6's requirement that **max-retry = 3 be earned** by the per-iteration curves rather than assumed, and on §5.1b's retry-temperature ablation. **Must be read in full before the §4.6 dynamics report is written.** |
+| `axiv2604_18490_lqm` | arXiv 2604.18490, 2026-04-20 | `[~]` **abstract only** | The general form of our concrete gap: established evaluation schemes including **MQM are "largely language-agnostic"** and miss language-specific phenomena. §4.6's four failure categories inherit exactly such a generic list and **cannot name a Bangla register or honorific failure**. Forces §S4 decision 6. |
+| `axiv2606_10765_arabigee` | arXiv 2606.10765, 2026-06-09 | `[~]` **abstract only** | Precedent for a **language-specific hierarchical error taxonomy** in a non-English language — evidence that extending §4.6's list for Bangla is normal practice, not an ad hoc departure. |
+| `axiv2608_03966_hallutruthqa` | arXiv 2608.03966, 2026-08-04 | `[~]` **abstract only** | Comparable low-resource resources *"often assign a binary label"*; fine-grained is the improvement. Supports a multi-category taxonomy with a **reported `other` rate** over pass/fail coding. |
+
 ---
 
 ## Gap table — the sentence Ch.2 must end with

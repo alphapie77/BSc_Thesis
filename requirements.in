@@ -21,11 +21,11 @@ accelerate
 # umap-learn        # VISUALIZATION ONLY - never cluster in UMAP space
 # statsmodels
 
-# # --- agents / RAG (Phase 4) ---
-# langgraph
-# chromadb
-# groq
-# google-generativeai
+# --- agents / RAG (Phase 4) --- ENABLED 2026-08-11
+langgraph
+chromadb
+groq                  # generator, primary (pipeline SS4.4)
+google-generativeai   # generator, secondary on a subset (pipeline SS4.4)
 
 # # --- eval (Phase 5) ---
 # mauve-text
