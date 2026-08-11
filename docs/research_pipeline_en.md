@@ -426,7 +426,15 @@ State = {
 - Params: temp 0.8, top_p 0.9, seed logged. Out: `draft` (Bangla). Prompt templates go verbatim in the appendix.
 
 **3 — Critic** (deterministic judge — explicitly not an LLM; this is the thesis's central claim)
-- In: `draft, target_persona` → `hybrid = 0.6×VerifierA(draft) + 0.4×symbolic(draft)` (dev-tuned weights, §3.5), compared with persona-specific τ → Out: `verdict + both scores`.
+- In: `draft, target_persona` → `hybrid = ~~0.6~~w×VerifierA(draft) + ~~0.4~~(1−w)×symbolic(draft)`, compared with a τ per axis level → Out: `verdict + both scores`.
+
+> 🔴 **`0.6 / 0.4` IS STRUCK — 2026-08-11, Sabbir's rule: *"hate likha thakle hbe na. karon thakte hobe."*** The spec called these *"dev-tuned weights, §3.5"*, but **no tuning ever produced them** — they are the number this whole audit started from, and tracing them found no derivation anywhere in the repo.
+>
+> ⚠️ **They are also not *tunable* as written.** Verifier-A scores **0.9866 — one error in 82** — so every weight in §5.1b's 0.5–0.8 grid returns the same verdict, and the *"symbolic adds <2 points"* rule would have to resolve **1.6 dev items**. The sweep as specified is degenerate.
+>
+> **What replaces it** (registered in `protocol.md`, 2026-08-11): `w` is fit on the **30 dev-plots' generated outputs** — where the Critic actually operates, and where `kapur2026length` says the length/specificity relation *differs* from human text — and reported as a **sensitivity curve, never a point**. Inclusion of the symbolic term must survive a **held-out marginal-value test**, not a standalone score: `barata2026hybrid` rejected a cheap component in **50 of 50 folds** while it looked fine standalone.
+>
+> **Until that runs, `w` has no value and §4.2 may not be implemented with one.**
 - Justification: **Self-Correction Illusion (2606.05976)** — external-role feedback is what works; **CRITIC (ICLR 2024)** — the judge is a tool, not the model itself. The Critic is never the Writer's model — that separation is the architecture's soul.
 - ⚠️ τ chosen to hit a pass-rate is itself a proxy — so τ is set **on dev-plots**, and the final τ is sanity-checked against Verifier-B scores, not only A.
 

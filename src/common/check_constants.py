@@ -11,6 +11,21 @@ audit that followed found the problem was not confined to that one number:
 `independent_at_or_above`, `explained_at_or_above` and `strong_at_or_above`
 decide verdicts and appear **zero times** in `protocol.md`.
 
+🔴 BLIND SPOT, STATED BECAUSE IT IS THE IMPORTANT ONE
+-----------------------------------------------------
+This scans `configs/*.yaml` ONLY. It does not read prose.
+
+So on 2026-08-11 it reported a clean pass while `0.6 x VerifierA + 0.4 x
+symbolic` -- **the number that caused this checker to be written** -- sat
+unjustified in `research_pipeline_en.md` §4.2, because Phase 4 has no config
+yet and the constant lives in a sentence.
+
+The audit cleaned up everything except its own reason for existing. Anyone
+reading a green exit code should know that is what green can mean here: the
+worst constants are the ones for steps not yet built, and those live in prose.
+When `configs/s4_*.yaml` is written, `w` must arrive with its derivation or
+this check will finally be able to see it.
+
 WHAT THIS DOES NOT DO
 ---------------------
 It cannot check that a reason is *good*. It checks that one was written down.
