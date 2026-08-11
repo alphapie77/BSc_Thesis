@@ -1324,6 +1324,204 @@ and the English half is named as outstanding rather than counted as done.**
 §3.3's dual-accuracy table remains **not producible** (logged 2026-08-08): G-300
 returned specificity ratings, not cluster labels, and they failed reliability.
 
+## S4 pre-commitment: the Phase 4 loop, the hybrid weight, τ scoping, and the generator pilot
+
+> **Written 2026-08-11, before `src/agents/` contains a single line and before
+> any generation exists anywhere in this project.** Phase 4 has produced no text,
+> no score and no trace. Everything below is a procedure fixed in advance of the
+> numbers it will govern, which is the only order in which a procedure can be
+> registered at all.
+>
+> **Index used: alphaXiv.** Consensus's quota is exhausted until 1 September
+> 2026. Recorded rather than worked around, for the reason §S3.3 gives:
+> *"searched a different index"* and *"did not search"* must not look alike.
+>
+> **Prerequisite state, verified on disk rather than read from STATUS.**
+> `artifacts/verifier_a.joblib` and `artifacts/verifier_b/` both exist, committed
+> in `0d2578d`; `results/s3c_verifier_a.md` reports dev macro-F1 **0.9866** with
+> T = **0.1092** (`CALIBRATION_IMPROVED`), `results/s3d_verifier_b.md` reports
+> **0.9597** at seed 42 (`COMPETENT_EVALUATOR`, `CALIBRATION_NOT_ESTABLISHED`).
+> The symbolic scorer is fitted (`results/s35_symbolic.*`). **So the Critic has
+> both of its terms and Phase 4 is unblocked.** ⚠️ `docs/STATUS.md` said the
+> opposite in two places when this section was written — see the deviations row.
+
+### The four components, restated so that no config has to infer them
+
+Contracts are §4.2's and are **not** re-specified here; what follows is only what
+§4.2 leaves open. Naming is §4.0's, verbatim and non-negotiable: **a compound AI
+system implementing the evaluator–optimizer workflow.** The phrase *autonomous
+multi-agent system* may not appear in any file this phase produces.
+
+| | Component | LLM call | Registered here |
+|---|---|---|---|
+| 1 | Researcher | no | retry-query contract, exemplar-overlap logging |
+| 2 | Writer | **yes** | generator identity (decision 3) |
+| 3 | Critic | **no, deliberately** | `w` (decision 1), τ scoping (decision 2) |
+| 4 | Reflector | yes, small | FAIL-only firing, failed-rule naming |
+
+🔴 **Rule 6, restated as a code-level constraint rather than an intention:**
+Verifier-B may not be imported, loaded or referenced anywhere under
+`src/agents/`. It scores S6 and the τ endpoints only. A test must fail if the
+Phase 4 package acquires a path to it. **This wall *is* the Goodhart test**, and
+the one previous near-miss (2026-08-11, Verifier-B's data definition) shows the
+wall collapses through ambiguity, not through disagreement.
+
+### Registered decision 1 — `w` has **no value**, and may not acquire one before the dev-plot generations exist
+
+The pipeline's ~~`0.6 × VerifierA + 0.4 × symbolic`~~ is struck (2026-08-11).
+`w` is **fit on the 30 dev-plots' generated outputs** and **reported as a
+sensitivity curve, never as a point**. Inclusion of the symbolic term must
+additionally survive a **held-out marginal-value test** — not a standalone score.
+
+**Pre-committed outcomes, fixed before any curve is drawn:**
+
+1. **`SYMBOLIC_EARNS_ITS_PLACE`** — the verdict is sensitive to `w` and the
+   held-out marginal-value test favours including the symbolic term. RQ3's
+   original hypothesis is supported and the curve is the evidence.
+2. **`SYMBOLIC_INERT`** — the verdict is flat in `w` across the reported range.
+   **This is a publishable negative result and is reported as one.** The
+   symbolic term is still retained, for the reason already registered in §S3.5:
+   the Reflector *requires* a component that can name which rule failed, and the
+   LaBSE probe cannot. Retained for interpretability, not for accuracy.
+3. **`SYMBOLIC_HARMS`** — the held-out test rejects the symbolic term, as
+   `barata2026hybrid` rejected a cheap component in 50 of 50 folds. Reported,
+   and the consequence for RQ3 stated plainly rather than softened.
+
+⚠️ **Outcome 2 is the one to expect**, and saying so now is the point of saying
+it here: Verifier-A scores **1 error on 82 items**, so on *human* text every
+weight returns the same verdict. Whether generated text behaves the same way is
+exactly what is unknown — `kapur2026length` show the length/specificity relation
+is flat or reversed in machine text — and it is why the fit moved off dev-82 in
+the first place.
+
+### Registered decision 2 — τ is fitted **hierarchically across the two axis levels**, not pooled and not split
+
+**The question.** §4.2 says *"a τ per axis level"*. Under K = 2 (decision 7) that
+is two τ values fitted on 30 dev-plots each, while decision 19's τ\* argmax is
+written for a single frontier. The two readings were put to Sabbir, who
+delegated: *"research kore dekho konta vlo hoy."*
+
+**⚠️ Provenance: the choice and reasoning below are Claude's, endorsed not
+authored — as for decisions 12, 14, 16 and 19.**
+
+**What the search returned, and it moved the answer off both options.** The
+2026 literature on group-conditional thresholds is close to one-directional:
+`2605.14260` (*On the Burden of Achieving Fairness in Conformal Prediction*)
+states that a single pooled threshold *"can hide cross-group heterogeneity in
+score distributions and distort group-wise coverage"* — our exact configuration,
+two levels whose generated-score distributions we have no basis to assume match.
+`2605.05562` makes the same point in its title: *marginal validity is not enough
+for subgroup reliability*. `2606.29403` and `2606.20115` independently reproduce
+pooled calibration masking subgroup undercoverage. **So a single global τ is not
+the conservative choice it appears to be.** But `2605.14260`'s own title names
+the counterweight — group-conditional thresholds cost calibration sample — and at
+30 dev-plots per level we have very little to spend.
+
+**The registered procedure**, following `2607.24562` (*Hierarchical
+Group-Conditional Conformal Risk Control*): τ is estimated by **partial pooling
+across the two levels**, with the shrinkage **estimated from the ratio of
+within-level to between-level score variance, not chosen**. This matters for the
+standing rule — a hand-picked pooling weight would be exactly the constant
+`check_constants.py` exists to catch, whereas an estimated one has a criterion.
+The estimator degrades to the global τ when the levels are indistinguishable and
+to per-level τ when they are strongly separated, which is precisely the
+behaviour we cannot predict in advance and therefore should not hard-code.
+
+**Reported alongside, always, and not as an afterthought:** the **global τ** and
+the **two per-level τ** as the limiting cases the estimator interpolates between,
+plus a **two-sample permutation test** on the per-level generated-score
+distributions (**5,000 shuffles, α = 0.05** — the same instrument and the same
+constants already pre-registered in §RQ1-F Gate 2, adopted rather than reinvented).
+
+🔑 **The permutation test is DESCRIPTIVE and is not a gate.** At 30 generations
+per level it is underpowered, and a gate whose null verdict is the likely one
+regardless of the truth is the failure RQ1-F's Gate 2 had to be rewritten
+mid-protocol to escape. **A non-significant result means *not detected*, never
+*equal*, and must be written that way.** This is why the hierarchical estimator
+is the default rather than the consequence of a test: it needs no gate to be
+correct.
+
+**Decision 19 is unaffected.** τ\* = argmax [quality(τ) − α_lo] / E[calls](τ)
+still names one point on one frontier; the hierarchical fit determines *which* τ
+each level is held to, not how the operating point is chosen. `quality(τ)`,
+α_lo and α_hi remain measured by **Verifier-B, never Verifier-A**.
+
+### Registered decision 3 — the 20-generation generator pilot, with `TIE` as the pre-committed default
+
+§4.4 specifies a **20-generation pilot** on Groq to choose between Llama and
+Qwen. **As written it is a budget with no decision rule**, which is the same
+defect class as the struck `0.6/0.4` and the struck *"first-pass 60–70%"*.
+The rule is fixed here, before the first generation.
+
+- **Design:** 20 generations = **10 dev-plots × 2 axis levels**, one draft each,
+  seed logged; temp **0.8**, top_p **0.9** (§4.2, not chosen here). Both models
+  see byte-identical prompts.
+- **Scored by:** *not* Verifier-A. Verifier-A is the in-loop judge, and
+  pre-selecting the generator against it is a soft form of the co-adaptation
+  `wang2026hacking` name and rule 6 exists to prevent.
+- **Pre-committed default outcome: `TIE`.** The tie-break is fixed in advance
+  and is a **declared non-performance rule**, exactly as S3.2's was: on tie,
+  take the model with the lower cost and higher rate limit, and **state in the
+  thesis that the data did not choose**.
+- **Banner: `NOT A RESULT`**, in the style of `results/pilot_s35_idf.*`. No
+  Llama-vs-Qwen claim may be quoted from this file.
+
+**Why `TIE` is registered as the expected outcome rather than discovered as a
+disappointment.** `2605.10405` (*Valid Best-Model Identification for LLM
+Evaluation*) treats best-model selection under a small evaluation budget as a
+statistical problem with a known failure mode, not a matter of inspection; and
+our own S3.2 returned `TIE` across **seven arms × five seeds**, with a
+between-arm spread smaller than one arm's own seed SD. **Expecting 20
+generations to separate two models, when 70 runs could not separate seven, is
+not defensible.** Registering the tie-break now is what stops the pilot
+collapsing into "read 20 outputs and pick the nicer ones", which is a preference,
+not a reason.
+
+⚠️ **Model identity is deliberately left blank here.** The exact Groq model IDs
+are written into `configs/s4_pilot.yaml` with a retrieval date, from the live
+catalogue — **not from memory.** A model string recalled from training data is a
+constant with no source, and catalogues churn.
+
+**Bangla generation quality is a live risk and gets its own citation trail
+rather than an assumption:** `2605.31483` (BenHalluEval) is the first systematic
+Bengali hallucination evaluation of LLMs, and `2605.22487` documents honorific
+failures in multilingual Bangla generation — register and honorifics being part
+of the very construct the axis measures. Neither is briefed to
+`base_papers_brief.md` depth; **abstracts only, and that is stated.**
+
+### Registered decision 4 — the Researcher's retry contract
+
+§4.2's anchoring rule is adopted unchanged and made checkable: on retry the
+original persona+plot query **stays anchored**; feedback keywords **augment,
+never replace**. A test must fail if the retry query does not contain the
+original query as a subsequence.
+
+**Exemplar overlap per attempt is logged**, and §4.2's own trigger is
+pre-committed rather than left to judgement: **overlap < 50% with no pass-rate
+gain → re-retrieval is disabled and retries route straight to the Writer**, which
+becomes the §5.1b routing ablation. The 50% is §4.2's, not a new constant.
+
+### Loop control and `gave_up`
+
+FAIL & attempt < 3 → Researcher (anchored + augmented). FAIL & attempt = 3 →
+emit **best-of-3 by hybrid** with `gave_up = True`. **Every metric in Phases 4–5
+is reported split by `gave_up` status** (§4.2). The three-attempt cap is §4.2's
+and is itself a claim to be earned in §4.6 by the per-iteration curves, not
+assumed — `madaan2023selfrefine` report diminishing returns by iteration 3.
+
+### What is NOT registered here, and is left open on purpose
+
+- **`w`, τ and τ\* have no values.** They cannot until generations exist.
+- **`enable_f1` stays `false`.** The rule-7 amendment packet is unsigned
+  (`docs/rule7_amendment_packet.md`); the structural guard in `s35_scorer.py`
+  stays in place. Flipping it is not a Phase 4 act.
+- **Title wording** (open decision 12) is Sabbir's. Phase 4 code and configs use
+  *axis / level / the cut* throughout and never *persona* or bare *cluster*.
+- **Decisions 9, 10 and 11** (cost-matched baseline, prompt parity, external-role
+  self-critique row 7b) block **Phase 5**, not Phase 4 — but decision 10 in
+  particular constrains the §5.1 row-1 prompt that becomes α_lo, so it is flagged
+  here as due before the τ sweep is interpreted, not before the loop is built.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 
@@ -1390,3 +1588,8 @@ Any departure from this document is recorded here with date, reason, and commit.
 | 2026-08-11 | ✅ **Open decision 17 CLOSED — and the question itself was malformed, which is the finding** | §4.5's τ sweep moves from a **uniform 0.30→0.95 step-0.05 grid** to **quantiles of the observed score distribution**, reported on the **calibrated** scale. The calibrated-vs-uncalibrated question that decision 17 posed is **withdrawn as ill-posed**, not answered. Opens decision 19 (τ has no objective). | 🔴 **Claude wrote decision 17 and its premise was false.** It asserted that temperature scaling makes Verifier-A's output *"near-binary, so a τ sweep has almost no resolution"*, and offered (a) uncalibrated / (b) calibrated as alternatives. **They are the same alternative.** `mattei2026welltempered`: β>0 ⇒ βz is ordered exactly as z, so temperature scaling is **accuracy-preserving**; their Thm 5.1 / Cor 1 strengthen this into a characterisation — it is the **only** accuracy-preserving linear scaler, which is precisely why matrix scaling and Dirichlet calibration can move hard predictions and it cannot. A monotone map cannot move an item across a threshold, so every τ on the calibrated scale has an exact twin on the raw scale producing an identical PASS/FAIL set. ✅ **Checked against our own data rather than taken on the paper's word:** applying T = 0.10918 to `s3c_verifier_a_dev_predictions.csv` gives **0 rank inversions, 1 new tie, and 2 of 82 items saturated to exactly 1.0** — the theorem holds, with float saturation as the only leakage. 🔑 **The real defect was the GRID, and it is worse than decision 17 described.** On the spec's uniform grid the calibrated scores yield **5 distinct pass-set sizes against raw's 12**, and sit **flat at 28 items for τ = 0.30 through 0.65 — eight consecutive dead grid points**. Thresholds placed at the observed score values recover **81 operating points on either scale**. So the fix is arithmetic, not a choice of score. **Reported on the calibrated scale** because `kotte2026ucci` (Thm 1) show threshold policies on calibrated error probability are cost-optimal under stated assumptions, and because a τ that reads as a probability is interpretable in Ch.4. ⚠️ **Two warnings carried forward rather than absorbed.** (i) `kotte2026ucci` selected **isotonic regression over temperature scaling** precisely because temperature is *"constrained to a single-parameter monotone rescaling, which is too rigid"* (ECE 0.03 vs 0.08) — and our T = 0.109 is one parameter fitted in-sample on 82 rows. (ii) Their τ minimises an **explicit cost objective**; §4.5 names only *"first-pass 60–70%"*, a target rate. **A threshold cannot be optimal for an unstated objective**, so that becomes open decision 19 — the same defect class as the struck `0.6/0.4`: a number with a value and no criterion. |
 | 2026-08-11 | 🔴 **Decision 19 quantified: the τ cost objective is DEGENERATE without a quality constraint, and §4.5's own grid may not reach §4.5's own target** | Sabbir: *"dekho paper e kivabe deya oita hishab kore koro"* — take `kotte2026ucci`'s formulation and compute it rather than describe it. `src/eval/tau_objective.py` does so against §4.2's actual loop. | **The loop's cost, written out:** Writer call per attempt, Reflector per FAIL except after the last (nothing left to feed), Researcher free because §4.2 makes it a deterministic tool-caller. With `q` = per-attempt pass rate and 3 attempts: **E[calls] = 1 + 2(1−q) + 2(1−q)²**, **P(accept) = 1 − (1−q)³**. Calls per accepted generation: **q=0.10 → 16.310, 0.30 → 5.145, 0.50 → 2.857, 0.65 → 2.032, 0.80 → 1.492, 0.99 → 1.020.** 🔑 **Monotonically decreasing, so the unconstrained minimum is q = 1, τ = 0 — the cheapest loop never rejects.** UCCI's Thm 1 proves threshold policies optimal *subject to* an accuracy constraint; **we adopted the objective and dropped the constraint**, which is why §4.5's *"first-pass 60–70%"* reads like an operating point but cannot be derived as one. It is a stand-in for a quality floor that was never stated. **The fix is not a number:** the floor must be measured by **Verifier-B, never Verifier-A** — A is inside the loop, and constraining the loop by its own judge is precisely the Goodhart collapse inviolable rule 6 exists to prevent. ⚠️ **Second finding, not looked for.** On the only score distribution in the repo (dev-82; labelled NOT A RESULT in the script, since `kapur2026length` show human text does not stand in for generated), the uniform 0.30–0.95 grid reaches pass-rates spanning only **0.06–0.38**, while quantile spacing spans **0.01–1.00**. **The spec's grid cannot reach the spec's 60–70% target on this distribution.** Whether that survives on generated text is unmeasured — but the grid and the target were plainly never checked against each other, and that check cost one script. |
 | 2026-08-11 | ✅ **Decision 19 CLOSED: τ selection adopts `kotte2026ucci`'s procedure wholesale. §4.5's "first-pass 60–70%" is STRUCK** | τ is selected by constrained cost minimisation with the constraint bounded by two measured endpoints — **α_lo** (τ=0, Critic never rejects; = §5.1 row 1, zero-shot, 1 call) and **α_hi** (τ=1, all 3 attempts, best-of-3) — **both scored by Verifier-B, never Verifier-A**. Headline operating point τ\* = **argmax [quality(τ) − α_lo] / E[calls](τ)**. Full Pareto frontier reported regardless. Cost model and selection rule: `src/eval/tau_objective.py`. | ⚠️ **Provenance: Sabbir delegated — *"abar amar shiddhanto ki vai. tmk paper dekhte bolsi emnei nki. paper er moto kora lagbe."* The choice and reasoning are Claude's, endorsed not authored, as for decisions 12, 14 and 16.** He is also correcting a real failure: the previous pass computed the cost curve and then handed him a three-option menu, which is the opposite of "do it like the paper". **The forcing result, computed rather than asserted:** under §4.2's loop (**E[calls] = 1 + 2(1−q) + 2(1−q)²**, Researcher free because it makes no LLM call), calls-per-accepted is **monotonically decreasing** — 16.310 at q=0.10, 5.145 at 0.30, 2.857 at 0.50, 2.032 at 0.65, 1.020 at 0.99. **Minimising cost alone therefore selects q=1, τ=0: the cheapest loop is the one that never rejects anything.** UCCI's Thm 1 proves threshold policies optimal *subject to* an accuracy constraint; we had adopted the objective and dropped the constraint, which is exactly why "first-pass 60–70%" reads like an operating point and cannot be derived as one. 🔑 **The paper's constraint is not free-floating either** — *"a target accuracy τ in [α_s, α_ℓ]"*, bounded by the cheap and expensive systems' measured accuracies. Our two ends of τ **are** two ends of a cost/quality range we were already going to measure, so no new experiment is created. **The Verifier-B restriction is ours, not theirs:** UCCI has no in-loop/out-of-loop wall, and using Verifier-A to constrain a loop Verifier-A judges would be the Goodhart collapse rule 6 exists to prevent. ✅ **Why an argmax and not a fraction:** UCCI's 0.91 sits 74.1% up their achievable range — a deployment choice they were entitled to make. Adopting a fraction of our own would reintroduce precisely the hand-written constant this day was spent eliminating (see the `0.6/0.4` and `r1_fraction` rows above), so the headline point is defined by an argmax with nothing to choose. Synthetic check in the script: the rule selects an interior point at **67.1% of achievable gain**, close to UCCI's own 74.1% — the rule is not degenerate at either end. ⚠️ **`quality(τ)` cannot be computed yet** — it needs generations and Phase 4 has produced none. What is registered here is the **procedure, fixed before any number exists**, which is the only order in which it can be registered at all. |
+| 2026-08-11 | ✅ **S4 pre-commitment written — Phase 4 is registered before `src/agents/` contains a line of code** | New section §"S4 pre-commitment" registers: `w` has no value and three pre-committed outcomes for its sensitivity curve; τ scoping (below); the 20-generation generator pilot's decision rule; the Researcher's retry contract; and `gave_up` reporting. **Rule 6 is restated as a code-level constraint** — Verifier-B may not be imported anywhere under `src/agents/`, enforced by a test rather than by intention. | **Written in the only order that makes a pre-registration mean anything: Phase 4 has produced no text, no score and no trace.** Index used: **alphaXiv** (Consensus quota exhausted to 1 Sep 2026), stated because *"searched a different index"* and *"did not search"* must not look alike. ⚠️ **The rule-6 restatement is not ceremonial.** The 2026-08-11 Verifier-B data-definition row records a wall that came one training run from collapsing through **ambiguity, not disagreement** — everyone read the sentence correctly and the code would not have. A constraint that lives only in prose has already failed once here. |
+| 2026-08-11 | **§4.2's "a τ per axis level" is REPLACED by a hierarchical fit across the two levels — neither pooled nor split** | τ is estimated by **partial pooling** over the two axis levels, with the shrinkage **estimated from the within/between-level score-variance ratio, not chosen**. Global τ and the two per-level τ are reported as the limiting cases it interpolates. A two-sample permutation test on the per-level generated scores (5,000 shuffles, α = 0.05 — §RQ1-F's existing instrument and constants, adopted not reinvented) is reported **descriptively and is not a gate**. Decision 19's τ\* argmax is unaffected. | ⚠️ **Provenance: Sabbir delegated — *"research kore dekho konta vlo hoy"*. The choice and reasoning are Claude's, endorsed not authored, as for decisions 12, 14, 16 and 19.** 🔑 **The search moved the answer off BOTH options that were offered him, and that is the finding.** Claude had recommended a single global τ. `2605.14260` states a single pooled threshold *"can hide cross-group heterogeneity in score distributions and distort group-wise coverage"*; `2605.05562` — *marginal validity is not enough for subgroup reliability*; `2606.29403` and `2606.20115` independently reproduce pooled calibration masking subgroup undercoverage. **So the "conservative" option was not conservative.** The counterweight is in `2605.14260`'s own title — group-conditional thresholds cost calibration sample, and we have 30 dev-plots per level. `2607.24562` supplies the resolution: hierarchical partial pooling **degrades to global when the levels are indistinguishable and to per-level when they separate**, i.e. it is correct under the condition we cannot know in advance. 🔑 **Why the permutation test is deliberately not a gate:** at n = 30 per level it is underpowered, and a gate whose null verdict fires regardless of the truth is exactly the failure that forced RQ1-F's Gate 2 to be rewritten mid-protocol. **A non-significant result means *not detected*, never *equal*.** The hierarchical estimator needs no gate to be right, which is the whole argument for it. ⚠️ Estimating the shrinkage rather than picking it is what keeps this compliant with the 2026-08-11 standing rule; a hand-set pooling weight would be the same defect as `0.6/0.4`. |
+| 2026-08-11 | **§4.4's 20-generation pilot gains a DECISION RULE; `TIE` is pre-committed as the expected outcome** | §4.4 specifies *"20-generation pilot → Llama vs Qwen"* — a budget with no rule for reading it. Registered: 10 dev-plots × 2 levels, byte-identical prompts, **not scored by Verifier-A**, **`TIE` as the pre-committed default**, a declared non-performance tie-break (lower cost / higher rate limit), and a **`NOT A RESULT`** banner in the style of `results/pilot_s35_idf.*`. Groq model IDs are read from the live catalogue with a retrieval date, never from memory. | **The same defect class as the struck `0.6/0.4` and the struck *"first-pass 60–70%"*: a procedure with a number and no criterion.** `2605.10405` treats best-model identification under a small evaluation budget as a statistical problem with a known failure mode rather than a matter of inspection. 🔑 **The forcing argument is our own data, not the citation:** S3.2 returned `TIE` across **seven arms × five seeds**, with the between-arm spread (0.0348) *smaller than one arm's own seed SD* (0.0391). **Expecting 20 generations to separate two models, when 70 runs could not separate seven, is not defensible** — so the tie-break is registered now rather than improvised at the point of looking at 20 outputs, which would be a preference wearing a result's clothes. **Not scored by Verifier-A** because pre-selecting the generator against the in-loop judge is a soft form of the evaluator–policy co-adaptation `wang2026hacking` name and rule 6 exists to prevent. ⚠️ **Bangla generation quality is registered as a live risk with citations rather than an assumption** — `2605.31483` (BenHalluEval, first systematic Bengali hallucination evaluation) and `2605.22487` (honorific failures in multilingual Bangla generation, where register is part of the construct the axis measures). **Abstracts only; neither is briefed to `base_papers_brief.md` depth, and that is stated rather than implied.** |
+| 2026-08-11 | 🔧 **PROCESS DEFECT, self-reported: `docs/STATUS.md` contradicted itself about whether Phase 3 had run, and the stale half was the one a fresh session read first** | STATUS line 128 recorded the completed S3.3 run (Verifier-A 0.986555, Verifier-B `COMPETENT_EVALUATOR` 0.959666). The **step-11 row** and the **"Phase 3 real state" box** in the same file still read *"0 trained, 2 built"*, *"zero files in `results/`"* and **"Phase 4 cannot start."** Both artifacts and all four result files were committed in `0d2578d`. Corrected in this commit. | **Found because a fresh Phase 4 session read STATUS top-to-bottom, believed it, and reported Phase 4 as blocked — and Sabbir corrected it from memory: *"verifier A to ache maybe. artifacts e. check koro to."*** 🔴 **This is the fourth instance of the pattern STATUS itself already names** (open decisions 1, 2 and 4 were each satisfied and left open for days): *a row here is not closed by the work being done, only by someone closing it.* **What makes this instance worse than those three:** the contradiction was **inside the single file `CLAUDE.md` designates as the source of truth for "where are we"**, and the two halves disagreed on whether the next phase could begin at all. Decisions 1/2/4 were stale rows in a table people had stopped reading; this one actively instructed a new session to stop working. ⚠️ **The general lesson, recorded rather than fixed a fourth time and forgotten: a "verified facts" row and a "pipeline steps" row can be updated independently, so the file's own structure permits this failure.** Checking `results/` and `artifacts/` on disk is now the first action of any session that reads STATUS, because disk cannot go stale. |
+| 2026-08-11 | 🔧 **`research_pipeline_en.md` §4.5 still carried the struck *"first-pass 60–70%"* as a live bullet, directly beneath the box that strikes it** | Decision 19 (earlier the same day) struck the target and recorded it in the §4.5 prose box. **The bullet *"Pick the operating point where first-attempt pass ≈ 60–70%"* survived four lines below it**, unmarked. Struck in place, not deleted, per the append-only convention, and noted in the file's MAINTENANCE STATE box. | **The strike was applied to the argument and not to the instruction.** A reader — supervisor, reviewer, or a fresh session — scanning §4.5's bullet list for the operating rule would have found the withdrawn target and no indication it was dead, and the box above it is long enough that skipping to the bullets is the likely reading path. 🔑 **Same shape as the two defects logged hours earlier**: `0.6/0.4` survived in the spec after its derivation was found not to exist, and line 8's Bangla mirror survived because nobody followed the reference. **All three are cases where the corrected text and the uncorrected text lived in the same file and only one was edited.** Recorded as a maintenance failure rather than a typo, because the pattern is now three-for-three and the cost of the next one lands on whoever trusts the spec. |

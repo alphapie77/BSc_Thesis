@@ -869,3 +869,148 @@
              our pipeline SS4.5 names only a target pass rate of 60-70%, which
              is a proxy, not an objective. Cited in SS4.5 and in Ch.5.}
 }
+
+% ---------------------------------------------------------------------------
+% S4 / Phase 4 -- added 2026-08-11, before any Phase 4 code existed.
+% Index used: alphaXiv (Consensus quota exhausted until 2026-09-01).
+%
+% !! METADATA GAP, FLAGGED RATHER THAN FILLED WITH GUESSES !!
+% These six were surfaced by an alphaXiv discovery call that returns title,
+% arXiv ID, URL and date but NOT the author list. Titles, IDs and dates below
+% are copied verbatim from the tool output and are correct. AUTHORS ARE NOT
+% RESOLVED and are deliberately left as a visible placeholder rather than
+% inferred -- CLAUDE.md forbids inventing a citation, and an author list
+% recalled from training data is exactly that. Resolve every one of these
+% before the bibliography enters the thesis or any submission.
+%
+% Depth: ABSTRACT ONLY for all six. None is briefed to base_papers_brief.md
+% depth. Where a claim below carries weight in protocol.md SS4, it rests on
+% the abstract, and that is stated in the deviation row too.
+% ---------------------------------------------------------------------------
+
+@article{axiv2607_24562_hierarchicalcrc,
+  title   = {Hierarchical Group-Conditional Conformal Risk Control for
+             Selective Prediction in Language Models},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2607.24562},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. THE PAPER THAT DECIDED
+             SS4.2's tau scoping. Motivating premise is ours almost exactly:
+             "large language models serve heterogeneous populations structured
+             by domain, topic difficulty, and linguistic style", and marginal
+             conformal risk control gives guarantees that need not hold per
+             group. Supplies the procedure adopted in protocol.md SS4
+             decision 2: HIERARCHICAL PARTIAL POOLING across groups, which
+             degrades to the pooled threshold when groups are indistinguishable
+             and to per-group thresholds when they separate. That property is
+             why it was chosen -- we cannot know in advance which regime our
+             two axis levels are in, and the estimator does not require us to.
+             Shrinkage is ESTIMATED, not chosen, which is what keeps it
+             compliant with the 2026-08-11 standing rule on hand-set constants.}
+}
+
+@article{axiv2605_14260_fairnessburden,
+  title   = {On the Burden of Achieving Fairness in Conformal Prediction},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2605.14260},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. THE PAPER THAT KILLED THE
+             RECOMMENDATION CLAUDE HAD ALREADY MADE. Claude had recommended a
+             single global tau to Sabbir on the ground that it was the
+             conservative choice. This states the opposite: conformal
+             prediction "is often calibrated with a single pooled threshold,
+             but this can hide cross-group heterogeneity in score distributions
+             and distort group-wise coverage." Our configuration is exactly
+             that -- two axis levels whose generated-score distributions we
+             have no basis to assume match. The title also names the
+             counterweight we must respect: group-conditional thresholds cost
+             calibration sample, and we have 30 dev-plots per level. Cited in
+             protocol.md SS4 decision 2 and in the deviations log as the fifth
+             entry in CLAUDE.md's search-first table.}
+}
+
+@article{axiv2605_05562_socioconformal,
+  title   = {Socio-Conformal Calibration in Complex Survey Data: Marginal
+             Validity Is Not Enough for Subgroup Reliability},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2605.05562},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Corroborates
+             axiv2605_14260_fairnessburden from a different application area
+             (ordinal conformal prediction on survey data), and its title is
+             the one-line statement of the point: marginal validity is not
+             enough for subgroup reliability. Cited as convergent rather than
+             independent evidence -- it is the same argument in another domain,
+             not a second measurement of ours.}
+}
+
+@article{axiv2606_29403_selforganizedcp,
+  title   = {Self-Organized Conformal Prediction: Reducing Regional Coverage
+             Gaps with Unsupervised Group Discovery},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2606.29403},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Third reproduction of the
+             pooled-calibration failure: "pooled calibration averages over
+             heterogeneous regions and can mask regional undercoverage."
+             Listed in protocol.md SS4 decision 2 so that the claim rests on a
+             field rather than on one paper -- per CLAUDE.md's search
+             mechanics, one 10-result call is not "the search".}
+}
+
+@article{axiv2605_10405_bestmodelid,
+  title   = {Valid Best-Model Identification for LLM Evaluation via Low-Rank
+             Factorization},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2605.10405},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Cited in protocol.md SS4
+             decision 3 for one narrow purpose: it establishes that selecting
+             the best model under a small evaluation budget is a STATISTICAL
+             problem with a known failure mode, not a matter of inspecting
+             outputs. That is the warrant for giving SS4.4's 20-generation
+             pilot a pre-committed decision rule and a TIE default instead of
+             a budget with no criterion. NOTE, because it matters for how far
+             this may be pushed: the paper's own method (multi-armed bandits /
+             low-rank factorisation over a benchmark matrix) is NOT adopted --
+             our pilot has 2 arms and 20 items, far below the regime it
+             addresses. It is cited for the framing, and the forcing argument
+             for the TIE default is our OWN S3.2 result (seven arms, five
+             seeds, between-arm spread 0.0348 < MuRIL's own seed SD 0.0391),
+             not this citation.}
+}
+
+@article{axiv2605_31483_benhallueval,
+  title   = {BenHalluEval: A Multi-Task Hallucination Evaluation Framework for
+             Large Language Models on Bengali},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2605.31483},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Registers Bangla
+             generation quality as a documented risk rather than an assumption
+             before the Writer generates a single review. Its own framing --
+             "despite Bengali being the sixth most spoken language in the
+             world, no prior work has systematically evaluated hallucination in
+             LLMs for Bengali" -- is also usable in Ch.1 as independent 2026
+             evidence for the low-resource gap this thesis claims. Cited in
+             protocol.md SS4 decision 3 and flagged for Ch.2.}
+}
+
+@article{axiv2605_22487_banglahonorific,
+  title   = {Polite on the Surface, Wrong in Practice: A Curated Dataset for
+             Fixing Honorific Failures in Multilingual Bangla Generation},
+  author  = {AUTHORS UNRESOLVED -- see header note},
+  journal = {arXiv preprint arXiv:2605.22487},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. The one of the six with a
+             direct line to our construct: honorifics and register are not
+             stylistic garnish in Bangla, and the engagement-specificity axis
+             RQ1-H validated is partly a register distinction (S2b's register
+             probe found first-person pronouns, exclamation and comma-runs
+             separating the two corpora). A generator that gets Bangla
+             honorifics wrong is failing on the same dimension the Critic
+             scores. Cited in protocol.md SS4 decision 3; flagged as a
+             candidate for the SS4.6 failure taxonomy's category list, which is
+             currently "wrong sentiment / too short / off-topic / template
+             repeat" and has no register category at all.}
+}

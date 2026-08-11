@@ -26,6 +26,34 @@
 > unticked), the §5.1 generation count, and the persona-count arithmetic in the S6
 > contract and §4.5.
 >
+> ---
+>
+> ### 🔧 SECOND PASS — 2026-08-11, later the same day, at the start of Phase 4
+>
+> **The first pass missed four live survivals of text it had already struck.**
+> Decision 19 struck *"first-pass 60–70%"* and decision 17 struck the uniform
+> τ grid, and both strikes were applied **to the §4.5 argument box and nowhere
+> else**. Still reading as live instructions afterwards:
+>
+> | Where | What survived |
+> |---|---|
+> | checklist step 16 (line ~148) | the struck **`0.6×VerifierA + 0.4×symbolic`** |
+> | checklist step 17 (line ~149) | *"first-pass 60–70%"*, **plus** *"blocked by open decision 17"* — closed — **plus its refuted premise** (*"79 of 82 dev items sit at confidence 0.998"*) |
+> | S5 stage contract, Gate **G4** (line ~199) | *"if first-attempt pass rate doesn't reach 60–70%, raise τ"* |
+> | §4.5 bullet list (line ~473) | *"Pick the operating point where first-attempt pass ≈ 60–70%"* — **four lines below the box that strikes it** |
+>
+> All four are now struck in place, not deleted, and each points at the section
+> of `protocol.md` that replaced it.
+>
+> 🔑 **The lesson, recorded because it is now three-for-three.** `0.6/0.4`
+> survived after its derivation was found not to exist; line 8's Bangla mirror
+> survived because nobody followed the reference; and these four survived
+> because a strike was written into the prose and not into the instructions.
+> **Every one is a case where corrected and uncorrected text lived in the same
+> file and only one copy was edited.** Striking a number now means grepping the
+> whole file for it, not editing the paragraph where the argument happens to
+> live — a reader scanning a checklist or a gate table never reaches the box.
+>
 > **Deliberately NOT fixed, because it is not Claude's to fix:** every occurrence
 > of *persona* / *three personas* as **framing language** (§2.3 heading, §8.1,
 > §8.2, the Ch.1 blueprint). That is **open decision 12 — Sabbir's wording call.**
@@ -144,9 +172,9 @@
 ⚠️ 14. Train Verifier-A + B (bn, en) → dual accuracy [§3.1, 3.3] → Gate G3 — **bn pair DONE 2026-08-11** (`results/s3c_verifier_a.json`, `s3d_verifier_b.json`): A 0.986555 (1 error in 82, reproduces S3.2b), B `COMPETENT_EVALUATOR` 0.959666, mean 0.967442 ± 0.015839 over 5 seeds. **en pair not built** (step 7). ✗ **the dual-accuracy table is NOT PRODUCIBLE** — established 2026-08-08. 🔴 **Pre-committed: no claim that either verifier is better may be made from dev-82** (1 item = 0.0122 macro-F1)
 ☑ 15. Calibration (ECE + temperature scaling) [§3.4] + LR-learned symbolic rules [§3.5] — **both done 2026-08-11.** 🔴 **Verifier-A was miscalibrated: ECE 0.11836 → 0.00537**, and the direction is **UNDER-confidence** (T = 0.10918 < 1), opposite to `guo2017calibration`'s finding. ✅ **Verifier-B's pre-committed null FIRED** (ΔECE CI [−0.00661, +0.00705] straddles zero). ⚠️ Symbolic scorer is weak and gameable: CV **0.5150 ± 0.0713** vs majority 0.3926, features almost all presence-based. 🔴 **F1/IDF disabled pending Sabbir's rule-7 ruling — measured cost ~18 macro-F1 points**
 
-**Weeks 7–9 — Loop (S5)** — ⛔ **NOT STARTED. `src/agents/` and `src/eval/` are empty stubs.** This is Phase 4, and it is where the title's *"Multi-Agent"* and *"Verifier-in-the-Loop"* live
-☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → choose Llama vs Qwen — **unblocked as of 2026-08-11**: §4.2's Critic is `0.6×VerifierA + 0.4×symbolic` and both inputs now exist
-☐ 17. τ sweep → operating point (first-pass 60–70%) [§4.5] → Gate G4 — 🔴 **blocked by open decision 17**: after temperature scaling **79 of 82 dev items sit at confidence 0.998**, so a sweep over calibrated Verifier-A scores has almost no resolution. Calibrated or uncalibrated must be settled *by a literature search* before this step, not during it
+**Weeks 7–9 — Loop (S5)** — 🔨 **PRE-REGISTERED 2026-08-11 (`protocol.md` §S4), no code yet.** `src/agents/` is an empty stub; `src/eval/` holds `tau_objective.py` only. This is Phase 4, and it is where the title's *"Multi-Agent"* and *"Verifier-in-the-Loop"* live
+☐ 16. Build LangGraph (§4.1–4.2) + 20-generation pilot → choose Llama vs Qwen — **unblocked as of 2026-08-11**: §4.2's Critic is `w×VerifierA + (1−w)×symbolic` and both inputs now exist (`artifacts/verifier_a.joblib`, `results/s35_symbolic.*`). ⚠️ ~~`0.6×VerifierA + 0.4×symbolic`~~ **STRUCK** — `w` has no value and is fit on the 30 dev-plots' generations as a sensitivity curve (protocol.md §S4). The pilot's decision rule, with `TIE` pre-committed, is registered in the same section
+☐ 17. τ sweep → operating point [§4.5] → Gate G4 — ✅ **unblocked.** ~~first-pass 60–70%~~ **STRUCK** (decision 19): the operating point is **τ\* = argmax [quality(τ) − α_lo] / E[calls](τ)**, derived, with the full Pareto frontier reported regardless. ~~🔴 blocked by open decision 17: after temperature scaling **79 of 82 dev items sit at confidence 0.998**, so a sweep over calibrated Verifier-A scores has almost no resolution.~~ **CLOSED 2026-08-11 and the premise was FALSE** — temperature scaling is accuracy-preserving (`mattei2026welltempered`), so calibrated and raw τ are reparametrisations of the same partition; the defect was the uniform grid, not the scores. τ is swept at **quantiles of the observed score distribution**, and scoped **hierarchically across the two axis levels** (protocol.md §S4, decision 2)
 ☐ 18. Loop dynamics + failure taxonomy [§4.6]
 
 **Weeks 9–12 — Experiments (S6)**
@@ -196,7 +224,7 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable = 4,730
 | **S2** Persona discovery ⚠️ **on region A only** — on the full corpus the clusters are a corpus detector (93.3%) | K-Means (both languages) + GMM + HDBSCAN robustness | R + LaBSE → master K-table (7 criteria), stability, theory grounding, persona definitions | **G1:** prediction strength < 0.8 or bootstrap ARI worse than neighboring K → K=3 may not be forced; most stable K becomes primary, K=3 theory-motivated secondary |
 | **S3** Human gold | nothing | **region-A-**stratified 300 → gold labels + Fleiss κ **and** Krippendorff's α (ordinal) | **G2:** α < 0.667 → revise guideline + re-annotate; failing twice → reframe claim ("theory-driven scheme, validated learnability") |
 | **S4** Verifier training | **bn-A, bn-B, en-A, en-B** (4 classifiers) + symbolic-weight LR ×2 + temperature scaling ×4 | R1/R2 → dual accuracy (weak-label **and** gold), calibration (ECE before/after) | **G3:** gold accuracy < ~55% (chance=33%) → verifier too weak; increase symbolic weight / inspect data |
-| **S5** Loop build + τ sweep | nothing (calibration only) | Verifier-A + R1-RAG → LangGraph loop, τ sweep 0.30–0.95 on dev-plots, operating point | **G4:** if first-attempt pass rate doesn't reach 60–70%, raise τ — "everything passes" means the loop is dead (the old mistake) |
+| **S5** Loop build + τ sweep | nothing (calibration only) | Verifier-A + R1-RAG → LangGraph loop, τ swept at **quantiles of the observed score distribution** (~~0.30–0.95 uniform~~ struck, decision 17) on dev-plots, operating point | **G4:** ~~if first-attempt pass rate doesn't reach 60–70%, raise τ~~ **STRUCK** (decision 19 — an unreachable target that could not be derived). Replaced: **τ\* = argmax [quality(τ) − α_lo] / E[calls](τ)**, both endpoints scored by **Verifier-B, never A**. The underlying worry survives and is kept: *"everything passes" means the loop is dead* — but it is now read off the frontier, not enforced by a target |
 | **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × **90 eval-plots** (disjoint from dev-30) × ~~3 personas~~ **2 axis levels** (corrected 2026-08-11) → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only. ⚠️ **Verifier-B's calibration improvement is NOT established** (null fired 2026-08-11) — report that beside the Goodhart test, since B is the scorer here |
 
 **Total trained artifacts: 10** (4 verifiers + 2 LR + 4 temperature scalings) — all small, all free-Colab. **No LLM is ever trained** — generation is prompted only.
@@ -470,7 +498,7 @@ Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate
 >
 > Procedure and cost model: `src/eval/tau_objective.py`, pre-registered before any generation exists.
 - Plot: first-attempt pass rate, avg attempts, final acceptance, and **Verifier-B score** (independent quality).
-- **Pick the operating point where first-attempt pass ≈ 60–70%** → the Reflector fires on 30–40% of cases → the loop's behavior becomes measurable.
+- ~~**Pick the operating point where first-attempt pass ≈ 60–70%** → the Reflector fires on 30–40% of cases → the loop's behavior becomes measurable.~~ ⛔ **STRUCK 2026-08-11 (decision 19).** This bullet survived four lines below the box that strikes it — logged as a maintenance failure in `protocol.md`. **Replaced by the derived τ\* above.** The *motivation* is retained and is still right — a loop that passes everything is dead — but it is now observed on the frontier rather than imposed as a target, because a target that cannot be derived is a constraint wearing an optimum's clothes.
 - **Temperature schedule (ablation only):** retry temps 0.8→0.9→1.0 — a published diversity mechanism for escaping mode-collapsed drafts; measure in §5.1b, do not bake in.
 
 ### 4.6 Loop dynamics report

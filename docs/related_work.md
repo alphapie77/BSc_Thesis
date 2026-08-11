@@ -495,6 +495,39 @@ interesting individually.**
 
 ---
 
+## Tier 10 — Threshold scoping and generator selection (added 2026-08-11, for Phase 4)
+
+> **All six were found by a search run *before* the decision they inform, and
+> the first two changed a recommendation Claude had already made to Sabbir.**
+> ⚠️ **Index used: alphaXiv, not Consensus** — quota exhausted until
+> 1 September 2026, recorded for the reason Tier 9 gives.
+>
+> 🔴 **READING DEPTH, STATED UP FRONT BECAUSE IT IS SHALLOW: abstracts only, all
+> six.** None is briefed to `base_papers_brief.md` depth. Where a claim in
+> `protocol.md` §S4 rests on one of these, it rests on an abstract. That is a
+> real weakness in a Q1 submission and it is flagged here rather than
+> discovered at review. **`axiv2607_24562_hierarchicalcrc` is the one that must
+> be read in full before the τ sweep runs**, because its estimator is being
+> adopted, not merely cited.
+>
+> ⛔ **METADATA GAP:** the alphaXiv discovery call returns title, arXiv ID, URL
+> and date but **not author lists**. Titles and IDs in `references.bib` are
+> verbatim and correct; **authors are left as an explicit unresolved
+> placeholder rather than inferred**, per CLAUDE.md's do-not-invent rule. They
+> must be resolved before the bibliography enters the thesis.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `axiv2607_24562_hierarchicalcrc` | arXiv 2607.24562, 2026-07-27 | `[~]` **abstract only** | 🔴 **Supplies the τ procedure adopted in protocol.md §S4 decision 2: hierarchical partial pooling across the two axis levels, shrinkage estimated rather than chosen.** Its motivating premise is ours nearly verbatim — LLMs "serve heterogeneous populations structured by domain, topic difficulty, and linguistic style", so marginal guarantees need not hold per group. 🔑 **Chosen for a property, not a result:** it degrades to the pooled threshold when groups are indistinguishable and to per-group thresholds when they separate, and we cannot know in advance which regime our two levels are in. An estimated shrinkage also keeps the design compliant with the 2026-08-11 standing rule — a hand-picked pooling weight would be another `0.6/0.4`. |
+| `axiv2605_14260_fairnessburden` | arXiv 2605.14260, 2026-05-14 | `[~]` **abstract only** | 🔴 **The fifth entry in CLAUDE.md's search-first table — it refuted a recommendation Claude had already given Sabbir.** Claude had recommended a single global τ *as the conservative option*. The paper states that a single pooled threshold "can hide cross-group heterogeneity in score distributions and distort group-wise coverage". ⚠️ Its title also names the constraint on the other side — group-conditional thresholds **cost calibration sample**, and we have 30 dev-plots per level — which is precisely why the answer is partial pooling rather than a straight switch to per-level τ. |
+| `axiv2605_05562_socioconformal` | arXiv 2605.05562, 2026-05-07 | `[~]` **abstract only** | Corroborates the row above from a different domain (ordinal conformal prediction on complex survey data); its title *is* the argument — *marginal validity is not enough for subgroup reliability*. **Cited as convergent, not independent, evidence** — the same claim in another field, not a second measurement of ours. |
+| `axiv2606_29403_selforganizedcp` | arXiv 2606.29403, 2026-06-28 | `[~]` **abstract only** | Third reproduction of the pooled-calibration failure — "pooled calibration averages over heterogeneous regions and can mask regional undercoverage". Included so decision 2 rests on a **field** rather than on one paper, per CLAUDE.md's search mechanics: one 10-result call is not "the search". |
+| `axiv2605_10405_bestmodelid` | arXiv 2605.10405, 2026-05-11 | `[~]` **abstract only** | **Frames §4.4's 20-generation pilot as a statistical problem rather than an inspection** (protocol.md §S4 decision 3) — best-model identification under a small evaluation budget has a known failure mode. ⚠️ **Its method is NOT adopted**: bandits over a benchmark matrix address a regime far above 2 arms × 20 items. 🔑 **The forcing argument for the pre-committed `TIE` is our own data, not this citation** — S3.2's between-arm spread (0.0348) was smaller than one arm's seed SD (0.0391) across seven arms and five seeds. |
+| `axiv2605_31483_benhallueval` | arXiv 2605.31483, 2026-05-29 | `[~]` **abstract only** | First systematic Bengali hallucination evaluation of LLMs. **Registers Bangla generation quality as a documented risk before the Writer produces a single review**, rather than as an assumption. 🎁 Its framing — *no prior work has systematically evaluated hallucination in LLMs for Bengali, despite Bengali being the sixth most spoken language* — is independent 2026 support for the low-resource gap Ch.1 claims. |
+| `axiv2605_22487_banglahonorific` | arXiv 2605.22487, 2026-05-21 | `[~]` **abstract only** | 🔑 **The one with a direct line to our construct.** Honorifics and register are not garnish in Bangla, and the engagement-specificity axis is partly a register distinction — S2b's probe separated the two corpora on first-person pronouns, exclamation and comma-runs. **A generator that mishandles Bangla honorifics fails on the dimension the Critic scores.** ⚠️ Flagged for §4.6: the pre-specified failure taxonomy is *wrong sentiment / too short / off-topic / template repeat* and has **no register or honorific category at all**. |
+
+---
+
 ## Gap table — the sentence Ch.2 must end with
 
 Fill as entries complete. The claim we must be able to defend is:

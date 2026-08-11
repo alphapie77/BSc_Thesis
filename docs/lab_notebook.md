@@ -3575,3 +3575,119 @@ Verifier-B per-seed macro-F1 (lr 2e-05): 42 -> 0.959666 (3 errors), 43 -> 0.9728
   anticipated one; update the annotation to say so.
 - ⚠️ **No new search was run for this entry** -- it executes an already-searched
   design. The §4.5 τ decision above *does* require one and has not had it.
+
+---
+
+## 2026-08-11 -- S4: Phase 4 pre-registration: the loop, w, tau scoping, the generator pilot
+**Feeds:** Ch.3 Methods (SS4.1-4.2), Ch.4 SS4.5
+**Commit:** `d84efd392225385095e51310730f75b2af2cae60-dirty`
+**Artifacts:** `docs/protocol.md` §"S4 pre-commitment" (new section + 5 deviation
+rows); `docs/research_pipeline_en.md` (second maintenance pass); `docs/STATUS.md`
+(self-contradiction corrected, step 12 added); `docs/related_work.md` Tier 10;
+`docs/references.bib` (6 entries). **No code, no config, no result files** — that
+is the point of the entry.
+
+### Numbers
+- **No new measured number exists**, and none may. Phase 4 has produced no
+  generation, so `w`, τ, τ\*, `quality(τ)`, α_lo and α_hi are all undefined.
+- Numbers *carried in* and verified on disk rather than read from STATUS:
+  Verifier-A dev macro-F1 **0.9866** (T = 0.1092, `CALIBRATION_IMPROVED`),
+  Verifier-B **0.9597** at seed 42 (`COMPETENT_EVALUATOR`,
+  `CALIBRATION_NOT_ESTABLISHED`), both committed in `0d2578d`.
+- `check_constants.py` after this pass: **115 constants carry a reason, 0
+  DECISION-tier do not, 0 openly flagged unresolved** (41 KNOB-tier unstated,
+  never enforced). Exit 0.
+- ⚠️ **`pytest` is not installed in this session's sandbox, so the 171-test
+  suite was NOT run.** This commit touches only Markdown and BibTeX, so no test
+  outcome could have changed — but "not run" is recorded rather than implied.
+
+### Decisions made (and why)
+- **τ scoping — hierarchical partial pooling across the two axis levels**, not
+  one global τ and not two independent ones. Alternatives were exactly those
+  two, and both were put to Sabbir. ⚠️ **Provenance: Sabbir delegated —
+  *"research kore dekho konta vlo hoy"* — so the choice and reasoning are
+  Claude's, endorsed not authored,** as for decisions 12, 14, 16 and 19. Reason:
+  `2605.14260` says a single pooled threshold hides cross-group heterogeneity,
+  while its own title says group-conditional thresholds cost calibration sample
+  — and `2607.24562`'s estimator resolves the conflict by degrading to whichever
+  end the data supports. The shrinkage is **estimated from the within/between
+  variance ratio, not chosen**, which is what keeps it clear of the standing
+  hand-written-constant rule.
+- **The 20-generation pilot gets a decision rule, with `TIE` pre-committed** and
+  a declared non-performance tie-break. Alternative was §4.4 as written — a
+  budget with no criterion, i.e. the same defect as `0.6/0.4`. Reason: S3.2
+  returned `TIE` over seven arms and five seeds with a between-arm spread
+  smaller than one arm's seed SD; expecting 20 generations to separate two
+  models is not defensible, so the rule is fixed before any output is seen.
+- **The pilot is not scored by Verifier-A.** Alternative was to reuse the
+  in-loop judge for convenience. Reason: pre-selecting the generator against
+  the judge that will grade it is a soft form of the evaluator–policy
+  co-adaptation `wang2026hacking` name, and rule 6 exists to prevent it.
+- **Rule 6 restated as a code-level constraint** (no Verifier-B import under
+  `src/agents/`, enforced by a test) rather than as prose. Reason: the
+  2026-08-11 Verifier-B data-definition row records this wall coming one
+  training run from collapsing through *ambiguity*, not disagreement.
+- **`w` is left with no value and three pre-committed outcomes**, including
+  `SYMBOLIC_INERT` as a publishable negative result. Nothing was decided about
+  its magnitude and nothing could be.
+
+### Findings (things we did not expect)
+- 🔴 **`docs/STATUS.md` contradicted itself about whether Phase 3 had run**, and
+  a fresh session read the stale half, believed it, and reported Phase 4 as
+  blocked. Sabbir corrected it from memory — *"verifier A to ache maybe.
+  artifacts e. check koro to."* **Fourth instance of the pattern the file
+  already names**, and the worst of the four, because the two halves disagreed
+  on whether the next phase could begin at all.
+- 🔴 **The struck `0.6/0.4` and the struck *"first-pass 60–70%"* were still live
+  in FOUR places in the normative pipeline** — checklist steps 16 and 17, the S5
+  stage-contract Gate G4, and the §4.5 bullet list four lines below the box that
+  strikes them. Step 17 additionally still cited **closed** decision 17 *and its
+  refuted premise*. **Both strikes had been applied to the argument and not to
+  the instructions.**
+- 🔑 **The general shape, now three-for-three** (`0.6/0.4`, line 8's Bangla
+  mirror, these four): corrected and uncorrected text living in the same file
+  with only one copy edited. Striking a number means grepping the file for it,
+  not editing the paragraph where the argument happens to live — a reader
+  scanning a checklist or a gate table never reaches the prose box.
+- ⚠️ **The search overturned Claude's own recommendation, again.** A global τ had
+  already been recommended to Sabbir as the conservative option before the
+  search ran on it. It is not conservative. Fifth entry in CLAUDE.md's
+  search-first table.
+- 🎁 **The previous entry (S3.3) closed itself with *"the §4.5 τ decision above
+  does require [a search] and has not had it."*** That gap is now closed by this
+  entry — a small demonstration that the notebook's own flagged debts get paid.
+
+### Consequences for downstream steps
+- **Step 16 (build the loop) may now proceed**, against §S4 rather than against
+  §4.2 alone. `configs/s4_loop.yaml` and `configs/s4_pilot.yaml` must carry a
+  `# ref:` to §S4 on every decision constant.
+- **`requirements.in`'s Phase-4 block must be uncommented** (`langgraph`,
+  `chromadb`, `groq`, `google-generativeai`) and `requirements.lock.txt`
+  regenerated by `env_snapshot.py` — never hand-edited.
+- **§4.6's failure taxonomy is under-specified.** Its four categories (*wrong
+  sentiment / too short / off-topic / template repeat*) have **no register or
+  honorific category**, and `2605.22487` documents exactly that failure mode in
+  Bangla generation. Flagged now; the taxonomy is hand-coded over 50 three-time
+  failures, so the category list must be fixed before coding starts.
+- **Decision 10 (prompt parity) is promoted from "blocks Phase 5" to "due before
+  the τ sweep is interpreted"** — §5.1 row 1 *is* α_lo, so an under-specified
+  row-1 prompt inflates the loop's apparent gain, which is precisely the
+  artefact Huang et al. §5 document.
+- **`axiv2607_24562_hierarchicalcrc` must be read in full before the τ sweep
+  runs.** Its estimator is being *adopted*, not merely cited, and the entry rests
+  on an abstract.
+
+### Citations needed
+- Six new entries added to `docs/references.bib` and `docs/related_work.md`
+  **Tier 10**: `axiv2607_24562_hierarchicalcrc`, `axiv2605_14260_fairnessburden`,
+  `axiv2605_05562_socioconformal`, `axiv2606_29403_selforganizedcp`,
+  `axiv2605_10405_bestmodelid`, `axiv2605_31483_benhallueval`,
+  `axiv2605_22487_banglahonorific`.
+- ⚠️ **Index used: alphaXiv**, not Consensus (quota exhausted to 2026-09-01).
+- 🔴 **Reading depth is ABSTRACT ONLY for all of them**, and 🔴 **author lists are
+  UNRESOLVED** — the alphaXiv discovery call returns title, ID, URL and date but
+  no authors, so the `author` field is an explicit placeholder rather than an
+  inference. Both gaps are flagged in the `.bib` header and in Tier 10, and both
+  must be closed before the bibliography enters the thesis. Guessing an author
+  list from memory is the defect CLAUDE.md's do-not-invent rule names, and it
+  would look identical to a correct one.
