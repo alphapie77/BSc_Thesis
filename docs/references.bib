@@ -1203,3 +1203,114 @@
              is entirely informal comment text averaging ~8 words, so this is
              the resource-gap citation for Ch.1 rather than a method citation.}
 }
+
+@article{axiv2502_15603_thinkinenglish,
+  title   = {Do Multilingual LLMs Think In English?},
+  author  = {AUTHORS UNRESOLVED -- Google DeepMind / University of Oxford per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2502.15603},
+  year    = {2025},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. LLMs "make key decisions in
+             a representation space closest to English." With
+             axiv2402_10588_llamasinenglish and axiv2504_11833_thinkmultilingually
+             this is the support for Sabbir's hypothesis that an English prompt
+             may be understood better. It is NOT sufficient on its own -- see
+             the three counterweights in docs/axis_definition.md SS3e.}
+}
+
+@article{axiv2402_10588_llamasinenglish,
+  title   = {Do Llamas Work in English? On the Latent Language of Multilingual
+             Transformers},
+  author  = {AUTHORS UNRESOLVED -- EPFL per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2402.10588},
+  year    = {2024},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. English as an internal
+             PIVOT language in English-dominated multilingual transformers.
+             Directly relevant because our generator arm is Llama.}
+}
+
+@article{axiv2504_11833_thinkmultilingually,
+  title   = {Could Thinking Multilingually Empower LLM Reasoning?},
+  author  = {AUTHORS UNRESOLVED -- Shanghai AI Lab / CMU / Nanjing per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2504.11833},
+  year    = {2025},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. States the English bias
+             plainly: LLMs "often perform better when tasks are presented in
+             English."}
+}
+
+@article{axiv2605_27649_languageroles,
+  title   = {Disentangling Language Roles in Multilingual LLM Task Execution},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2605.27649},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Studies exactly our
+             configuration -- instruction language, source-content language and
+             required response language not coinciding. The paper to read in
+             full before the pilot's prompt-language arms are finalised.}
+}
+
+@article{axiv2606_08994_languageconfusion,
+  title   = {Language-Aware Token Boosting: LLM Language Confusion Reduction
+             Without Tuning},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2606.08994},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Language confusion when
+             generating non-English text. THE risk of an English instruction
+             block for us: the Writer answering in English or in a mix is not a
+             quality dip, it is a void generation. Basis for the pilot's
+             LANG_CONFUSION criterion, which is a failure RATE and therefore
+             decidable at n=20 where a quality difference is not.}
+}
+
+@article{axiv2606_19668_languageanchoring,
+  title   = {Code-Switching Reveals Language Anchoring in Multilingual LLMs},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2606.19668},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Mixing languages
+             "frequently degrades performance relative to source- or
+             target-language monolingual" prompts; axiv2506_14012_lostinthemix
+             agrees. This is what rules out the "sprinkle some Bangla into the
+             English prompt" option: if the prompt goes English, the split must
+             be clean and structural (instructions English, content Bangla).}
+}
+
+@article{axiv2506_14012_lostinthemix,
+  title   = {Lost in the Mix: Evaluating LLM Understanding of Code-Switched Text},
+  author  = {AUTHORS UNRESOLVED -- MBZUAI / Ecole Polytechnique per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2506.14012},
+  year    = {2025},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Corroborates
+             axiv2606_19668_languageanchoring on degradation under code-switched
+             input.}
+}
+
+@article{axiv2603_25015_imperativeinterference,
+  title   = {Imperative Interference: Social Register Shapes Instruction
+             Topology in Large Language Models},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2603.25015},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. The finding that makes the
+             prompt-language question undecidable from the armchair: "System
+             prompt instructions that cooperate in English COMPETE in Spanish,
+             with the same semantic content, but opposite interaction topology."
+             SS4.2's Writer prompt carries FOUR instruction sources -- definition,
+             10 exemplars, plot, and on retry the Reflector feedback -- so
+             changing prompt language may change how they INTERACT, not merely
+             how well each is understood. Nothing in the literature says which
+             way for Bangla, which is why this became a pilot factor.}
+}
+
+@article{axiv2604_16937_nooneftsall,
+  title   = {No One Fits All: From Fixed Prompting to Learned Routing in
+             Multilingual LLMs},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2604.16937},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Translation-based
+             prompting's effectiveness VARIES across ten languages of differing
+             resource levels. The citation for "there is no universal answer to
+             import", and therefore for measuring rather than adopting.}
+}

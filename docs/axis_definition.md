@@ -94,6 +94,46 @@ is what RQ1-H validated and inventing fresh wording would discard the validation
   লেখেন।
 <!-- AXIS_DEFINITION_END -->
 
+### The English rendering (pilot arm B — §3e)
+
+Same construct, same swap tests, same positive framing. **Not a translation of
+the block above so much as the same content written natively in English**, since
+`2503.04369` makes literal translation its own failure mode. The Bangla terms
+kept in brackets are the ones the corpus and the annotation instrument actually
+use — the exception `2606.19668` allows, because a term of art is not
+code-switching.
+
+<!-- AXIS_DEFINITION_EN_BEGIN -->
+### Level 0 — an opinion, but nothing specific
+
+The comment calls the film good or bad and stops there. It may be emphatic —
+repeating itself, using intense words, talking about the writer's own feelings —
+but it never names any particular thing in the film. Not the story, not the
+acting, not the songs, not the direction, not a character, not a scene.
+
+**A quick test:** this comment could be pasted under almost any film and nothing
+about it would change.
+
+### Level 1 — talking about something particular
+
+The comment takes hold of one particular thing in the film — the story, the
+acting, the songs, the lead actor or actress, the direction, the ending, a
+scene, someone's name. It does not stop at naming it; it attaches a reaction to
+that thing: why it felt that way, what it is being compared to, what was
+expected, what actually happened on watching.
+
+**A quick test:** this comment stops working under a different film.
+
+### Normal at both levels
+
+- **Praise and criticism, both.** At either level people may like the film or
+  dislike it.
+- **Short comments and long comments, both.** A single line can name something
+  particular; several lines can stay inside a familiar mould.
+- **Ordinary colloquial Bangla (চলিত)** — the way people write in Facebook or
+  YouTube comments.
+<!-- AXIS_DEFINITION_EN_END -->
+
 ## 3b. Why the "what it is NOT" section was removed — the search attacked this file
 
 **Delegated by Sabbir (*"tmi research kore dekho ki valo hoy"*); the reading is
@@ -186,6 +226,84 @@ comments from R1. Where §3c warns that pattern-completion may *fight* the
 instruction on length, here it *helps* — the exemplars demonstrate the register
 that `2410.15956` says a model will otherwise drift away from. Same mechanism,
 opposite sign, and both are now on the record.
+
+## 3e. Prompt language — Sabbir's hypothesis, and why it becomes a pilot factor rather than a decision
+
+**Sabbir, 2026-08-11:** *"english prompt hole valo bujhbe maybe LLM. lagle
+bangla add korba okhane akri."* ⚠️ He marked it *maybe*, and the searches below
+say he is largely right and that adopting it outright would still be a mistake.
+
+**This is the second search on this question, deliberately.** §3d recorded it as
+*thin* after one call with one phrasing; CLAUDE.md forbids treating one 10-result
+call as "the search". Re-worded, it is not thin at all — **the earlier "thin"
+verdict was a property of my query, not of the field**, and that is worth
+recording because a thin result is exactly what silently closes a question.
+
+**Supporting his hypothesis, and strongly:**
+
+- **`2502.15603` — *Do Multilingual LLMs Think In English?*** (Google DeepMind /
+  Oxford): LLMs *"make key decisions in a representation space closest to
+  English."*
+- **`2402.10588` — *Do Llamas Work in English?*** (EPFL): English as an internal
+  **pivot** language in English-dominated models.
+- **`2504.11833`**: *"LLMs exhibit a significant English bias, i.e. they often
+  perform better when tasks are presented in English."*
+- **`2605.27649` — *Disentangling Language Roles in Multilingual LLM Task
+  Execution*** is our exact configuration: models used *"when instruction, source
+  content, and required response languages do not coincide."*
+
+**And three findings that stop it being a free swap:**
+
+1. 🔴 **`2606.08994` — *Language-Aware Token Boosting: LLM Language Confusion
+   Reduction*.** Models *"sometimes exhibit language confusion when generating
+   non-English text."* An English instruction block raises the risk the Writer
+   answers in English, or in a Bangla–English mix. **For us that is not a quality
+   dip, it is a void generation.**
+2. 🔴 **`2606.19668` — *Code-Switching Reveals Language Anchoring*** finds mixing
+   languages *"frequently degrades performance relative to source- or
+   target-language monolingual"* prompts, and **`2506.14012`** agrees. **So the
+   *"lagle bangla add korba"* part — sprinkling Bangla into an English prompt —
+   is the option with the least support.** If we go English, the split must be
+   clean and structural: **instructions in English, content in Bangla**, which is
+   what `2605.27649` studies.
+3. 🔴 **`2603.25015` — *Imperative Interference*** is the one that makes this
+   genuinely undecidable from the armchair: *"System prompt instructions that
+   cooperate in English **compete** in Spanish, with the same semantic content,
+   but opposite interaction topology."* Our prompt carries **four** instruction
+   sources — definition, 10 exemplars, plot, and on retry the Reflector's
+   feedback. **Switching prompt language may change how they interact, not
+   merely how well each is understood**, and no amount of reading tells us which
+   way for Bangla.
+4. **`2604.16937`** reports translation-based prompting's effectiveness *varies
+   across languages and tasks* over ten languages. **There is no universal
+   answer to import.**
+
+### The registered design
+
+**Prompt language becomes a pre-registered factor of the pilot, with two
+renderings emitted from one template**, so the axis definition still has a
+single source (decision 5's parity requirement is unaffected — it holds within
+each rendering).
+
+**Invariant in both arms, because nothing supports varying them:** the 10
+retrieved exemplars are real Bangla comments; the plot is Bangla; the output
+requirement is Bangla.
+
+🔑 **The criterion is a failure rate, not a quality score, and that is what
+makes it decidable at n = 20.** A quality difference between prompt languages
+would need hundreds of generations — the same power problem that makes `TIE`
+the pilot's registered default for model choice. **Language confusion is a
+binary with a large expected gap**, so it is visible immediately:
+
+- **`LANG_CONFUSION` fires** if any arm produces output that is not Bangla, or
+  is Bangla–English code-mixed beyond the loanwords the corpus itself contains
+  (`has_latin` is **0.09% / 0.00%** in region A — so the corpus baseline is
+  effectively zero and any Latin script is a signal).
+- **If one arm confuses and the other does not, the clean arm wins**, and no
+  quality claim is made either way.
+- **If neither confuses, the Bangla arm is retained** — not because it won, but
+  because it is the incumbent and 20 generations cannot separate the arms on
+  quality. **Registered now so it cannot be reasoned to afterwards.**
 
 ## 3c. Pre-registered diagnostic — did the Writer learn specificity or length?
 
