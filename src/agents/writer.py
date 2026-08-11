@@ -46,7 +46,30 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.provenance import stamp  # noqa: E402
 from src.common.secrets import redact, require  # noqa: E402
 
-COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions"
+#: Providers, keyed by name. Both are addressed through their OpenAI-compatible
+#: chat-completions endpoint, so ONE code path serves both and the provider is a
+#: config value rather than a fork.
+#:
+#: Why a provider is a first-class field rather than a detail: `2605.19537`
+#: names the inference BACKEND a silent hyperparameter affecting reproducibility.
+#: Two providers serving the same weights are not the same measurement, so the
+#: provider is recorded on every generation and a comparison may never mix them.
+#: ref: docs/protocol.md, 2026-08-12 provider deviation.
+PROVIDERS = {
+    "groq": {
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "models_url": "https://api.groq.com/openai/v1/models",
+        "key_env": "GROQ_API_KEY",
+    },
+    "gemini": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "models_url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
+        "key_env": "GOOGLE_API_KEY",
+    },
+}
+
+#: Kept for the existing call sites; the provider table is the source of truth.
+COMPLETIONS_URL = PROVIDERS["groq"]["url"]
 
 #: §4.2, verbatim and not tuned here. Recorded as conventional-but-unTUNED:
 #: `2408.13586` is the standard for selecting these, `2407.01082` (min-p)
@@ -134,19 +157,25 @@ class Generation:
     usage: dict = field(default_factory=dict)
     response_id: str | None = None
     system_fingerprint: str | None = None
+    provider: str = "groq"
     rate_limits: dict = field(default_factory=dict)
     transport_retries: int = 0
     provenance: dict = field(default_factory=dict)
 
 
-def generation_key(plot_id: str, target_level: int, attempt: int, arm: str, model: str) -> str:
-    """Identity of a generation, for resume. Model and arm are part of it.
+def generation_key(
+    plot_id: str, target_level: int, attempt: int, arm: str, model: str,
+    provider: str = "groq",
+) -> str:
+    """Identity of a generation, for resume. Provider, model and arm are in it.
 
-    Including them means switching arm or model does not silently reuse a
-    generation produced under different conditions -- which would look like a
-    completed run and be a mixed one.
+    Including them means switching provider, arm or model does not silently
+    reuse a generation produced under different conditions -- which would look
+    like a completed run and be a mixed one. The PROVIDER is in the key for the
+    same reason it is a field: two backends serving the same weights are not the
+    same measurement (`2605.19537`).
     """
-    return f"{plot_id}|L{target_level}|a{attempt}|{arm}|{model}"
+    return f"{plot_id}|L{target_level}|a{attempt}|{arm}|{provider}:{model}"
 
 
 def completed_keys(jsonl_path: str | Path) -> set[str]:
@@ -190,12 +219,17 @@ class Writer:
         *,
         arm: str = "bn",
         jsonl_path: str | Path,
+        provider: str = "groq",
         tpm_budget: int | None = FREE_TIER_TPM,
     ):
+        if provider not in PROVIDERS:
+            raise ValueError(f"provider must be one of {sorted(PROVIDERS)}, got {provider!r}")
         self.model = model
         self.arm = arm
+        self.provider = provider
+        self._endpoint = PROVIDERS[provider]["url"]
         self.jsonl_path = Path(jsonl_path)
-        self._key = require("GROQ_API_KEY")
+        self._key = require(PROVIDERS[provider]["key_env"])
         self._tpm = tpm_budget
         # (timestamp, tokens) for the last minute. Pacing PROACTIVELY is much
         # cheaper than reacting to 429s: the reactive path costs a wasted
@@ -239,7 +273,8 @@ class Writer:
         """
         import requests
 
-        key = generation_key(plot_id, target_level, attempt, self.arm, self.model)
+        key = generation_key(plot_id, target_level, attempt, self.arm,
+                             self.model, self.provider)
         # ~2.5 chars per token is deliberately pessimistic for Bangla: the
         # tokenizer fertility is an unmeasured covariate of our own (SS1.2), so
         # the pacer over-estimates rather than under-estimates its spend.
@@ -260,7 +295,7 @@ class Writer:
         retries = 0
         while True:
             resp = requests.post(
-                COMPLETIONS_URL,
+                self._endpoint,
                 headers={
                     "Authorization": f"Bearer {self._key}",
                     "Content-Type": "application/json",
@@ -325,6 +360,7 @@ class Writer:
             attempt=attempt,
             arm=self.arm,
             model=self.model,
+            provider=self.provider,
             prompt=prompt,
             text=choice["message"]["content"].strip(),
             temperature=TEMPERATURE,

@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.provenance import write_result  # noqa: E402
 from src.common.secrets import redact, require  # noqa: E402
 
-MODELS_URL = "https://api.groq.com/openai/v1/models"
+from src.agents.writer import PROVIDERS  # noqa: E402
 
 #: Re-registered 2026-08-11 after the live catalogue showed Qwen is a PREVIEW
 #: model, which Groq documents as removable "at short notice" -- unacceptable for
@@ -62,7 +62,13 @@ LIMIT_HEADERS = (
 
 
 def main() -> int:
-    key = require("GROQ_API_KEY")
+    ap = __import__("argparse").ArgumentParser(description=__doc__)
+    ap.add_argument("--provider", default="groq", choices=sorted(PROVIDERS))
+    args = ap.parse_args()
+    spec = PROVIDERS[args.provider]
+    MODELS_URL = spec["models_url"]
+    key = require(spec["key_env"])
+    print(f"provider: {args.provider}")
 
     import requests
 
@@ -92,7 +98,14 @@ def main() -> int:
 
     print(f"auth OK. {len(served)} models served to this account.\n")
     missing = []
-    for role, model_id in REGISTERED.items():
+    registered = REGISTERED if args.provider == "groq" else {}
+    if not registered:
+        print("  (no registered models for this provider yet -- listing what is "
+              "served, so the pilot arms can be chosen from FACT rather than "
+              "from a blog post or from memory)")
+        for m in served:
+            print(f"     {m}")
+    for role, model_id in registered.items():
         ok = model_id in served
         print(f"  {'OK ' if ok else 'MISSING'}  {role:30s} {model_id}")
         if not ok:
@@ -116,10 +129,10 @@ def main() -> int:
             "rate_limit_headers": limits,
             "models_served": served,
         },
-        "results/s4_groq_preflight.json",
+        f"results/s4_{args.provider}_preflight.json",
         config_path=None,
     )
-    print("\nwrote results/s4_groq_preflight.json")
+    print(f"\nwrote results/s4_{args.provider}_preflight.json")
 
     if missing:
         print(
