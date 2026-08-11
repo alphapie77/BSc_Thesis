@@ -18,6 +18,16 @@ provider: local   # ref: docs/protocol.md 2026-08-12 -- generation moves off the
 # floating-point reductions. Must not vary within a comparison.
 batch_size: 8
 
+# 4-bit nf4. Not a preference: 12.19B in fp16 is ~24 GB and a T4 has 16 GB.
+# Quantisation is IDENTICAL across both arms, or the comparison measures the
+# quantiser rather than the model.
+quantization: nf4
+
+# Corpus median is EIGHT WORDS. 200 was the API default and let the 1B ramble to
+# the cap; 80 is still several times the longest thing in the corpus, and
+# finish_reason records truncation so it is visible rather than silent.
+max_new_tokens: 80
+
 # --- the arms -------------------------------------------------------------
 # Re-registered 2026-08-12. Verified from each model's own config.json, not from
 # the paper and not from memory: BOTH are Gemma3ForCausalLM, hidden_size 1152,
@@ -33,10 +43,18 @@ batch_size: 8
 # ⚠️ arXiv 2503.10995 states TigerLLM-1B is built on LLaMA-3.2. The uploaded
 # weights are Gemma-3. The paper's benchmark table therefore does not describe
 # these weights, and NO claim here rests on it. Logged as a deviation.
-# ⚠️ google/gemma-3-1b-it is gated: accept the licence once on HF (free).
+# ⚠️ google/gemma-3-12b-it is GATED: accept the licence once on HF (free), and
+# put an HF read token in Kaggle Secrets as HF_TOKEN.
+#
+# 🔴 SIZE RE-REGISTERED 2026-08-12 after the smoke test. The 1B pair was tried
+# first and FAILED: TigerLLM-1B produced 1 usable comment in 3, including one
+# degenerate repetition of the plot sentence seven times. The 9B (12.19B, 4-bit)
+# produced 3 in 3. Hand-read, n=3, NOT A RESULT -- but it is why the size moved.
+# arXiv 2503.10995 rates the 1B at MMLU-bn 0.61, above Gemma-2-27B; that score
+# did not transfer to open-ended generation, which was the registered caution.
 models:
-  arm_a: google/gemma-3-1b-it
-  arm_b: md-nishat-008/TigerLLM-1B-it
+  arm_a: google/gemma-3-12b-it
+  arm_b: md-nishat-008/TigerLLM-9B-it
 
 # Prompt language is a pilot FACTOR, not a decision.
 # ref: docs/axis_definition.md section 3e. Sabbir's hypothesis (English may be

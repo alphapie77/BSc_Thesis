@@ -64,7 +64,8 @@ class LocalWriter:
         jsonl_path: str | Path,
         batch_size: int = DEFAULT_BATCH_SIZE,
         dtype: str = "float16",
-        max_new_tokens: int = 200,
+        quantization: str | None = None,
+        max_new_tokens: int = 80,
     ):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -91,16 +92,29 @@ class LocalWriter:
         # it looks like a bad model rather than a bad harness.
         self.tokenizer.padding_side = "left"
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id, dtype=self._dtype, device_map="auto"
-        )
+        kw = {"dtype": self._dtype, "device_map": "auto"}
+        if quantization:
+            # 12.19B in fp16 is ~24 GB against a T4's 16 GB. Quantisation must be
+            # IDENTICAL across arms or the comparison measures the quantiser.
+            from transformers import BitsAndBytesConfig
+
+            kw["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=self._dtype,
+                bnb_4bit_quant_type=quantization,
+                bnb_4bit_use_double_quant=True,
+            )
+            kw.pop("dtype")
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, **kw)
         self.model.eval()
 
         self._env = {
             "provider": "local",
             "model_id": model_id,
             "dtype": dtype,
+            "quantization": quantization,
             "batch_size": batch_size,
+            "max_new_tokens": max_new_tokens,
             "device": str(next(self.model.parameters()).device),
             "torch": torch.__version__,
             "cuda": torch.version.cuda,
