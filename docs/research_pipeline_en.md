@@ -456,7 +456,19 @@ Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate
 ### 4.5 Threshold sweep — the central task
 - ~~τ = 0.30 → 0.95 (step 0.05)~~ **τ swept at QUANTILES of the observed score distribution** (corrected 2026-08-11, decision 17), each τ on the **30 dev-plots** × **2 axis levels**; the 20-generation model pilot uses this dev set too.
 
-> 🔑 **Why the uniform grid was replaced, and why the calibrated/uncalibrated question was dropped.** Temperature scaling is **accuracy-preserving** — `mattei2026welltempered` prove it is the *only* accuracy-preserving linear scaler — so it cannot move an item across a threshold, and calibrated vs raw τ are **reparametrisations of the same partition**. Confirmed on dev-82: **0 rank inversions**. The defect was never the scores; it was the grid. On the old uniform grid, calibrated scores gave **5 distinct pass-sets against raw's 12**, and were **flat for 8 consecutive grid points**. Thresholds placed at observed score values give **81 operating points on either scale**. **Report on the calibrated scale** so τ reads as a probability (`kotte2026ucci`, Thm 1). ⚠️ **Still open (decision 19): τ has no stated objective.** "First-pass 60–70%" is a target rate, not a criterion, and no threshold can be called optimal without one.
+> 🔑 **Why the uniform grid was replaced, and why the calibrated/uncalibrated question was dropped.** Temperature scaling is **accuracy-preserving** — `mattei2026welltempered` prove it is the *only* accuracy-preserving linear scaler — so it cannot move an item across a threshold, and calibrated vs raw τ are **reparametrisations of the same partition**. Confirmed on dev-82: **0 rank inversions**. The defect was never the scores; it was the grid. On the old uniform grid, calibrated scores gave **5 distinct pass-sets against raw's 12**, and were **flat for 8 consecutive grid points**. Thresholds placed at observed score values give **81 operating points on either scale**. **Report on the calibrated scale** so τ reads as a probability (`kotte2026ucci`, Thm 1). ✅ **Decision 19 CLOSED 2026-08-11 — τ is now derived, and ~~"first-pass 60–70%"~~ is struck.**
+>
+> The cost objective **alone is degenerate**: calls-per-accepted falls monotonically in the pass rate (16.310 at q=0.10 → 1.020 at q=0.99), so minimising it selects **τ = 0**. The 60–70% target was a constraint wearing an optimum's clothes.
+>
+> **Following `kotte2026ucci` §3, the constraint is bounded by two measured endpoints, and ours are already §5.1 rows:**
+> - **α_lo** — τ=0, the Critic never rejects: **row 1, zero-shot, 1 call**
+> - **α_hi** — τ=1, every plot runs all 3 attempts, best-of-3 emitted
+>
+> 🔑 **Both measured by Verifier-B, never Verifier-A** (rule 6 — A is inside the loop). This is stricter than UCCI, which has no such wall.
+>
+> **Headline point, no free constant:** τ\* = **argmax [quality(τ) − α_lo] / E[calls](τ)**. UCCI picked 74.1% of the achievable range; choosing our own fraction would reintroduce a hand-written constant, so the argmax replaces it. **The full frontier is the deliverable** (their Fig. 2); τ\* names a point on it.
+>
+> Procedure and cost model: `src/eval/tau_objective.py`, pre-registered before any generation exists.
 - Plot: first-attempt pass rate, avg attempts, final acceptance, and **Verifier-B score** (independent quality).
 - **Pick the operating point where first-attempt pass ≈ 60–70%** → the Reflector fires on 30–40% of cases → the loop's behavior becomes measurable.
 - **Temperature schedule (ablation only):** retry temps 0.8→0.9→1.0 — a published diversity mechanism for escaping mode-collapsed drafts; measure in §5.1b, do not bake in.
