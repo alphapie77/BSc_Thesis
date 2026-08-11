@@ -69,9 +69,9 @@ is what RQ1-H validated and inventing fresh wording would discard the validation
 ### স্তর ০ — মত আছে, নির্দিষ্ট কিছু নেই
 
 মন্তব্যটা ছবিটাকে ভালো বা খারাপ বলে, আর ওখানেই থেমে যায়। জোর থাকতে পারে — একই
-কথা বারবার, তীব্র শব্দ, নিজের অনুভূতির কথা — কিন্তু ছবির কোনো একটা জিনিসের নাম
-ওঠে না। গল্প, অভিনয়, গান, পরিচালনা, কোনো চরিত্র, কোনো দৃশ্য — কিছুই আলাদা করে
-ধরা হয় না।
+কথা বারবার, তীব্র শব্দ, নিজের অনুভূতির কথা। গল্প, অভিনয়, গান, পরিচালনা, কোনো
+চরিত্র বা দৃশ্যের নাম উঠতেও পারে — **কিন্তু নাম করেই থেমে যায়, তার বেশি কিছু
+বলা হয় না।**
 
 **চেনার সহজ উপায়:** এই মন্তব্য প্রায় যেকোনো ছবির নিচে বসিয়ে দেওয়া যায়, আর
 তাতে কিছুই বদলায় না।
@@ -108,9 +108,9 @@ code-switching.
 ### Level 0 — an opinion, but nothing specific
 
 The comment calls the film good or bad and stops there. It may be emphatic —
-repeating itself, using intense words, talking about the writer's own feelings —
-but it never names any particular thing in the film. Not the story, not the
-acting, not the songs, not the direction, not a character, not a scene.
+repeating itself, using intense words, talking about the writer's own feelings.
+It may even name something — the story, the acting, the songs, the direction, a
+character, a scene — **but it stops at the naming and goes no further.**
 
 **A quick test:** this comment could be pasted under almost any film and nothing
 about it would change.

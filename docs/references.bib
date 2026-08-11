@@ -1416,3 +1416,94 @@
              optimised, which this paper frames as the field's normal (and
              criticised) practice rather than as our idiosyncrasy.}
 }
+
+@article{axiv2202_12837_rethinkingdemos,
+  title   = {Rethinking the Role of Demonstrations: What Makes In-Context
+             Learning Work?},
+  author  = {AUTHORS UNRESOLVED -- University of Washington / Meta / AI2 per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2202.12837},
+  year    = {2022},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Ground-truth labels in
+             demonstrations matter far less than expected; what carries the
+             work is the label SPACE, the input DISTRIBUTION and the FORMAT.
+             The reason the SS4.2 exemplar block survives the discovery that
+             cluster membership is impure: the ten retrieved comments supply
+             register and distribution, and they are not label-carrying
+             demonstrations of a classification task.}
+}
+
+@article{axiv2605_08295_incontextfixation,
+  title   = {In-Context Fixation: When Demonstrated Labels Override Semantics
+             in Few-Shot Classification},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2605.08295},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Sharpens
+             axiv2202_12837_rethinkingdemos: "while random demonstration labels
+             barely hurt in-context learning (Min et al., 2022), we show that
+             HOMOGENEOUS labels -- even semantically valid ones -- collapse
+             accuracy to <=12% across six models." Our exemplar block is
+             homogeneous BY DESIGN (SS4.2 retrieves within the target level).
+             The finding is about CLASSIFICATION, where homogeneity destroys the
+             decision; ours is GENERATION with no labels attached, where
+             homogeneity is the conditioning signal. Cited with that boundary
+             stated explicitly, because the surface pattern matches ours and a
+             reader will notice it.}
+}
+
+@article{axiv2603_04464_democonflict,
+  title   = {Understanding the Dynamics of Demonstration Conflict in In-Context
+             Learning},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2603.04464},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Demonstrations "can
+             naturally contain noise and conflicting examples". This is our
+             situation exactly: cluster_k2 is a cut through a continuum
+             (silhouette 0.053), so some level-0 exemplars visibly name actors.
+             Cited for the phenomenon rather than for a fix.}
+}
+
+@article{axiv2303_03846_largermodelsicl,
+  title   = {Larger language models do in-context learning differently},
+  author  = {AUTHORS UNRESOLVED -- Stanford / Google Research per alphaXiv listing},
+  journal = {arXiv preprint arXiv:2303.03846},
+  year    = {2023},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Larger models override
+             semantic priors from flipped in-context labels; smaller ones do
+             not. Bears on the pilot: llama-3.3-70b-versatile and
+             openai/gpt-oss-20b differ by roughly 3.5x in parameters, so they
+             may respond DIFFERENTLY to the impure exemplars -- which is a
+             reason the pilot exists rather than a reason to prefer either.}
+}
+
+@article{axiv2602_08033_comparisonsandratings,
+  title   = {The Benefits of Diversity: Combining Comparisons and Ratings for
+             Efficient Scoring},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2602.08033},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Answers "absolute criteria
+             or comparative judgement?" with BOTH: combining the two forms
+             beats either alone. This is the warrant for the axis definition's
+             final shape -- a prototype description (rating-like) PLUS the swap
+             test (comparison-like) -- rather than for replacing one with the
+             other. It also sits naturally beside kiritchenko2017, whose
+             finding that comparative judgements are more reliable cost this
+             project a failed G-300 round.}
+}
+
+@article{axiv2604_17022_interpretablecriteria,
+  title   = {Beyond Black-Box Labels: Interpretable Criteria for Diagnosing
+             Subjective NLP Tasks},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2604.17022},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Distinguishes disagreement
+             caused by unclear criteria, by COLLAPSED DISTINCTIONS, and by
+             legitimate variation. G-300 attempt 1 failed with 68%/76% of all
+             ratings on the single value "2" -- a collapsed distinction in this
+             paper's exact sense -- so it is the framing for the Ch.4
+             post-mortem, which currently blames scale collapse and Claude's
+             calibration advice without naming the general category.}
+}
