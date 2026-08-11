@@ -1101,3 +1101,48 @@
              fine-grained scheme is the improvement. Supports a multi-category
              taxonomy with a reported `other` rate over a pass/fail coding.}
 }
+
+@article{axiv2601_08070_gravitywells,
+  title   = {Semantic Gravity Wells: Why Negative Constraints Backfire},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2601.08070},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Studies instructions of the
+             form "do not use word X" and reports that they misfire. It removed
+             three lines from docs/axis_definition.md that named the two
+             confounds this thesis most needs absent from generated text
+             (length, length_auc 0.6764 -> LENGTH_CONFOUNDED; and sentiment,
+             level 0 66% positive vs level 1 74% negative). A prompt that names
+             a confound in order to forbid it may make it more available. Every
+             guardrail was kept and rewritten POSITIVELY. Cited in Ch.3 beside
+             the prompt templates, which go in the appendix verbatim.}
+}
+
+@article{axiv2605_03052_negation,
+  title   = {How Language Models Process Negation},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2605.03052},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Mechanistic account of
+             negation processing; open-weight models often answer negation
+             questions wrongly. Cited with axiv2601_08070_gravitywells for the
+             weaker of the two claims -- a negative constraint may simply fail
+             to land even where it does not actively backfire. Relevant because
+             our generator is an open-weight model on Groq.}
+}
+
+@article{axiv2605_20382_instructioninduction,
+  title   = {Do as I Say, Not as I Do: Instruction-Induction Conflict in LLMs},
+  author  = {AUTHORS UNRESOLVED -- see Phase 4 header note},
+  journal = {arXiv preprint arXiv:2605.20382},
+  year    = {2026},
+  note    = {Abstract only, 2026-08-11 via alphaXiv. Instruction-following and
+             pattern-completion can conflict. Directly relevant to SS4.2's Writer
+             prompt, which contains BOTH the axis definition (instruction) AND
+             10 retrieved exemplars from the target level (pattern) -- and the
+             level-1 exemplars are systematically shorter (8.85 vs 13.12 mean
+             words). The model can satisfy the exemplars by copying LENGTH while
+             ignoring the construct, and the Critic would partly reward that
+             since length_auc is 0.6764. Forced the pre-registered length
+             diagnostic in docs/axis_definition.md SS3c.}
+}

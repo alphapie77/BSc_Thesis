@@ -84,13 +84,72 @@ is what RQ1-H validated and inventing fresh wording would discard the validation
 
 এই স্তরের মন্তব্য **এই ছবিটি সম্পর্কেই**; অন্য ছবির গায়ে বসিয়ে দিলে আর খাটে না।
 
-### দুই স্তরের মধ্যে পার্থক্য কোথায় নয়
+### দুই স্তরেই যা স্বাভাবিক
 
-- **মতামতের দিক নয়।** দুই স্তরেই প্রশংসা ও নিন্দা দুটোই থাকে।
-- **দৈর্ঘ্য নয়।** ছোট মন্তব্যও নির্দিষ্ট হতে পারে; লম্বা মন্তব্যও ছাঁচে বাঁধা
-  হতে পারে।
-- **ভালো বাংলা কি না, তা নয়।** বানান বা গঠন এখানে বিচার্য নয়।
+- **প্রশংসা এবং নিন্দা — দুটোই।** দুই স্তরেই লেখক ছবিটি পছন্দ করতে পারেন, আবার
+  অপছন্দও করতে পারেন।
+- **ছোট মন্তব্য, বড় মন্তব্য — দুটোই।** এক লাইনের মন্তব্যও কোনো নির্দিষ্ট
+  জিনিসের নাম করতে পারে; কয়েক লাইনের মন্তব্যও চেনা ছাঁচে থেকে যেতে পারে।
+- **সাধারণ মানুষের মুখের বাংলা।** যেভাবে দর্শক আসলে লেখেন, সেভাবেই।
 <!-- AXIS_DEFINITION_END -->
+
+## 3b. Why the "what it is NOT" section was removed — the search attacked this file
+
+**Delegated by Sabbir (*"tmi research kore dekho ki valo hoy"*); the reading is
+Claude's.** Index: **alphaXiv**.
+
+The draft's third block listed three negative constraints — *not sentiment
+direction, not length, not good Bangla*. **All three are now gone**, and the
+reason is that they were the most likely thing in this file to cause the exact
+failure it exists to prevent.
+
+- **`2601.08070` — *Semantic Gravity Wells: Why Negative Constraints Backfire***
+  studies instructions of literally the form *"do not use word X"* and reports
+  that they misfire. Our removed lines said *"not length"* and *"not
+  sentiment"* — i.e. they **named the two confounds we most need absent**
+  (`length_auc` 0.6764 → `LENGTH_CONFOUNDED`; level 0 66% positive vs level 1
+  74% negative). A prompt that names them may make them *more* available, not
+  less.
+- **`2605.03052` — *How Language Models Process Negation*** and **`2606.18922`**
+  both report negation as a known weak point, so the constraint may simply not
+  land even when it does not backfire.
+
+**What replaces them: the same guardrails stated positively.** *"Both praise and
+criticism are normal at either level"* carries the sentiment-independence
+guidance without the word *not*; *"short comments and long comments both
+occur"* carries the length-independence guidance the same way. **No guardrail is
+dropped — each is rewritten in a form the literature says a model can act on.**
+
+🔑 **The assumption that broke, and it was mine:** §3 justifies reusing the
+G-300 wording because RQ1-H validated that instrument. **But RQ1-H validated it
+on humans.** Negative framing is fine for a human annotator reading a guideline
+and is a documented hazard for a model reading a prompt. **The validation
+transfers to the *construct*, not to the *prompt format*** — and I had treated
+one as the other.
+
+## 3c. Pre-registered diagnostic — did the Writer learn specificity or length?
+
+**A risk this search surfaced that no component owns.** `2605.20382` (*Do as I
+Say, Not as I Do: Instruction-Induction Conflict*) shows instruction-following
+and pattern-completion can conflict. §4.2's Writer prompt contains **both** the
+definition above **and 10 retrieved exemplars from the target level** — and the
+level-1 exemplars are, as a matter of fact, systematically **shorter** (8.85 vs
+13.12 mean words). So the model can satisfy the exemplars by copying length
+while ignoring the construct, and the Critic would partly reward it, because
+`length_auc` is 0.6764.
+
+**Registered before any generation exists**, with outcomes fixed in advance:
+
+- Report **mean generated length by target level**, always, beside every
+  axis-level result.
+- If generated level-1 text is shorter than level-0 text by an amount
+  **comparable to the corpus gap (13.12 → 8.85 words)**, the loop's apparent
+  axis control **may not be claimed as specificity control** without the
+  length-matched check RQ1-H used — where a length heuristic scored **0.16,
+  below chance**.
+- If the length gap is **absent or reversed** while Verifier-B scores still
+  separate the levels, that is **positive evidence** that the construct
+  transferred rather than the confound, and it is reportable as such.
 
 ## 4. Open questions for Sabbir
 
