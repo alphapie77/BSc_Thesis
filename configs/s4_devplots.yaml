@@ -1,0 +1,82 @@
+# S4.dev -- attempt-1 generations on the 30 dev-plots.
+#
+# WHAT THIS IS FOR. `w` (the Critic's hybrid weight) has no value and, per
+# protocol.md S4 decision 1, may not acquire one before these generations exist:
+# it is fitted on the dev-plots' GENERATED outputs, never on the 82 human dev
+# rows, because `kapur2026length` show the length/specificity relation is flat or
+# reversed in machine text. This config produces exactly that input.
+#
+# ⛔ NOT A RESULT, and not the loop. Attempt 1 only, NO Critic and NO Reflector
+# -- the Critic requires `w` and tau, and both are absent by design. Running the
+# loop first would mean choosing a `w` to fit `w`.
+#
+# These generations ARE, however, quotable in one specific role: they are
+# S5.1 row 1 (zero-shot with retrieval) evidence and therefore feed alpha_lo.
+# `prompts.render()` is the single template shared with the loop's attempt 1
+# (protocol.md S4 decision 5), so parity holds by construction.
+
+step: S4.dev
+seed: 42
+
+provider: local   # ref: docs/protocol.md 2026-08-12 -- generation is local.
+
+# Provenance, not a knob (see src/agents/local_writer.py docstring). Identical
+# to the pilot's value so the two archives are comparable on this axis.
+batch_size: 8
+
+# ref: configs/s4_pilot_local.yaml -- identical quantisation to the pilot run,
+# and identical across everything generated for this thesis. A mid-experiment
+# change would confound the quantiser with whatever else moved.
+quantization: nf4
+
+# ref: configs/s4_pilot_local.yaml. Measured on the 80 valid pilot generations:
+# 2 of 80 hit this cap, mean 22 words against a corpus median of 8. Retained
+# unchanged -- a cap that binds 2.5% of the time is disclosed, not tuned.
+max_new_tokens: 80
+
+# --- the generator ---------------------------------------------------------
+# Single arm, fixed 2026-08-12 (protocol.md, same date): the pilot's second arm
+# collapsed when `TigerLLM-9B-it` turned out to be `gemma-3-12b-it` byte-for-byte,
+# so there was nothing left to select between. The Bangla-adapted comparison is
+# SCHEDULED as a pre-registered robustness check, not dropped (open decision 22).
+# ⚠️ The single-backbone bound is a stated limitation, citing `2604.04532`
+# (backbone rankings invert across languages; two backbones recommended).
+models:
+  arm_a: google/gemma-3-12b-it
+
+# Prompt language stays a FACTOR, not a decision. ref: docs/axis_definition.md
+# section 3e. The pilot gave the first data point and it is not nothing:
+# non-Bangla-script leakage was 1/20 under Bangla prompts against 4/20 under
+# English ones, and `2604.04532`'s ablation finds instruction-language
+# localisation decisive in the lower-resource of its two test languages
+# (Hindi 42.8% -> 23.2% when judge instructions stayed English).
+prompt_arms: [bn, en]
+
+# --- the sample ------------------------------------------------------------
+# ALL 30 dev-plots x 2 axis levels x 2 prompt arms = 120 generations.
+# 30 is the frozen dev split (data/splits, plots track); it is not a sample size
+# anyone chose here, and decision 2 already records that tau's per-level fits
+# rest on 30 each -- which is why the fit is hierarchical rather than split.
+sample:
+  split: dev
+  n_plots: 30
+  levels: [0, 1]
+
+# --- what must be reported beside these generations ------------------------
+# Registered in docs/axis_definition.md section 3c BEFORE any generation existed:
+# mean generated length per target level is reported beside every axis-level
+# result. If level-1 generations are shorter than level-0 by an amount
+# comparable to the corpus gap (13.12 -> 8.85 mean words), the loop's axis
+# control MAY NOT be claimed as specificity -- it may be length.
+report:
+  length_by_level: true       # ref: docs/axis_definition.md section 3c
+  copy_check: true            # ref: docs/protocol.md 2026-08-11 -- verbatim
+                              # exemplar copying was observed in the first Groq
+                              # run (BN016 L0 returned bn_0230 exactly), so copy
+                              # statistics sit BESIDE every quality number.
+  latin_char_baseline_pct: 0.09   # ref: results/s2e_regionA_k2_profile.md
+
+outputs:
+  generations_jsonl: results/s4_devplot_generations.jsonl
+  report_md: results/s4_devplot_generations.md
+  report_json: results/s4_devplot_generations.json
