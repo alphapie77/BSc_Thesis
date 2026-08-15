@@ -337,7 +337,7 @@ def main() -> int:
         "version's bug, and it inflated the pilot's apparent leak rate from "
         "1-in-20 to 18-in-20.",
     ]
-    write_text_lf("\n".join(lines) + "\n", out["report_md"], config_path=args.config)
+    write_text_lf(out["report_md"], "\n".join(lines) + "\n")
     print(f"\nwrote {out['report_md']} and {out['report_json']}")
     for k, v in per_cell.items():
         print(f"  {k:8s} n={v['n']:3d}  mean_words={v['mean_words']:5.1f}  "

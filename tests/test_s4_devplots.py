@@ -118,3 +118,20 @@ def test_requested_quantisation_is_verified_after_load():
     lw = (ROOT / "src" / "agents" / "local_writer.py").read_text(encoding="utf-8")
     assert "is_loaded_in_4bit" in lw
     assert "quantisation was requested" in lw
+
+
+def test_report_writers_are_called_with_the_right_signature():
+    """`write_text_lf(path, text)` — path FIRST. The reversed call cost a full
+    120-generation run its report on 2026-08-15: every generation was safely on
+    disk, but the step still exited non-zero at the last line.
+
+    Checked by binding the real signature rather than by reading the call, so a
+    future rename fails here instead of at the end of a 40-minute run.
+    """
+    import inspect
+
+    from src.common.provenance import write_text_lf
+    params = list(inspect.signature(write_text_lf).parameters)
+    assert params[:2] == ["path", "text"]
+    assert "config_path" not in params
+    assert 'write_text_lf(out["report_md"]' in SRC
