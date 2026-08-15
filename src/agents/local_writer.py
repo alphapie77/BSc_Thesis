@@ -100,6 +100,30 @@ class LocalWriter:
 
         kw = {"dtype": self._dtype, "device_map": "auto"}
         if quantization:
+            # CHECKED BEFORE THE LOAD, not after. transformers does not raise
+            # when bitsandbytes is absent: it drops the quantization_config and
+            # loads in fp16 -- 12.19B at ~24 GB against a 16 GB card -- so the
+            # first symptom is an OOM 90 seconds in, with a traceback pointing
+            # at CUDA rather than at the missing package. Twice on 2026-08-15.
+            try:
+                from transformers.utils import is_bitsandbytes_available
+                available = is_bitsandbytes_available()
+            except ImportError:  # older transformers
+                try:
+                    import bitsandbytes  # noqa: F401
+                    available = True
+                except ImportError:
+                    available = False
+            if not available:
+                raise RuntimeError(
+                    f"{quantization!r} quantisation was requested and "
+                    "bitsandbytes is not available to transformers. Refusing to "
+                    "load: without it the model loads in fp16, which is both a "
+                    "different memory footprint and a DIFFERENT NUMERICAL PATH "
+                    "from every other generation in this archive. Install a "
+                    "bitsandbytes build matching this torch, or run on a card "
+                    "that fits the unquantised model and register the change."
+                )
             # 12.19B in fp16 is ~24 GB against a T4's 16 GB. Quantisation must be
             # IDENTICAL across arms or the comparison measures the quantiser.
             from transformers import BitsAndBytesConfig
