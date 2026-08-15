@@ -104,7 +104,18 @@ def overlap(previous: tuple[str, ...] | None, current: tuple[str, ...]) -> float
 class Researcher:
     """Queries the R1-only index. Holds no state beyond its handles."""
 
-    def __init__(self, persist_dir: str, collection: str, encoder_name: str):
+    def __init__(self, persist_dir: str, collection: str, encoder_name: str,
+                 *, device: str | None = None):
+        """`device` pins the encoder. Default (None) keeps sentence-transformers'
+        own choice, which is CUDA when a GPU exists.
+
+        Retrieval and generation compete for the same VRAM: LaBSE sits on the
+        GPU for the whole run while a 12B generator is loaded beside it, and on
+        a 16 GB T4 that margin matters. Retrieval is 60 short queries for the
+        dev-plots -- seconds on CPU -- so callers that also load a generator
+        pass device="cpu". The embedding is identical either way; only the
+        placement changes.
+        """
         from chromadb import PersistentClient
         from chromadb.config import Settings
         from sentence_transformers import SentenceTransformer
@@ -113,7 +124,7 @@ class Researcher:
             path=persist_dir, settings=Settings(anonymized_telemetry=False)
         )
         self._collection = self._client.get_collection(collection)
-        self._encoder = SentenceTransformer(encoder_name)
+        self._encoder = SentenceTransformer(encoder_name, device=device)
 
     def retrieve(
         self,

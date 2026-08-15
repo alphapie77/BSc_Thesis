@@ -99,3 +99,22 @@ def test_the_length_diagnostic_is_reported():
     assert CFG["report"]["length_by_level"] is True
     assert "LENGTH_MAY_EXPLAIN_LEVEL" in SRC
     assert "13.12" in SRC and "8.85" in SRC
+
+
+def test_retrieval_encoder_is_pinned_to_cpu():
+    """LaBSE and a 12B generator must not share 16 GB of VRAM.
+
+    Retrieval happens once, up front, and the encoder is released before the
+    generator loads. Regression guard for the 2026-08-15 OOM.
+    """
+    assert 'device="cpu"' in SRC
+    assert SRC.index("del researcher") < SRC.index("LocalWriter")
+
+
+def test_requested_quantisation_is_verified_after_load():
+    """An ignored `quantization_config` still 'loads' — in fp16, at 3.4x the
+    memory — and the only symptom is a crash somewhere else. The guard turns
+    that into a named failure at the point of cause."""
+    lw = (ROOT / "src" / "agents" / "local_writer.py").read_text(encoding="utf-8")
+    assert "is_loaded_in_4bit" in lw
+    assert "quantisation was requested" in lw

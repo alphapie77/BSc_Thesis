@@ -114,6 +114,30 @@ class LocalWriter:
         self.model = AutoModelForCausalLM.from_pretrained(load_src, **kw)
         self.model.eval()
 
+        # A REQUESTED quantisation that did not happen must not pass silently.
+        # On 2026-08-15 a 12B model requested as nf4 loaded at ~24 GB and died
+        # of OOM mid-load; the traceback pointed at CUDA, not at the cause. If
+        # bitsandbytes is missing or the config is ignored, the model still
+        # "loads" -- in fp16, at 3.4x the memory -- and the only symptom is a
+        # crash somewhere further on. Checked here, where the cause is legible.
+        if quantization:
+            loaded_4bit = bool(getattr(self.model, "is_loaded_in_4bit", False)) or (
+                getattr(self.model.config, "quantization_config", None) is not None
+            )
+            if not loaded_4bit:
+                try:
+                    import bitsandbytes  # noqa: F401
+                    hint = "bitsandbytes imports, so the config was ignored"
+                except ImportError:
+                    hint = "bitsandbytes is NOT installed in this environment"
+                raise RuntimeError(
+                    f"{quantization!r} quantisation was requested and the loaded "
+                    f"model is not quantised -- {hint}. Refusing to continue: an "
+                    "unquantised load is a different memory footprint AND a "
+                    "different numerical path from every other generation in "
+                    "this archive."
+                )
+
         self._env = {
             "provider": "local",
             "model_id": model_id,

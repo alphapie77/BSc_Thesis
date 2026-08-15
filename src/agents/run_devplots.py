@@ -107,7 +107,10 @@ def main() -> int:
         )
 
     idx = yaml.safe_load(Path("configs/s4_index.yaml").read_text(encoding="utf-8"))["index"]
-    researcher = Researcher(idx["persist_dir"], idx["collection"], idx["encoder"])
+    # CPU: see Researcher.__init__. LaBSE must not hold VRAM while a 12B
+    # generator loads beside it on a 16 GB card.
+    researcher = Researcher(idx["persist_dir"], idx["collection"], idx["encoder"],
+                            device="cpu")
 
     total = len(models) * len(arms) * len(plots) * len(levels)
     print(f"grid: {len(models)} model x {len(arms)} prompt arms x "
@@ -138,6 +141,30 @@ def main() -> int:
     done = completed_keys(out["generations_jsonl"])
     if done:
         print(f"resuming: {len(done)} generations already on disk")
+
+    # ALL retrieval first, then the encoder is released, then the generator
+    # loads. Retrieval depends on nothing the generator produces (attempt 1 has
+    # no feedback), so interleaving them only means holding two models at once.
+    # Doing it in one pass also makes every prompt exist before any generation
+    # does, which is the order the dry-run already prints in.
+    print("retrieving exemplars for every (plot, level) ...", flush=True)
+    prompts: dict[tuple[str, int, str], str] = {}
+    for p in plots:
+        for level in levels:
+            r = researcher.retrieve(p["synopsis"], level)
+            for arm in arms:
+                prompts[(p["plot_id"], level, arm)] = render(
+                    plot=p["synopsis"], target_level=level, arm=arm,
+                    exemplars=r.texts)
+    del researcher
+    import gc
+    gc.collect()
+    try:
+        import torch
+        torch.cuda.empty_cache()
+    except Exception:
+        pass
+    print(f"  {len(prompts)} prompts built; retrieval encoder released")
 
     import time as _time
     started = _time.monotonic()
@@ -172,9 +199,7 @@ def main() -> int:
                                          provider=provider)
                     if key in done:
                         continue
-                    r = researcher.retrieve(p["synopsis"], level)
-                    prompt = render(plot=p["synopsis"], target_level=level,
-                                    arm=arm, exemplars=r.texts)
+                    prompt = prompts[(p["plot_id"], level, arm)]
                     gen = writer.generate(prompt=prompt, plot_id=p["plot_id"],
                                           target_level=level, attempt=1)
                     n_done += 1
