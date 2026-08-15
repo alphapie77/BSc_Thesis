@@ -114,6 +114,24 @@ class LocalWriter:
                     available = True
                 except ImportError:
                     available = False
+            # transformers 5.0.0 (Kaggle's stock build) does not apply the
+            # 4-bit config even with bitsandbytes present: it loads fp16 and
+            # says nothing. The pilot ran on 5.15.0, where it works. Checked
+            # because "bitsandbytes is installed" was true in BOTH the working
+            # and the failing session, so availability alone is not the test.
+            try:
+                import transformers
+                from packaging.version import parse as _V
+                if _V(transformers.__version__) < _V("5.15.0"):
+                    raise RuntimeError(
+                        f"transformers {transformers.__version__} does not apply "
+                        f"the {quantization!r} config (fp16 is loaded instead, "
+                        "silently). The archive's generations were produced on "
+                        "5.15.0 -- see results/env_snapshot_s4_kaggle.json. "
+                        "Upgrade and restart the kernel."
+                    )
+            except ImportError:
+                pass
             if not available:
                 raise RuntimeError(
                     f"{quantization!r} quantisation was requested and "
