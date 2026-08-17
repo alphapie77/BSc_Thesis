@@ -1,0 +1,367 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-17T19:37:50.129803+00:00",
+    "git_commit": "dda307c855d2f77026e2a39a89d5d81b166e1281-dirty",
+    "untracked_files": 7,
+    "config": "configs/s4_w.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "NOT_A_RESULT": false,
+    "what_this_is": "`w` reported as a sensitivity curve (protocol.md §S4 decision 1). No single w is selected; the curve is the deliverable.",
+    "label_limit": "The label is the REQUESTED level, so this measures agreement with the instruction, not whether the text is really at that level. No axis-control claim is made here.",
+    "w_grid": [
+      0.0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0
+    ],
+    "per_condition": {
+      "length_controlled": {
+        "n": 120,
+        "curve": [
+          {
+            "w": 0.0,
+            "auc": 0.3416666666666667,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.05,
+            "auc": 0.4572222222222222,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.1,
+            "auc": 0.5569444444444445,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.15,
+            "auc": 0.6166666666666667,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.2,
+            "auc": 0.6713888888888889,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.25,
+            "auc": 0.6991666666666667,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.3,
+            "auc": 0.7213888888888889,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.35,
+            "auc": 0.7322222222222222,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.4,
+            "auc": 0.7425,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.45,
+            "auc": 0.745,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.5,
+            "auc": 0.7486111111111111,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.55,
+            "auc": 0.7541666666666667,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.6,
+            "auc": 0.7597222222222222,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.65,
+            "auc": 0.7625,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.7,
+            "auc": 0.765,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.75,
+            "auc": 0.7663888888888889,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.8,
+            "auc": 0.77,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.85,
+            "auc": 0.7738888888888888,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.9,
+            "auc": 0.7772222222222223,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.95,
+            "auc": 0.7822222222222223,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 1.0,
+            "auc": 0.8333333333333334,
+            "n_pos": 60,
+            "n_neg": 60
+          }
+        ],
+        "verdict_flip_share": 0.5083333333333333,
+        "marginal_value": {
+          "n_folds": 5,
+          "w_chosen_per_fold": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "delta_auc_per_fold": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean_delta_auc": 0.0,
+          "folds_mixture_beats_neural_only": 0,
+          "folds_tied": 5,
+          "folds_neural_only_better": 0
+        },
+        "length_only_auc": {
+          "bn": 0.9111111111111111,
+          "en": 0.9927777777777778
+        },
+        "outcome": "PRECOMMITMENT_UNRESOLVED",
+        "outcome_as_emitted_by_dda307c": "SYMBOLIC_INERT"
+      },
+      "free_length": {
+        "n": 120,
+        "curve": [
+          {
+            "w": 0.0,
+            "auc": 0.06555555555555556,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.05,
+            "auc": 0.23972222222222223,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.1,
+            "auc": 0.4063888888888889,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.15,
+            "auc": 0.46305555555555555,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.2,
+            "auc": 0.4841666666666667,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.25,
+            "auc": 0.5286111111111111,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.3,
+            "auc": 0.5644444444444444,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.35,
+            "auc": 0.6072222222222222,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.4,
+            "auc": 0.6305555555555555,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.45,
+            "auc": 0.6466666666666666,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.5,
+            "auc": 0.6544444444444445,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.55,
+            "auc": 0.6588888888888889,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.6,
+            "auc": 0.6630555555555555,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.65,
+            "auc": 0.6666666666666666,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.7,
+            "auc": 0.675,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.75,
+            "auc": 0.6786111111111112,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.8,
+            "auc": 0.6855555555555556,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.85,
+            "auc": 0.6902777777777778,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.9,
+            "auc": 0.7005555555555556,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 0.95,
+            "auc": 0.7058333333333333,
+            "n_pos": 60,
+            "n_neg": 60
+          },
+          {
+            "w": 1.0,
+            "auc": 0.8658333333333333,
+            "n_pos": 60,
+            "n_neg": 60
+          }
+        ],
+        "verdict_flip_share": 0.39166666666666666,
+        "marginal_value": {
+          "n_folds": 5,
+          "w_chosen_per_fold": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "delta_auc_per_fold": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean_delta_auc": 0.0,
+          "folds_mixture_beats_neural_only": 0,
+          "folds_tied": 5,
+          "folds_neural_only_better": 0
+        },
+        "length_only_auc": {
+          "bn": 0.9894444444444445,
+          "en": 1.0
+        },
+        "outcome": "PRECOMMITMENT_UNRESOLVED",
+        "outcome_as_emitted_by_dda307c": "SYMBOLIC_INERT"
+      }
+    },
+    "scoring_provenance": {
+      "timestamp_utc": "2026-08-17T19:26:53.492048+00:00",
+      "git_commit": "dda307c855d2f77026e2a39a89d5d81b166e1281",
+      "untracked_files": 2,
+      "config": "configs/s4_w.yaml",
+      "python": "3.12.13",
+      "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+    },
+    "audit_note": "Measurements are unchanged. The original classifier called the sensitive-curve/held-out-tie combination SYMBOLIC_INERT even though the registered definition requires a flat curve. The corrected label exposes that the three pre-registered outcomes did not cover the observed combination."
+  }
+}

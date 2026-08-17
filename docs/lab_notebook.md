@@ -4241,3 +4241,73 @@ blob, because a digest is readable and a binary is not.
 ### Citations needed
 - None. This repair enforces the already-recorded artifact environment and
   subprocess/input contracts; it introduces no method, threshold or claim.
+
+---
+
+## 2026-08-18 -- S4.5a: w sensitivity curve and verdict-mapping audit
+**Feeds:** Ch.4 Phase 4; RQ3; reproducibility appendix
+**Commit:** `dda307c855d2f77026e2a39a89d5d81b166e1281-dirty`
+**Artifacts:** `results/s4_w_sensitivity.json`, `results/s4_w_sensitivity.md`, `results/s4_w_sensitivity.csv`, `results/s4_w_scores.csv`, `results/env_snapshot_s4w_kaggle.json`
+
+### Numbers
+- `results/s4_w_sensitivity.json`
+  - `NOT_A_RESULT` = False
+  - `what_this_is` = `w` reported as a sensitivity curve (protocol.md §S4 decision 1). No single w is selected; the curve is the deliverable.
+  - `label_limit` = The label is the REQUESTED level, so this measures agreement with the instruction, not whether the text is really at that level. No axis-control claim is made here.
+  - `scoring_provenance` = {'timestamp_utc': '2026-08-17T19:26:53.492048+00:00', 'git_commit': 'dda307c855d2f77026e2a39a89d5d81b166e1281', 'untracked_files': 2, 'config': 'configs/s4_w.yaml', 'python': '3.12.13', 'platform': 'Linux-6.12.90+-x86_64-with-glibc2.35'}
+  - `audit_note` = Measurements are unchanged. The original classifier called the sensitive-curve/held-out-tie combination SYMBOLIC_INERT even though the registered definition requires a flat curve. The corrected label exposes that the three pre-registered outcomes did not cover the observed combination.
+- `results/s4_w_sensitivity.md`
+  - (see file; 3539 bytes)
+- `results/s4_w_sensitivity.csv`
+  - (see file; 7773 bytes)
+- `results/s4_w_scores.csv`
+  - (see file; 60287 bytes)
+- `results/env_snapshot_s4w_kaggle.json`
+  - `mode` = snapshot_only (requirements.lock.txt NOT modified)
+  - `key_versions` = {'hdbscan': '0.8.42', 'langgraph': '1.1.9', 'numpy': '2.0.2', 'pandas': '2.3.3', 'scikit-learn': '1.9.0', 'scipy': '1.16.3', 'sentence-transformers': '5.6.1', 'statsmodels': '0.14.6', 'torch': '2.10.0+cu128', 'transformers': '5.14.1', 'umap-learn': '0.5.12'}
+
+### Decisions made (and why)
+- **Do not accept the emitted `SYMBOLIC_INERT` label.** The registered definition
+  requires a flat curve, while 50.8% / 39.2% of verdicts changed over `w`.
+  Keeping the label would silently weaken the pre-registration after seeing the
+  data. The measurements remain untouched and the JSON preserves both the
+  Kaggle scoring provenance and the originally emitted label.
+- **Expose the gap as `PRECOMMITMENT_UNRESOLVED`, not as a fourth outcome.** The
+  alternative was to invent a post-hoc scientific band for “sensitive but tied”.
+  An audit state says only what is justified: the registered partition failed
+  to classify the observation.
+- **Select no single `w`.** All folds selected the neural-only endpoint and no
+  held-out gain was measured, while the step was registered as a curve rather
+  than a point. Choosing a convenient interior value would contradict both facts.
+
+### Findings (things we did not expect)
+- Both archives passed the repaired contract: **120 + 120** scored generations,
+  **42** curve rows, and **240** score rows. CSV provenance is complete on every
+  row; scoring commit `dda307c`, Python 3.12.13, sklearn 1.9.0 on Kaggle T4.
+- Length-controlled: symbolic-only AUC **0.3417**, neural-only/best-grid AUC
+  **0.8333**, verdict flip share **0.5083**. Free-length: **0.0656**, **0.8658**,
+  and **0.3917**, respectively.
+- In both conditions the held-out result was identical: chosen `w` values
+  **[1, 1, 1, 1, 1]**, mixture wins **0**, ties **5**, losses **0**, mean delta
+  AUC **0.0000**. The symbolic term established no predictive marginal value.
+- 🔴 The three outcome names were not exhaustive over the two registered
+  measurements. A test had shown each named outcome was reachable, but had not
+  shown every measurement combination mapped to one. The observed combination
+  hit an untested catch-all and was mislabeled.
+
+### Consequences for downstream steps
+- **RQ3's hybrid-accuracy hypothesis is not supported by S4.5a.** This is not
+  reframed as a win: the symbolic component remains only for interpretable
+  failed-rule feedback, and that role is not evidence of predictive gain.
+- `w` remains a reported sensitivity dimension, not a selected constant. The
+  tau frontier must not quietly import `0.6/0.4` or any other single mixture.
+- The outcome-classifier catch-all is removed; future sensitive-plus-tie cases
+  return `PRECOMMITMENT_UNRESOLVED`. The deviation is recorded in
+  `docs/protocol.md` on 2026-08-18.
+- The standing length limitation remains stronger than either Critic score:
+  length-only AUC is **0.9111/0.9928** controlled and **0.9894/1.0000** free.
+  No axis-control claim is made from this result.
+
+### Citations needed
+- None. This run executes the already cited/registered curve and grouped
+  held-out test; the added work is a logical coverage audit, not a new method.

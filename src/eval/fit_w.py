@@ -2,7 +2,8 @@
 """`w` as a sensitivity curve, plus the held-out marginal-value test.
 
 ref: `docs/protocol.md` §S4 registered decision 1, written 2026-08-11 before any
-generation existed. Three outcomes were pre-committed and are reported verbatim:
+generation existed. Three scientific outcomes were pre-committed and are
+reported verbatim:
 
   SYMBOLIC_EARNS_ITS_PLACE -- the verdict is sensitive to `w` AND the held-out
       marginal-value test favours including the symbolic term.
@@ -12,6 +13,11 @@ generation existed. Three outcomes were pre-committed and are reported verbatim:
   SYMBOLIC_HARMS -- the held-out test rejects the symbolic term.
 
 Outcome 2 was registered as the one to expect.
+
+PRECOMMITMENT_UNRESOLVED is not a fourth scientific outcome. It is an audit
+state for an observed combination that the three registered rules do not map:
+the verdict is sensitive to w, but the held-out test ties at the neural-only
+endpoint. Labelling that combination INERT would silently weaken "flat in w".
 
 WHAT IS MEASURED, AND THE LABEL'S LIMIT
 ---------------------------------------
@@ -234,14 +240,14 @@ def marginal_value(scored: list[dict], ws: list[float], n_folds: int) -> dict:
 
 
 def classify(flip_share: float, mv: dict, tol: float = 1e-6) -> str:
-    """The three pre-committed outcomes, in the registered words."""
+    """Map measurements to the registered outcomes or expose a coverage gap."""
     if mv["folds_neural_only_better"] > mv["folds_mixture_beats_neural_only"]:
         return "SYMBOLIC_HARMS"
     if flip_share <= tol and mv["folds_mixture_beats_neural_only"] == 0:
         return "SYMBOLIC_INERT"
     if mv["folds_mixture_beats_neural_only"] > mv["folds_neural_only_better"]:
         return "SYMBOLIC_EARNS_ITS_PLACE"
-    return "SYMBOLIC_INERT"
+    return "PRECOMMITMENT_UNRESOLVED"
 
 
 def main() -> int:
@@ -377,6 +383,22 @@ def main() -> int:
                 "which rule failed, and the LaBSE probe cannot. Retained for "
                 "interpretability, not for accuracy, and reported as a negative "
                 "result rather than softened.",
+                "",
+            ]
+        elif b["outcome"] == "PRECOMMITMENT_UNRESOLVED":
+            lines += [
+                "**Audit finding:** this is not a fourth scientific outcome. "
+                "The curve is not flat, so `SYMBOLIC_INERT` does not apply; "
+                "the held-out test also does not favour the symbolic term, so "
+                "`SYMBOLIC_EARNS_ITS_PLACE` does not apply; and neural-only "
+                "never beats the selected mixture, so `SYMBOLIC_HARMS` does "
+                "not apply. The registered rule therefore does not resolve "
+                "this observed combination.",
+                "",
+                "**Consequence:** no hybrid-accuracy claim and no single `w` "
+                "is selected. The symbolic component remains available for "
+                "failed-rule naming, its separately registered interpretability "
+                "role; this result does not establish predictive value.",
                 "",
             ]
     write_text_lf(cfg["outputs"]["report_md"], "\n".join(lines) + "\n")

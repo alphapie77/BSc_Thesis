@@ -99,6 +99,23 @@ def test_the_three_outcomes_are_the_registered_ones():
     assert classify(0.0, mv_flat) == "SYMBOLIC_INERT"
 
 
+def test_sensitive_curve_with_held_out_ties_exposes_registration_gap():
+    """Do not silently call a non-flat curve INERT when all folds choose w=1."""
+    mv_tied = {"folds_mixture_beats_neural_only": 0,
+               "folds_neural_only_better": 0,
+               "folds_tied": 5, "n_folds": 5}
+    assert classify(0.3, mv_tied) == "PRECOMMITMENT_UNRESOLVED"
+
+
+def test_result_audit_preserves_scoring_provenance_and_measurements():
+    audit_src = (ROOT / "src" / "eval" / "audit_w_result.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'payload.pop("_provenance")' in audit_src
+    assert 'result["scoring_provenance"]' in audit_src
+    assert "Measurements are unchanged" in audit_src
+
+
 def test_inert_retains_the_symbolic_term():
     """Registered in decision 1: on `SYMBOLIC_INERT` the term stays, because the
     Reflector needs something that can name a failing rule. The report must say

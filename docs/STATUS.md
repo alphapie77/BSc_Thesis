@@ -1,17 +1,24 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-18 (**S4.5a repair built; result not run; next action
-is the dedicated Kaggle runner.**) The long line below is the prior chronological
+**Last updated:** 2026-08-18 (**S4.5a ran; measurements valid; the registered
+outcome map did not cover the observed case. Next: the registered tau
+frontier.**) The long line below is the prior chronological
 timeline and is retained rather than silently rewritten.
 
-**Current update — 2026-08-18:** **S4.5a attempt 1 crashed before producing a
-result.** The symbolic sklearn-1.9.0 artifact was loaded under Kaggle 1.6.1 and
-failed at `predict_proba`. A separate single-checkout runner, exact runtime
-gate, two-artifact prediction preflight, mandatory two-archive contract and
-checked subprocess exits are now built. **No generation rerun. Next:** run
-`notebooks/s4_fit_w_kaggle.ipynb`. This update supersedes the older “Next: `w`”
-timeline line immediately below by specifying that the code is built and the
-remaining action is the repaired run.
+**Current update — 2026-08-18:** **S4.5a completed on both registered archives
+(120 + 120 generations), with no generation rerun.** In both conditions every
+held-out fold selected neural-only (`w=1`), mixture-vs-neural mean delta AUC was
+**0.0000**, and the symbolic term established no held-out predictive value.
+But the verdict was not flat in `w`: **50.8%** of length-controlled and **39.2%**
+of free-length generations changed PASS/FAIL somewhere on the curve. Therefore
+none of the three registered outcomes applies literally: `SYMBOLIC_INERT`
+requires a flat curve, `SYMBOLIC_EARNS_ITS_PLACE` requires held-out benefit, and
+`SYMBOLIC_HARMS` requires held-out rejection. The original mapper incorrectly
+fell through to `SYMBOLIC_INERT`; the measurements are unchanged and the
+interpretation is audited as **`PRECOMMITMENT_UNRESOLVED`**, not invented as a
+fourth outcome. **No hybrid-accuracy claim and no single `w` selection.** The
+symbolic scorer remains available only for its separately registered
+failed-rule-naming role. Next: build/run the registered tau frontier.
 
 **Last updated:** 2026-08-17 evening (**S4.dev-LC RAN: length control halved-and-then-some the gap and created a matched slice, but the level stays recoverable from length (AUC 0.91/0.99) → `LENGTH_RECOVERS_LEVEL`. No length-neutral axis-control claim may be made; matched analysis deferred to Phase 5. Two pre-registration defects logged in two days. Next: `w`**) · earlier: 2026-08-17 (**S4.dev free-length run READ: 120/120 generations, 0 verbatim copies — but 🔴 the pre-registered length diagnostic PASSED while length alone recovered the axis level at AUC 0.9894 (bn) / 1.0000 (en) and ZERO length-matched pairs existed. A length-controlled condition is registered and built; the direction-free confound measure replaces the failed diagnostic. 260 tests**) · earlier: 2026-08-16 (**S4.dev RAN — all 120 attempt-1 dev-plot generations produced on Kaggle T4; the report line then crashed on a reversed `write_text_lf` call, fixed, generations intact. Root cause of the two OOMs found and guarded: Kaggle's stock `transformers 5.0.0` silently drops the 4-bit config and loads fp16. 254 tests**) · previous: 2026-08-15 (**S4.dev built and NOT yet run: 120 attempt-1 dev-plot generations, the substrate `w` and τ are fitted on. Three harness defects fixed before any generation — empty `--model-path` from `$VAR` on a continuation line, LaBSE holding VRAM beside a 12B generator (CUDA OOM), and an ignored `nf4` config that would have loaded fp16 silently. 251 tests**) · previous: 2026-08-12 evening (**S4 pilot run 1 VOID: TigerLLM-9B-it weights are gemma-3-12b-it byte-for-byte — arm B unfilled, decision 22 open. Determinism check passed as salvage; two harness bugs fixed. See step 17b**) · earlier same day: (**S4 built end-to-end, 79 tests green. Generation moves to our own GPU on Kaggle; arms re-registered as gemma-3-12b-it vs TigerLLM-9B-it — same base, one variable. Fertility is PER-TOKENIZER: 0.93 on Llama, 3.71 on Gemma-3**) · previous: 2026-08-11 (**S3.3 RUN — both Bangla verifiers trained and committed (`0d2578d`); Phase 4 pre-registered in `protocol.md` §S4 before any code. A self-contradiction in this file, which had claimed "Phase 4 cannot start", is corrected below and logged as a deviation**) · **Phase:** 1–3 **Bangla-complete** → **4 (the loop, built; pilot part-run)**
 **Week:** 3 of 14
@@ -56,13 +63,14 @@ remaining action is the repaired run.
 | 16 | **S4.4–S4.7 — the four components** | ✅ **BUILT 2026-08-11, no generation run.** Researcher (**6/6**), Writer (**7/7**), Critic (**7/7**), Reflector, graph (**6/6**), one prompt renderer (**10/10**), secrets + redaction (**6/6**). 🔴 **Three bugs caught before any API call**: `target_level` was validated and discarded so the prompt never said which level to write; the level line used an ASCII digit against the definition's Bengali digits; and `advance()` cleared the Reflector's feedback so **every retry prompt was silently attempt 1's** — the loop would have looked like it was retrying and been re-rolling the dice. 🔑 Two of the three were found by **reading the rendered artifact**, not by the tests that were already passing | `src/agents/*`, `configs/s4_*.yaml`, `src/agents/README.md` | 2026-08-11 |
 | 17 | **S4.pilot — local generation on Kaggle T4** | 🔨 **READY, NOT RUN. Re-registered twice on 2026-08-12.** (i) **Provider → our own GPU**: no free API supplies ~10M tokens of Bangla (eight checked); cause is budget and is logged as budget, **but it narrows the reproducibility concession** — locally we choose the batch and set the seed, so `2601.17768`'s dynamic-batching problem disappears. **Batch size = 8 is provenance, not a knob.** (ii) **Arms → `google/gemma-3-12b-it` vs `md-nishat-008/TigerLLM-9B-it`** — same base, same size, **one variable: Bangla adaptation**. 🔴 **1B was tried first and FAILED** (1 of 3 usable, one degenerate); 9B gave 3 of 3. Hand-read, n=3, **NOT A RESULT**. 🎁 **Fertility re-measured on Gemma-3: 3.71 chars/token against Llama's 0.93 — 4×**, so every 2026-08-11 budget figure was Llama-specific and the crisis largely dissolves. ⚠️ Two observations recorded before they can become convenient: the 9B reads **more literary than the corpus**, and three samples **opened identically**. ⚠️ arXiv 2503.10995 does **not** describe these weights (says LLaMA-3.2/Gemma-2; uploads are Gemma-3, "9B" is 12.19B). ⚠️ The 27 Groq generations may **never** be merged with these — different provider, different models | `notebooks/s4_pilot_kaggle.ipynb`, `configs/s4_pilot_local.yaml`, `src/agents/local_writer.py`; **no results yet** | — |
 | 17d | **S4.dev-LC — the length-controlled condition** | ⚠️ **RAN 2026-08-17. `LENGTH_RECOVERS_LEVEL` in both arms — the control made a matched slice EXIST but did not remove the confound.** 120/120, **0 truncated** (was 5), **0 verbatim copies**. Mean words bn **11.5 → 16.2**, en **10.0 → 19.2** — the level gap fell from **24.8 → 4.8** (bn) and **34.0 → 9.2** (en), both levels back at corpus scale. **But length-only AUC moved only 0.9894 → 0.9111 (bn) and 1.0000 → 0.9928 (en)**: AUC is rank-based and the clause compressed the magnitude without disturbing the order (level 1 still longer in 25/30 bn, 29/30 en). Matched pairs **0 → 8** (bn), **0 → 2** (en). 🔴 **The registered failure criterion did not fire — it was written as a conjunction and the data split it** (AUC clause true, empty-slice clause false); recorded as not firing rather than read conveniently. **Second pre-registration defect in two days, same shape** (2026-08-16: a fixed direction; 2026-08-17: a compound condition). 🎁 Script leakage did **not** worsen: **12/120** vs free-length's 15/120, suspicion written down before counting. **Registered consequences:** the clause is standard for all later generation; free length is kept as a secondary condition; the matched analysis **moves to Phase 5** (90 plots → ~24 bn pairs; 8 is not an analysis); and 🔴 **no claim of length-neutral axis control may be made anywhere in the thesis** — the construct claim stays on RQ1-H's human validation of corpus text. ⬛ superseded: ~~🔨 BUILT + REGISTERED 2026-08-16, NOT RUN.~~ | `results/s4_devplot_lenctl_generations.{jsonl,md,json}`, `env_snapshot_s4dev_lenctl_kaggle.json` | 2026-08-17 |
+| 17e | **S4.5a — `w` sensitivity curve** | ⚠️ **RAN + AUDITED 2026-08-18. `PRECOMMITMENT_UNRESOLVED` in both conditions.** The measurements are complete: 120 length-controlled + 120 free-length scores, 21 grid points each. Every grouped held-out fold selected **`w=1.0`** and mean delta AUC vs neural-only was **0.0000**; symbolic-only was worse than neural-only in both conditions. Yet verdict sensitivity was **50.8% / 39.2%**, so the curve was not flat. 🔴 **Third pre-registration coverage defect in three days:** the three registered outcomes omitted “sensitive curve + held-out tie”; the code's catch-all silently called it `SYMBOLIC_INERT`. The emitted label is preserved in JSON, superseded by an audit state, and no fourth scientific outcome is invented. **Consequence:** no hybrid-accuracy claim, no predictive-value claim for symbolic, and no single `w`; symbolic remains available for failed-rule naming only. Length-only AUC remains the stronger baseline (**0.9111/0.9928** controlled; **0.9894/1.0000** free). | `results/s4_w_sensitivity.{md,json,csv}`, `s4_w_scores.csv`, `env_snapshot_s4w_kaggle.json` | 2026-08-18 |
 | 17d-old | (build record) | 🔨 **BUILT + REGISTERED 2026-08-16.** `configs/s4_devplots_lenctl.yaml` + one clause in `prompts.py` + 6 new tests (**260 total**), `check_constants` 128/0. One sentence added to the prompt, **identical at both levels**, capping the comment at **20 words** — derived from region A (level 0 = 13.12 mean words, level 1 = 8.85, corpus median 8), not chosen. Everything else byte-identical, pinned by test. 🔑 **Why it is needed, and why report-side control was not an option:** in the free-length run, length alone recovers the target level at **AUC 0.9894 (bn) / 1.0000 (en)**, and under `2607.18508`'s matched criterion there are **0 matched pairs in either arm** — the en ranges do not overlap (longest L0 = 15 words, shortest L1 = 25). The slice a length-neutral claim needs **does not exist**. Every axis-level report now prints the content-blind AUC and the matched-pair count, and `length_confound` (`LENGTH_RECOVERS_LEVEL` ≥ 0.90) supersedes `length_diagnostic` for any axis-control claim. ⚠️ **Pre-committed: if AUC stays ≥ 0.90 and the slice stays empty, the control FAILED and is reported as failed** (`2601.01768`: LLMs track their own output length poorly). ⚠️ Provenance: Sabbir delegated; the choice and the 20-word cap are Claude's. | code + config + tests; **no result files** | — |
 | 17c | **S4.dev — attempt-1 generations on the 30 dev-plots** | ✅ **GENERATED 2026-08-16** — all **120** on Kaggle T4, 4-bit nf4, `gemma-3-12b-it`, ~25 min. ⚠️ The run exited non-zero at the **last line** (`write_text_lf` called with its arguments reversed): every generation was already on disk, so the report is re-derived from the archive rather than the run repeated. Awaiting the four files before any number is read. 🔴 **The two CUDA OOMs that preceded this had one root cause, now guarded in code:** Kaggle ships `transformers 5.0.0`, which **drops a 4-bit `quantization_config` without raising** and loads fp16 (~24 GB on a 16 GB card); the pilot had run on 5.15.0 because its notebook carried `-U transformers`, and the rebuilt notebook lost that line. Third time this project has been bitten by a stock Kaggle library version (S3.2 crashed at arm 6/7 on transformers 5.x) — **and the first time the pin lives in the code rather than in one notebook.** ⬛ superseded: ~~🔨 BUILT 2026-08-15, NOT RUN.~~ `configs/s4_devplots.yaml` + `src/agents/run_devplots.py` + `notebooks/s4_devplots_kaggle.ipynb`, **11 new tests (251 total)**. Grid: 30 dev-plots × 2 axis levels × 2 prompt arms = **120 generations**, single generator (`gemma-3-12b-it`). **No Critic and no Reflector** — the Critic requires `w` and τ, and fitting them from a loop that used them would be circular; attempt 1 only. Batch/quantisation/max-tokens/seed pinned identical to the pilot **by test**, so the two archives stay comparable. The pre-registered length diagnostic (`axis_definition.md` §3c) is computed and printed **beside** every cell, not on request. 🔴 **Three defects found and fixed before any generation existed**, all logged: (i) `$GEMMA_PATH` on a `!`-cell continuation line arrived empty — the script's refusal is why it cost nothing; (ii) **CUDA OOM** — retrieval now runs first on CPU and the encoder is released before the generator loads; (iii) **an ignored `quantization_config` is now a hard error** — an fp16 load at 3.4× memory is also a different numerical path, and on a larger card it would have produced incomparable generations *without crashing at all*. | code + config + tests + notebook; **no result files** | — |
 | 17b | **S4.pilot RUN 1 — ⚫ VOID as a comparison (2026-08-12, evening)** | 🔴 **RAN 100 generations on Kaggle T4 and the two arms produced character-identical output — because `TigerLLM-9B-it`'s uploaded weights ARE `gemma-3-12b-it`, byte-for-byte** (SHA-256 `4847447e…` on shard 1 of both; HF's blob store deduplicated them). Third defect for this model after the paper/architecture and size mismatches. **Arm B is unfilled; the model-choice verdict is void.** 🎁 Salvage, registered in `protocol.md` before it could become convenient: (i) the accidental double-run is a **passed determinism check** — identical seed → identical generations across two loads, so the local path is bit-reproducible where the API was not; (ii) `LANG_CONFUSION` fired in all four cells, now read as a **single-model** property of gemma-3-12b-it under both prompt languages (Latin *"actors"*, Devanagari *"सलमान"*). Two harness bugs found and fixed the same evening (resume `provider=` key mismatch → 20 duplicate keys in the JSONL, dedupe-by-key on read; one-load-per-role OOM fix). ⚠️ **NEW STANDING RULE (from the TigerLLM event): no model enters an arm until its weights are verified against its claim — config.json + a tensor-level diff against the claimed base, never the model card.** | `results/pilot_s4_local_generations.jsonl` (100 rows, 20 duplicate keys), `pilot_s4_local_model_choice.{md,json}` — **NOT A RESULT** | — |
 
 ### S4.5a repair state
 
-🔨 **RUNNER REPAIRED 2026-08-18; result NOT RUN.** Attempt 1 reached all 120
+✅ **RUNNER REPAIRED AND RESULT RUN 2026-08-18.** Attempt 1 reached all 120
 length-controlled rows, then the symbolic scorer crashed: committed artifact =
 sklearn **1.9.0**, Kaggle runtime = **1.6.1**, and
 `LogisticRegression.multi_class` was absent. The Verifier-A-only preflight had
@@ -74,11 +82,10 @@ cell.
 Repairs: dedicated `s4_fit_w_kaggle.ipynb` with one checkout; exact 1.9.0 gate;
 read-only preflight making one prediction through **both** Critic halves; both
 120-row archives mandatory; pickle-version warning fatal; subprocess exits
-checked; CSV results carry provenance. **274 tests pass** (269 + 5), plus
-notebook JSON/compile checks 4/4 and full source compile. **Zero `s4_w_*`
-results exist.** The dedicated runner is batch-safe: all post-install checks
+checked; CSV results carry provenance. The dedicated runner is batch-safe: all post-install checks
 and scripts use fresh subprocesses, so Kaggle **Save & Run All** needs no manual
-kernel restart.
+kernel restart. The run produced all five expected files. Its numeric results
+and the post-run verdict-mapping audit are recorded in pipeline row 17e above.
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
@@ -328,26 +335,25 @@ rather than voiding it, and is itself reportable.
 
 9. ✅ **S4 pre-registration written** (`protocol.md` §S4, 2026-08-11) — before
    any code, which is the only order that makes it a pre-registration.
-10. 🔬 **Build the loop (pipeline step 16):** `src/agents/` — State (§4.1),
-    Researcher, Writer, Critic, Reflector, LangGraph wiring, JSONL trace
-    (§4.4). `configs/s4_loop.yaml`, every constant carrying a `# ref:`, and
-    `python src/common/check_constants.py` green. **Uncomment the Phase-4
-    block in `requirements.in`** (`langgraph`, `chromadb`, `groq`,
-    `google-generativeai`) and regenerate the lock via `env_snapshot.py`.
-11. 🔬 **The 20-generation generator pilot** — rule already registered, `TIE`
-    pre-committed, banner `NOT A RESULT`. **Read the live Groq catalogue for
-    model IDs and record the retrieval date; never write them from memory.**
-12. 🟡 **Then** τ sweep (step 17) — needs generations before `quality(τ)`,
-    α_lo or α_hi exist at all.
+10. ✅ **Loop and attempt-1 substrate built/run.** The four components, shared
+    prompt renderer, RAG contract, trace schema, 120 free-length generations,
+    and 120 length-controlled generations are on disk; see rows 16–17d.
+11. ✅ **S4.5a `w` curve run and audited.** No single `w`; no held-out symbolic
+    gain; the registered outcome map failed to cover the observed case. See row
+    17e and the 2026-08-18 deviation.
+12. 🔬 **Next: build and run the registered tau quality–cost frontier.** It must
+    preserve `w` as a sensitivity dimension rather than importing a convenient
+    point, estimate the hierarchical level-specific thresholds, measure
+    alpha_lo/alpha_hi with Verifier-B only, and report the full frontier plus
+    tau-star under decision 19's pre-registered objective.
 
 ⚠️ **Still Sabbir's, and now closer to binding than before:** decision 12 (the
 title wording — Phase 4 code and configs use *axis / level / the cut*
 throughout, so the constraint is satisfied while the title is not yet); the
-rule-7 amendment packet (`enable_f1` stays `false` until signed); **decision 10
-(prompt parity) is due before the τ sweep is interpreted**, because §5.1 row 1
-*is* α_lo and an under-specified row-1 prompt inflates the loop's apparent
-gain — the exact artefact Huang et al. §5 document; and — still the highest-risk
-item in this file — **the six base papers, none of which Sabbir has read.**
+rule-7 amendment packet (`enable_f1` stays `false` until signed); and — still
+the highest-risk item in this file — **the six base papers, none of which
+Sabbir has read.** Prompt parity is no longer open: decision 5 enforces it by
+construction through the shared renderer.
 
 ⚠️ **Still Sabbir's, and none of it blocks Phase 3:** decision 12 (title and
 whether *persona* is permitted again, reopened by RQ1-H), decision 13 (Unicode),
@@ -411,6 +417,10 @@ referenced nowhere. A result nobody can find is a result nobody can check.
 | `plots_harvest_report.md` | harvest yield, reject reasons, heading tally | ✅ current (4th harvest) |
 | `env_snapshot.json` | local Windows environment | ✅ current |
 | `env_snapshot_s2_kaggle.json` | **the environment S2's numbers came from** — Kaggle T4, scikit-learn 1.6.1 | ✅ current — cite this, not `requirements.lock.txt`, for S2 |
+| `s4_w_sensitivity.md` / `.json` | S4.5a 21-point `w` curves for both 120-row conditions; JSON preserves the original emitted labels and scoring provenance | ⚠️ current only with the audit banner: measurements valid, scientific outcome **unresolved by the pre-registration** |
+| `s4_w_sensitivity.csv` | 42 curve points (2 conditions × 21 `w` values), row-level provenance | ✅ current supporting data |
+| `s4_w_scores.csv` | 240 generation-condition scores from neural and symbolic Critic halves, row-level provenance | ✅ current supporting data |
+| `env_snapshot_s4w_kaggle.json` | environment of the successful S4.5a scoring run; sklearn 1.9.0, commit `dda307c` | ✅ current |
 
 ## Infrastructure state (2026-07-30)
 
