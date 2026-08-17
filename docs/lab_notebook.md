@@ -4081,3 +4081,96 @@ blob, because a digest is readable and a binary is not.
   **predicted this exact outcome** while the diagnostic was written to miss it.
   Recorded that way in `protocol.md` deliberately.
 - Index searched: **alphaXiv** (Consensus quota exhausted to 2026-09-01).
+
+---
+
+## 2026-08-17 -- S4.dev.lenctl: length-controlled dev-plot generations
+**Feeds:** Ch.4 Phase 4; §4.5 (w, tau); Ch.5 limitation
+**Commit:** `254bc5c4fb5d3825834adb5aea34ca63c8ef6e15-dirty`
+**Artifacts:** `results/s4_devplot_lenctl_generations.md`, `results/s4_devplot_lenctl_generations.json`
+
+### Numbers
+- `results/s4_devplot_lenctl_generations.md`
+  - (see file; 3333 bytes)
+- `results/s4_devplot_lenctl_generations.json`
+  - `NOT_A_RESULT` = True
+  - `banner` = Attempt-1 dev-plot generations. The substrate `w` and τ are fitted on. No Critic ran; no quality claim is made here.
+  - `n_generations` = 120
+  - `level_length_gap_words` = {'bn': -4.7666666666666675, 'en': -9.233333333333333}
+  - `corpus_level_gap_words` = 4.27
+  - `length_diagnostic` = {'bn': 'GAP_BELOW_CORPUS', 'en': 'GAP_BELOW_CORPUS'}
+  - `prompt_length_controlled` = True
+  - `length_cap_words` = 20
+  - `length_only_auc` = {'bn': 0.9111111111111111, 'en': 0.9927777777777778}
+  - `matched_pairs` = {'bn': 8, 'en': 2}
+  - `matched_slice_tolerance` = 0.15
+  - `length_confound` = {'bn': 'LENGTH_RECOVERS_LEVEL', 'en': 'LENGTH_RECOVERS_LEVEL'}
+
+### Decisions made (and why)
+- **One length clause, identical at both levels, capped at 20 words.** The cap
+  is derived from region A (level 0 = 13.12 mean words, level 1 = 8.85, corpus
+  median 8), so it constrains the generator without asking for text shorter than
+  the humans wrote. A per-level cap was refused explicitly: it would re-tie
+  length to level by hand, which is worse than the model doing it because it
+  would be invisible in the outputs.
+- **The prompt was NOT tuned again after seeing this result.** One clause was
+  registered, run and measured. Iterating until the AUC fell would be selecting
+  a prompt on the outcome it is meant to be tested against.
+- **The clause becomes standard for all subsequent generation**, free length is
+  kept as a registered secondary condition, and the length-matched analysis is
+  deferred to Phase 5 where n = 90 makes the slice usable. Sabbir delegated;
+  the choice and reasoning are Claude's.
+
+### Findings (things we did not expect)
+- **The control worked on the magnitude and not on the order.** Level gap fell
+  from **24.8 to 4.8** words (bn) and **34.0 to 9.2** (en); truncation 5 -> 0;
+  both levels back at corpus scale. But the length-only AUC moved only
+  **0.9894 -> 0.9111** (bn) and **1.0000 -> 0.9928** (en), because AUC is
+  rank-based: level 1 is still the longer of the pair in **25/30** (bn) and
+  **29/30** (en). A five-fold reduction in mean difference buys almost nothing
+  on a rank statistic -- and buys the entire matched slice.
+- **Matched pairs 0 -> 8 (bn) and 0 -> 2 (en).** The analysis that was
+  impossible yesterday is now possible in one arm and still not in the other.
+- 🔴 **The registered failure criterion did not fire, because it was written as
+  a conjunction** (*"AUC >= 0.90 AND the slice stays empty"*) and the data split
+  it: the first clause is true, the second false. Recorded as not firing rather
+  than read in whichever direction suited. **Second pre-registration defect in
+  two days, same shape** -- yesterday a fixed direction, today a compound
+  condition, both written from an expectation of how the result would look.
+- **Script leakage did not get worse under the clause: 12/120 against 15/120.**
+  The opposite was suspected from reading the progress log, and the suspicion
+  was written down before the count was taken. Composition changed (Tamil,
+  Telugu, Cyrillic, Devanagari, Latin across both runs) and the concentration at
+  level 1 / English prompts weakened. n = 120, difference = 3 generations:
+  a description, not a test.
+
+### Consequences for downstream steps
+- 🔴 **No claim of length-neutral axis control may be made anywhere in this
+  thesis.** The level stays recoverable from length alone (AUC 0.91-0.99). This
+  goes in Ch.5 and beside every axis-level number. The construct claim rests
+  where it always did: RQ1-H's human validation on *corpus* text, length-matched
+  to within 2 words, where a length heuristic scored 0.16 -- below chance.
+- **The length-matched comparison moves to Phase 5** (90 eval-plots -> ~24
+  matched pairs in bn at the observed rate). 8 pairs is not an analysis; the
+  dev-plot slice sizes are reported as the reason for deferring.
+- **Prompt parity (§S4 decision 5) still holds by construction** -- the clause
+  lives in the one shared template, so §5.1 row 1 and the loop's attempt 1 carry
+  it identically.
+- **`w` and tau are fitted on the length-controlled archive**, with the
+  free-length archive available as a robustness comparison.
+- ⚠️ **Remaining pre-registrations (tau, §4.6, Phase 5) must state outcome bands
+  over a single quantity, not compound conditions over several.** Logged in
+  `protocol.md` as the generalisable lesson from the two defects.
+
+### Citations needed
+- `2607.18508` -- the content-blind probe and the matched-slice criterion, both
+  adopted verbatim rather than invented. Already added for S4.dev.
+- `2601.01768` -- LLMs track their own output length poorly; predicted that the
+  clause would shift the distribution rather than enforce a bound, which is
+  exactly what happened.
+- `kapur2026length` -- already in the bibliography; the length/specificity
+  relation in machine text.
+- Index searched: **alphaXiv** (Consensus quota exhausted to 2026-09-01).
+  **No new search was run for this step** -- it executes a decision registered
+  yesterday with its search recorded there. Stated so that a silent absence and
+  a considered one do not look alike.

@@ -1,0 +1,91 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-17T14:33:20.713111+00:00",
+    "git_commit": "254bc5c4fb5d3825834adb5aea34ca63c8ef6e15-dirty",
+    "untracked_files": 1,
+    "config": "configs/s4_devplots_lenctl.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "NOT_A_RESULT": true,
+    "banner": "Attempt-1 dev-plot generations. The substrate `w` and τ are fitted on. No Critic ran; no quality claim is made here.",
+    "grid": {
+      "models": {
+        "arm_a": "google/gemma-3-12b-it"
+      },
+      "prompt_arms": [
+        "bn",
+        "en"
+      ],
+      "n_plots": 30,
+      "levels": [
+        0,
+        1
+      ]
+    },
+    "n_generations": 120,
+    "per_cell": {
+      "bn|L0": {
+        "n": 30,
+        "mean_words": 11.466666666666667,
+        "median_words": 11.5,
+        "n_truncated": 0,
+        "n_with_foreign_script": 1,
+        "n_latin_above_baseline": 0,
+        "n_verbatim_corpus_copies": 0
+      },
+      "bn|L1": {
+        "n": 30,
+        "mean_words": 16.233333333333334,
+        "median_words": 16.0,
+        "n_truncated": 0,
+        "n_with_foreign_script": 2,
+        "n_latin_above_baseline": 1,
+        "n_verbatim_corpus_copies": 0
+      },
+      "en|L0": {
+        "n": 30,
+        "mean_words": 9.966666666666667,
+        "median_words": 10.0,
+        "n_truncated": 0,
+        "n_with_foreign_script": 1,
+        "n_latin_above_baseline": 0,
+        "n_verbatim_corpus_copies": 0
+      },
+      "en|L1": {
+        "n": 30,
+        "mean_words": 19.2,
+        "median_words": 18.5,
+        "n_truncated": 0,
+        "n_with_foreign_script": 3,
+        "n_latin_above_baseline": 2,
+        "n_verbatim_corpus_copies": 0
+      }
+    },
+    "level_length_gap_words": {
+      "bn": -4.7666666666666675,
+      "en": -9.233333333333333
+    },
+    "corpus_level_gap_words": 4.27,
+    "length_diagnostic": {
+      "bn": "GAP_BELOW_CORPUS",
+      "en": "GAP_BELOW_CORPUS"
+    },
+    "prompt_length_controlled": true,
+    "length_cap_words": 20,
+    "length_only_auc": {
+      "bn": 0.9111111111111111,
+      "en": 0.9927777777777778
+    },
+    "matched_pairs": {
+      "bn": 8,
+      "en": 2
+    },
+    "matched_slice_tolerance": 0.15,
+    "length_confound": {
+      "bn": "LENGTH_RECOVERS_LEVEL",
+      "en": "LENGTH_RECOVERS_LEVEL"
+    }
+  }
+}
