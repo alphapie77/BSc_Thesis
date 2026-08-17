@@ -74,8 +74,19 @@ class Critic:
         *,
         verifier_a_path: str | Path = "artifacts/verifier_a.joblib",
         symbolic_path: str | Path = "artifacts/symbolic_scorer.joblib",
+        required_sklearn_version: str | None = None,
     ):
         import joblib
+        import sklearn
+        import warnings
+
+        if (required_sklearn_version is not None
+                and sklearn.__version__ != required_sklearn_version):
+            raise CriticContractError(
+                "scikit-learn runtime does not match the symbolic artifact: "
+                f"required {required_sklearn_version}, found {sklearn.__version__}. "
+                "Refusing before joblib can construct an incompatible estimator."
+            )
 
         a = joblib.load(verifier_a_path)
         if not isinstance(a, dict) or "head" not in a:
@@ -89,7 +100,22 @@ class Critic:
                 "Inviolable rule 6: Verifier-B never enters the loop."
             )
 
-        s = joblib.load(symbolic_path)
+        # The symbolic pipeline is a native sklearn object, unlike Verifier-A's
+        # small dict wrapper. Its 1.9.0 -> 1.6.1 load emitted a warning and then
+        # crashed only on predict_proba (`multi_class` was absent). A warning is
+        # therefore already a failed contract, not something to scroll past.
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            s = joblib.load(symbolic_path)
+        version_warnings = [
+            str(w.message) for w in caught
+            if "Version" in type(w.message).__name__
+        ]
+        if version_warnings:
+            raise CriticContractError(
+                "symbolic scorer pickle version mismatch: "
+                + version_warnings[0].split("\n")[0]
+            )
         if s.get("enable_f1"):
             raise CriticContractError(
                 f"{symbolic_path} was fitted with enable_f1=True. That is a RULE 7 "

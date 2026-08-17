@@ -26,6 +26,13 @@
 step: S4.5a
 seed: 42
 
+# The committed symbolic scorer was fitted under sklearn 1.9.0
+# (`results/env_snapshot.json`; `requirements.lock.txt`). Loading it under
+# Kaggle's 1.6.1 runtime warns and then crashes on predict_proba because the old
+# LogisticRegression expects an attribute the 1.9.0 pickle does not carry.
+runtime:
+  scikit_learn: "1.9.0"
+
 # Both archives. The length-controlled one is the standard going forward; the
 # free-length one is the registered secondary condition (protocol.md 2026-08-17)
 # and is scored too, so the curve's shape can be compared across a factor that
@@ -35,6 +42,14 @@ inputs:
     generations_jsonl: results/s4_devplot_lenctl_generations.jsonl
   - name: free_length
     generations_jsonl: results/s4_devplot_generations.jsonl
+
+# A missing secondary archive must not quietly turn the registered two-condition
+# comparison into a one-condition result. Counts apply after append-only archive
+# keys are deduplicated.
+validation:
+  required_conditions: [length_controlled, free_length]
+  expected_unique_generations_per_condition: 120  # 30 plots x 2 levels x 2 prompt arms
+  required_generation_fields: [key, plot_id, arm, target_level, text]
 
 artifacts:
   verifier_a: artifacts/verifier_a.joblib     # role A only; rule 6 is checked in code

@@ -1,5 +1,18 @@
 # STATUS — single source of truth for "where are we"
 
+**Last updated:** 2026-08-18 (**S4.5a repair built; result not run; next action
+is the dedicated Kaggle runner.**) The long line below is the prior chronological
+timeline and is retained rather than silently rewritten.
+
+**Current update — 2026-08-18:** **S4.5a attempt 1 crashed before producing a
+result.** The symbolic sklearn-1.9.0 artifact was loaded under Kaggle 1.6.1 and
+failed at `predict_proba`. A separate single-checkout runner, exact runtime
+gate, two-artifact prediction preflight, mandatory two-archive contract and
+checked subprocess exits are now built. **No generation rerun. Next:** run
+`notebooks/s4_fit_w_kaggle.ipynb`. This update supersedes the older “Next: `w`”
+timeline line immediately below by specifying that the code is built and the
+remaining action is the repaired run.
+
 **Last updated:** 2026-08-17 evening (**S4.dev-LC RAN: length control halved-and-then-some the gap and created a matched slice, but the level stays recoverable from length (AUC 0.91/0.99) → `LENGTH_RECOVERS_LEVEL`. No length-neutral axis-control claim may be made; matched analysis deferred to Phase 5. Two pre-registration defects logged in two days. Next: `w`**) · earlier: 2026-08-17 (**S4.dev free-length run READ: 120/120 generations, 0 verbatim copies — but 🔴 the pre-registered length diagnostic PASSED while length alone recovered the axis level at AUC 0.9894 (bn) / 1.0000 (en) and ZERO length-matched pairs existed. A length-controlled condition is registered and built; the direction-free confound measure replaces the failed diagnostic. 260 tests**) · earlier: 2026-08-16 (**S4.dev RAN — all 120 attempt-1 dev-plot generations produced on Kaggle T4; the report line then crashed on a reversed `write_text_lf` call, fixed, generations intact. Root cause of the two OOMs found and guarded: Kaggle's stock `transformers 5.0.0` silently drops the 4-bit config and loads fp16. 254 tests**) · previous: 2026-08-15 (**S4.dev built and NOT yet run: 120 attempt-1 dev-plot generations, the substrate `w` and τ are fitted on. Three harness defects fixed before any generation — empty `--model-path` from `$VAR` on a continuation line, LaBSE holding VRAM beside a 12B generator (CUDA OOM), and an ignored `nf4` config that would have loaded fp16 silently. 251 tests**) · previous: 2026-08-12 evening (**S4 pilot run 1 VOID: TigerLLM-9B-it weights are gemma-3-12b-it byte-for-byte — arm B unfilled, decision 22 open. Determinism check passed as salvage; two harness bugs fixed. See step 17b**) · earlier same day: (**S4 built end-to-end, 79 tests green. Generation moves to our own GPU on Kaggle; arms re-registered as gemma-3-12b-it vs TigerLLM-9B-it — same base, one variable. Fertility is PER-TOKENIZER: 0.93 on Llama, 3.71 on Gemma-3**) · previous: 2026-08-11 (**S3.3 RUN — both Bangla verifiers trained and committed (`0d2578d`); Phase 4 pre-registered in `protocol.md` §S4 before any code. A self-contradiction in this file, which had claimed "Phase 4 cannot start", is corrected below and logged as a deviation**) · **Phase:** 1–3 **Bangla-complete** → **4 (the loop, built; pilot part-run)**
 **Week:** 3 of 14
 
@@ -47,9 +60,27 @@
 | 17c | **S4.dev — attempt-1 generations on the 30 dev-plots** | ✅ **GENERATED 2026-08-16** — all **120** on Kaggle T4, 4-bit nf4, `gemma-3-12b-it`, ~25 min. ⚠️ The run exited non-zero at the **last line** (`write_text_lf` called with its arguments reversed): every generation was already on disk, so the report is re-derived from the archive rather than the run repeated. Awaiting the four files before any number is read. 🔴 **The two CUDA OOMs that preceded this had one root cause, now guarded in code:** Kaggle ships `transformers 5.0.0`, which **drops a 4-bit `quantization_config` without raising** and loads fp16 (~24 GB on a 16 GB card); the pilot had run on 5.15.0 because its notebook carried `-U transformers`, and the rebuilt notebook lost that line. Third time this project has been bitten by a stock Kaggle library version (S3.2 crashed at arm 6/7 on transformers 5.x) — **and the first time the pin lives in the code rather than in one notebook.** ⬛ superseded: ~~🔨 BUILT 2026-08-15, NOT RUN.~~ `configs/s4_devplots.yaml` + `src/agents/run_devplots.py` + `notebooks/s4_devplots_kaggle.ipynb`, **11 new tests (251 total)**. Grid: 30 dev-plots × 2 axis levels × 2 prompt arms = **120 generations**, single generator (`gemma-3-12b-it`). **No Critic and no Reflector** — the Critic requires `w` and τ, and fitting them from a loop that used them would be circular; attempt 1 only. Batch/quantisation/max-tokens/seed pinned identical to the pilot **by test**, so the two archives stay comparable. The pre-registered length diagnostic (`axis_definition.md` §3c) is computed and printed **beside** every cell, not on request. 🔴 **Three defects found and fixed before any generation existed**, all logged: (i) `$GEMMA_PATH` on a `!`-cell continuation line arrived empty — the script's refusal is why it cost nothing; (ii) **CUDA OOM** — retrieval now runs first on CPU and the encoder is released before the generator loads; (iii) **an ignored `quantization_config` is now a hard error** — an fp16 load at 3.4× memory is also a different numerical path, and on a larger card it would have produced incomparable generations *without crashing at all*. | code + config + tests + notebook; **no result files** | — |
 | 17b | **S4.pilot RUN 1 — ⚫ VOID as a comparison (2026-08-12, evening)** | 🔴 **RAN 100 generations on Kaggle T4 and the two arms produced character-identical output — because `TigerLLM-9B-it`'s uploaded weights ARE `gemma-3-12b-it`, byte-for-byte** (SHA-256 `4847447e…` on shard 1 of both; HF's blob store deduplicated them). Third defect for this model after the paper/architecture and size mismatches. **Arm B is unfilled; the model-choice verdict is void.** 🎁 Salvage, registered in `protocol.md` before it could become convenient: (i) the accidental double-run is a **passed determinism check** — identical seed → identical generations across two loads, so the local path is bit-reproducible where the API was not; (ii) `LANG_CONFUSION` fired in all four cells, now read as a **single-model** property of gemma-3-12b-it under both prompt languages (Latin *"actors"*, Devanagari *"सलमान"*). Two harness bugs found and fixed the same evening (resume `provider=` key mismatch → 20 duplicate keys in the JSONL, dedupe-by-key on read; one-load-per-role OOM fix). ⚠️ **NEW STANDING RULE (from the TigerLLM event): no model enters an arm until its weights are verified against its claim — config.json + a tensor-level diff against the claimed base, never the model card.** | `results/pilot_s4_local_generations.jsonl` (100 rows, 20 duplicate keys), `pilot_s4_local_model_choice.{md,json}` — **NOT A RESULT** | — |
 
+### S4.5a repair state
+
+🔨 **RUNNER REPAIRED 2026-08-18; result NOT RUN.** Attempt 1 reached all 120
+length-controlled rows, then the symbolic scorer crashed: committed artifact =
+sklearn **1.9.0**, Kaggle runtime = **1.6.1**, and
+`LogisticRegression.multi_class` was absent. The Verifier-A-only preflight had
+passed because it never touched the symbolic half. The appended notebook cells
+also switched to `/kaggle/working/repo/repo`, mixing two checkouts, while
+`!python` preserved the traceback as an ordinary stream instead of failing the
+cell.
+
+Repairs: dedicated `s4_fit_w_kaggle.ipynb` with one checkout; exact 1.9.0 gate;
+read-only preflight making one prediction through **both** Critic halves; both
+120-row archives mandatory; pickle-version warning fatal; subprocess exits
+checked; CSV results carry provenance. **274 tests pass** (269 + 5), plus
+notebook JSON/compile checks 4/4 and full source compile. **Zero `s4_w_*`
+results exist.**
+
 ## Parallel tracks (no step blocks these — but they block later steps)
 
-> **Checked 2026-08-17, unchanged and each for a recorded reason** — the hook
+> **Checked 2026-08-18, unchanged and each for a recorded reason** — the hook
 > asks for the counts at every close, so the answer is written rather than
 > skipped. **Plot synopses:** frozen at 120 (30 dev + 90 eval); nothing in
 > Phase 4 touches them. **Base-paper reading:** still **6 briefed, 0 read by

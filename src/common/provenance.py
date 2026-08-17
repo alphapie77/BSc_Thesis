@@ -1,4 +1,6 @@
 """Every result file must be able to answer: which code, which config, when?"""
+import csv
+import io
 import json
 import platform
 import subprocess
@@ -90,3 +92,38 @@ def write_result(obj: dict, path: str | Path, config_path: str | None = None) ->
     return write_text_lf(
         path, json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     )
+
+
+def write_csv_result(
+    rows: list[dict],
+    path: str | Path,
+    fieldnames: list[str],
+    config_path: str | None = None,
+) -> Path:
+    """Write a CSV whose every row carries the same provenance stamp.
+
+    A sidecar is too easy to separate from the table it describes, and a
+    comment preamble stops the file being an ordinary CSV. Repeating the six
+    small provenance fields keeps the artifact self-describing while remaining
+    readable by standard CSV tooling.
+    """
+    meta = stamp(config_path)
+    provenance = {
+        "_timestamp_utc": meta["timestamp_utc"],
+        "_git_commit": meta["git_commit"],
+        "_untracked_files": meta["untracked_files"],
+        "_config": meta["config"],
+        "_python": meta["python"],
+        "_platform": meta["platform"],
+    }
+    provenance_fields = list(provenance)
+    overlap = set(fieldnames) & set(provenance_fields)
+    if overlap:
+        raise ValueError(f"CSV fieldnames collide with provenance fields: {sorted(overlap)}")
+
+    buf = io.StringIO(newline="")
+    writer = csv.DictWriter(buf, fieldnames=[*provenance_fields, *fieldnames])
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({**provenance, **{name: row[name] for name in fieldnames}})
+    return write_text_lf(path, buf.getvalue())

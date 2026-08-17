@@ -37,7 +37,6 @@ rather than on dev-82, and it is restated wherever these scores appear.
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import statistics
 import sys
@@ -49,7 +48,11 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.agents.critic import Critic  # noqa: E402
-from src.common.provenance import write_result, write_text_lf  # noqa: E402
+from src.common.provenance import (  # noqa: E402
+    write_csv_result,
+    write_result,
+    write_text_lf,
+)
 from src.common.seed import set_seed  # noqa: E402
 
 #: Sensitivity of the *verdict*, not of a score: the share of generations whose
@@ -58,6 +61,10 @@ from src.common.seed import set_seed  # noqa: E402
 #: Registered as descriptive -- τ itself is decision 19's argmax and is not
 #: selected here.
 FLIP_TAU_QUANTILE = 0.5
+
+
+class InputContractError(RuntimeError):
+    """A declared S4.5a input is absent or not the registered archive."""
 
 
 def auc(pos: list[float], neg: list[float]) -> float:
@@ -85,6 +92,40 @@ def dedupe(path: str | Path) -> list[dict]:
         seen.add(g["key"])
         out.append(g)
     return out
+
+
+def validate_inputs(cfg: dict) -> dict[str, list[dict]]:
+    """Load every declared archive and refuse a partial or malformed run."""
+    validation = cfg["validation"]
+    required = set(validation["required_conditions"])
+    declared = {src["name"] for src in cfg["inputs"]}
+    if declared != required:
+        raise InputContractError(
+            f"configured conditions {sorted(declared)} do not equal required "
+            f"conditions {sorted(required)}"
+        )
+
+    expected_n = int(validation["expected_unique_generations_per_condition"])
+    required_fields = set(validation["required_generation_fields"])
+    loaded: dict[str, list[dict]] = {}
+    for src in cfg["inputs"]:
+        name, path = src["name"], Path(src["generations_jsonl"])
+        if not path.is_file():
+            raise InputContractError(f"required condition {name!r} is missing: {path}")
+        rows = dedupe(path)
+        if len(rows) != expected_n:
+            raise InputContractError(
+                f"condition {name!r} has {len(rows)} unique generations; "
+                f"expected {expected_n}"
+            )
+        for i, row in enumerate(rows, 1):
+            missing = required_fields - set(row)
+            if missing:
+                raise InputContractError(
+                    f"condition {name!r} row {i} lacks fields {sorted(missing)}"
+                )
+        loaded[name] = rows
+    return loaded
 
 
 def score_all(critic: Critic, rows: list[dict]) -> list[dict]:
@@ -210,21 +251,20 @@ def main() -> int:
 
     set_seed()
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
+    loaded_inputs = validate_inputs(cfg)
     g = cfg["grid"]
     step = float(g["w_step"])
     ws = [g["w_min"] + i * step
           for i in range(int(round((g["w_max"] - g["w_min"]) / step)) + 1)]
 
     critic = Critic(verifier_a_path=cfg["artifacts"]["verifier_a"],
-                    symbolic_path=cfg["artifacts"]["symbolic"])
+                    symbolic_path=cfg["artifacts"]["symbolic"],
+                    required_sklearn_version=cfg["runtime"]["scikit_learn"])
 
     per_condition, all_scores = {}, []
     for src in cfg["inputs"]:
-        name, path = src["name"], src["generations_jsonl"]
-        if not Path(path).exists():
-            print(f"  {name}: {path} missing -- skipped")
-            continue
-        rows = dedupe(path)
+        name = src["name"]
+        rows = loaded_inputs[name]
         print(f"  {name}: scoring {len(rows)} generations ...", flush=True)
         scored = score_all(critic, rows)
         for r in scored:
@@ -246,20 +286,21 @@ def main() -> int:
                                    block["marginal_value"])
         per_condition[name] = block
 
-    with open(cfg["outputs"]["scores_csv"], "w", newline="", encoding="utf-8") as f:
-        wr = csv.DictWriter(f, fieldnames=["condition", "key", "plot_id", "arm",
-                                          "target_level", "n_words",
-                                          "neural", "symbolic"])
-        wr.writeheader()
-        for r in all_scores:
-            wr.writerow({k: r[k] for k in wr.fieldnames})
+    score_fields = ["condition", "key", "plot_id", "arm", "target_level",
+                    "n_words", "neural", "symbolic"]
+    write_csv_result(all_scores, cfg["outputs"]["scores_csv"], score_fields,
+                     config_path=args.config)
 
-    with open(cfg["outputs"]["curve_csv"], "w", newline="", encoding="utf-8") as f:
-        wr = csv.writer(f)
-        wr.writerow(["condition", "w", "auc", "n_pos", "n_neg"])
-        for name, b in per_condition.items():
-            for c in b["curve"]:
-                wr.writerow([name, c["w"], f"{c['auc']:.6f}", c["n_pos"], c["n_neg"]])
+    curve_rows = []
+    for name, block in per_condition.items():
+        for point in block["curve"]:
+            curve_rows.append({"condition": name, **point})
+    write_csv_result(
+        curve_rows,
+        cfg["outputs"]["curve_csv"],
+        ["condition", "w", "auc", "n_pos", "n_neg"],
+        config_path=args.config,
+    )
 
     result = {
         "NOT_A_RESULT": False,

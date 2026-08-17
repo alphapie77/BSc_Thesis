@@ -4174,3 +4174,66 @@ blob, because a digest is readable and a binary is not.
   **No new search was run for this step** -- it executes a decision registered
   yesterday with its search recorded there. Stated so that a silent absence and
   a considered one do not look alike.
+
+---
+
+## 2026-08-18 -- S4.5a repair: the symbolic artifact never passed the preflight
+**Feeds:** Ch.4 Phase 4; §4.5 (`w` sensitivity curve); reproducibility appendix
+**Commit:** pending
+**Artifacts:** code, config, tests and `notebooks/s4_fit_w_kaggle.ipynb`; **no result files**
+
+### Numbers
+- Failed run reached **120** length-controlled generations before the first
+  symbolic prediction.
+- Symbolic artifact environment: scikit-learn **1.9.0**.
+- Failed Kaggle runtime: scikit-learn **1.6.1**.
+- Registered inputs remain **2 archives × 120 unique generations**; neither is
+  regenerated or rewritten.
+- Test inventory: **269 → 274 tests**. Local verification completed: notebook
+  JSON valid, notebook compile checks **4/4**, `compileall` passed, and the full
+  suite passed **274/274** in the project `.venv`.
+
+### Decisions made (and why)
+- **A separate S4.5a runner replaces the three cells appended to the generation
+  notebook.** The appended cells changed into `/kaggle/working/repo/repo`; a
+  dedicated `/kaggle/working/wfit_repo` makes the checkout identity singular
+  and makes accidentally re-running generation impossible. Sabbir asked Codex
+  to repair the notebook; this implementation choice and reasoning are Codex's.
+- **The scoring runtime is fixed to sklearn 1.9.0, the committed artifact's own
+  environment.** This is read from `requirements.lock.txt` and
+  `results/env_snapshot.json`, not selected from a score. The artifact is not
+  refitted: replacing a committed fitted object to accommodate an older runtime
+  would change the thing being evaluated.
+- **Preflight means both halves predict.** The old preflight tested only
+  Verifier-A and truthfully passed; using that pass as a Critic preflight was the
+  error. The new gate loads both registered archives and makes one neural and
+  one symbolic prediction before the full pass.
+- **Every external command is checked.** `subprocess.run(..., check=True)` makes
+  a non-zero script exit a failed notebook cell rather than a traceback-looking
+  stream beneath a successful execution count.
+
+### Findings (things we did not expect)
+- 🔴 **A component-level preflight was mistaken for a system preflight.** Its
+  green verdict covered Verifier-A only; the symbolic estimator had never been
+  called in that environment.
+- 🔴 **The incompatibility warned before it crashed.** Letting joblib's warning
+  scroll past converted an immediate environment refusal into an 18-second
+  model load and a failure inside sklearn. The symbolic loader now promotes that
+  warning to a contract error.
+- The generation archive and the fitted artifacts are intact. The failed run
+  wrote no `s4_w_*` result, so there is no partial number to discard or report.
+
+### Consequences for downstream steps
+- Run only `notebooks/s4_fit_w_kaggle.ipynb`; do **not** run either dev-generation
+  condition again.
+- `fit_w.py` now refuses a missing condition or any archive whose deduplicated
+  count is not 120, so the registered robustness comparison cannot silently
+  collapse into a single-condition report.
+- The two CSV outputs now carry timestamp, commit, config, Python and platform
+  provenance in every row, matching the repository's result contract.
+- `w` remains unobserved. The next scientific action is still the registered
+  curve run; none of the three outcome labels has fired.
+
+### Citations needed
+- None. This repair enforces the already-recorded artifact environment and
+  subprocess/input contracts; it introduces no method, threshold or claim.

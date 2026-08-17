@@ -191,12 +191,14 @@ def main() -> None:
     # was not found by the Critic failing to load something.
     if cfg["outputs"].get("artifact"):
         import joblib
+        import sklearn
 
         art_path = Path(cfg["outputs"]["artifact"])
         art_path.parent.mkdir(parents=True, exist_ok=True)
         joblib.dump(
             {
                 "kind": "symbolic_scorer",
+                "sklearn_version": sklearn.__version__,
                 "pipeline": model,
                 "feature_names": names,
                 # The Critic must rebuild features in EXACTLY this order and

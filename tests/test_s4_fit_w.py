@@ -9,6 +9,9 @@ pre-committed outcomes.
 from __future__ import annotations
 
 import sys
+import json
+import tempfile
+from copy import deepcopy
 from pathlib import Path
 
 import yaml
@@ -17,15 +20,22 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.eval.fit_w import (  # noqa: E402
+    InputContractError,
     auc,
     classify,
     curve,
     marginal_value,
+    validate_inputs,
     verdict_flip_share,
 )
 
 CFG = yaml.safe_load((ROOT / "configs" / "s4_w.yaml").read_text(encoding="utf-8"))
 SRC = (ROOT / "src" / "eval" / "fit_w.py").read_text(encoding="utf-8")
+PREFLIGHT_SRC = (ROOT / "src" / "eval" / "preflight_w.py").read_text(encoding="utf-8")
+CRITIC_SRC = (ROOT / "src" / "agents" / "critic.py").read_text(encoding="utf-8")
+RUNNER = json.loads(
+    (ROOT / "notebooks" / "s4_fit_w_kaggle.ipynb").read_text(encoding="utf-8")
+)
 
 
 def _row(plot, level, neural, symbolic, arm="bn", words=10):
@@ -106,3 +116,87 @@ def test_no_single_w_is_written_anywhere():
 def test_verifier_b_is_unreachable_from_this_module():
     """Inviolable rule 6 — the fit uses the in-loop verifier only."""
     assert "verifier_b" not in SRC
+
+
+def _write_archive(path: Path, n: int = 2, *, omit: str | None = None):
+    rows = []
+    for i in range(n):
+        row = {
+            "key": f"k{i}", "plot_id": f"P{i}", "arm": "bn",
+            "target_level": i % 2, "text": f"text {i}",
+        }
+        if omit:
+            row.pop(omit)
+        rows.append(row)
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+
+
+def _validation_cfg(root: Path) -> dict:
+    cfg = deepcopy(CFG)
+    cfg["validation"]["expected_unique_generations_per_condition"] = 2
+    cfg["inputs"] = [
+        {"name": "length_controlled", "generations_jsonl": str(root / "lc.jsonl")},
+        {"name": "free_length", "generations_jsonl": str(root / "free.jsonl")},
+    ]
+    return cfg
+
+
+def test_all_declared_archives_are_mandatory():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        cfg = _validation_cfg(root)
+        _write_archive(root / "lc.jsonl")
+        try:
+            validate_inputs(cfg)
+        except InputContractError as exc:
+            assert "free_length" in str(exc) and "missing" in str(exc)
+        else:
+            raise AssertionError("a missing registered condition was silently skipped")
+
+
+def test_archive_count_and_fields_are_contracts():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        cfg = _validation_cfg(root)
+        _write_archive(root / "lc.jsonl")
+        _write_archive(root / "free.jsonl", n=1)
+        try:
+            validate_inputs(cfg)
+        except InputContractError as exc:
+            assert "1 unique generations" in str(exc)
+        else:
+            raise AssertionError("a short archive was accepted")
+
+        _write_archive(root / "free.jsonl", omit="text")
+        try:
+            validate_inputs(cfg)
+        except InputContractError as exc:
+            assert "text" in str(exc)
+        else:
+            raise AssertionError("a malformed archive was accepted")
+
+
+def test_runtime_and_pickle_mismatch_are_hard_failures():
+    assert CFG["runtime"]["scikit_learn"] == "1.9.0"
+    assert "required_sklearn_version" in CRITIC_SRC
+    assert "symbolic scorer pickle version mismatch" in CRITIC_SRC
+    assert "missing -- skipped" not in SRC
+
+
+def test_w_preflight_is_read_only_and_keeps_the_evaluator_wall():
+    assert "write_result" not in PREFLIGHT_SRC
+    assert "write_text" not in PREFLIGHT_SRC
+    assert "verifier_b" not in PREFLIGHT_SRC
+    assert "validate_inputs" in PREFLIGHT_SRC
+
+
+def test_w_runner_has_one_checkout_and_fails_on_command_errors():
+    source = "\n".join(
+        "".join(cell.get("source", [])) for cell in RUNNER["cells"]
+        if cell.get("cell_type") == "code"
+    )
+    assert "/repo/repo" not in source
+    assert "/kaggle/working/wfit_repo" in source
+    assert "scikit-learn==1.9.0" in source
+    assert "subprocess.run" in source and "check=True" in source
+    assert "run_devplots.py" not in source

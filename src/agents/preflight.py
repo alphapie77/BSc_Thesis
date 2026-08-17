@@ -67,7 +67,7 @@ def macro_f1(y_true: list[int], y_pred: list[int]) -> float:
     return float(f1_score(y_true, y_pred, average="macro"))
 
 
-def main() -> None:
+def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", required=True)
     args = ap.parse_args()
@@ -228,6 +228,7 @@ def main() -> None:
             "change to the model or the data, only to the environment. Stop and\n"
             "record it before building the Critic."
         )
+        return 1
     elif rank_inversions == 0 and max_delta < min_adjacent_gap:
         print(
             "\nVERDICT: QUANTILES_STABLE — all 82 labels agree, the score\n"
@@ -237,14 +238,15 @@ def main() -> None:
             "same two items on both hosts, so τ selects the same operating\n"
             "points. The Critic may use this artifact locally.\n"
             "\n⚠️  What is NOT established, and must not be written as though it\n"
-            "    were: that the estimator is unaffected. Two things changed at\n"
-            "    once — sklearn 1.6.1 → 1.9.0 AND the encoding host — and this\n"
-            "    run cannot separate them, because the committed file records\n"
+            "    were: that the estimator is unaffected. The sklearn/encoder\n"
+            "    stack and the host can change together, and this run cannot\n"
+            "    separate them, because the committed file records\n"
             "    probabilities, not embeddings. The drift is at the 1e-6 scale\n"
             "    typical of float/BLAS differences rather than of a changed\n"
             "    estimator, but that is an inference from magnitude, not a\n"
             "    measurement, and it is labelled as one."
         )
+        return 0
     else:
         print(
             f"\nVERDICT: QUANTILES_AT_RISK — labels agree, but the ordering does\n"
@@ -254,7 +256,8 @@ def main() -> None:
             "between a different pair of items on this host than on Kaggle.\n"
             "Do not build the Critic on this artifact until it is resolved."
         )
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

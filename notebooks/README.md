@@ -9,6 +9,7 @@ paper — a reviewer cannot read a cell that only ever existed in a browser tab.
 | Notebook | Runs | Needs |
 |---|---|---|
 | `s2_pilot_kaggle.ipynb` | `src/cluster/s2_pilot.py` (S2 pilot: near-dup + ARI trap-check) | GPU, internet ON, `bn_clean.csv` as a Kaggle Dataset |
+| `s4_fit_w_kaggle.ipynb` | `src/eval/preflight_w.py`, then `src/eval/fit_w.py` (S4.5a sensitivity curve) | Internet ON; GPU recommended; no external data/model input |
 
 ## Why a Kaggle Dataset for the input
 
