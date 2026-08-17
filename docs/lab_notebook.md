@@ -3992,3 +3992,92 @@ blob, because a digest is readable and a binary is not.
   (§5, why parity is structural). **No search was run for this step and none was
   needed** — it implements already-searched decisions, recorded rather than
   omitted so that a silent absence and a considered one do not look alike.
+
+---
+
+## 2026-08-17 -- S4.dev: attempt-1 dev-plot generations, free length
+**Feeds:** Ch.4 Phase 4; §4.5 (w, tau); §5.4 realism
+**Commit:** `07ef398881083d41f9e1b545c4adb8b4407387eb-dirty`
+**Artifacts:** `results/s4_devplot_generations.md`, `results/s4_devplot_generations.json`
+
+### Numbers
+- `results/s4_devplot_generations.md`
+  - (see file; 1648 bytes)
+- `results/s4_devplot_generations.json`
+  - `NOT_A_RESULT` = True
+  - `banner` = Attempt-1 dev-plot generations. The substrate `w` and τ are fitted on. No Critic ran; no quality claim is made here.
+  - `n_generations` = 120
+  - `level_length_gap_words` = {'bn': -24.766666666666666, 'en': -33.96666666666666}
+  - `corpus_level_gap_words` = 4.27
+  - `length_diagnostic` = {'bn': 'GAP_BELOW_CORPUS', 'en': 'GAP_BELOW_CORPUS'}
+
+### Decisions made (and why)
+- **Ran attempt 1 only, with no Critic and no Reflector.** The Critic requires
+  `w` and tau, and both are estimated *from these generations* (S4 decisions 1,
+  2, 19). Running the loop first would mean choosing a `w` in order to fit `w`.
+  The alternative -- fitting `w` on the 82 human dev rows -- was already
+  rejected on 2026-08-11: `kapur2026length` show the length/specificity relation
+  is flat or reversed in machine text, and this run confirms it on our own data.
+- **A length-controlled second condition is registered rather than replacing
+  this one.** Sabbir delegated the choice; the reasoning and the 20-word cap are
+  Claude's. The free-length archive is retained because it is the measurement of
+  what the generator does unconstrained. Alternative considered and closed by
+  arithmetic, not preference: a report-side length-matched analysis, which
+  cannot be done at all (see Findings).
+
+### Findings (things we did not expect)
+- 🔴 **The pre-registered length diagnostic PASSED while the confound it exists
+  to catch was at its strongest.** It asks whether level-1 output came out
+  *shorter* than level-0 by roughly the corpus gap (4.27 mean words). Observed:
+  level 1 is **longer** -- bn 13.5 -> 38.3, en 6.3 -> 40.3 -- so the rule
+  returned `GAP_BELOW_CORPUS`. The rule fixed a **direction** as well as a
+  magnitude, and the generator inverted the direction. Verdict re-reported as
+  **UNINFORMATIVE**, never as a pass.
+- 🔴 **Length alone recovers the target level: AUC 0.9894 (bn), 1.0000 (en).**
+  Computed here, labelled exploratory. In the en arm the ranges do not overlap
+  at all -- longest level-0 = 15 words, shortest level-1 = 25.
+- 🔴 **No length-matched slice exists.** Under `2607.18508`'s criterion
+  (|l0-l1| < 0.15*max, same plot) there are **0 matched pairs in both arms**.
+  This is what closed the report-only option: the subset a length-neutral claim
+  would be made on is empty, so this was never a choice between controlling at
+  generation time and controlling at reporting time.
+- ⚠️ Truncation is 5 of 120, **all at level 1** (2 bn, 3 en), which biases the
+  level-1 mean *downward* -- the true separation is if anything larger.
+- 🎁 **Verbatim exemplar copying: 0 of 120.** Worth counting: the Groq pilot
+  emitted `bn_0230` exactly. Retrieval is not being echoed here.
+- 🎁 **Generated text does not reproduce the corpus's length signature.** The
+  corpus's level 1 is *shorter and richer* (8.85 vs 13.12 mean words, ~18%
+  richer per 1k tokens); the generator renders "specific" as "long", at 37-40
+  words against a corpus median of 8. A §5.4 realism result, not a defect.
+- 🎁 **Non-Bangla script leakage is concentrated at level 1 and under English
+  prompts**: bn-L0 0/30, bn-L1 3/30, en-L0 1/30, en-L1 6/30, one generation
+  carrying Tamil script. Same direction as the pilot's 1/20 vs 4/20 at larger n
+  -- the second data point for the §3e prompt-language factor.
+
+### Consequences for downstream steps
+- **No axis-control claim may rest on these 120 generations.** They remain valid
+  as the `w` / tau substrate and as §5.1 row-1 (alpha_lo) evidence, because
+  neither depends on the level contrast being length-neutral.
+- **`length_confound` (AUC-based, direction-free) supersedes
+  `length_diagnostic`** for any axis-control claim, and both the AUC and the
+  matched-pair count are now printed beside every axis-level cell.
+- **The length-controlled condition must run before `w` is interpreted per
+  level.** Pre-committed: if its AUC stays >= 0.90 and its matched slice stays
+  empty, the control FAILED and is reported as failed -- `2601.01768` finds LLMs
+  track their own output length poorly, so that outcome is live.
+- **Ch.5 gains a limitation and §5.4 gains a result** from the same observation:
+  the inversion of the corpus length/specificity relation.
+- Four deviations logged in `protocol.md` under 2026-08-16, including the
+  pre-registration's own directionality defect.
+
+### Citations needed
+- `2607.18508` (Style over Substance) -- content-blind probe, length-matched
+  slice, and the recommendation that generation-time and reporting-time controls
+  are both required. **Supplied the remedy; the matched-pair count taken from
+  its §3 criterion is what closed the report-only option.**
+- `2601.01768` -- LLMs track their own output length poorly; the reason the
+  length clause is measured rather than assumed to work.
+- `kapur2026length` -- already in the bibliography, and the paper that
+  **predicted this exact outcome** while the diagnostic was written to miss it.
+  Recorded that way in `protocol.md` deliberately.
+- Index searched: **alphaXiv** (Consensus quota exhausted to 2026-09-01).

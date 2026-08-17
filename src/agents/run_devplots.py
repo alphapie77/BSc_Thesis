@@ -80,6 +80,36 @@ def foreign_script_chars(text: str) -> dict[str, int]:
     return dict(out)
 
 
+def length_only_auc(l1: list[int], l0: list[int]) -> float:
+    """P(a level-1 generation is longer than a level-0 one), ties at 0.5.
+
+    The content-blind probe of `2607.18508` §4.1, reduced to its one usable
+    feature here: we have a single generator, so their *generator-identity*
+    shortcut cannot exist and length is the whole of it. **0.5 is no signal;
+    1.0 means the target level is fully recoverable from a word count.**
+
+    Reported beside every axis-level number, always. The free-length run scored
+    0.9894 (bn) and 1.0000 (en), and the pre-registered length diagnostic still
+    returned a pass — because it fixed a direction. A quantity with no direction
+    in it cannot fail that way.
+    """
+    if not l1 or not l0:
+        return float("nan")
+    s = sum(1.0 if a > b else 0.5 if a == b else 0.0 for a in l1 for b in l0)
+    return s / (len(l1) * len(l0))
+
+
+def matched_pairs(pairs: list[tuple[int, int]], tol: float) -> int:
+    """Pairs whose two lengths are within `tol` of the longer. `2607.18508` §3.
+
+    Zero means **no length-matched evaluation is possible** on this archive, and
+    that is a finding rather than a missing table: it says every level-1 output
+    is longer than its level-0 counterpart by more than the tolerance, with no
+    exceptions to build a slice from.
+    """
+    return sum(1 for a, b in pairs if abs(a - b) < tol * max(a, b))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", default="configs/s4_devplots.yaml")
@@ -99,6 +129,12 @@ def main() -> int:
     arms = list(cfg["prompt_arms"])
     models = dict(cfg["models"])
     provider = cfg.get("provider", "local")
+    # One factor, one flag. False for the free-length archive, true for the
+    # length-controlled one; the two configs differ by this and nothing else.
+    length_controlled = bool(cfg.get("prompt_length_controlled", False))
+    if length_controlled:
+        print("prompt: LENGTH-CONTROLLED "
+              f"(<= {cfg.get('length_cap_words')} words, identical at both levels)")
 
     if len(plots) != int(cfg["sample"]["n_plots"]):
         raise SystemExit(
@@ -122,7 +158,8 @@ def main() -> int:
             r = researcher.retrieve(p["synopsis"], level)
             for arm in arms:
                 prompt = render(plot=p["synopsis"], target_level=level,
-                                arm=arm, exemplars=r.texts)
+                                arm=arm, exemplars=r.texts,
+                                length_controlled=length_controlled)
                 print(f"\n{'-'*72}\nFULL PROMPT — {p['plot_id']}, arm {arm}, "
                       f"level {level} ({len(prompt)} chars)\n{'-'*72}")
                 print(prompt)
@@ -155,7 +192,7 @@ def main() -> int:
             for arm in arms:
                 prompts[(p["plot_id"], level, arm)] = render(
                     plot=p["synopsis"], target_level=level, arm=arm,
-                    exemplars=r.texts)
+                    exemplars=r.texts, length_controlled=length_controlled)
     del researcher
     import gc
     gc.collect()
@@ -271,6 +308,21 @@ def main() -> int:
             gaps[arm] = a - b
     CORPUS_GAP = 13.12 - 8.85  # ref: docs/axis_definition.md §3, from the data
 
+    # The two quantities the free-length run needed and did not have. Both are
+    # direction-free, which is precisely why they survive an outcome the
+    # registered diagnostic was written the wrong way round to catch.
+    tol = float(cfg["report"].get("matched_slice_tolerance", 0.15))
+    probe: dict[str, float] = {}
+    matched: dict[str, int] = {}
+    for arm in arms:
+        by_plot: dict[str, dict[int, int]] = defaultdict(dict)
+        for g in gens:
+            if g["arm"] == arm:
+                by_plot[g["plot_id"]][g["target_level"]] = len(g["text"].split())
+        pairs = [(v[0], v[1]) for v in by_plot.values() if 0 in v and 1 in v]
+        probe[arm] = length_only_auc([p[1] for p in pairs], [p[0] for p in pairs])
+        matched[arm] = matched_pairs(pairs, tol)
+
     result = {
         "NOT_A_RESULT": True,
         "banner": "Attempt-1 dev-plot generations. The substrate `w` and τ are "
@@ -285,11 +337,24 @@ def main() -> int:
             arm: ("LENGTH_MAY_EXPLAIN_LEVEL" if g >= CORPUS_GAP else "GAP_BELOW_CORPUS")
             for arm, g in gaps.items()
         },
+        "prompt_length_controlled": length_controlled,
+        "length_cap_words": cfg.get("length_cap_words"),
+        "length_only_auc": probe,
+        "matched_pairs": matched,
+        "matched_slice_tolerance": tol,
+        # The verdict that supersedes `length_diagnostic` for any axis-control
+        # claim. Direction-free, so the 2026-08-16 failure mode cannot recur.
+        "length_confound": {
+            arm: ("LENGTH_RECOVERS_LEVEL" if a >= 0.90 else
+                  "LENGTH_PARTIAL" if a >= 0.70 else "LENGTH_WEAK")
+            for arm, a in probe.items()
+        },
     }
     write_result(result, out["report_json"], config_path=args.config)
 
     lines = [
-        "# S4.dev — attempt-1 generations on the 30 dev-plots",
+        "# S4.dev — attempt-1 generations on the 30 dev-plots"
+        + (" (LENGTH-CONTROLLED)" if length_controlled else " (free length)"),
         "",
         "> ⛔ **NOT A RESULT.** These generations are the substrate `w` "
         "(`protocol.md` §S4 decision 1) and τ (decisions 2, 19) are fitted on. "
@@ -329,6 +394,46 @@ def main() -> int:
         "distinction is specificity. It establishes only that the length "
         "explanation is not as strong here as in the human corpus. The construct "
         "claim rests on RQ1-H's human validation, not on this table.",
+        "",
+        "🔴 **And on 2026-08-16 that verdict was UNINFORMATIVE.** The rule above "
+        "fixes a *direction* — it asks whether level 1 came out shorter — and the "
+        "free-length run produced the opposite: level 1 was 25–34 words *longer*. "
+        "The test passed while the confound it exists to catch was at its "
+        "strongest. The table below replaces it for any axis-control claim, "
+        "because it has no direction in it.",
+        "",
+        "## The length confound, measured without a direction",
+        "",
+        "**Content-blind probe** (`2607.18508` §4.1): P(a level-1 generation is "
+        "longer than a level-0 one). **0.5 = length says nothing about the level; "
+        "1.0 = the level is fully recoverable from a word count.** "
+        "**Matched pairs**: same-plot L0/L1 pairs within "
+        f"{tol:.0%} of the longer — the slice any length-neutral claim would have "
+        "to be made on. **Zero means no such claim can be made at all.**",
+        "",
+        f"Prompt length control: **{'ON' if length_controlled else 'OFF'}**"
+        + (f" (≤ {cfg.get('length_cap_words')} words, identical at both levels)"
+           if length_controlled else " (free length)"),
+        "",
+        "| prompt arm | length-only AUC | verdict | matched pairs (of 30) |",
+        "|---|---|---|---|",
+    ]
+    for arm in arms:
+        a = probe.get(arm, float("nan"))
+        v = ("🔴 `LENGTH_RECOVERS_LEVEL`" if a >= 0.90 else
+             "⚠️ `LENGTH_PARTIAL`" if a >= 0.70 else "`LENGTH_WEAK`")
+        lines.append(f"| {arm} | {a:.4f} | {v} | **{matched.get(arm, 0)}** |")
+    lines += [
+        "",
+        "Reference — the **free-length** run of 2026-08-16: AUC **0.9894** (bn) "
+        "and **1.0000** (en), **0** matched pairs in either arm. In the en arm "
+        "the ranges did not overlap at all (longest L0 = 15 words, shortest "
+        "L1 = 25), so no length-matched evaluation existed to be run.",
+        "",
+        "⚠️ `2601.01768` finds LLMs track their own output length poorly, so a "
+        "length clause is expected to shift the distribution rather than enforce "
+        "a bound. **If the AUC stays ≥ 0.90 and the matched slice stays empty, "
+        "the control FAILED** — and that is reported as a failure, not softened.",
         "",
         "## Non-Bangla script",
         "",

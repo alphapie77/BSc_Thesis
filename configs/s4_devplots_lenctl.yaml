@@ -1,0 +1,79 @@
+# S4.dev-LC -- the LENGTH-CONTROLLED condition of the dev-plot generations.
+#
+# WHY THIS EXISTS. The free-length run (configs/s4_devplots.yaml, 2026-08-16)
+# produced level-1 comments of 38-40 mean words against level-0's 6-13, so
+# **length alone separated the two levels at AUC 0.9894 (bn) and 1.0000 (en)**.
+# Under `2607.18508`'s length-matched criterion (|l0-l1| < 0.15*max) there were
+# **0 matched pairs in either arm** -- in the en arm the ranges do not even
+# overlap (longest L0 = 15 words, shortest L1 = 25). So a reporting-side control
+# was not merely weak, it was impossible: the slice it needs does not exist.
+#
+# ⛔ STILL NOT A RESULT. This is the same step under one changed factor.
+#
+# WHAT IS DIFFERENT FROM configs/s4_devplots.yaml -- exactly one thing:
+#   prompt_length_controlled: true
+# which appends ONE sentence, identical at both levels, capping the comment at
+# 20 words. Everything else -- model, quantisation, batch size, seed, exemplars,
+# max_new_tokens, the axis definition, section order -- is byte-identical, so
+# the two archives differ by that sentence and nothing else.
+#
+# THE FREE-LENGTH ARCHIVE IS NOT SUPERSEDED. It is the condition that measures
+# what the generator does when nobody constrains it: it reads "specific" as
+# "long", inverting the corpus (level 1 is SHORTER there, 8.85 vs 13.12 mean
+# words, yet ~18% richer). `kapur2026length` predicted exactly this for machine
+# text. That inversion is a SS5.4 realism finding and is reported, not discarded.
+
+step: S4.dev.lenctl
+seed: 42
+
+provider: local
+batch_size: 8          # ref: configs/s4_devplots.yaml -- provenance, not a knob
+quantization: nf4      # ref: configs/s4_devplots.yaml -- identical or the
+                       # comparison measures the quantiser
+max_new_tokens: 80     # ref: configs/s4_devplots.yaml. Deliberately UNCHANGED:
+                       # moving the cap at the same time as the prompt clause
+                       # would confound the instruction with the truncation.
+
+models:
+  arm_a: google/gemma-3-12b-it   # ref: configs/s4_devplots.yaml, decision 22
+
+prompt_arms: [bn, en]
+
+# --- the one changed factor ------------------------------------------------
+# 20 words is DERIVED, not chosen: region A's level 0 averages 13.12 words and
+# level 1 averages 8.85 (results/s2e_regionA_k2_profile.md), corpus median 8.
+# 20 sits above both means, so the cap constrains the generator without asking
+# for text shorter than the humans wrote.
+#
+# ⚠️ IDENTICAL AT BOTH LEVELS. A per-level cap would re-tie length to level --
+# by hand this time, which is worse than the model doing it.
+#
+# ⚠️ The axis definition ALREADY says short and long comments are both normal at
+# both levels (docs/axis_definition.md SS3), and the model read that and ignored
+# it. This clause escalates a permission into an instruction; it does not
+# introduce a new claim about the construct.
+prompt_length_controlled: true
+length_cap_words: 20            # ref: results/s2e_regionA_k2_profile.md
+
+sample:
+  split: dev
+  n_plots: 30
+  levels: [0, 1]
+
+report:
+  length_by_level: true
+  copy_check: true
+  latin_char_baseline_pct: 0.09   # ref: results/s2e_regionA_k2_profile.md
+  # NEW, and reported whether or not it flatters the condition: the content-blind
+  # length-only probe (`2607.18508` SS4.1) and the size of the length-matched
+  # slice. If the slice is still empty, the control FAILED and the report says so
+  # -- `2601.01768` finds LLMs track their own output length poorly, so this is a
+  # live possibility, not a formality.
+  length_only_auc: true           # ref: 2607.18508 -- content-blind probe
+  matched_slice: true             # ref: 2607.18508 -- |l0-l1| < 0.15*max(l0,l1)
+  matched_slice_tolerance: 0.15   # ref: 2607.18508 SS3, adopted not invented
+
+outputs:
+  generations_jsonl: results/s4_devplot_lenctl_generations.jsonl
+  report_md: results/s4_devplot_lenctl_generations.md
+  report_json: results/s4_devplot_lenctl_generations.json

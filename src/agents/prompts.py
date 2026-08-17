@@ -97,6 +97,11 @@ _WRAPPER = {
         "retry_header": "তোমার আগের মন্তব্য:",
         "feedback_header": "যা ঠিক করতে হবে — ঠিক এই জিনিসগুলোই:",
         "closing": "শুধু মন্তব্যটি লেখো, বাংলায়। আর কিছু লিখো না।",
+        # Registered 2026-08-16. IDENTICAL at both levels -- that is the whole
+        # point: a different cap per level would re-tie length to level, by hand
+        # this time. 20 is derived from region A, not chosen: level 0 averages
+        # 13.12 words and level 1 averages 8.85, and the corpus median is 8.
+        "length": "এক-দুই বাক্যে লেখো, ২০ শব্দের মধ্যে।",
     },
     "en": {
         "task": (
@@ -110,6 +115,7 @@ _WRAPPER = {
         "retry_header": "Your previous comment:",
         "feedback_header": "Fix exactly these issues:",
         "closing": "Write only the comment, in Bangla. Nothing else.",
+        "length": "Write one or two sentences, at most 20 words.",
     },
 }
 
@@ -124,6 +130,7 @@ def render(
     feedback: str | None = None,
     definition: str | None = None,
     strict_exemplar_count: bool = True,
+    length_controlled: bool = False,
 ) -> str:
     """Build the Writer's prompt. §5.1 row 1 is this with no exemplars, no feedback.
 
@@ -131,6 +138,21 @@ def render(
     on retry + [previous draft + feedback]. The order is part of the contract
     because the appendix prints these verbatim and a reordered prompt is a
     different experimental condition.
+
+    `length_controlled` appends ONE sentence, identical at both levels, capping
+    the comment at 20 words. Registered 2026-08-16 after the free-length run
+    measured level-1 outputs at 38-40 mean words against level-0's 6-13, so that
+    **length alone separated the levels at AUC 0.9894 (bn) and 1.0000 (en)** and
+    no length-matched slice could be built from them -- 0 matched pairs under
+    `2607.18508`'s criterion, in either arm. The clause is a FACTOR, not a
+    replacement: the free-length archive is retained as the condition that
+    measures what the model does when left alone, which is to read "specific" as
+    "long" -- the inversion of the corpus, and what `kapur2026length` predicted.
+
+    ⚠️ `2601.01768` finds LLMs track their own output length poorly, so the
+    clause is expected to shift the distribution rather than enforce a bound.
+    That is why the achieved lengths and the matched-slice size are both
+    reported: the control is measured, never assumed to have worked.
     """
     w = _WRAPPER[arm] if arm in _WRAPPER else None
     if w is None:
@@ -179,6 +201,14 @@ def render(
             parts += ["", w["retry_header"], previous_draft.strip()]
         if feedback is not None:
             parts += ["", w["feedback_header"], feedback.strip()]
+
+    # Length clause immediately before the closing instruction, so the two
+    # instructions about *form* sit together and nothing between the plot and
+    # the closing changes between conditions except this one line. The diff
+    # between a free-length and a length-controlled prompt is therefore exactly
+    # one sentence, which is what makes it a factor rather than a rewrite.
+    if length_controlled:
+        parts += ["", w["length"]]
 
     parts += ["", w["closing"]]
     return "\n".join(parts)

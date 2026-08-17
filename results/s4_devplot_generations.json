@@ -1,0 +1,76 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-15T19:48:23.338460+00:00",
+    "git_commit": "07ef398881083d41f9e1b545c4adb8b4407387eb-dirty",
+    "untracked_files": 1,
+    "config": "configs/s4_devplots.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "NOT_A_RESULT": true,
+    "banner": "Attempt-1 dev-plot generations. The substrate `w` and τ are fitted on. No Critic ran; no quality claim is made here.",
+    "grid": {
+      "models": {
+        "arm_a": "google/gemma-3-12b-it"
+      },
+      "prompt_arms": [
+        "bn",
+        "en"
+      ],
+      "n_plots": 30,
+      "levels": [
+        0,
+        1
+      ]
+    },
+    "n_generations": 120,
+    "per_cell": {
+      "bn|L0": {
+        "n": 30,
+        "mean_words": 13.533333333333333,
+        "median_words": 12.5,
+        "n_truncated": 0,
+        "n_with_foreign_script": 0,
+        "n_latin_above_baseline": 0,
+        "n_verbatim_corpus_copies": 0
+      },
+      "bn|L1": {
+        "n": 30,
+        "mean_words": 38.3,
+        "median_words": 37.0,
+        "n_truncated": 2,
+        "n_with_foreign_script": 3,
+        "n_latin_above_baseline": 3,
+        "n_verbatim_corpus_copies": 0
+      },
+      "en|L0": {
+        "n": 30,
+        "mean_words": 6.333333333333333,
+        "median_words": 6.0,
+        "n_truncated": 0,
+        "n_with_foreign_script": 1,
+        "n_latin_above_baseline": 0,
+        "n_verbatim_corpus_copies": 0
+      },
+      "en|L1": {
+        "n": 30,
+        "mean_words": 40.3,
+        "median_words": 40.0,
+        "n_truncated": 3,
+        "n_with_foreign_script": 6,
+        "n_latin_above_baseline": 6,
+        "n_verbatim_corpus_copies": 0
+      }
+    },
+    "level_length_gap_words": {
+      "bn": -24.766666666666666,
+      "en": -33.96666666666666
+    },
+    "corpus_level_gap_words": 4.27,
+    "length_diagnostic": {
+      "bn": "GAP_BELOW_CORPUS",
+      "en": "GAP_BELOW_CORPUS"
+    }
+  }
+}

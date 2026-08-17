@@ -1,0 +1,69 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-11T21:30:30.593520+00:00",
+    "git_commit": "54479eb5661bf477a56f02d3f195d3b4173842bf-dirty",
+    "untracked_files": 1,
+    "config": "configs/s4_pilot_local.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "NOT_A_RESULT": true,
+    "banner": "Generator selection pilot. Selects a model; measures nothing.",
+    "grid": {
+      "models": {
+        "arm_a": "google/gemma-3-12b-it",
+        "arm_b": "md-nishat-008/TigerLLM-9B-it"
+      },
+      "prompt_arms": [
+        "bn",
+        "en"
+      ],
+      "n_plots": 10,
+      "levels": [
+        0,
+        1
+      ]
+    },
+    "latin_baseline_fraction": 0.0009,
+    "cells": {
+      "google/gemma-3-12b-it|bn": {
+        "n": 40,
+        "n_latin_above_baseline": 2,
+        "max_latin_fraction": 0.07251908396946564,
+        "mean_chars": 141.4,
+        "n_verbatim_corpus_copies": 0,
+        "verbatim_copies_by_level": {},
+        "verdict": "LANG_CONFUSION"
+      },
+      "google/gemma-3-12b-it|en": {
+        "n": 20,
+        "n_latin_above_baseline": 1,
+        "max_latin_fraction": 0.03355704697986577,
+        "mean_chars": 125.3,
+        "n_verbatim_corpus_copies": 0,
+        "verbatim_copies_by_level": {},
+        "verdict": "LANG_CONFUSION"
+      },
+      "md-nishat-008/TigerLLM-9B-it|bn": {
+        "n": 20,
+        "n_latin_above_baseline": 1,
+        "max_latin_fraction": 0.07251908396946564,
+        "mean_chars": 139.55,
+        "n_verbatim_corpus_copies": 0,
+        "verbatim_copies_by_level": {},
+        "verdict": "LANG_CONFUSION"
+      },
+      "md-nishat-008/TigerLLM-9B-it|en": {
+        "n": 20,
+        "n_latin_above_baseline": 1,
+        "max_latin_fraction": 0.03355704697986577,
+        "mean_chars": 125.3,
+        "n_verbatim_corpus_copies": 0,
+        "verbatim_copies_by_level": {},
+        "verdict": "LANG_CONFUSION"
+      }
+    },
+    "observed_rate_limits": {}
+  }
+}

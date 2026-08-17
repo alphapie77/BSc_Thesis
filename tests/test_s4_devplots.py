@@ -16,6 +16,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.agents.prompts import render  # noqa: E402
 from src.agents.run_devplots import foreign_script_chars  # noqa: E402
 
 CFG = yaml.safe_load((ROOT / "configs" / "s4_devplots.yaml").read_text(encoding="utf-8"))
@@ -118,6 +119,75 @@ def test_requested_quantisation_is_verified_after_load():
     lw = (ROOT / "src" / "agents" / "local_writer.py").read_text(encoding="utf-8")
     assert "is_loaded_in_4bit" in lw
     assert "quantisation was requested" in lw
+
+
+LC = yaml.safe_load(
+    (ROOT / "configs" / "s4_devplots_lenctl.yaml").read_text(encoding="utf-8"))
+
+
+def test_length_clause_is_identical_at_both_levels():
+    """The whole point of the control.
+
+    A per-level cap would re-tie length to level — by hand, which is worse than
+    the model doing it, because it would look deliberate and be undiscoverable
+    from the outputs.
+    """
+    from src.agents.prompts import _WRAPPER
+    for arm in ("bn", "en"):
+        p0 = render(plot="x", target_level=0, arm=arm, length_controlled=True)
+        p1 = render(plot="x", target_level=1, arm=arm, length_controlled=True)
+        clause = _WRAPPER[arm]["length"]
+        assert clause in p0 and clause in p1
+
+
+def test_length_control_adds_exactly_one_line_and_nothing_else():
+    """Free-length and length-controlled prompts must differ by ONE sentence.
+
+    Anything more and the two archives differ by a rewrite rather than a factor,
+    and the comparison stops being attributable.
+    """
+    for arm in ("bn", "en"):
+        for lvl in (0, 1):
+            free = render(plot="x", target_level=lvl, arm=arm)
+            ctl = render(plot="x", target_level=lvl, arm=arm, length_controlled=True)
+            added = [ln for ln in ctl.splitlines() if ln not in free.splitlines()]
+            assert len(added) == 1, added
+
+
+def test_default_is_free_length():
+    """The 120 free-length generations were produced without this flag; a
+    default of True would silently reclassify them."""
+    import inspect
+    assert inspect.signature(render).parameters["length_controlled"].default is False
+
+
+def test_the_two_devplot_configs_differ_only_in_the_length_factor():
+    diffs = {k for k in set(CFG) | set(LC) if CFG.get(k) != LC.get(k)}
+    assert diffs <= {"step", "outputs", "report",
+                     "prompt_length_controlled", "length_cap_words"}, diffs
+    for k in ("batch_size", "quantization", "max_new_tokens", "seed",
+              "provider", "models", "prompt_arms", "sample"):
+        assert CFG[k] == LC[k], k
+
+
+def test_the_cap_is_traceable_to_the_corpus():
+    """20 words is derived from region A (13.12 / 8.85 mean, median 8), not
+    chosen. `check_constants.py` enforces the `# ref:`; this pins the value."""
+    assert LC["length_cap_words"] == 20
+    assert "s2e_regionA_k2_profile.md" in (
+        ROOT / "configs" / "s4_devplots_lenctl.yaml").read_text(encoding="utf-8")
+
+
+def test_the_length_confound_verdict_has_no_direction_in_it():
+    """The 2026-08-16 failure: the registered diagnostic asked whether level 1
+    came out SHORTER, and the run produced the opposite, so it passed while the
+    confound was total. The replacement is an AUC, which cannot pass that way."""
+    from src.agents.run_devplots import length_only_auc, matched_pairs
+    assert length_only_auc([40, 38], [6, 7]) == 1.0      # L1 longer  -> recovers
+    assert length_only_auc([6, 7], [40, 38]) == 0.0      # L1 shorter -> recovers
+    assert length_only_auc([10, 11], [10, 11]) == 0.5    # no signal
+    assert "LENGTH_RECOVERS_LEVEL" in SRC
+    assert matched_pairs([(10, 11), (6, 40)], 0.15) == 1
 
 
 def test_report_writers_are_called_with_the_right_signature():
