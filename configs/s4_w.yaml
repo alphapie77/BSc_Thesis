@@ -1,0 +1,77 @@
+# S4.5a -- the hybrid weight `w`, fitted as a SENSITIVITY CURVE.
+#
+# ref: docs/protocol.md §S4 registered decision 1. `w` has no value and may not
+# acquire one before the dev-plot generations exist. They now do.
+#
+# WHAT IS BEING ASKED. The Critic scores `w*VerifierA + (1-w)*symbolic` and the
+# question is how much the verdict depends on `w`. The answer is reported as a
+# CURVE over the whole range, never as a point -- a point would be the `0.6/0.4`
+# defect with a fitting procedure attached to it.
+#
+# THE LABEL, AND ITS LIMIT -- stated here because it is the weak joint.
+# The only label available on generated text is the level that was REQUESTED.
+# So every number below measures "does the score agree with the instruction",
+# NOT "is this text really level 1": the generator's compliance is assumed, and
+# it is the thing that cannot be checked without annotation. This is the right
+# quantity for FITTING `w` -- the Critic's job in the loop is precisely to
+# reward compliance -- and the wrong quantity for claiming the axis was
+# controlled. That second claim is not made from this file.
+#
+# THE BASELINE THAT MATTERS. S4.dev-LC measured that a word count alone
+# recovers the requested level at AUC 0.9111 (bn) / 0.9928 (en). So the honest
+# reference for any hybrid score is not 0.5 -- it is the length-only probe. A
+# scorer that cannot beat counting words has not earned its place, and that
+# comparison is printed beside every curve.
+
+step: S4.5a
+seed: 42
+
+# Both archives. The length-controlled one is the standard going forward; the
+# free-length one is the registered secondary condition (protocol.md 2026-08-17)
+# and is scored too, so the curve's shape can be compared across a factor that
+# is known to move the confound.
+inputs:
+  - name: length_controlled
+    generations_jsonl: results/s4_devplot_lenctl_generations.jsonl
+  - name: free_length
+    generations_jsonl: results/s4_devplot_generations.jsonl
+
+artifacts:
+  verifier_a: artifacts/verifier_a.joblib     # role A only; rule 6 is checked in code
+  symbolic: artifacts/symbolic_scorer.joblib  # enable_f1=True is refused by the Critic
+
+# --- the curve --------------------------------------------------------------
+# 21 points at 0.05 spacing across the FULL range. Not the pipeline's old
+# 0.5-0.8 grid: that grid presupposed the answer lay in the neural-heavy half,
+# and w=0 / w=1 are the two endpoints the marginal-value test is defined
+# against. Spacing is a resolution choice, not a decision constant -- the curve
+# is reported whole and nothing selects a single point from it.
+grid:
+  w_min: 0.0
+  w_max: 1.0
+  w_step: 0.05
+
+# --- the held-out marginal-value test ---------------------------------------
+# ref: protocol.md §S4 decision 1 -- inclusion of the symbolic term must survive
+# a held-out test, not a standalone score. `barata2026hybrid` rejected a cheap
+# component in 50 of 50 folds while it looked fine on its own.
+#
+# GROUPED BY PLOT. Both levels of one plot share a synopsis and ten retrieved
+# exemplars, so splitting them across folds would leak the plot. 5 folds over
+# 30 plots = 6 held-out plots (12 generations) per fold.
+marginal_value:
+  n_folds: 5              # 30 plots / 5 = 6 held-out plots per fold
+  group_by: plot_id       # never split a plot across folds
+
+# --- the length baseline, carried in rather than recomputed -----------------
+# ref: results/s4_devplot_lenctl_generations.json (and the free-length file).
+# Read from the result files at run time; recorded here so the comparison is
+# part of the config rather than something the reader has to look up.
+report:
+  compare_against_length_only: true
+
+outputs:
+  report_md: results/s4_w_sensitivity.md
+  report_json: results/s4_w_sensitivity.json
+  curve_csv: results/s4_w_sensitivity.csv
+  scores_csv: results/s4_w_scores.csv   # per-generation neural + symbolic
