@@ -76,7 +76,9 @@ read-only preflight making one prediction through **both** Critic halves; both
 120-row archives mandatory; pickle-version warning fatal; subprocess exits
 checked; CSV results carry provenance. **274 tests pass** (269 + 5), plus
 notebook JSON/compile checks 4/4 and full source compile. **Zero `s4_w_*`
-results exist.**
+results exist.** The dedicated runner is batch-safe: all post-install checks
+and scripts use fresh subprocesses, so Kaggle **Save & Run All** needs no manual
+kernel restart.
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 

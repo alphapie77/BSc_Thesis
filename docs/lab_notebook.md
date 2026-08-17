@@ -4211,6 +4211,10 @@ blob, because a digest is readable and a binary is not.
 - **Every external command is checked.** `subprocess.run(..., check=True)` makes
   a non-zero script exit a failed notebook cell rather than a traceback-looking
   stream beneath a successful execution count.
+- **The runner is batch-safe, not restart-dependent.** Kaggle's saved batch run
+  cannot pause for a manual kernel restart. The install is followed only by
+  fresh Python subprocesses, so none can retain a pre-install sklearn import;
+  `Save & Run All` can therefore finish and preserve outputs unattended.
 
 ### Findings (things we did not expect)
 - 🔴 **A component-level preflight was mistaken for a system preflight.** Its
