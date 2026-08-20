@@ -40,23 +40,30 @@ class Response:
 
     def json(self):
         return {
-            "candidates": [{"content": {"parts": [{"text": json.dumps({
-                "verdict": "PASS", "target_fit_score": 100, "feedback": ""
-            })}]}}],
-            "modelVersion": "gemini-2.5-flash",
+            "id": "r", "model": "gemini-3.6-flash", "status": "completed",
+            "steps": [{"type": "model_output", "content": [{
+                "type": "text", "text": json.dumps({
+                    "verdict": "PASS", "target_fit_score": 100, "feedback": ""
+                }),
+            }]}],
         }
 
 
 class Session:
     def post(self, url, **kwargs):
-        assert "secret" in url
-        schema = kwargs["json"]["generationConfig"]["responseSchema"]
+        assert "secret" not in url
+        assert kwargs["headers"]["x-goog-api-key"] == "secret"
+        assert kwargs["json"]["generation_config"] == {
+            "seed": 42, "thinking_level": "medium",
+        }
+        schema = kwargs["json"]["response_format"]["schema"]
         assert "additionalProperties" not in schema
         return Response()
 
 
 def test_gemini_runtime_gate_uses_the_registered_schema():
     out = validate_gemini_api(
-        api_key="secret", model="gemini-2.5-flash", session=Session()
+        api_key="secret", model="gemini-3.6-flash", seed=42,
+        thinking_level="medium", session=Session()
     )
-    assert out["verdict"] == "PASS" and out["model_version"] == "gemini-2.5-flash"
+    assert out["verdict"] == "PASS" and out["model_version"] == "gemini-3.6-flash"

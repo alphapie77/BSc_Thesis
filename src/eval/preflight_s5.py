@@ -23,6 +23,9 @@ from src.eval.s5_contract import (  # noqa: E402
     symbolic_scores_from_s4,
     threshold_for_acceptance_rate,
 )
+from src.eval.gemini_judge import (  # noqa: E402
+    REQUIRED_MODEL, REQUIRED_SEED, REQUIRED_THINKING_LEVEL,
+)
 from src.verifier.split_access import _read_split_map, load_training_rows  # noqa: E402
 
 
@@ -39,6 +42,19 @@ def preflight(cfg: dict) -> dict:
         raise S5ContractError("config condition order does not match the frozen registry")
     if tuple(cfg.get("replicate_seeds", ())) != REPLICATE_SEEDS:
         raise S5ContractError("replicate seeds must be exactly [42, 43, 44]")
+    judge = cfg.get("gemini_judge", {})
+    if judge.get("model") != REQUIRED_MODEL:
+        raise S5ContractError(f"row 8 model must be {REQUIRED_MODEL}")
+    if judge.get("transport") != "interactions_v1beta":
+        raise S5ContractError("row 8 must use the Gemini Interactions v1beta transport")
+    if "temperature" in judge:
+        raise S5ContractError("Gemini 3.6 does not accept a temperature parameter")
+    if judge.get("seed") != REQUIRED_SEED:
+        raise S5ContractError(f"row 8 seed must be {REQUIRED_SEED}")
+    if judge.get("thinking_level") != REQUIRED_THINKING_LEVEL:
+        raise S5ContractError(
+            f"row 8 thinking level must be {REQUIRED_THINKING_LEVEL}"
+        )
     sample = cfg["sample"]
     if sample != {
         "split": "eval", "n_plots": 90, "levels": [0, 1],
@@ -134,6 +150,10 @@ def preflight(cfg: dict) -> dict:
         "symbolic_dev_passes": symbolic_passes,
         "symbolic_dev_cases": len(scores),
         "rag_n_indexed": rag["n_indexed"],
+        "gemini_model": judge["model"],
+        "gemini_transport": judge["transport"],
+        "gemini_seed": judge["seed"],
+        "gemini_thinking_level": judge["thinking_level"],
         "verifier_b_loaded": False,
         "sample_prompt_chars": {"zero_shot": len(zero), "static_few_shot": len(few)},
     }

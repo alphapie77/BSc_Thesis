@@ -74,8 +74,10 @@ symbolic_gate:
   max_attempts: 3  # identical retry budget to neural loop, protocol §S5
 
 gemini_judge:
-  model: gemini-2.5-flash
-  temperature: 0
+  model: gemini-3.6-flash
+  transport: interactions_v1beta
+  seed: 42  # global reproducibility contract; supported by Interactions API
+  thinking_level: medium  # freeze Gemini 3.6's documented default explicitly
   structured_output: true
   max_attempts: 3  # identical retry budget to proposed loop, protocol §S5
   feedback_language: bn

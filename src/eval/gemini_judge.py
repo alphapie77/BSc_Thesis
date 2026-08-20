@@ -22,23 +22,55 @@ SCHEMA = {
     "required": ["verdict", "target_fit_score", "feedback"],
 }
 
+INTERACTIONS_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/interactions"
+)
+REQUIRED_MODEL = "gemini-3.6-flash"
+REQUIRED_SEED = 42
+REQUIRED_THINKING_LEVEL = "medium"
+
 
 class GeminiJudgeError(RuntimeError):
     pass
 
 
-def structured_generation_config() -> dict:
-    """Return the legacy generateContent-compatible structured-output config.
-
-    The v1beta ``responseSchema`` field accepts an OpenAPI subset and rejected
-    ``additionalProperties`` on the live 2026-08-20 endpoint. Exact-key
-    enforcement remains in :func:`validate_payload`, after JSON parsing.
-    """
+def interaction_request(
+    *, model: str, prompt: str, seed: int, thinking_level: str,
+) -> dict:
+    """Return the Gemini-3 Interactions structured-output request."""
     return {
-        "temperature": 0,
-        "responseMimeType": "application/json",
-        "responseSchema": SCHEMA,
+        "model": model,
+        "input": prompt,
+        "response_format": {
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": SCHEMA,
+        },
+        "generation_config": {
+            "seed": seed,
+            "thinking_level": thinking_level,
+        },
     }
+
+
+def interaction_text(raw: dict) -> str:
+    """Extract the sole text payload from a completed Interaction response."""
+    if raw.get("status") != "completed":
+        raise GeminiJudgeError(
+            f"Gemini interaction status is {raw.get('status')!r}, not completed"
+        )
+    texts = [
+        part["text"]
+        for step in raw.get("steps", [])
+        if step.get("type") == "model_output"
+        for part in step.get("content", [])
+        if part.get("type") == "text" and isinstance(part.get("text"), str)
+    ]
+    if len(texts) != 1 or not texts[0].strip():
+        raise GeminiJudgeError(
+            f"expected one Gemini model-output text part, found {len(texts)}"
+        )
+    return texts[0]
 
 
 @dataclass(frozen=True)
@@ -89,12 +121,21 @@ def load_archive(path: str | Path) -> dict[str, dict]:
 
 class GeminiJudge:
     def __init__(
-        self, *, model: str, archive_path: str | Path,
+        self, *, model: str, seed: int, thinking_level: str,
+        archive_path: str | Path,
         api_key: str | None = None, session=None,
     ):
-        if model != "gemini-2.5-flash":
-            raise GeminiJudgeError("row 8 model must be stable gemini-2.5-flash")
+        if model != REQUIRED_MODEL:
+            raise GeminiJudgeError(f"row 8 model must be stable {REQUIRED_MODEL}")
+        if seed != REQUIRED_SEED:
+            raise GeminiJudgeError(f"row 8 seed must be {REQUIRED_SEED}")
+        if thinking_level != REQUIRED_THINKING_LEVEL:
+            raise GeminiJudgeError(
+                f"row 8 thinking level must be {REQUIRED_THINKING_LEVEL}"
+            )
         self.model = model
+        self.seed = seed
+        self.thinking_level = thinking_level
         self.archive_path = Path(archive_path)
         self.api_key = api_key or require("GOOGLE_API_KEY")
         if session is None:
@@ -111,23 +152,24 @@ class GeminiJudge:
                 verdict, score, feedback, row.get("usage", {}),
                 row.get("model_version"), row.get("response_id"), key,
             )
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent?key={self.api_key}"
+        body = interaction_request(
+            model=self.model, prompt=prompt, seed=self.seed,
+            thinking_level=self.thinking_level,
         )
-        body = {
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": structured_generation_config(),
-        }
         started = time.monotonic()
-        response = self.session.post(url, json=body, timeout=120)
+        response = self.session.post(
+            INTERACTIONS_URL,
+            headers={"x-goog-api-key": self.api_key, "Content-Type": "application/json"},
+            json=body,
+            timeout=120,
+        )
         if response.status_code != 200:
             raise GeminiJudgeError(
                 f"Gemini HTTP {response.status_code}: {response.text[:300]}"
             )
         raw = response.json()
         try:
-            text = raw["candidates"][0]["content"]["parts"][0]["text"]
+            text = interaction_text(raw)
             parsed = json.loads(text)
             verdict, score, feedback = validate_payload(parsed)
         except Exception as exc:
@@ -137,10 +179,12 @@ class GeminiJudge:
             "prompt": prompt,
             "parsed": parsed,
             "raw": raw,
-            "usage": raw.get("usageMetadata", {}),
+            "usage": raw.get("usage", {}),
             "model": self.model,
-            "model_version": raw.get("modelVersion"),
-            "response_id": raw.get("responseId"),
+            "seed": self.seed,
+            "thinking_level": self.thinking_level,
+            "model_version": raw.get("model"),
+            "response_id": raw.get("id"),
             "latency_seconds": time.monotonic() - started,
             "provenance": stamp(config_path="configs/s5_main_bn.yaml"),
         }

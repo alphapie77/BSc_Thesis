@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.secrets import require  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 from src.eval.gemini_judge import (  # noqa: E402
-    structured_generation_config, validate_payload,
+    INTERACTIONS_URL, interaction_request, interaction_text, validate_payload,
 )
 from src.eval.s5_prompts import role_control_messages  # noqa: E402
 
@@ -82,22 +82,26 @@ def validate_role_templates(tokenizer) -> dict:
     return rendered
 
 
-def validate_gemini_api(*, api_key: str, model: str, session=None) -> dict:
+def validate_gemini_api(
+    *, api_key: str, model: str, seed: int, thinking_level: str, session=None,
+) -> dict:
     if session is None:
         import requests
         session = requests
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{model}:generateContent?key={api_key}"
-    )
-    body = {
-        "contents": [{"role": "user", "parts": [{"text": (
+    prompt = (
             "Return a schema-valid evaluation object. Use verdict PASS, "
             "target_fit_score 100, and empty feedback."
-        )}]}],
-        "generationConfig": structured_generation_config(),
-    }
-    response = session.post(url, json=body, timeout=60)
+    )
+    body = interaction_request(
+        model=model, prompt=prompt, seed=seed,
+        thinking_level=thinking_level,
+    )
+    response = session.post(
+        INTERACTIONS_URL,
+        headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
+        json=body,
+        timeout=60,
+    )
     if response.status_code != 200:
         # Never echo the URL: it contains the API key.
         raise KagglePreflightError(
@@ -106,7 +110,7 @@ def validate_gemini_api(*, api_key: str, model: str, session=None) -> dict:
         )
     raw = response.json()
     try:
-        payload = json.loads(raw["candidates"][0]["content"]["parts"][0]["text"])
+        payload = json.loads(interaction_text(raw))
         verdict, score, feedback = validate_payload(payload)
     except Exception as exc:
         raise KagglePreflightError(
@@ -115,7 +119,7 @@ def validate_gemini_api(*, api_key: str, model: str, session=None) -> dict:
     return {
         "verdict": verdict, "target_fit_score": score,
         "feedback_chars": len(feedback),
-        "model_version": raw.get("modelVersion"),
+        "model_version": raw.get("model"),
     }
 
 
@@ -155,7 +159,10 @@ def main() -> int:
     tokenizer = AutoTokenizer.from_pretrained(args.model_path, local_files_only=True)
     roles = validate_role_templates(tokenizer)
     gemini = validate_gemini_api(
-        api_key=require("GOOGLE_API_KEY"), model=cfg["gemini_judge"]["model"]
+        api_key=require("GOOGLE_API_KEY"),
+        model=cfg["gemini_judge"]["model"],
+        seed=int(cfg["gemini_judge"]["seed"]),
+        thinking_level=cfg["gemini_judge"]["thinking_level"],
     )
     print(json.dumps({
         "status": "KAGGLE_RUNTIME_READY_NO_MODEL_LOADED",

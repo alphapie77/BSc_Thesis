@@ -167,6 +167,8 @@ def main() -> int:
     # Construction is network-free: the first request is made inside row 8.
     gemini = GeminiJudge(
         model=cfg["gemini_judge"]["model"],
+        seed=int(cfg["gemini_judge"]["seed"]),
+        thinking_level=cfg["gemini_judge"]["thinking_level"],
         archive_path=out["gemini_calls_jsonl"],
     )
     rag_cfg = cfg["rag"]

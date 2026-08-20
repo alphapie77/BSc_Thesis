@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from src.eval.gemini_judge import (
-    GeminiJudge, GeminiJudgeError, structured_generation_config,
-    validate_payload,
+    INTERACTIONS_URL, GeminiJudge, GeminiJudgeError, interaction_request,
+    interaction_text, validate_payload,
 )
 
 
@@ -15,13 +15,14 @@ class Response:
 
     def json(self):
         return {
-            "candidates": [{"content": {"parts": [{"text": json.dumps({
-                "verdict": "FAIL", "target_fit_score": 61,
-                "feedback": "আরও নির্দিষ্ট করে লেখো।",
-            }, ensure_ascii=False)}]}}],
-            "usageMetadata": {"promptTokenCount": 10, "candidatesTokenCount": 8},
-            "modelVersion": "gemini-2.5-flash",
-            "responseId": "r1",
+            "id": "r1", "model": "gemini-3.6-flash", "status": "completed",
+            "steps": [{"type": "model_output", "content": [{
+                "type": "text", "text": json.dumps({
+                    "verdict": "FAIL", "target_fit_score": 61,
+                    "feedback": "আরও নির্দিষ্ট করে লেখো।",
+                }, ensure_ascii=False),
+            }]}],
+            "usage": {"total_input_tokens": 10, "total_output_tokens": 8},
         }
 
 
@@ -31,8 +32,13 @@ class Session:
 
     def post(self, *args, **kwargs):
         self.calls += 1
-        assert kwargs["json"]["generationConfig"]["temperature"] == 0
-        assert kwargs["json"]["generationConfig"]["responseMimeType"] == "application/json"
+        assert args[0] == INTERACTIONS_URL
+        assert kwargs["headers"]["x-goog-api-key"] == "test"
+        assert kwargs["json"]["model"] == "gemini-3.6-flash"
+        assert kwargs["json"]["generation_config"] == {
+            "seed": 42, "thinking_level": "medium",
+        }
+        assert "temperature" not in kwargs["json"]
         return Response()
 
 
@@ -44,20 +50,33 @@ def test_schema_validation_refuses_extra_fields_and_pass_feedback():
         validate_payload({"verdict": "FAIL", "target_fit_score": 50, "feedback": "x", "extra": 1})
 
 
-def test_legacy_transport_schema_omits_unsupported_extra_property_keyword():
-    config = structured_generation_config()
-    assert config["temperature"] == 0
-    assert config["responseMimeType"] == "application/json"
-    assert "additionalProperties" not in config["responseSchema"]
-    assert set(config["responseSchema"]["required"]) == {
+def test_interactions_transport_uses_structured_output_without_sampling_knobs():
+    body = interaction_request(
+        model="gemini-3.6-flash", prompt="p", seed=42,
+        thinking_level="medium",
+    )
+    assert body["input"] == "p" and "temperature" not in body
+    assert body["response_format"]["mime_type"] == "application/json"
+    schema = body["response_format"]["schema"]
+    assert "additionalProperties" not in schema
+    assert set(schema["required"]) == {
         "verdict", "target_fit_score", "feedback",
     }
+
+
+def test_interaction_text_requires_one_completed_model_output():
+    raw = Response().json()
+    assert json.loads(interaction_text(raw))["verdict"] == "FAIL"
+    raw["status"] = "failed"
+    with pytest.raises(GeminiJudgeError, match="not completed"):
+        interaction_text(raw)
 
 
 def test_call_is_archived_and_second_call_resumes(tmp_path: Path):
     session = Session()
     judge = GeminiJudge(
-        model="gemini-2.5-flash", archive_path=tmp_path / "g.jsonl",
+        model="gemini-3.6-flash", seed=42, thinking_level="medium",
+        archive_path=tmp_path / "g.jsonl",
         api_key="test", session=session,
     )
     first = judge.judge(key="k", prompt="p")

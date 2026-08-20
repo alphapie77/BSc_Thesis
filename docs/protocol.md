@@ -1775,13 +1775,16 @@ choose them after seeing eval outputs.
    threshold. The computed value is **0.18166513482099075**, accepting exactly
    **39/60 = 0.65**. The threshold is verified again from
    `results/s4_w_scores.csv` at preflight rather than trusted from this prose.
-3. **LLM judge (row 8).** Use stable model ID `gemini-2.5-flash`, temperature
-   zero and structured JSON: `verdict` PASS/FAIL, integer `target_fit_score`
+3. **LLM judge (row 8).** Use stable model ID `gemini-3.6-flash` through the
+   v1beta Interactions API, with seed 42 and explicitly frozen `medium` thinking.
+   Gemini 3.6 does not accept a temperature parameter. Use structured JSON:
+   `verdict` PASS/FAIL, integer `target_fit_score`
    0–100, and Bangla `feedback` of no more than two sentences (empty on PASS).
    The judge sees the exact axis definition, requested level, plot and draft,
    but neither verifier. It controls up to three Writer attempts; after three
    failures, the highest judge score is emitted, ties earliest. Raw JSON, model
-   ID, token usage and latency are archived. `kim2026judgeutility` is the reason
+   ID, seed, thinking level, token usage and latency are archived.
+   `kim2026judgeutility` is the reason
    evaluation ability is not assumed to imply useful optimization feedback.
 4. **Replicates and estimand.** Sampling replicates are fixed at **42, 43, 44**.
    The entry point still calls global `set_seed()` with 42 as its first action;
@@ -1806,9 +1809,11 @@ choose them after seeing eval outputs.
    three stop at three Writer attempts and select their own gate's best attempt,
    ties earliest.
 
-The Google model identifier and structured-output capability were checked
-against the provider's official model and structured-output documentation on
-2026-08-20. **What the literature changed:** demonstration selection became a
+The replacement Google model identifier, Interactions transport, structured-
+output capability, supported seed and removed temperature control were checked
+against the provider's official model, migration and Interactions documentation
+on 2026-08-21. Google's live endpoint also named `gemini-3.6-flash` as the
+account-compatible replacement. **What the literature changed:** demonstration selection became a
 frozen treatment component rather than an implementation detail; the judge got
 a machine-validated output schema and an explicit all-fail policy; and the old
 “mean±SD decides” wording was replaced by paired case-level inference with
@@ -1831,6 +1836,7 @@ Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-21 | S5 row 8 — Gemini model lifecycle and Interactions migration | The third live Kaggle gate passed Gemma role rendering and the repaired structured schema, then returned HTTP 404 because `gemini-2.5-flash` is unavailable to new users and explicitly instructed this account to use `gemini-3.6-flash`. Row 8 now uses that model through Google's v1beta Interactions API. The request freezes supported `seed=42` and `thinking_level=medium`; the removed temperature field is not sent. The verdict schema, Bangla feedback, prompt visibility, three-attempt budget, all-fail selection and A/B isolation are unchanged. | This is a forced pre-generation provider-lifecycle deviation. Official current documentation identifies 3.6 Flash as GA/production-ready with structured output, documents Interactions as its required API and says 3.6 no longer supports temperature. We chose the error-recommended 3.6 rather than a merely newer model to minimize model drift. The earlier legacy-schema repair remains the correct audit of the retired endpoint but is superseded for execution. No 12B model load or eval generation occurred; raw Interaction responses, exact model, seed, thinking level, usage and latency remain archived. |
 | 2026-08-20 | S5 row 8 — Gemini legacy REST schema transport | The live Kaggle gate returned HTTP 400 because v1beta `generationConfig.responseSchema` rejected the JSON-Schema keyword `additionalProperties`. The wire schema now contains only the accepted object/properties/required/type/enum/range subset. Exact-key rejection remains mandatory in the local `validate_payload()` after parsing, so missing or extra fields still fail. Preflight and the real judge now call one shared generation-config builder. | This is transport compatibility, not a scientific relaxation: verdict enum, integer bounds, PASS/FAIL feedback rules, temperature 0, model, prompt and archive are unchanged. Google's current API reference distinguishes the legacy OpenAPI-subset `responseSchema` surface from the fuller JSON-schema surface; the actual endpoint error settles which contract this runner is using. The gate failed before the 12B model loaded and before any eval generation. |
 | 2026-08-20 | S5 rows 7a/7b — Gemma-native role placement | Before any eval generation, the Kaggle tokenizer gate rejected the proposed external condition because it contained consecutive `user` messages. Both controls now use the same valid `user → assistant → user` topology: the byte-identical critique is placed in the assistant content for 7a and in the final user content for 7b; the revision instruction and shared revision seed remain fixed. | The old five-message construction was not realizable by Gemma-3's native chat template. Google documents only `user`/`model` turns, and `selfcorrectionillusion2026` v2 explicitly records the same Gemma-3 limitation while reporting its user-role effect. A raw-token bypass or filler assistant acknowledgement would leave the native training format or add a second manipulation. The three-slot placement is the smallest valid repair, and the real-tokenizer preflight remains mandatory. |
 | 2026-08-20 | S5 row 2 and S4/S5 realized batch | The globally fixed static-example draw is superseded before eval generation by deterministic instance-level randomization over plot/level/replicate; selection remains stratified R1-only and non-query-dependent. Phase-5 batch is 1, correcting the nominal `batch_size=8` field to the batch actually used by S4's single-item call path. | Recent primary literature changed the few-shot decision: `li2025instance` shows fixed random settings can bias a whole evaluation and instance-level randomization reduces variance; `cegin2025randomselection` supports random selection as a strong low-resource default. Direct code inspection changed the batch decision: both S4 runners invoke `generate()`, which passes a one-item list. No eval output exists, so both changes precede outcomes. |
