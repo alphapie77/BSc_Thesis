@@ -78,4 +78,7 @@ def test_tau_notebook_installs_and_gates_the_registered_nf4_runtime():
     )
     assert "transformers==5.15.0" in source
     assert "transformers.__version__=='5.15.0'" in source
+    assert "tau_repo_8178f26" in source
+    assert "8178f26c6eeaa90f49562a313a7799074e5d51c7" in source
+    assert "checkout','--detach',RUNNER_COMMIT" in source
     assert 'REQUIRED_NF4_TRANSFORMERS = "5.15.0"' in writer
