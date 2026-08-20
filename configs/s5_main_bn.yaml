@@ -50,7 +50,7 @@ conditions:
   - rag_neural_symbolic_feedback
   - intrinsic_self_critique
   - external_role_self_critique
-  - gemini_judge_loop
+  - gemma4_26b_a4b_judge_loop
   - blind_resampling
 
 static_few_shot:
@@ -74,15 +74,23 @@ symbolic_gate:
   max_attempts: 3  # identical retry budget to neural loop, protocol §S5
 
 gemini_judge:
-  model: gemini-3.6-flash
+  model: gemma-4-26b-a4b-it
   transport: interactions_v1beta
   seed: 42  # global reproducibility contract; supported by Interactions API
-  thinking_level: medium  # freeze Gemini 3.6's documented default explicitly
+  thinking_level: high  # Gemma 4 supports only minimal/high; freeze judge reasoning on
+  max_output_tokens: 512  # bounded structured verdict + hidden reasoning budget
   structured_output: true
   max_attempts: 3  # identical retry budget to proposed loop, protocol §S5
   feedback_language: bn
   feedback_max_sentences: 2  # bounded diagnostic payload, protocol §S5 contract 3
   all_fail_selection: highest_target_fit_score_then_earliest
+  # Effective free-project limits read from AI Studio on 2026-08-21:
+  # 30 RPM, 16K TPM, 14.4K RPD. We stay below all three and reserve headroom
+  # for preflight plus unrelated project traffic.
+  requests_per_minute: 30
+  tokens_per_minute: 16000
+  requests_per_pacific_day: 14400
+  safety_fraction: 0.90
 
 blind_resampling:
   max_candidates: 5  # full nested frontier frozen in protocol decision 9
@@ -93,5 +101,8 @@ blind_resampling:
 outputs:
   calls_jsonl: data/generated/s5_main_bn_calls.jsonl
   gemini_calls_jsonl: data/generated/s5_main_bn_gemini_calls.jsonl
+  superseded_gemini36_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_calls.jsonl
+  superseded_gemini36_writer_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_writer_calls.jsonl
+  superseded_gemini36_cases_jsonl: results/s5_main_bn_gemini36_superseded_cases.jsonl
   cases_jsonl: results/s5_main_bn_cases.jsonl
   preflight_json: results/s5_main_bn_preflight.json

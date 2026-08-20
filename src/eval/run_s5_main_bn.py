@@ -209,6 +209,13 @@ def main() -> int:
         seed=int(cfg["gemini_judge"]["seed"]),
         thinking_level=cfg["gemini_judge"]["thinking_level"],
         archive_path=out["gemini_calls_jsonl"],
+        max_output_tokens=int(cfg["gemini_judge"]["max_output_tokens"]),
+        requests_per_minute=int(cfg["gemini_judge"]["requests_per_minute"]),
+        tokens_per_minute=int(cfg["gemini_judge"]["tokens_per_minute"]),
+        requests_per_pacific_day=int(
+            cfg["gemini_judge"]["requests_per_pacific_day"]
+        ),
+        safety_fraction=float(cfg["gemini_judge"]["safety_fraction"]),
     )
     rag_cfg = cfg["rag"]
     researcher = Researcher(
@@ -314,13 +321,13 @@ def main() -> int:
         results["intrinsic_self_critique"] = role_a
         results["external_role_self_critique"] = role_b
         judge_model = cfg["gemini_judge"]["model"]
-        results["gemini_judge_loop"] = run_gemini_loop(
-            condition="gemini_judge_loop", initial_gen=initial,
+        results["gemma4_26b_a4b_judge_loop"] = run_gemini_loop(
+            condition="gemma4_26b_a4b_judge_loop", initial_gen=initial,
             base_prompt=rag_prompt, plot=p.synopsis, plot_id=p.plot_id,
             target_level=level, rag_texts=rag.texts, arm=sample["prompt_arm"],
             call_fn=adapter, gemini=gemini,
             judge_key_fn=lambda attempt: generation_key(
-                condition="gemini_judge_loop", replicate_seed=seed,
+                condition="gemma4_26b_a4b_judge_loop", replicate_seed=seed,
                 plot_id=p.plot_id, target_level=level, call_role="judge",
                 call_index=attempt, arm=sample["prompt_arm"],
                 provider="gemini", model=judge_model,

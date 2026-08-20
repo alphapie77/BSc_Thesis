@@ -40,7 +40,7 @@ class Response:
 
     def json(self):
         return {
-            "id": "r", "model": "gemini-3.6-flash", "status": "completed",
+            "id": "r", "model": "gemma-4-26b-a4b-it", "status": "completed",
             "steps": [{"type": "model_output", "content": [{
                 "type": "text", "text": json.dumps({
                     "verdict": "PASS", "target_fit_score": 100, "feedback": ""
@@ -54,7 +54,7 @@ class Session:
         assert "secret" not in url
         assert kwargs["headers"]["x-goog-api-key"] == "secret"
         assert kwargs["json"]["generation_config"] == {
-            "seed": 42, "thinking_level": "medium",
+            "seed": 42, "thinking_level": "high", "max_output_tokens": 512,
         }
         schema = kwargs["json"]["response_format"]["schema"]
         assert "additionalProperties" not in schema
@@ -63,7 +63,7 @@ class Session:
 
 def test_gemini_runtime_gate_uses_the_registered_schema():
     out = validate_gemini_api(
-        api_key="secret", model="gemini-3.6-flash", seed=42,
-        thinking_level="medium", session=Session()
+        api_key="secret", model="gemma-4-26b-a4b-it", seed=42,
+        thinking_level="high", max_output_tokens=512, session=Session()
     )
-    assert out["verdict"] == "PASS" and out["model_version"] == "gemini-3.6-flash"
+    assert out["verdict"] == "PASS" and out["model_version"] == "gemma-4-26b-a4b-it"

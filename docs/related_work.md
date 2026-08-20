@@ -629,6 +629,25 @@ already-recorded warning also changed the old “mean±SD over seeds” sentence
 three replicates remain as sensitivity/blocking, not as the inferential sample
 or a best-seed selection surface.
 
+### Tier 10f — Hosted-judge replacement after the quota stop (added 2026-08-21)
+
+> Consensus remained unavailable until 2026-09-01, so the recent-first search
+> used alphaXiv and then read the primary paper text. The search materially
+> changed the repair: a model swap became a renamed full-row restart, and the
+> same-family relation became an explicit limitation rather than being called
+> an independent external judge.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `yang2026judgechanges` | Yang, Hou & Yang, arXiv 2607.08535 | `[x]` primary paper | Replacing a judge changes the measurement even when candidate responses are fixed; model upgrades are not interchangeable. Forces a distinct Gemma-4 condition, full restart of row 8, and separate archival of all Gemini-3.6 traces. |
+| `pombal2026selfpreference` | Pombal, Rei & Martins, COLM 2026 / arXiv 2604.06996 | `[x]` primary paper | Rubric-based judges can favor their own outputs and outputs from their model family; the paper reports family-level effects for Gemma. Forces the label “hosted cross-generation same-family judge,” forbids an independence claim, and keeps Verifier-B as the sole final outcome scorer. |
+
+**Provider evidence.** Google's official Gemma API guide lists
+`gemma-4-26b-a4b-it`; the Interactions reference lists the same model and
+structured-output interface; the pricing page lists Gemma 4 input/output as
+free with no paid token tier. These are capability/lifecycle sources, not
+method citations.
+
 ---
 
 ## Gap table — the sentence Ch.2 must end with

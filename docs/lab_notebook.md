@@ -4609,3 +4609,63 @@ while the run was producing them; the code checkout itself was pinned)
   NFDC-NFAI's 2026 restored complete-feature list and Il Cinema Ritrovato's
   description of *Jukti Takko Aar Gappo* as the final film support one factual
   coding decision; they are source checks, not method references.
+
+---
+
+## 2026-08-21 -- S5h: quota-safe hosted Gemma-4 judge replacement
+**Feeds:** Chapter 3 experimental conditions; Chapter 5 limitations; S5 row 8
+**Commit:** recorded by the enclosing implementation commit
+**Artifacts:** `configs/s5_main_bn.yaml`,
+`src/eval/migrate_s5_checkpoint_gemma4.py`, S5 runner/preflight/tests
+
+### Numbers
+- AI Studio account limits shown by Sabbir for the Gemma-4 model rows:
+  **30 RPM, 16,000 TPM, 14,400 RPD**.
+- Runner safety fraction: **0.90**; structured-output cap: **512 tokens**.
+- Full repository regression: **328 passed**, one existing physical-core
+  discovery warning; focused S5 set: **26 passed**.
+- **Zero Gemma-4 judgments exist at close time.** The next Kaggle preflight is
+  the first live request under this condition.
+
+### Decisions made (and why)
+- Sabbir selected the free hosted `gemma-4-26b-a4b-it` alternative after
+  Gemini 3.6 exhausted the project quota. Row 8 is renamed
+  `gemma4_26b_a4b_judge_loop` and restarts from zero; a silent mid-row model
+  swap was rejected because it would mix measuring instruments.
+- The other nine conditions and shared RAG initials remain scientifically
+  unchanged. A deterministic migrator retains them with their original
+  provenance nested under a migration stamp, while old Gemini-3.6 judgments,
+  cases, and judge-conditioned Writer retries move to named superseded
+  archives. This preserves work without contaminating the new row.
+- Gemma-4 thinking is frozen at `high`, not `minimal`, because the condition
+  asks for a verdict plus actionable Bangla feedback; 512 max output tokens
+  bound the hosted reasoning/response surface. This is a pre-output choice and
+  will not be tuned after the smoke.
+- The limiter uses realized archived token counts in a rolling 60-second
+  window, reserves 1,500 tokens for the next request, and applies 90% of all
+  three account limits. TPM, not RPD, is the binding observed constraint.
+
+### Findings (things we did not expect)
+- Gemma 4 is available as a hosted Interactions model, so the 26B-A4B judge
+  does not compete with the local Gemma-3 Writer for T4 VRAM.
+- The recent literature makes the convenient replacement scientifically less
+  independent than its API boundary suggests: Gemma-4 judges Gemma-3 output
+  across generations but inside one model family. This is recorded as a
+  same-family limitation, not hidden under the word “external.”
+
+### Consequences for downstream steps
+- The clean `510a95c` checkpoint must be attached once. Notebook restoration
+  runs the migrator before any model load, and exports both active and
+  superseded archives after every chunk.
+- Live preflight must validate Gemma-4 model access, high thinking, and the
+  unchanged JSON schema before the 12B Writer loads. A failed preflight creates
+  no evaluable generation.
+- Verifier-B remains outside every loop and is still the only final outcome
+  scorer. The Gemma-family relation belongs in Ch.5 limitations.
+
+### Citations needed
+- Yang, Hou & Yang (2026), `yang2026judgechanges`, primary paper read: judge
+  replacement changes the measurement and forces a separately named restart.
+- Pombal, Rei & Martins (2026), `pombal2026selfpreference`, primary COLM paper
+  read: rubric judges can favor their own model family, including Gemma-family
+  effects. Both are recorded in `related_work.md` and `references.bib`.

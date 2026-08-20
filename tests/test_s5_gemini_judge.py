@@ -15,7 +15,7 @@ class Response:
 
     def json(self):
         return {
-            "id": "r1", "model": "gemini-3.6-flash", "status": "completed",
+            "id": "r1", "model": "gemma-4-26b-a4b-it", "status": "completed",
             "steps": [{"type": "model_output", "content": [{
                 "type": "text", "text": json.dumps({
                     "verdict": "FAIL", "target_fit_score": 61,
@@ -34,9 +34,9 @@ class Session:
         self.calls += 1
         assert args[0] == INTERACTIONS_URL
         assert kwargs["headers"]["x-goog-api-key"] == "test"
-        assert kwargs["json"]["model"] == "gemini-3.6-flash"
+        assert kwargs["json"]["model"] == "gemma-4-26b-a4b-it"
         assert kwargs["json"]["generation_config"] == {
-            "seed": 42, "thinking_level": "medium",
+            "seed": 42, "thinking_level": "high", "max_output_tokens": 512,
         }
         assert "temperature" not in kwargs["json"]
         return Response()
@@ -52,8 +52,8 @@ def test_schema_validation_refuses_extra_fields_and_pass_feedback():
 
 def test_interactions_transport_uses_structured_output_without_sampling_knobs():
     body = interaction_request(
-        model="gemini-3.6-flash", prompt="p", seed=42,
-        thinking_level="medium",
+        model="gemma-4-26b-a4b-it", prompt="p", seed=42,
+        thinking_level="high", max_output_tokens=512,
     )
     assert body["input"] == "p" and "temperature" not in body
     assert body["response_format"]["mime_type"] == "application/json"
@@ -75,8 +75,11 @@ def test_interaction_text_requires_one_completed_model_output():
 def test_call_is_archived_and_second_call_resumes(tmp_path: Path):
     session = Session()
     judge = GeminiJudge(
-        model="gemini-3.6-flash", seed=42, thinking_level="medium",
+        model="gemma-4-26b-a4b-it", seed=42, thinking_level="high",
         archive_path=tmp_path / "g.jsonl",
+        max_output_tokens=512, requests_per_minute=30,
+        tokens_per_minute=16000, requests_per_pacific_day=14400,
+        safety_fraction=0.9,
         api_key="test", session=session,
     )
     first = judge.judge(key="k", prompt="p")

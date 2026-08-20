@@ -117,10 +117,14 @@ def test_real_config_passes_cpu_preflight_without_loading_verifier_b():
     assert result["static_schedule_cases"] == 90 * 2 * 3
     assert result["static_counts"] == {"0": 10, "1": 10}
     assert result["symbolic_dev_passes"] == 39
-    assert result["gemini_model"] == "gemini-3.6-flash"
+    assert result["gemini_model"] == "gemma-4-26b-a4b-it"
     assert result["gemini_transport"] == "interactions_v1beta"
     assert result["gemini_seed"] == 42
-    assert result["gemini_thinking_level"] == "medium"
+    assert result["gemini_thinking_level"] == "high"
+    assert result["judge_max_output_tokens"] == 512
+    assert result["judge_rate_limits"] == {
+        "rpm": 30, "tpm": 16000, "rpd": 14400, "safety_fraction": 0.9,
+    }
     assert result["verifier_b_loaded"] is False
 
 

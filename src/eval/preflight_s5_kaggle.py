@@ -83,7 +83,8 @@ def validate_role_templates(tokenizer) -> dict:
 
 
 def validate_gemini_api(
-    *, api_key: str, model: str, seed: int, thinking_level: str, session=None,
+    *, api_key: str, model: str, seed: int, thinking_level: str,
+    max_output_tokens: int, session=None,
 ) -> dict:
     if session is None:
         import requests
@@ -94,7 +95,7 @@ def validate_gemini_api(
     )
     body = interaction_request(
         model=model, prompt=prompt, seed=seed,
-        thinking_level=thinking_level,
+        thinking_level=thinking_level, max_output_tokens=max_output_tokens,
     )
     response = session.post(
         INTERACTIONS_URL,
@@ -163,6 +164,7 @@ def main() -> int:
         model=cfg["gemini_judge"]["model"],
         seed=int(cfg["gemini_judge"]["seed"]),
         thinking_level=cfg["gemini_judge"]["thinking_level"],
+        max_output_tokens=int(cfg["gemini_judge"]["max_output_tokens"]),
     )
     print(json.dumps({
         "status": "KAGGLE_RUNTIME_READY_NO_MODEL_LOADED",

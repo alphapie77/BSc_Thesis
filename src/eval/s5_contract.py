@@ -28,7 +28,7 @@ CONDITIONS = (
     "rag_neural_symbolic_feedback",
     "intrinsic_self_critique",
     "external_role_self_critique",
-    "gemini_judge_loop",
+    "gemma4_26b_a4b_judge_loop",
     "blind_resampling",
 )
 

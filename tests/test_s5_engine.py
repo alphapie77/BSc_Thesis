@@ -88,7 +88,7 @@ class Judge:
 def test_gemini_loop_obeys_structured_verdict():
     call_fn, _ = caller_factory([0.7])
     out = run_gemini_loop(
-        condition="gemini_judge_loop", initial_gen=Gen("i", "draft 0.2"),
+        condition="gemma4_26b_a4b_judge_loop", initial_gen=Gen("i", "draft 0.2"),
         base_prompt="base", plot="p", plot_id="BN", target_level=0,
         rag_texts=tuple(f"e{i}" for i in range(10)), arm="bn",
         call_fn=call_fn, gemini=Judge(), judge_key_fn=lambda i: f"j{i}",

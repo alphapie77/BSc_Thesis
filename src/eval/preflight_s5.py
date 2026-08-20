@@ -48,13 +48,24 @@ def preflight(cfg: dict) -> dict:
     if judge.get("transport") != "interactions_v1beta":
         raise S5ContractError("row 8 must use the Gemini Interactions v1beta transport")
     if "temperature" in judge:
-        raise S5ContractError("Gemini 3.6 does not accept a temperature parameter")
+        raise S5ContractError("Gemma 4 judge must not receive temperature")
     if judge.get("seed") != REQUIRED_SEED:
         raise S5ContractError(f"row 8 seed must be {REQUIRED_SEED}")
     if judge.get("thinking_level") != REQUIRED_THINKING_LEVEL:
         raise S5ContractError(
             f"row 8 thinking level must be {REQUIRED_THINKING_LEVEL}"
         )
+    if int(judge.get("max_output_tokens", 0)) != 512:
+        raise S5ContractError("Gemma-4 judge max_output_tokens must be exactly 512")
+    observed_limits = (
+        int(judge.get("requests_per_minute", 0)),
+        int(judge.get("tokens_per_minute", 0)),
+        int(judge.get("requests_per_pacific_day", 0)),
+    )
+    if observed_limits != (30, 16000, 14400):
+        raise S5ContractError("Gemma-4 limits must match AI Studio: 30/16000/14400")
+    if not 0.5 <= float(judge.get("safety_fraction", 0)) < 1.0:
+        raise S5ContractError("Gemma-4 safety fraction must be in [0.5,1.0)")
     sample = cfg["sample"]
     if sample != {
         "split": "eval", "n_plots": 90, "levels": [0, 1],
@@ -154,6 +165,13 @@ def preflight(cfg: dict) -> dict:
         "gemini_transport": judge["transport"],
         "gemini_seed": judge["seed"],
         "gemini_thinking_level": judge["thinking_level"],
+        "judge_max_output_tokens": judge["max_output_tokens"],
+        "judge_rate_limits": {
+            "rpm": judge["requests_per_minute"],
+            "tpm": judge["tokens_per_minute"],
+            "rpd": judge["requests_per_pacific_day"],
+            "safety_fraction": judge["safety_fraction"],
+        },
         "verifier_b_loaded": False,
         "sample_prompt_chars": {"zero_shot": len(zero), "static_few_shot": len(few)},
     }

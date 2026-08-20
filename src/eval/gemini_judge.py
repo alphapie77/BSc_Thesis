@@ -6,7 +6,9 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from src.common.provenance import stamp
 from src.common.secrets import require
@@ -25,9 +27,10 @@ SCHEMA = {
 INTERACTIONS_URL = (
     "https://generativelanguage.googleapis.com/v1beta/interactions"
 )
-REQUIRED_MODEL = "gemini-3.6-flash"
+REQUIRED_MODEL = "gemma-4-26b-a4b-it"
 REQUIRED_SEED = 42
-REQUIRED_THINKING_LEVEL = "medium"
+REQUIRED_THINKING_LEVEL = "high"
+PACIFIC = ZoneInfo("America/Los_Angeles")
 
 
 class GeminiJudgeError(RuntimeError):
@@ -36,6 +39,7 @@ class GeminiJudgeError(RuntimeError):
 
 def interaction_request(
     *, model: str, prompt: str, seed: int, thinking_level: str,
+    max_output_tokens: int,
 ) -> dict:
     """Return the Gemini-3 Interactions structured-output request."""
     return {
@@ -49,6 +53,7 @@ def interaction_request(
         "generation_config": {
             "seed": seed,
             "thinking_level": thinking_level,
+            "max_output_tokens": max_output_tokens,
         },
     }
 
@@ -123,6 +128,11 @@ class GeminiJudge:
     def __init__(
         self, *, model: str, seed: int, thinking_level: str,
         archive_path: str | Path,
+        max_output_tokens: int,
+        requests_per_minute: int,
+        tokens_per_minute: int,
+        requests_per_pacific_day: int,
+        safety_fraction: float,
         api_key: str | None = None, session=None,
     ):
         if model != REQUIRED_MODEL:
@@ -136,6 +146,22 @@ class GeminiJudge:
         self.model = model
         self.seed = seed
         self.thinking_level = thinking_level
+        if not 128 <= max_output_tokens <= 1024:
+            raise GeminiJudgeError("judge max_output_tokens must be in [128,1024]")
+        self.max_output_tokens = int(max_output_tokens)
+        if requests_per_minute != 30 or tokens_per_minute != 16000:
+            raise GeminiJudgeError("Gemma-4 limits must match AI Studio: 30 RPM, 16K TPM")
+        if requests_per_pacific_day != 14400:
+            raise GeminiJudgeError("Gemma-4 daily limit must match AI Studio: 14.4K RPD")
+        if not 0.5 <= safety_fraction < 1.0:
+            raise GeminiJudgeError("rate-limit safety fraction must be in [0.5,1.0)")
+        self.requests_per_minute = int(requests_per_minute)
+        self.tokens_per_minute = int(tokens_per_minute)
+        self.requests_per_pacific_day = int(requests_per_pacific_day)
+        self.safety_fraction = float(safety_fraction)
+        self.safe_rpm = max(1, int(self.requests_per_minute * self.safety_fraction))
+        self.safe_tpm = max(1, int(self.tokens_per_minute * self.safety_fraction))
+        self.safe_rpd = max(1, int(self.requests_per_pacific_day * self.safety_fraction))
         self.archive_path = Path(archive_path)
         self.api_key = api_key or require("GOOGLE_API_KEY")
         if session is None:
@@ -143,6 +169,91 @@ class GeminiJudge:
             session = requests
         self.session = session
         self.cached = load_archive(self.archive_path)
+        self._last_request_epoch = self._latest_request_epoch()
+
+    @staticmethod
+    def _row_timestamp(row: dict) -> datetime | None:
+        value = row.get("provenance", {}).get("timestamp_utc")
+        if not isinstance(value, str):
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+
+    def _latest_request_epoch(self) -> float | None:
+        timestamps = [
+            parsed.timestamp()
+            for row in self.cached.values()
+            if (parsed := self._row_timestamp(row)) is not None
+        ]
+        return max(timestamps, default=None)
+
+    def _requests_today(self) -> int:
+        today = datetime.now(timezone.utc).astimezone(PACIFIC).date()
+        return sum(
+            1 for row in self.cached.values()
+            if (parsed := self._row_timestamp(row)) is not None
+            and parsed.astimezone(PACIFIC).date() == today
+        )
+
+    @staticmethod
+    def _row_tokens(row: dict) -> int:
+        usage = row.get("usage", {})
+        for key in ("total_tokens", "totalTokenCount"):
+            value = usage.get(key)
+            if isinstance(value, int) and value >= 0:
+                return value
+        input_tokens = usage.get("total_input_tokens", 0)
+        output_tokens = usage.get("total_output_tokens", 0)
+        if all(isinstance(x, int) and x >= 0 for x in (input_tokens, output_tokens)):
+            return input_tokens + output_tokens
+        return 0
+
+    def _recent_usage(self, now_epoch: float) -> tuple[int, int, float | None]:
+        recent = []
+        for row in self.cached.values():
+            parsed = self._row_timestamp(row)
+            if parsed is None:
+                continue
+            epoch = parsed.timestamp()
+            if 0 <= now_epoch - epoch < 60:
+                recent.append((epoch, self._row_tokens(row)))
+        return (
+            len(recent), sum(tokens for _, tokens in recent),
+            min((epoch for epoch, _ in recent), default=None),
+        )
+
+    def _reserve_rate_slot(self) -> None:
+        used = self._requests_today()
+        if used >= self.safe_rpd:
+            raise GeminiJudgeError(
+                f"local safety cap reached: {used}/"
+                f"{self.safe_rpd} Gemma requests on the "
+                "current Pacific day; resume after midnight Pacific"
+            )
+        while True:
+            now = time.time()
+            recent_requests, recent_tokens, oldest = self._recent_usage(now)
+            request_full = recent_requests >= self.safe_rpm
+            # Reserve 1,500 tokens for the next request. The realized usage is
+            # archived and drives later slots; 1,500 exceeds the 937-token
+            # observed Gemini-3.6 smoke call while leaving 10% provider headroom.
+            token_full = recent_tokens + 1500 > self.safe_tpm
+            if not request_full and not token_full:
+                break
+            if oldest is None:
+                raise GeminiJudgeError("rate limiter has no timestamp for recent usage")
+            time.sleep(max(0.1, 60.1 - (now - oldest)))
+        minimum_interval = 60.0 / self.safe_rpm
+        if self._last_request_epoch is not None:
+            remaining = minimum_interval - (time.time() - self._last_request_epoch)
+            if remaining > 0:
+                time.sleep(remaining)
+        self._last_request_epoch = time.time()
 
     def judge(self, *, key: str, prompt: str) -> GeminiVerdict:
         if key in self.cached:
@@ -155,7 +266,9 @@ class GeminiJudge:
         body = interaction_request(
             model=self.model, prompt=prompt, seed=self.seed,
             thinking_level=self.thinking_level,
+            max_output_tokens=self.max_output_tokens,
         )
+        self._reserve_rate_slot()
         started = time.monotonic()
         response = self.session.post(
             INTERACTIONS_URL,
@@ -183,6 +296,7 @@ class GeminiJudge:
             "model": self.model,
             "seed": self.seed,
             "thinking_level": self.thinking_level,
+            "max_output_tokens": self.max_output_tokens,
             "model_version": raw.get("model"),
             "response_id": raw.get("id"),
             "latency_seconds": time.monotonic() - started,
