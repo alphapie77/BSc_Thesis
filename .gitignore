@@ -57,6 +57,7 @@ data/plots/review.html
 # data/cleaned/. The RATINGS are regenerable by nothing, so g300_score.py
 # extracts them text-free to results/g300_ratings.csv, which IS committed.
 data/annotation/*.csv
+data/annotation/*.xlsx
 data/annotation/intrusion/*.csv
 results/_dryrun/
 
