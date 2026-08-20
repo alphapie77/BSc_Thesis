@@ -4474,6 +4474,12 @@ while the run was producing them; the code checkout itself was pinned)
   6 requires independent double-coding and leaves the coder choice to Sabbir.
   The script creates one blank packet containing all eight observed failures;
   S4.6 remains open until two codings can be reconciled.
+- **2026-08-20 coding update:** Sabbir explicitly delegated Coder-A to Codex
+  (*"ধরে নাও আমি তোমাকে আমার হয়ে অনুমতি দিলাম; ধরো তুমি Sabbir"*). Codex coded
+  the emitted draft for all eight cases, but the artifact records **Codex acting
+  under authorization**, not Sabbir as a human coder. This completes one coding
+  only. Simulating Coder-B with the same model would manufacture independence,
+  so the agreement report and Phase-4 closure remain pending.
 
 ### Findings (things we did not expect)
 - Accepted stops are **39 / 12 / 1** at attempts 1/2/3, plus **8 gave up**.
@@ -4495,6 +4501,12 @@ while the run was producing them; the code checkout itself was pinned)
   diagnostics, not a new operating-point argument.
 - Gave-up emitted drafts average B **0.503921**, versus **0.848111** among
   accepted cases. The split is descriptive and does not license B as a gate.
+- **Coder-A only (not a final taxonomy):** off-topic **1/8**, `other` **3/8**,
+  and wrong-sentiment / too-short / template-repeat / register-or-honorific
+  **0/8** each; **4/8** emitted drafts have no observable text defect under the
+  registered categories. The three `other` labels are two specificity-level
+  mismatches and one film/serial medium misidentification. These counts remain
+  provisional until independent Coder-B and reconciliation.
 
 ### Consequences for downstream steps
 - `docs/figures/s4_loop_dynamics.svg` supplies the required frontier/dynamics
