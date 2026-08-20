@@ -57,7 +57,7 @@ def test_kaggle_work_cells_are_restart_safe_and_model_input_is_unambiguous():
         ))
     ]
     assert len(work_cells) == 6
-    assert all("REPO = Path('/kaggle/working/s5_repo_9e00d2e')" in cell for cell in work_cells)
+    assert all("REPO = Path('/kaggle/working/s5_repo_2e91989')" in cell for cell in work_cells)
     assert all("os.chdir(REPO)" in cell for cell in work_cells)
     setup = next(cell for cell in work_cells if "bn_clean.csv" in cell)
     assert "assert len(clean) == 1" in setup
