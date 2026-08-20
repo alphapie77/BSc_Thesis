@@ -1,0 +1,157 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-20T15:47:46.620275+00:00",
+    "git_commit": "1eb8dc422cc8d250fc6a3be83ab42ed2b26da8e1",
+    "untracked_files": 1,
+    "config": "configs/s4_failure_taxonomy_single.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "status": "single_coder_user_endorsed_protocol_deviation",
+    "n_cases": 8,
+    "coding_unit": "emitted_best_verifier_a_draft_after_three_time_gate_failure",
+    "requested_cases_by_normative_spec": 50,
+    "observed_complete_case_census": 8,
+    "coder_a_identity": "Codex acting under Sabbir's explicit authorization",
+    "user_reviewed_coder_a_before_endorsement": true,
+    "independent_coder_b": false,
+    "agreement": null,
+    "agreement_reason": "not_available_single_coder_protocol_deviation",
+    "category_counts": {
+      "wrong_sentiment": 0,
+      "too_short": 0,
+      "off_topic": 1,
+      "template_repeat": 0,
+      "register_or_honorific": 0,
+      "other": 2
+    },
+    "uncategorized_no_observable_registered_error": 5,
+    "other_label_counts_post_hoc": {
+      "medium misidentification": 1,
+      "specificity-level mismatch": 1
+    },
+    "cases": [
+      {
+        "case_id": "BN043:L0",
+        "target_level": 0,
+        "emitted_attempt": 3,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "No observable emitted-text failure: the reaction to a complex/unexpected ending can still fit many films and matches L0's swap test."
+      },
+      {
+        "case_id": "BN046:L1",
+        "target_level": 1,
+        "emitted_attempt": 1,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 1,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "The material claim that this was Ritwik Ghatak's 'last work' is unsupported by the synopsis and factually wrong."
+      },
+      {
+        "case_id": "BN048:L1",
+        "target_level": 1,
+        "emitted_attempt": 1,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "No observable emitted-text failure: coherent, on-topic, complete, and plot-specific."
+      },
+      {
+        "case_id": "BN063:L0",
+        "target_level": 0,
+        "emitted_attempt": 3,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "No observable emitted-text failure: short but complete, on-topic, and appropriately general."
+      },
+      {
+        "case_id": "BN066:L1",
+        "target_level": 1,
+        "emitted_attempt": 2,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 1
+        },
+        "other_label": "medium misidentification",
+        "coder_notes": "The emitted draft calls the film a serial ('সিরিয়াল'); otherwise it is coherent and on-topic."
+      },
+      {
+        "case_id": "BN105:L1",
+        "target_level": 1,
+        "emitted_attempt": 2,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "No observable emitted-text failure: coherent, on-topic, complete, and specific."
+      },
+      {
+        "case_id": "BN110:L1",
+        "target_level": 1,
+        "emitted_attempt": 2,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 1
+        },
+        "other_label": "specificity-level mismatch",
+        "coder_notes": "Complete but mostly generic; target L1 calls for concrete plot-grounded specificity."
+      },
+      {
+        "case_id": "BN115:L1",
+        "target_level": 1,
+        "emitted_attempt": 2,
+        "labels": {
+          "wrong_sentiment": 0,
+          "too_short": 0,
+          "off_topic": 0,
+          "template_repeat": 0,
+          "register_or_honorific": 0,
+          "other": 0
+        },
+        "other_label": null,
+        "coder_notes": "No observable emitted-text failure: coherent, on-topic, complete, and plot-specific."
+      }
+    ]
+  }
+}

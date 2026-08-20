@@ -4501,12 +4501,13 @@ while the run was producing them; the code checkout itself was pinned)
   diagnostics, not a new operating-point argument.
 - Gave-up emitted drafts average B **0.503921**, versus **0.848111** among
   accepted cases. The split is descriptive and does not license B as a gate.
-- **Coder-A only (not a final taxonomy):** off-topic **1/8**, `other` **3/8**,
+- **Coder-A only (before Sabbir's later waiver):** off-topic **1/8**, `other` **2/8**,
   and wrong-sentiment / too-short / template-repeat / register-or-honorific
-  **0/8** each; **4/8** emitted drafts have no observable text defect under the
-  registered categories. The three `other` labels are two specificity-level
-  mismatches and one film/serial medium misidentification. These counts remain
-  provisional until independent Coder-B and reconciliation.
+  **0/8** each; **5/8** emitted drafts have no observable text defect under the
+  registered categories. The two `other` labels are one specificity-level
+  mismatch and one film/serial medium misidentification. Re-reading BN043
+  against the registered swap test corrected it from `other` to no observable
+  defect: its generic reaction to a complex/unexpected ending fits many films.
 
 ### Consequences for downstream steps
 - `docs/figures/s4_loop_dynamics.svg` supplies the required frontier/dynamics
@@ -4527,3 +4528,82 @@ while the run was producing them; the code checkout itself was pinned)
   `kim2026judgeutility`; Wu et al. (2026), `wu2026textualrelaxation`. All were
   found via alphaXiv because Consensus remains unavailable until 2026-09-01;
   metadata was checked against primary arXiv records.
+
+---
+
+## 2026-08-20 -- S4.6: loop dynamics and single-coder failure taxonomy
+**Feeds:** Chapter 5 loop analysis; RQ3/RQ5; Phase 5 operating contract
+**Commit:** `1eb8dc422cc8d250fc6a3be83ab42ed2b26da8e1`
+**Artifacts:** `results/s4_loop_dynamics.json`, `results/s4_failure_taxonomy.json`
+
+### Numbers
+- `results/s4_loop_dynamics.json`
+  - `method` = descriptive_retry_dynamics_on_frozen_max_traces
+  - `n_cases` = 60
+  - `tau` = 0.4384071072784451
+  - `max_attempts` = 3
+  - `score_roles` = {'gate_score': 'verifier_a_in_loop', 'symbolic_score': 'diagnostic_only', 'verifier_b_score': 'evaluation_only'}
+  - `direction_tolerance` = 0.0
+  - `failure_taxonomy` = {'status': 'pending_independent_double_coding', 'available_three_time_gate_failures': 8, 'requested_by_spec': 50, 'substitution_or_oversampling': 'forbidden'}
+- `results/s4_failure_taxonomy.json`
+  - `status` = single_coder_user_endorsed_protocol_deviation
+  - `n_cases` = 8
+  - `coding_unit` = emitted_best_verifier_a_draft_after_three_time_gate_failure
+  - `requested_cases_by_normative_spec` = 50
+  - `observed_complete_case_census` = 8
+  - `coder_a_identity` = Codex acting under Sabbir's explicit authorization
+  - `user_reviewed_coder_a_before_endorsement` = True
+  - `independent_coder_b` = False
+  - `agreement_reason` = not_available_single_coder_protocol_deviation
+  - `category_counts` = {'wrong_sentiment': 0, 'too_short': 0, 'off_topic': 1, 'template_repeat': 0, 'register_or_honorific': 0, 'other': 2}
+  - `uncategorized_no_observable_registered_error` = 5
+  - `other_label_counts_post_hoc` = {'medium misidentification': 1, 'specificity-level mismatch': 1}
+
+### Decisions made (and why)
+- Sabbir explicitly waived the registered independent Coder-B **after reading
+  Coder-A**, saying the coding looked correct and another annotator was not
+  needed. The alternative was to keep Phase 4 open for independent coding.
+  Because the review was not blind, the artifact records
+  `single_coder_user_endorsed_protocol_deviation`, `independent_coder_b=false`
+  and `agreement=null`; endorsement is never relabelled as agreement.
+- The coding unit remains the **emitted best-by-A draft**, not attempt 3. This is
+  the text the system would actually ship after giving up, and changing to the
+  last draft would classify an output the policy discards.
+- Before finalization all eight rows were re-read against the synopsis and the
+  axis swap test. That check changed BN043:L0 from a post-hoc specificity
+  mismatch to no observable defect. The correction was made before the final
+  JSON existed and is recorded rather than preserving a known bad label.
+
+### Findings (things we did not expect)
+- Of the eight three-time **gate** failures, **5/8 have no observable emitted-
+  text error** under the registered categories in the single coding. Gate
+  failure is therefore not interchangeable with human-visible text failure.
+  This is qualitative evidence only; no independent coder or agreement exists.
+- Counts: off-topic **1/8**, post-hoc `other` **2/8**, and zero for wrong
+  sentiment, too short, template repeat, and register/honorific. The `other`
+  cases are one specificity-level mismatch and one film/serial medium error.
+- The off-topic case calls 1961's *Komal Gandhar* Ritwik Ghatak's last work.
+  [NFDC-NFAI's 2026 complete-feature
+  list](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2268264&lang=2&reg=3)
+  places *Subarnarekha*, *Titas Ekti Nadir Naam*, and *Jukti Takko Aar Gappo*
+  after it; [Il Cinema
+  Ritrovato](https://ilcinemaritrovato.it/en/film/jukti-takko-aar-gappo/)
+  separately describes the latter as his final film. The factual-error code
+  therefore survives the re-check.
+
+### Consequences for downstream steps
+- Phase 4 closes **under two explicit deviations**: complete-case census 8/8
+  instead of 50, and single-coder user-endorsed taxonomy instead of independent
+  double-coding. Both must be stated beside the taxonomy and in Limitations.
+- No inter-coder agreement number may appear in the thesis. `null` is the
+  result, not missing work to be silently filled later.
+- Phase 5 may now open using tau*=0.4384071, max-retry=3, neural-only gate,
+  symbolic diagnostics, and Verifier-B evaluation-only. The attempt-3 average
+  regression remains a limitation and motivates the registered retry ablation;
+  it is not a reason to alter the frozen Phase-5 policy now.
+
+### Citations needed
+- No new method citation. The dynamics citations were recorded in S4.6q.
+  NFDC-NFAI's 2026 restored complete-feature list and Il Cinema Ritrovato's
+  description of *Jukti Takko Aar Gappo* as the final film support one factual
+  coding decision; they are source checks, not method references.
