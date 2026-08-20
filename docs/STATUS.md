@@ -1,12 +1,16 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-20 (**S4.5b neural-gate/τ runner built and tested;
-not yet run. Kaggle attempt 1 exposed a contradictory runtime pin: the notebook
-installed transformers 5.14.1 while the registered nf4 archive requires exactly
-5.15.0. The runner/notebook contract is corrected and regression-tested; the
-sklearn-1.6.1 Verifier-A head now uses version-neutral coefficient inference in
-the symbolic scorer's required sklearn-1.9.0 runtime. No scores or fitted
-parameters changed.**) The long
+**Last updated:** 2026-08-20 (**S4.5b generation complete but scoring not yet
+complete.** Kaggle attempt 2 ran all **60/60** forced-three loop cases, then
+failed before writing the complete trace result because the uploaded
+Verifier-B dataset root carried a non-model `config.json` with no `model_type`.
+The append-only call cache retains the expensive generations in the live Kaggle
+session. Verifier-B's exact seed-42 HF config is now registered in the repo and
+the loader uses it instead of transport metadata; the local 442 MB weights load
+as `ElectraForSequenceClassification` and end-to-end scoring is verified. No
+scores or fitted parameters changed. Earlier attempt 1 exposed and fixed the
+contradictory transformers 5.14.1/5.15.0 notebook pin and the mixed-sklearn
+Verifier-A inference path.**) The long
 line below is the prior chronological
 timeline and is retained rather than silently rewritten.
 

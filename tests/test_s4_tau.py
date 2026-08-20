@@ -82,3 +82,20 @@ def test_tau_notebook_installs_and_gates_the_registered_nf4_runtime():
     assert "8178f26c6eeaa90f49562a313a7799074e5d51c7" in source
     assert "checkout','--detach',RUNNER_COMMIT" in source
     assert 'REQUIRED_NF4_TRANSFORMERS = "5.15.0"' in writer
+
+
+def test_verifier_b_uses_the_registered_training_config_not_transport_metadata():
+    config = json.loads(
+        (ROOT / "configs" / "s3d_verifier_b_hf_config.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    scorer = (ROOT / "src" / "eval" / "verifier_b_score.py").read_text(
+        encoding="utf-8"
+    )
+    assert config["model_type"] == "electra"
+    assert config["architectures"] == ["ElectraForSequenceClassification"]
+    assert config["vocab_size"] == 32000
+    assert "AutoConfig.for_model" in scorer
+    assert "config=model_config" in scorer
+    assert "csebuetnlp/banglabert" in scorer
