@@ -4442,3 +4442,76 @@ while the run was producing them; the code checkout itself was pinned)
 ### Citations needed
 - None. This run mechanically executes the already registered and cited
   quality--cost frontier, external-evaluator wall, and permutation instrument.
+
+---
+
+## 2026-08-20 -- S4.6q: retry dynamics (taxonomy pending)
+**Feeds:** Phase 4 loop diagnostics; RQ3/RQ5 interpretation
+**Commit:** `d4e6b68ca512ad84d0471c39b46090a272784149`
+**Artifacts:** `results/s4_loop_dynamics.json`, `docs/figures/s4_loop_dynamics.svg`
+
+### Numbers
+- `results/s4_loop_dynamics.json`
+  - `method` = descriptive_retry_dynamics_on_frozen_max_traces
+  - `n_cases` = 60
+  - `tau` = 0.4384071072784451
+  - `max_attempts` = 3
+  - `score_roles` = {'gate_score': 'verifier_a_in_loop', 'symbolic_score': 'diagnostic_only', 'verifier_b_score': 'evaluation_only'}
+  - `direction_tolerance` = 0.0
+  - `failure_taxonomy` = {'status': 'pending_independent_double_coding', 'available_three_time_gate_failures': 8, 'requested_by_spec': 50, 'substitution_or_oversampling': 'forbidden'}
+
+### Decisions made (and why)
+- The registered tau and three-attempt archive are held fixed. S4.6 is a
+  descriptive replay: it cannot tune the gate, choose another retry budget, or
+  expose Verifier-B to the loop after seeing the curves.
+- Three **post-hoc descriptive** diagnostics were added after a 2026 literature
+  pass: A/B transition-direction agreement, independent-B oracle headroom, and
+  raw normalized character edit magnitude. Each is labelled post hoc and none
+  is a selection rule or cutoff. This follows Kim (2026) on evaluator/optimizer
+  separation and Wu et al. (2026) on revision dynamics without importing their
+  domain-specific thresholds.
+- The taxonomy is deliberately **not filled by Codex alone**. Protocol decision
+  6 requires independent double-coding and leaves the coder choice to Sabbir.
+  The script creates one blank packet containing all eight observed failures;
+  S4.6 remains open until two codings can be reconciled.
+
+### Findings (things we did not expect)
+- Accepted stops are **39 / 12 / 1** at attempts 1/2/3, plus **8 gave up**.
+  Emitted best-attempt counts are **41 / 16 / 3** and must not be mistaken for
+  stop counts: gave-up cases emit their highest-A draft after exhausting the
+  loop.
+- Attempt 1→2 improves mean A by **+0.08719** and B by **+0.08902**. Attempt
+  2→3 reverses direction: A **−0.06272**, symbolic diagnostic **−0.02366**, B
+  **−0.01805**; B falls on **37/60** cases. Three attempts therefore provide an
+  oracle-search budget, not three monotonic improvements.
+- A and B disagree on revision direction for **18/60** cases in each transition
+  (1→2 and 2→3). Mean changes alone would hide that proxy disagreement.
+- Revisions remain large: mean normalized character edit distance is **0.6651**
+  then **0.6330**. With only two transitions and no registered cutoff, this is
+  not evidence of a fixed point.
+- The post-hoc B oracle reaches **0.872402**. A-selected `FORCED_3` reaches
+  **0.866272**, or **97.36%** of the B-oracle gain over attempt 1; tau* reaches
+  **69.74%** while using 2.0 rather than 5.0 mean calls. These percentages are
+  diagnostics, not a new operating-point argument.
+- Gave-up emitted drafts average B **0.503921**, versus **0.848111** among
+  accepted cases. The split is descriptive and does not license B as a gate.
+
+### Consequences for downstream steps
+- `docs/figures/s4_loop_dynamics.svg` supplies the required frontier/dynamics
+  figure. Phase 5 can use tau* operationally, but Phase 4 does not close until
+  the eight-case taxonomy is independently double-coded and reconciled.
+- The empirical retry-budget statement is bounded: attempt 2 earns its cost on
+  average; attempt 3 is useful for occasional rescue (one case first passes
+  there) and best-of-three headroom, but **does not improve average quality**.
+- §4.6's requested 50 failures is impossible on the frozen run. The deviations
+  log records complete-case coding (8/8), with no duplication, threshold change,
+  or substitution.
+
+### Citations needed
+- Liu & Meng (2026), `axiv2604_22273_scfeedbackcontrol`, now read in full;
+  scope boundary recorded rather than transferring its binary intrinsic-loop
+  threshold.
+- Kiecker et al. (2026), `kiecker2026magicnumber`; Kim (2026),
+  `kim2026judgeutility`; Wu et al. (2026), `wu2026textualrelaxation`. All were
+  found via alphaXiv because Consensus remains unavailable until 2026-09-01;
+  metadata was checked against primary arXiv records.
