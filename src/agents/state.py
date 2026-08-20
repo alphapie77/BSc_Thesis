@@ -62,7 +62,7 @@ class LoopState:
     # --- written by the Critic --------------------------------------------
     neural_score: float | None = None
     symbolic_score: float | None = None
-    hybrid: float | None = None
+    gate_score: float | None = None
     verdict: Verdict | None = None
 
     # --- written by the Reflector (FAIL only) ------------------------------
@@ -89,7 +89,7 @@ class LoopState:
                 "draft": self.draft,
                 "neural_score": self.neural_score,
                 "symbolic_score": self.symbolic_score,
-                "hybrid": self.hybrid,
+                "gate_score": self.gate_score,
                 "verdict": self.verdict,
                 "feedback": self.feedback,
                 "failed_rules": self.failed_rules,
@@ -109,15 +109,15 @@ class LoopState:
         # into the next one is how a stale PASS survives a changed draft.
         self.neural_score = None
         self.symbolic_score = None
-        self.hybrid = None
+        self.gate_score = None
         self.verdict = None
         self.feedback = None
         self.failed_rules = []
 
     def best_of_trace(self) -> dict[str, Any]:
-        """The highest-hybrid attempt, including the current one.
+        """The highest Verifier-A gate-score attempt, including the current one.
 
-        SS4.2: on FAIL at attempt 3, "emit best-of-3 by hybrid with
+        Post-S4.5a §4.2: on FAIL at attempt 3, emit best-of-3 by Verifier-A with
         gave_up=True". Ties break toward the EARLIEST attempt -- if two drafts
         score identically, the loop did not earn the extra calls, and choosing
         the later one would quietly flatter the loop in exactly the metric
@@ -125,10 +125,10 @@ class LoopState:
         divides by.
         """
         candidates = [*self.trace, self.snapshot()]
-        scored = [c for c in candidates if c["hybrid"] is not None]
+        scored = [c for c in candidates if c["gate_score"] is not None]
         if not scored:
             raise RuntimeError("no scored attempt exists; the Critic never ran.")
-        return max(scored, key=lambda c: (c["hybrid"], -c["attempt"]))
+        return max(scored, key=lambda c: (c["gate_score"], -c["attempt"]))
 
     def finalize_give_up(self) -> dict[str, Any]:
         """Mark the run as exhausted and return the emitted attempt."""

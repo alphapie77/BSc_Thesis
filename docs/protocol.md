@@ -1446,6 +1446,64 @@ still names one point on one frontier; the hierarchical fit determines *which* �
 each level is held to, not how the operating point is chosen. `quality(τ)`,
 α_lo and α_hi remain measured by **Verifier-B, never Verifier-A**.
 
+### Post-S4.5a amendment — 2026-08-18, before any retry generation
+
+This amendment is post hoc to the `w` data and pre-analysis for the τ frontier.
+It changes the method because the registered hybrid did not earn predictive
+use; it does not change or relabel the S4.5a measurements.
+
+**Gate/diagnosis separation.** S4.5a found that all five grouped held-out folds
+selected `w=1`, with mean delta-AUC **0.0000** against neural-only in both
+registered conditions. The symbolic term nevertheless moved many verdicts,
+which is influence without established held-out value. Therefore:
+
+- **Verifier-A alone decides PASS/FAIL and best-of-three.** `gate_score` is the
+  calibrated probability of the requested level.
+- **The symbolic scorer remains active on every attempt.** Its score and exact
+  failed-rule contributions remain in the trace and ground the Reflector's
+  natural-language feedback. It is diagnosis, not a second vote.
+- **Verifier-B remains outside `src/agents/`** and scores the frontier only.
+
+The literature search preceded this amendment. Consensus was unavailable until
+2026-09-01, so primary arXiv records were used and that substitution is
+disclosed. `ackermann2025offpolicy` identifies reward-model inaccuracy under
+policy distribution shift; our scorer was trained on human reviews and S4.dev
+measured an inverted human→generated length relation. `liu2026openrubrics`
+separates hard rules from implicit principles, supporting structured diagnostic
+rules without granting them unvalidated decision authority.
+`wang2026nlhf` shows that a correct binary outcome can coexist with an unsound
+critique, supporting retention of process-level feedback. `anugraha2026mr3`
+documents poor transfer of English judges to non-English settings, arguing
+against replacing the Bangla path with an off-the-shelf English judge. **What
+the search changed:** generated-domain symbolic refitting was considered, then
+rejected without new human comparative labels; the immediate design became
+decoupling, not reweighting.
+
+**Correction to registered decision 2.** The cited `2607.24562` was read beyond
+its abstract on 2026-08-18. It does **not** define variance-ratio partial
+pooling. HG-CRC uses Bonferroni-corrected node certification and a leaf-first
+fallback to a coarser certified threshold. The registered estimator therefore
+has no cited algorithm and will not be invented. HG-CRC is also a mismatch to
+this objective: it controls conditional error risk under a fixed budget,
+whereas decision 19 optimises independent quality gain per LLM call.
+
+**Replacement τ scope:** the headline is one **global frontier and global
+τ\*** over the balanced 30×2 dev cases. Every frontier row is additionally
+reported separately for level 0 and level 1, and the already registered
+5,000-shuffle comparison of their score distributions remains descriptive.
+No group-conditional guarantee is claimed. Per-level τ\* values are reported as
+sensitivity analyses only; they are not deployed. This keeps the single
+decision-19 objective executable without hiding the heterogeneity that the
+group-conditional literature warns about.
+
+**Endpoint correction:** α_hi is an explicit `FORCED_3` policy, not `τ=1`.
+Verifier-A produced calibrated scores equal to exactly 1.0, and the Critic uses
+`score >= τ`; therefore `τ=1` can pass early and cannot mean "every case runs
+three attempts." The maximum trace is generated once; each ordinary threshold
+replays its prefix and stops at its first PASS. `FORCED_3` ignores PASS for
+control flow, emits the highest Verifier-A attempt, and is scored by Verifier-B.
+This correction is fixed before any retry is generated.
+
 ### Registered decision 3 — the 20-generation generator pilot, with `TIE` as the pre-committed default
 
 §4.4 specifies a **20-generation pilot** on Groq to choose between Llama and
@@ -1592,7 +1650,8 @@ fine-grained scheme over a pass/fail one. ⚠️ **All three are abstracts only.
 
 ### What is NOT registered here, and is left open on purpose
 
-- **`w`, τ and τ\* have no values.** They cannot until generations exist.
+- **τ and τ\* have no values.** They cannot until retry generations exist.
+  `w` is retired by the 2026-08-18 amendment; no hybrid point is selected.
 - **`enable_f1` stays `false`.** The rule-7 amendment packet is unsigned
   (`docs/rule7_amendment_packet.md`); the structural guard in `s35_scorer.py`
   stays in place. Flipping it is not a Phase 4 act.
@@ -1608,6 +1667,7 @@ Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-18 | 🔴 S4 decisions 1, 2 and 19 — gate/diagnosis separation, τ scope correction, explicit upper endpoint | Verifier-A alone now controls PASS/FAIL and best-of-three; symbolic scoring remains active for failed-rule diagnostics. The nonexistent variance-ratio partial-pooling estimator is replaced by one global headline frontier with mandatory per-level reporting and descriptive permutation comparison. α_hi becomes explicit `FORCED_3`, not `τ=1`. | **Observed evidence forced the gate change:** every S4.5a held-out fold selected `w=1` with delta-AUC 0.0000, while symbolic influence on verdicts remained large. **Primary-paper reading forced the scope correction:** Salem et al. (2026) use Bonferroni certification plus leaf-first fallback, not the estimator previously attributed to them; implementing the old text would invent a method. **A code boundary forced the endpoint correction:** calibrated scores can equal 1.0 and `>=` must be retained so α_lo at τ=0 never rejects. Literature searched before deciding; Consensus unavailable until 2026-09-01, so primary arXiv records were used and logged. |
 | 2026-08-18 | 🔴 S4 decision 1 — the three registered `w` outcomes did not cover the observed combination | Both complete conditions produced a **sensitive** verdict curve (50.8% / 39.2% flip share), while all five grouped held-out folds selected the neural-only endpoint `w=1.0` and tied neural-only at delta AUC 0.0000. Thus `SYMBOLIC_INERT` (registered as **flat**), `SYMBOLIC_EARNS_ITS_PLACE` (held-out benefit), and `SYMBOLIC_HARMS` (held-out rejection) all fail literally. The implementation's final catch-all nevertheless emitted `SYMBOLIC_INERT`. The numeric curves and scores are unchanged; the emitted labels are preserved in the JSON and superseded by the audit state `PRECOMMITMENT_UNRESOLVED`, explicitly **not** a fourth post-hoc scientific outcome. | **Third pre-registration coverage defect in three days.** Like the direction error and conjunction gap before it, this came from enumerating expected verbal cases without proving the map covered all combinations of its two measurements. Consequence fixed to the data observed: no hybrid-accuracy claim, no claim of symbolic predictive value, and no single `w` is selected. The symbolic component remains available only for its separately registered failed-rule-naming role. A test now pins the missing sensitive-plus-tie case so it cannot silently fall through again. No literature search was run: this is an audit correction to a logical partition, not a new method, threshold, or scientific design choice. |
 | 2026-08-18 | S4.5a — first `w` fit attempt **crashed before any result was produced** | The committed symbolic scorer was fitted under scikit-learn **1.9.0**, but the inherited Kaggle environment carried **1.6.1**. Joblib emitted `InconsistentVersionWarning`; the run continued until the first symbolic `predict_proba`, then failed because `LogisticRegression.multi_class` was absent. The appended notebook cells also changed from `/kaggle/working/repo` to `/kaggle/working/repo/repo`, so code and archives could come from different checkouts, and `!python` did not turn the non-zero process exit into a failed cell. | **No scientific outcome was observed and no generation is repeated.** This is an execution/provenance repair, not a method amendment: one dedicated runner uses a single checkout; the runtime must equal the artifact's recorded/locked 1.9.0; a read-only preflight makes an actual prediction through both Critic halves; both registered 120-row archives are mandatory; a symbolic pickle-version warning is fatal; and every subprocess uses `check=True`. No literature search was run because no design choice or threshold changed—the code now enforces the environment under which the already-committed artifact was produced. |
 | 2026-08-11 | S3.3 — **Verifier-B's learning rate is fixed at 2e-5 and never selected** | S3.2's recipe sweeps `lr ∈ {2e-5, 3e-5}`. Verifier-B runs **5 seeds at 2e-5 only**, the pipeline §3.1 default. Half the compute, and no hyperparameter is chosen by looking at a score. | **Searched before deciding** (alphaXiv; Consensus quota exhausted until 1 Sep). `schneider2025overtuning` re-analyse seven HPO benchmark suites and find **~10% of runs select a configuration that generalises worse than the default** — and their mixed models name the aggravating conditions as **small data, holdout rather than CV, binary classification, accuracy-type metric**. Verifier-B is all four: 888 rows, an 82-row holdout, two classes, macro-F1. Their recommendation is repeated CV; **not tuning at all is strictly stronger and was available**, so it was taken. Cost accepted and named: B may be a little weaker than a tuned B. **Sabbir's call, 2026-08-11**, from three options presented with their costs. |

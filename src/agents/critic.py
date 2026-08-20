@@ -7,12 +7,10 @@ feedback from an *external* role, not a model grading itself.
 
 ⛔ THREE THINGS THIS FILE REFUSES TO DO
 ---------------------------------------
-1. **It has no default `w` and no default `τ`.** Both are required arguments and
-   there is no fallback. `w` is fitted on the 30 dev-plots' generations and
-   reported as a sensitivity curve, never a point (protocol.md §S4 decision 1);
-   τ is selected by decision 19's argmax. A default here would become a value by
-   use, which is exactly how `0.6/0.4` survived in the spec for months with no
-   derivation anywhere.
+1. **It has no default `τ`.** The threshold is selected by decision 19's
+   quality–cost frontier. The former hybrid weight `w` was retired after S4.5a:
+   the symbolic scorer added zero held-out predictive value in every fold, so
+   allowing it to move verdicts would keep an unvalidated reward channel.
 2. **It refuses a symbolic artifact carrying `enable_f1=True`.** That is a
    rule-7 pilot object. The amendment packet is unsigned, and an artifact is
    loaded silently -- unlike a result file, nothing about its contents appears
@@ -61,9 +59,8 @@ class Judgement:
 
     neural_score: float
     symbolic_score: float
-    hybrid: float
+    gate_score: float
     verdict: str  # "PASS" | "FAIL"
-    w: float
     tau: float
     target_level: int
 
@@ -75,6 +72,7 @@ class Critic:
         verifier_a_path: str | Path = "artifacts/verifier_a.joblib",
         symbolic_path: str | Path = "artifacts/symbolic_scorer.joblib",
         required_sklearn_version: str | None = None,
+        encoder_device: str = "cpu",
     ):
         import joblib
         import sklearn
@@ -138,6 +136,7 @@ class Critic:
         self._temperature = a.get("temperature")
         self._normalize = bool(a.get("normalize_embeddings", True))
         self._encoder_name = a["encoder"]
+        self._encoder_device = encoder_device
         self._encoder = None  # lazy: the Critic is constructed in tests too
         self._symbolic = s["pipeline"]
 
@@ -145,7 +144,9 @@ class Critic:
         if self._encoder is None:
             from sentence_transformers import SentenceTransformer
 
-            self._encoder = SentenceTransformer(self._encoder_name)
+            self._encoder = SentenceTransformer(
+                self._encoder_name, device=self._encoder_device
+            )
         return self._encoder.encode(
             [text], normalize_embeddings=self._normalize, show_progress_bar=False
         )
@@ -166,10 +167,8 @@ class Critic:
         p1 = float(self._symbolic.predict_proba(row)[0, 1])
         return p1 if target_level == 1 else 1.0 - p1
 
-    def judge(self, draft: str, target_level: int, *, w: float, tau: float) -> Judgement:
-        """§4.2's hybrid. `w` and `tau` are required and have no defaults."""
-        if not 0.0 <= w <= 1.0:
-            raise CriticContractError(f"w must be in [0,1], got {w!r}")
+    def judge(self, draft: str, target_level: int, *, tau: float) -> Judgement:
+        """Gate on Verifier-A; always retain symbolic diagnostic evidence."""
         if not 0.0 <= tau <= 1.0:
             raise CriticContractError(f"tau must be in [0,1], got {tau!r}")
         if target_level not in (0, 1):
@@ -178,7 +177,6 @@ class Critic:
             )
         n = self.neural(draft, target_level)
         s = self.symbolic(draft, target_level)
-        hybrid = w * n + (1.0 - w) * s
         # >= not >: at τ = 0 the Critic must never reject, because decision 19
         # defines α_lo as exactly that -- "τ=0, the Critic never rejects, = §5.1
         # row 1". With a strict inequality a score of 0.0 would FAIL and α_lo
@@ -186,9 +184,8 @@ class Critic:
         return Judgement(
             neural_score=n,
             symbolic_score=s,
-            hybrid=hybrid,
-            verdict="PASS" if hybrid >= tau else "FAIL",
-            w=w,
+            gate_score=n,
+            verdict="PASS" if n >= tau else "FAIL",
             tau=tau,
             target_level=target_level,
         )

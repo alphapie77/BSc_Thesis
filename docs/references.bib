@@ -891,22 +891,60 @@
 @article{axiv2607_24562_hierarchicalcrc,
   title   = {Hierarchical Group-Conditional Conformal Risk Control for
              Selective Prediction in Language Models},
-  author  = {AUTHORS UNRESOLVED -- see header note},
+  author  = {Salem, Murilo and Böhm, Luísa and Pontes, Daniel and Ferrugem, Anderson},
   journal = {arXiv preprint arXiv:2607.24562},
   year    = {2026},
-  note    = {Abstract only, 2026-08-11 via alphaXiv. THE PAPER THAT DECIDED
-             SS4.2's tau scoping. Motivating premise is ours almost exactly:
-             "large language models serve heterogeneous populations structured
-             by domain, topic difficulty, and linguistic style", and marginal
-             conformal risk control gives guarantees that need not hold per
-             group. Supplies the procedure adopted in protocol.md SS4
-             decision 2: HIERARCHICAL PARTIAL POOLING across groups, which
-             degrades to the pooled threshold when groups are indistinguishable
-             and to per-group thresholds when they separate. That property is
-             why it was chosen -- we cannot know in advance which regime our
-             two axis levels are in, and the estimator does not require us to.
-             Shrinkage is ESTIMATED, not chosen, which is what keeps it
-             compliant with the 2026-08-11 standing rule on hand-set constants.}
+  note    = {HTML method read 2026-08-18 from arXiv. CORRECTION: HG-CRC uses
+             Bonferroni-corrected node certification and a leaf-first fallback
+             to a coarser certified threshold; it does not define the
+             variance-ratio partial-pooling estimator previously attributed to
+             it. The method is not adopted for our quality-per-call objective.}
+}
+
+@article{ackermann2025offpolicy,
+  title   = {Off-Policy Corrected Reward Modeling for Reinforcement Learning
+             from Human Feedback},
+  author  = {Ackermann, Johannes and Ishida, Takashi and Sugiyama, Masashi},
+  journal = {arXiv preprint arXiv:2507.15507},
+  year    = {2025},
+  note    = {COLM 2025. Abstract read 2026-08-18 from arXiv. Supports treating
+             the observed human-to-generated scorer shift as a reward-model
+             distribution-shift risk, not evidence for post-hoc reweighting.}
+}
+
+@article{liu2026openrubrics,
+  title   = {OpenRubrics: Towards Scalable Synthetic Rubric Generation for
+             Reward Modeling and {LLM} Alignment},
+  author  = {Liu, Tianci and Xu, Ran and Yu, Tony and Hong, Ilgee and Yang,
+             Carl and Zhao, Tuo and Wang, Haoyu},
+  journal = {arXiv preprint arXiv:2510.07743},
+  year    = {2026},
+  note    = {Abstract read 2026-08-18 from arXiv. Distinguishes hard rules from
+             implicit principles; supports retaining symbolic rules as
+             structured diagnostic evidence rather than an unvalidated gate.}
+}
+
+@article{wang2026nlhf,
+  title   = {Reward Modeling from Natural Language Human Feedback},
+  author  = {Wang, Zongqi and Wang, Rui and Wu, Yuchuan and Yu, Yiyao and
+             Zhang, Pinyi and Sun, Shaoning and Yang, Yujiu and Li, Yongbin},
+  journal = {arXiv preprint arXiv:2601.07349},
+  year    = {2026},
+  note    = {ICML 2026. Abstract read 2026-08-18 from arXiv. Shows outcome-only
+             correctness can coexist with unsound critiques; supports keeping
+             process-level failed-rule feedback visible.}
+}
+
+@article{anugraha2026mr3,
+  title   = {{mR3}: Multilingual Rubric-Agnostic Reward Reasoning Models},
+  author  = {Anugraha, David and Hung, Shou-Yi and Tang, Zilu and Lee, Annie
+             En-Shiun and Wijaya, Derry Tanti and Winata, Genta Indra},
+  journal = {arXiv preprint arXiv:2510.01146},
+  year    = {2026},
+  note    = {ICLR 2026. Abstract read 2026-08-18 from arXiv. Reports that
+             English judge performance does not generalize reliably to
+             non-English settings; argues against replacing the Bangla-native
+             diagnostic path with an off-the-shelf English judge.}
 }
 
 @article{axiv2605_14260_fairnessburden,

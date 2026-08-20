@@ -55,13 +55,13 @@ class StubCritic:
         self.n = 0
         self._symbolic = None
 
-    def judge(self, draft, level, *, w, tau):
+    def judge(self, draft, level, *, tau):
         from src.agents.critic import Judgement
 
         self.n += 1
-        hybrid = 0.1 * self.n
+        score = 0.1 * self.n
         verdict = "PASS" if self.n >= self.passes_at else "FAIL"
-        return Judgement(hybrid, hybrid, hybrid, verdict, w, tau, level)
+        return Judgement(score, 1.0 - score, score, verdict, tau, level)
 
 
 class StubReflector:
@@ -73,11 +73,11 @@ class StubReflector:
         return f"feedback {self.calls}", ["connective_frac"]
 
 
-def _run(passes_at):
+def _run(passes_at, **kwargs):
     r, wr, c, rf = StubResearcher(), StubWriter(), StubCritic(passes_at), StubReflector()
     res = run_loop(
         plot_id="BN001", plot="কাহিনি", target_level=1,
-        researcher=r, writer=wr, critic=c, reflector=rf, w=0.5, tau=0.5,
+        researcher=r, writer=wr, critic=c, reflector=rf, tau=0.5, **kwargs,
     )
     return res, r, wr, rf
 
@@ -105,7 +105,9 @@ def test_three_failures_give_up_and_make_exactly_two_reflector_calls():
 
 def test_giving_up_emits_the_best_attempt_not_the_last():
     res, _, _, _ = _run(passes_at=99)
-    assert res.emitted["hybrid"] == max(t["hybrid"] for t in res.state.trace + [res.emitted])
+    assert res.emitted["gate_score"] == max(
+        t["gate_score"] for t in res.state.trace + [res.emitted]
+    )
 
 
 def test_trace_holds_every_earlier_attempt():
@@ -124,6 +126,12 @@ def test_the_retry_prompt_contains_the_previous_draft_and_the_feedback():
     _, _, wr, _ = _run(passes_at=3)
     assert "draft 1" in wr.prompts[1] and "feedback 1" in wr.prompts[1]
     assert "draft 1" not in wr.prompts[0], "attempt 1 cannot contain a previous draft"
+
+
+def test_forced_three_continues_after_pass_without_calling_it_gave_up():
+    res, _, _, rf = _run(passes_at=1, force_all_attempts=True)
+    assert res.writer_calls == 3 and rf.calls == 2 and res.llm_calls == 5
+    assert res.gave_up is False
 
 
 def _run_all() -> int:

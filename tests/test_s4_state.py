@@ -34,13 +34,13 @@ def test_trace_entries_are_independent_snapshots():
     s = _state()
     s.retrieved = ["a", "b"]
     s.draft = "draft 1"
-    s.hybrid = 0.10
+    s.gate_score = 0.10
     s.failed_rules = ["F2_length"]
     s.advance()
 
     s.retrieved.append("c")
     s.draft = "draft 2"
-    s.hybrid = 0.90
+    s.gate_score = 0.90
     s.failed_rules.append("F5_sentiment")
 
     first = s.trace[0]
@@ -49,15 +49,15 @@ def test_trace_entries_are_independent_snapshots():
         f"trace row aliases live state: {first['retrieved']}"
     )
     assert first["failed_rules"] == ["F2_length"]
-    assert first["hybrid"] == 0.10
+    assert first["gate_score"] == 0.10
 
 
 def test_advance_clears_scores_so_a_stale_pass_cannot_survive():
     s = _state()
-    s.draft, s.hybrid, s.verdict = "d1", 0.9, "PASS"
+    s.draft, s.gate_score, s.verdict = "d1", 0.9, "PASS"
     s.neural_score, s.symbolic_score = 0.9, 0.9
     s.advance()
-    assert s.verdict is None and s.hybrid is None, (
+    assert s.verdict is None and s.gate_score is None, (
         "a previous attempt's verdict survived into the next attempt — a stale "
         "PASS would then be attributed to a draft it never scored"
     )
@@ -65,10 +65,10 @@ def test_advance_clears_scores_so_a_stale_pass_cannot_survive():
 
 def test_advance_refuses_past_the_cap():
     s = _state()
-    s.hybrid = 0.1
+    s.gate_score = 0.1
     for _ in range(MAX_ATTEMPTS - 1):
         s.advance()
-        s.hybrid = 0.1
+        s.gate_score = 0.1
     assert s.attempt == MAX_ATTEMPTS
     try:
         s.advance()
@@ -80,13 +80,13 @@ def test_advance_refuses_past_the_cap():
     )
 
 
-def test_best_of_three_picks_the_highest_hybrid():
+def test_best_of_three_picks_the_highest_gate_score():
     s = _state()
-    s.draft, s.hybrid = "d1", 0.20
+    s.draft, s.gate_score = "d1", 0.20
     s.advance()
-    s.draft, s.hybrid = "d2", 0.80
+    s.draft, s.gate_score = "d2", 0.80
     s.advance()
-    s.draft, s.hybrid = "d3", 0.50
+    s.draft, s.gate_score = "d3", 0.50
     best = s.best_of_trace()
     assert best["draft"] == "d2", f"picked {best['draft']!r}"
 
@@ -99,15 +99,15 @@ def test_ties_break_toward_the_earliest_attempt():
     while charging the calls it did make.
     """
     s = _state()
-    s.draft, s.hybrid = "d1", 0.60
+    s.draft, s.gate_score = "d1", 0.60
     s.advance()
-    s.draft, s.hybrid = "d2", 0.60
+    s.draft, s.gate_score = "d2", 0.60
     assert s.best_of_trace()["attempt"] == 1
 
 
 def test_finalize_sets_gave_up():
     s = _state()
-    s.draft, s.hybrid = "d1", 0.3
+    s.draft, s.gate_score = "d1", 0.3
     best = s.finalize_give_up()
     assert s.gave_up is True and best["draft"] == "d1"
 

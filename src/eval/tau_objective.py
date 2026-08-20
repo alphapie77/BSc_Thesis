@@ -28,8 +28,9 @@ of the cost/quality range:
 
     alpha_lo  tau = 0. The Critic never rejects; the first draft ships.
               Exactly SS5.1 row 1 (zero-shot, no loop). 1 call.
-    alpha_hi  tau = 1. Every plot runs all 3 attempts and emits best-of-3.
-              The maximum-cost end of our own system.
+    alpha_hi  FORCED_3. Every plot runs all 3 attempts and emits best-of-3.
+              This is explicit rather than tau=1 because calibrated scores may
+              equal 1.0 and the Critic correctly uses score >= tau.
 
 **Quality at both ends is measured by Verifier-B, never Verifier-A.**
 Verifier-A is inside the loop; constraining the loop by its own judge is
@@ -70,10 +71,9 @@ wearing an optimum's clothes.
 
 WHAT CANNOT BE RUN YET
 ----------------------
-quality(tau) needs generations, and Phase 4 has produced none. This file
-therefore ships the *procedure*, pre-registered before any number exists, plus
-a synthetic demonstration that the selection rule behaves. `kapur2026length`
-rule out using dev-82 human reviews as a stand-in for generated text.
+This file preserves the pre-run cost derivation and synthetic demonstration.
+The executable post-S4.5a frontier is `src/eval/fit_tau.py`; its input is the
+explicit maximum trace produced by `src/eval/run_tau_traces.py`.
 
 Usage:  python src/eval/tau_objective.py
 """
@@ -161,7 +161,7 @@ def main() -> int:
         (0.40, 0.75, 0.734),
         (0.60, 0.55, 0.769),
         (0.80, 0.35, 0.784),
-        (1.00, 0.00, 0.790),   # alpha_hi -- always 3 attempts, best-of-3
+        (1.00, 0.00, 0.790),   # synthetic stand-in for explicit FORCED_3
     ]:
         demo.append((tau, quality, expected_calls(q_pass)))
 
@@ -172,7 +172,7 @@ def main() -> int:
 
     chosen = select_tau(demo)
     print(f"\n  alpha_lo (row 1, no loop)      = {chosen['alpha_lo']:.3f}")
-    print(f"  alpha_hi (always 3, best-of-3) = {chosen['alpha_hi']:.3f}")
+    print(f"  alpha_hi (explicit FORCED_3)    = {chosen['alpha_hi']:.3f}")
     print(f"  headline tau*                  = {chosen['tau']:.2f}")
     print(f"    quality {chosen['quality']:.3f} at {chosen['calls']:.3f} calls, "
           f"{chosen['fraction_of_achievable']:.1%} of achievable gain")

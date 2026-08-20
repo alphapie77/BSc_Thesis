@@ -1,0 +1,21 @@
+# S4.5b -- corrected post-S4.5a tau frontier.
+# Verifier-A alone gates; symbolic scores remain diagnostic; Verifier-B appears
+# only in this evaluation input, never under src/agents/. The maximum three-
+# attempt trace is generated once and ordinary thresholds replay its prefixes.
+
+step: S4.5b
+seed: 42
+
+input:
+  max_traces_jsonl: results/s4_tau_max_traces.jsonl
+  expected_cases: 60          # 30 plots x 2 levels, Bangla prompt arm
+
+analysis:
+  threshold_grid: observed_gate_scores
+  permutation_shuffles: 5000  # adopted from protocol.md RQ1-F Gate 2
+  headline_scope: global
+  per_level_reporting: mandatory
+  upper_endpoint: FORCED_3
+
+output:
+  report_json: results/s4_tau_frontier.json

@@ -15,7 +15,7 @@ four components make no LLM call at all.
 WHAT THE LOOP GUARANTEES
 ------------------------
 * FAIL & attempt < 3 -> back to the Researcher with the query **anchored**.
-* FAIL & attempt = 3 -> emit best-of-3 by hybrid with `gave_up=True`.
+* FAIL & attempt = 3 -> emit best-of-3 by Verifier-A with `gave_up=True`.
 * Every attempt is snapshotted into `trace` **before** the next one starts.
 * `E[calls]` is countable from the trace: one Writer call per attempt, one
   Reflector call per FAIL except the last. Decision 19's cost model depends on
@@ -59,11 +59,16 @@ def run_loop(
     writer,
     critic,
     reflector,
-    w: float,
     tau: float,
     arm: str = "bn",
+    force_all_attempts: bool = False,
+    length_controlled: bool = False,
 ) -> LoopResult:
-    """One plot, one level, up to three attempts. `w` and `tau` are required."""
+    """One plot, one level, up to three attempts. `tau` is required.
+
+    `force_all_attempts` is the explicit alpha-hi data-collection policy. It
+    continues after PASS so tau=1 is never overloaded to mean forced execution.
+    """
     from src.agents.prompts import render
 
     state = LoopState(plot_id=plot_id, plot=plot, target_level=target_level)
@@ -96,6 +101,7 @@ def run_loop(
             exemplars=retrieval.texts,
             previous_draft=state.trace[-1]["draft"] if state.trace else None,
             feedback=pending_feedback,
+            length_controlled=length_controlled,
         )
         gen = writer.generate(
             prompt=prompt,
@@ -106,16 +112,20 @@ def run_loop(
         writer_calls += 1
         state.draft = gen.text
 
-        j = critic.judge(state.draft, target_level, w=w, tau=tau)
+        j = critic.judge(state.draft, target_level, tau=tau)
         state.neural_score = j.neural_score
         state.symbolic_score = j.symbolic_score
-        state.hybrid = j.hybrid
+        state.gate_score = j.gate_score
         state.verdict = j.verdict
 
-        if j.verdict == "PASS":
+        if j.verdict == "PASS" and not force_all_attempts:
             return LoopResult(state, state.snapshot(), writer_calls, reflector_calls)
 
         if state.attempt >= MAX_ATTEMPTS:
+            if force_all_attempts:
+                return LoopResult(
+                    state, state.best_of_trace(), writer_calls, reflector_calls
+                )
             # No Reflector call here, and that is not an optimisation: there is
             # no further attempt to feed, so a call would cost a request and buy
             # nothing -- and it would inflate E[calls] against the cost model
@@ -124,7 +134,13 @@ def run_loop(
                 state, state.finalize_give_up(), writer_calls, reflector_calls
             )
 
-        feedback, failed = reflector.reflect(critic, state.draft, target_level)
+        feedback, failed = reflector.reflect(
+            critic,
+            state.draft,
+            target_level,
+            plot_id=plot_id,
+            attempt=state.attempt,
+        )
         reflector_calls += 1
         state.feedback = feedback
         pending_feedback = feedback

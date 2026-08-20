@@ -4311,3 +4311,57 @@ blob, because a digest is readable and a binary is not.
 ### Citations needed
 - None. This run executes the already cited/registered curve and grouped
   held-out test; the added work is a logical coverage audit, not a new method.
+
+---
+
+## 2026-08-18 -- S4.5b build: neural gate, symbolic diagnosis, tau frontier
+**Feeds:** Ch.4 Phase 4; RQ2; RQ3; RQ5; reproducibility appendix
+**Commit:** pending
+**Artifacts:** code/config/notebook only; no result file exists yet
+
+### Decisions made (and why)
+- **Verifier-A alone controls PASS/FAIL and best-of-three.** S4.5a gave the
+  symbolic term influence over verdicts but zero held-out marginal value in all
+  folds. Keeping it in the gate would turn unvalidated influence into decision
+  authority. This is recorded as a negative result for the hybrid-accuracy
+  hypothesis, not reframed as a hybrid win.
+- **Symbolic scoring remains active as diagnosis.** Exact failed-rule
+  contributions remain in every trace and continue to ground Reflector
+  feedback. The component is not removed; its predictive and explanatory roles
+  are separated.
+- **Use a global headline tau frontier with mandatory per-level reporting.**
+  The paper cited for variance-ratio partial pooling does not contain that
+  estimator. Inventing the missing formula would be worse than correcting the
+  pre-registration. Per-level frontiers and the 5,000-shuffle descriptive test
+  expose heterogeneity without claiming unsupported group guarantees.
+- **Make alpha-hi an explicit `FORCED_3` policy.** Calibrated Verifier-A scores
+  can equal 1.0, so `tau=1` plus the registered `>=` comparison cannot force
+  three attempts. `>=` is retained because tau=0 must never reject.
+
+### Findings from implementation
+- The real Reflector path was missing `plot_id` and `attempt` metadata required
+  by `LocalWriter.generate`; unit stubs had hidden the mismatch. The graph now
+  passes both, and the Reflector forwards `target_level`.
+- Writer and Reflector calls would have collided in the append-only generation
+  cache because the original key had no role field. The runner gives Reflector
+  calls a disjoint `REFLECT:` plot-id namespace.
+- The maximum trace is generated once. Ordinary thresholds replay prefixes,
+  so a threshold that passes on attempt 2 costs exactly three LLM calls (Writer,
+  Reflector, Writer); a three-attempt path costs five.
+- The full repository suite passes: **282 tests**, one existing environment
+  warning about physical-core detection.
+
+### Run boundary
+- **No retry generation or Verifier-B frontier score has been produced.** The
+  next action is to run `notebooks/s4_tau_kaggle.ipynb` on a T4 with Gemma,
+  `bn_clean.csv`, and the trained Verifier-B directory mounted.
+- Attempt 1 is reused byte-for-byte from
+  `results/s4_devplot_lenctl_generations.jsonl`; it must not be regenerated.
+
+### Citations added
+- Ackermann et al. (COLM 2025), `ackermann2025offpolicy`.
+- Liu et al. (2026), `liu2026openrubrics`.
+- Wang et al. (ICML 2026), `wang2026nlhf`.
+- Anugraha et al. (ICLR 2026), `anugraha2026mr3`.
+- Salem et al. (2026), `axiv2607_24562_hierarchicalcrc`, corrected after
+  reading the method beyond its abstract.

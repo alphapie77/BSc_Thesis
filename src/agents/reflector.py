@@ -161,5 +161,7 @@ class Reflector:
     def reflect(self, critic, draft: str, target_level: int, **kw) -> tuple[str, list[str]]:
         rules = failed_rules(critic, draft, target_level)
         prompt = render_feedback_prompt(draft, target_level, rules, arm=self._arm)
-        feedback = self._generate(prompt=prompt, **kw)
+        feedback = self._generate(
+            prompt=prompt, target_level=target_level, **kw
+        )
         return feedback, [r.feature for r in rules]

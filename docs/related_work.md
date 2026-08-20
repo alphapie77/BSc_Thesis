@@ -518,7 +518,7 @@ interesting individually.**
 
 | Key | Source | Read | Defends / forces |
 |---|---|---|---|
-| `axiv2607_24562_hierarchicalcrc` | arXiv 2607.24562, 2026-07-27 | `[~]` **abstract only** | 🔴 **Supplies the τ procedure adopted in protocol.md §S4 decision 2: hierarchical partial pooling across the two axis levels, shrinkage estimated rather than chosen.** Its motivating premise is ours nearly verbatim — LLMs "serve heterogeneous populations structured by domain, topic difficulty, and linguistic style", so marginal guarantees need not hold per group. 🔑 **Chosen for a property, not a result:** it degrades to the pooled threshold when groups are indistinguishable and to per-group thresholds when they separate, and we cannot know in advance which regime our two levels are in. An estimated shrinkage also keeps the design compliant with the 2026-08-11 standing rule — a hand-picked pooling weight would be another `0.6/0.4`. |
+| `axiv2607_24562_hierarchicalcrc` | arXiv 2607.24562, 2026-07-27 | `[x]` **HTML method read 2026-08-18** | 🔴 **CORRECTION:** this paper does **not** define variance-ratio partial pooling. HG-CRC uses Bonferroni-corrected node certification and a **leaf-first fallback** to a coarser certified threshold. The earlier abstract-only note attributed an estimator the paper does not contain. Its heterogeneity warning still supports reporting per-level frontiers, but its method is not adopted: our objective is quality per LLM call, not conformal risk under a fixed error budget, and 30 cases per level cannot support the claimed certification. |
 | `axiv2605_14260_fairnessburden` | arXiv 2605.14260, 2026-05-14 | `[~]` **abstract only** | 🔴 **The fifth entry in CLAUDE.md's search-first table — it refuted a recommendation Claude had already given Sabbir.** Claude had recommended a single global τ *as the conservative option*. The paper states that a single pooled threshold "can hide cross-group heterogeneity in score distributions and distort group-wise coverage". ⚠️ Its title also names the constraint on the other side — group-conditional thresholds **cost calibration sample**, and we have 30 dev-plots per level — which is precisely why the answer is partial pooling rather than a straight switch to per-level τ. |
 | `axiv2605_05562_socioconformal` | arXiv 2605.05562, 2026-05-07 | `[~]` **abstract only** | Corroborates the row above from a different domain (ordinal conformal prediction on complex survey data); its title *is* the argument — *marginal validity is not enough for subgroup reliability*. **Cited as convergent, not independent, evidence** — the same claim in another field, not a second measurement of ours. |
 | `axiv2606_29403_selforganizedcp` | arXiv 2606.29403, 2026-06-28 | `[~]` **abstract only** | Third reproduction of the pooled-calibration failure — "pooled calibration averages over heterogeneous regions and can mask regional undercoverage". Included so decision 2 rests on a **field** rather than on one paper, per CLAUDE.md's search mechanics: one 10-result call is not "the search". |
@@ -539,6 +539,21 @@ interesting individually.**
 | `axiv2604_18490_lqm` | arXiv 2604.18490, 2026-04-20 | `[~]` **abstract only** | The general form of our concrete gap: established evaluation schemes including **MQM are "largely language-agnostic"** and miss language-specific phenomena. §4.6's four failure categories inherit exactly such a generic list and **cannot name a Bangla register or honorific failure**. Forces §S4 decision 6. |
 | `axiv2606_10765_arabigee` | arXiv 2606.10765, 2026-06-09 | `[~]` **abstract only** | Precedent for a **language-specific hierarchical error taxonomy** in a non-English language — evidence that extending §4.6's list for Bangla is normal practice, not an ad hoc departure. |
 | `axiv2608_03966_hallutruthqa` | arXiv 2608.03966, 2026-08-04 | `[~]` **abstract only** | Comparable low-resource resources *"often assign a binary label"*; fine-grained is the improvement. Supports a multi-category taxonomy with a **reported `other` rate** over pass/fail coding. |
+
+### Tier 10c — Post-S4.5a gate/diagnosis separation (added 2026-08-18)
+
+> Search ran before changing the Critic. Consensus remained unavailable until
+> 2026-09-01; primary arXiv records were used. These are abstract-level reads.
+> **The search changed the design:** generated-domain symbolic refitting was
+> considered, then deferred until human comparative labels exist; the immediate
+> remedy is to separate decision authority from diagnostic feedback.
+
+| Key | Source | Defends / forces |
+|---|---|---|
+| `ackermann2025offpolicy` | Ackermann et al., COLM 2025, arXiv 2507.15507 | Reward models become inaccurate when the policy distribution moves away from their training responses. This maps directly to the measured human→generated shift and argues against post-hoc symbolic reweighting on requested labels. |
+| `liu2026openrubrics` | Liu et al., arXiv 2510.07743 v3 (2026) | Separates hard rules from implicit principles. Supports keeping exact symbolic rules as structured diagnostic evidence without treating their scalar combination as a validated gate. |
+| `wang2026nlhf` | Wang et al., ICML 2026, arXiv 2601.07349 | A binary outcome can be correct while the critique is unsound; process-level natural-language feedback supplies information that outcome labels omit. Supports retaining failed-rule traces. |
+| `anugraha2026mr3` | Anugraha et al., ICLR 2026, arXiv 2510.01146 | English LLM-judge performance does not reliably generalise to non-English evaluation. Argues against replacing the Bangla-specific verifier/diagnostic path with a convenient English judge. |
 
 ---
 

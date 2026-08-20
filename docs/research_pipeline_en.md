@@ -434,7 +434,7 @@ State = {
   plot: str, target_persona: str,          # immutable input
   retrieved: list[review_id],              # written by Researcher
   draft: str,                              # written/updated by Writer
-  neural_score: float, symbolic_score: float, hybrid: float,
+  neural_score: float, symbolic_score: float, gate_score: float,
   verdict: PASS | FAIL,                    # written by Critic
   feedback: str | None,                    # written by Reflector
   attempt: int (max 3),
@@ -454,7 +454,8 @@ State = {
 - Params: temp 0.8, top_p 0.9, seed logged. Out: `draft` (Bangla). Prompt templates go verbatim in the appendix.
 
 **3 — Critic** (deterministic judge — explicitly not an LLM; this is the thesis's central claim)
-- In: `draft, target_persona` → `hybrid = ~~0.6~~w×VerifierA(draft) + ~~0.4~~(1−w)×symbolic(draft)`, compared with a τ per axis level → Out: `verdict + both scores`.
+- In: `draft, target_persona` → `gate_score = VerifierA(draft)`, compared
+  with τ → Out: `verdict + neural score + symbolic diagnostic score`.
 
 > 🔴 **`0.6 / 0.4` IS STRUCK — 2026-08-11, Sabbir's rule: *"hate likha thakle hbe na. karon thakte hobe."*** The spec called these *"dev-tuned weights, §3.5"*, but **no tuning ever produced them** — they are the number this whole audit started from, and tracing them found no derivation anywhere in the repo.
 >
@@ -462,7 +463,12 @@ State = {
 >
 > **What replaces it** (registered in `protocol.md`, 2026-08-11): `w` is fit on the **30 dev-plots' generated outputs** — where the Critic actually operates, and where `kapur2026length` says the length/specificity relation *differs* from human text — and reported as a **sensitivity curve, never a point**. Inclusion of the symbolic term must survive a **held-out marginal-value test**, not a standalone score: `barata2026hybrid` rejected a cheap component in **50 of 50 folds** while it looked fine standalone.
 >
-> **Until that runs, `w` has no value and §4.2 may not be implemented with one.**
+> **S4.5a RAN 2026-08-18.** Every held-out fold selected `w=1`; mean
+> delta-AUC against neural-only was 0.0000 in both registered conditions.
+> Therefore no `w` is selected. The neural score alone controls PASS/FAIL;
+> the symbolic score remains active only to localise failed rules for the
+> Reflector. This is a negative result for RQ3's hybrid-accuracy hypothesis,
+> not removal of the symbolic component.
 - Justification: **Self-Correction Illusion (2606.05976)** — external-role feedback is what works; **CRITIC (ICLR 2024)** — the judge is a tool, not the model itself. The Critic is never the Writer's model — that separation is the architecture's soul.
 - ⚠️ τ chosen to hit a pass-rate is itself a proxy — so τ is set **on dev-plots**, and the final τ is sanity-checked against Verifier-B scores, not only A.
 
@@ -470,7 +476,7 @@ State = {
 - In: `draft, scores, failed-rule list` → structured feedback — not random critique but **which symbolic rules failed + which persona the neural confidence leaned toward**, rendered in natural language (e.g., "no intensifiers [R1 failed]; reads Indifferent-cold — raise emotion, name the lead actor") → Out: `feedback`.
 - Justification: Reflexion (NeurIPS 2023) — verbal feedback memory; ours is verifier-grounded, not self-generated. Error-localized feedback beats generic (Self-Refine ablation; Tyen et al. 2024).
 
-**Loop control:** FAIL & attempt<3 → back to Researcher (anchored+augmented query). FAIL & attempt=3 → emit best-of-3 by hybrid with `gave_up=True` — the raw material of the failure taxonomy; report all metrics split by `gave_up` status.
+**Loop control:** FAIL & attempt<3 → back to Researcher (anchored+augmented query). FAIL & attempt=3 → emit best-of-3 by Verifier-A gate score with `gave_up=True` — the raw material of the failure taxonomy; report all metrics split by `gave_up` status.
 
 ### 4.3 ⚠️ Pre-empting "is this really multi-agent?"
 Be honest: two of four components are deterministic. Three defences, written explicitly in the paper:
@@ -494,7 +500,10 @@ Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate
 >
 > **Following `kotte2026ucci` §3, the constraint is bounded by two measured endpoints, and ours are already §5.1 rows:**
 > - **α_lo** — τ=0, the Critic never rejects: **row 1, zero-shot, 1 call**
-> - **α_hi** — τ=1, every plot runs all 3 attempts, best-of-3 emitted
+> - **α_hi** — an explicit **FORCED-3 policy**: every plot runs all 3
+>   attempts and best-of-3 is emitted. This is not represented as `τ=1`,
+>   because calibrated Verifier-A scores can equal exactly 1.0 and the Critic's
+>   registered `>=` comparison would pass them early.
 >
 > 🔑 **Both measured by Verifier-B, never Verifier-A** (rule 6 — A is inside the loop). This is stricter than UCCI, which has no such wall.
 >
@@ -506,7 +515,10 @@ Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate
 - **Temperature schedule (ablation only):** retry temps 0.8→0.9→1.0 — a published diversity mechanism for escaping mode-collapsed drafts; measure in §5.1b, do not bake in.
 
 ### 4.6 Loop dynamics report
-Attempt distribution (1/2/3), hybrid-score growth per attempt, persona-wise retry rates (Enthusiastic Casual expected highest — prior recall 0.5674 says so), and a hand-coded **failure taxonomy** of 50 three-time failures (wrong sentiment / too short / off-topic / template repeat).
+Attempt distribution (1/2/3), Verifier-A gate-score growth and symbolic-score
+movement per attempt, axis-level retry rates, and a hand-coded **failure
+taxonomy** of 50 three-time failures (wrong sentiment / too short / off-topic /
+template repeat).
 
 **Base papers:** Madaan et al. NeurIPS 2023 (Self-Refine — diminishing returns by iteration 3); Shinn et al. NeurIPS 2023 (Reflexion); Gou et al. ICLR 2024 (CRITIC); Anthropic 2024; Zaharia et al. (BAIR) 2024.
 **Deliverables:** working instrumented system, threshold-sweep figure, chosen τ per persona, **per-iteration pass-rate/score curves per persona (the empirical justification for max-retry=3)**, dynamics report.

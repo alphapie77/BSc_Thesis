@@ -1,0 +1,30 @@
+# S4.5b maximum-trace generation. One standard condition: Bangla prompt arm,
+# length-controlled, 30 frozen dev plots x two levels. Attempt 1 is reused.
+
+step: S4.5b.traces
+seed: 42
+provider: local
+model: google/gemma-3-12b-it
+
+runtime:
+  scikit_learn: "1.9.0"
+  batch_size: 8       # inherited from S4.dev; provenance, not tuned
+  quantization: nf4
+  max_new_tokens: 80
+
+sample:
+  n_plots: 30         # protocol.md S4 decision 2, fixed before generation
+  levels: [0, 1]
+
+input:
+  attempt1_jsonl: results/s4_devplot_lenctl_generations.jsonl
+
+verifier_b:
+  artifact: artifacts/verifier_b.joblib
+  batch_size: 32      # inference throughput only; model.eval(), no fitting
+
+output:
+  # Append-only transport cache. Writer and Reflector have disjoint keys.
+  calls_jsonl: data/generated/s4_tau_calls.jsonl
+  # Complete only: written atomically after all 180 drafts receive B scores.
+  max_traces_jsonl: results/s4_tau_max_traces.jsonl
