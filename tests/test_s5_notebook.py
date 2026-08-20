@@ -12,6 +12,9 @@ def _nb():
 
 def test_notebook_is_runner_only_and_pins_a_full_commit():
     nb = _nb()
+    for index, cell in enumerate(nb["cells"]):
+        if cell["cell_type"] == "code":
+            compile("".join(cell.get("source", [])), f"cell-{index}", "exec")
     code = "\n".join(
         "".join(cell.get("source", []))
         for cell in nb["cells"] if cell["cell_type"] == "code"
@@ -20,6 +23,8 @@ def test_notebook_is_runner_only_and_pins_a_full_commit():
     assert match
     assert "subprocess.run" in code and "check=True" in code
     assert "Verifier-B" not in code and "verifier_b" not in code.lower()
+    assert code.index("preflight_s5_kaggle.py") < code.index("build_index.py")
+    assert code.index("preflight_s5_kaggle.py") < code.index("run_s5_main_bn.py")
 
 
 def test_notebook_defaults_to_smoke_only_and_exports_all_resume_archives():
@@ -33,3 +38,24 @@ def test_notebook_defaults_to_smoke_only_and_exports_all_resume_archives():
         "s5_main_bn_cases.jsonl", "s5_checkpoint.zip",
     ):
         assert name in code
+
+
+def test_kaggle_work_cells_are_restart_safe_and_model_input_is_unambiguous():
+    nb = _nb()
+    work_cells = [
+        "".join(cell.get("source", []))
+        for cell in nb["cells"]
+        if cell["cell_type"] == "code"
+        and any(marker in "".join(cell.get("source", [])) for marker in (
+            "bn_clean.csv", "restore = {", "preflight_s5_kaggle.py",
+            "RUN_SMOKE = True", "RUN_CHUNK = False", "snapshot =",
+        ))
+    ]
+    assert len(work_cells) == 6
+    assert all("REPO = Path('/kaggle/working/s5_repo_08569d6')" in cell for cell in work_cells)
+    assert all("os.chdir(REPO)" in cell for cell in work_cells)
+    setup = next(cell for cell in work_cells if "bn_clean.csv" in cell)
+    assert "assert len(clean) == 1" in setup
+    for cell in work_cells:
+        if "MODEL_PATH" in cell:
+            assert "assert len(gemma) == 1" in cell
