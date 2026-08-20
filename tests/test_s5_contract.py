@@ -16,6 +16,9 @@ from src.eval.s5_contract import (
     threshold_for_acceptance_rate,
 )
 from src.verifier.split_access import load_training_rows
+from src.eval.preflight_s5 import preflight
+
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,3 +98,15 @@ def test_generation_keys_separate_conditions_seeds_and_call_roles():
         for role, i in (("writer", 1), ("critic", 1), ("writer", 2))
     }
     assert len(keys) == 10 * 3 * 3
+
+
+def test_real_config_passes_cpu_preflight_without_loading_verifier_b():
+    with open(ROOT / "configs/s5_main_bn.yaml", encoding="utf-8") as fh:
+        cfg = yaml.safe_load(fh)
+    result = preflight(cfg)
+    assert result["status"] == "READY_NO_GENERATION"
+    assert result["condition_cases_per_language_per_replicate"] == 1800
+    assert result["condition_cases_per_language"] == 5400
+    assert result["static_counts"] == {"0": 10, "1": 10}
+    assert result["symbolic_dev_passes"] == 39
+    assert result["verifier_b_loaded"] is False

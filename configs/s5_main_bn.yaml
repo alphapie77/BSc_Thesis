@@ -11,6 +11,13 @@ inputs:
   s4_scores_csv: results/s4_w_scores.csv
   verifier_a: artifacts/verifier_a.joblib
   symbolic_scorer: artifacts/symbolic_scorer.joblib
+  rag_manifest: results/s4_index_manifest.json
+
+rag:
+  persist_dir: data/rag/r1_index
+  collection: r1_regionA_k2
+  encoder: sentence-transformers/LaBSE
+  top_k: 10  # pipeline §4.2; held fixed for every RAG condition
 
 sample:
   split: eval
