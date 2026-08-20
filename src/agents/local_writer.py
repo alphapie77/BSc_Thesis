@@ -46,11 +46,11 @@ from src.agents.writer import (  # noqa: E402
 )
 from src.common.provenance import stamp  # noqa: E402
 
-#: Fixed, recorded, and NOT tuned. See the module docstring: this is a
-#: provenance field. 8 is chosen to fit a 1B model plus ~4k-token prompts on a
-#: single 16 GB T4 with headroom; if it must change, it changes for every arm at
-#: once and the change is logged.
-DEFAULT_BATCH_SIZE = 8
+#: One item is the realized S4 path: both historical runners called
+#: ``generate()``, which wraps ``generate_batch([item])``. The former default 8
+#: was only constructor metadata and never a realized batch. S5 passes 1
+#: explicitly and this default now tells the truth for new call sites.
+DEFAULT_BATCH_SIZE = 1
 REQUIRED_NF4_TRANSFORMERS = "5.15.0"
 
 
