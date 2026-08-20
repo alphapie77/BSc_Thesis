@@ -1,6 +1,7 @@
 """Unit tests for S4.6 dynamics and failure-packet selection."""
 from src.eval.build_s4_failure_sheet import build_rows
 from src.eval.report_s4_dynamics import analyse, normalized_edit_distance
+from src.eval.score_s4_failure_taxonomy import compare
 
 
 def _case(plot, level, gate, b, drafts=None):
@@ -71,5 +72,32 @@ def test_failure_sheet_contains_only_three_time_gate_failures_and_blank_codes():
     ]
     rows = build_rows(cases, plots, 0.5)
     assert [row["case_id"] for row in rows] == ["p0:L0"]
+    assert rows[0]["emitted_attempt"] == 3
+    assert rows[0]["emitted_draft"] == "কথাটা"
     assert rows[0]["wrong_sentiment"] == ""
     assert rows[0]["other_label"] == ""
+
+
+def test_taxonomy_agreement_keeps_degenerate_kappa_explicit():
+    base = {
+        "case_id": "p0:L0", "wrong_sentiment": "0", "too_short": "0",
+        "off_topic": "0", "template_repeat": "0",
+        "register_or_honorific": "0", "other": "0",
+    }
+    result, disagreements = compare([base], [base])
+    assert result["micro_binary_agreement"] == 1.0
+    assert result["micro_binary_cohen_kappa"] is None
+    assert disagreements == []
+
+
+def test_taxonomy_scorer_emits_only_actual_disagreements():
+    left = {
+        "case_id": "p0:L0", "wrong_sentiment": "0", "too_short": "1",
+        "off_topic": "0", "template_repeat": "0",
+        "register_or_honorific": "0", "other": "0",
+    }
+    right = {**left, "too_short": "0", "other": "yes"}
+    result, disagreements = compare([left], [right])
+    assert result["n_disagreements"] == 2
+    assert {(row["category"], row["coder_a"], row["coder_b"])
+            for row in disagreements} == {("too_short", 1, 0), ("other", 0, 1)}

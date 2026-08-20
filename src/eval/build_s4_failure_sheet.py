@@ -18,7 +18,7 @@ from src.eval.fit_tau import _emit, _validate  # noqa: E402
 
 FIELDS = [
     "case_id", "plot_id", "target_level", "title_bn", "synopsis",
-    "attempt_1", "attempt_2", "attempt_3",
+    "emitted_attempt", "emitted_draft", "attempt_1", "attempt_2", "attempt_3",
     "wrong_sentiment", "too_short", "off_topic", "template_repeat",
     "register_or_honorific", "other", "other_label", "coder_notes",
 ]
@@ -31,12 +31,15 @@ def build_rows(cases: list[dict], plots: list[dict], tau: float) -> list[dict]:
     rows = []
     for case in failed:
         plot = by_id[str(case["plot_id"])]
+        emitted, _, _ = _emit(case, tau)
         rows.append({
             "case_id": f"{case['plot_id']}:L{case['target_level']}",
             "plot_id": case["plot_id"],
             "target_level": case["target_level"],
             "title_bn": plot["title_bn"],
             "synopsis": plot["synopsis"],
+            "emitted_attempt": emitted["attempt"],
+            "emitted_draft": emitted["draft"],
             "attempt_1": case["attempts"][0]["draft"],
             "attempt_2": case["attempts"][1]["draft"],
             "attempt_3": case["attempts"][2]["draft"],

@@ -1,0 +1,13 @@
+# S4.6 -- agreement before reconciliation on two independently coded sheets.
+
+step: S4.6-taxonomy
+seed: 42
+
+input:
+  coder_a_csv: data/annotation/s4_failure_taxonomy_coder_a.csv
+  coder_b_csv: data/annotation/s4_failure_taxonomy_coder_b.csv
+  expected_cases: 8
+
+output:
+  agreement_json: results/s4_failure_taxonomy_agreement.json
+  disagreements_csv: data/annotation/s4_failure_taxonomy_disagreements.csv
