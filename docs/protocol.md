@@ -1062,19 +1062,28 @@ it is the step returning what it can support.
   RAG-only, and self-critique.
 - **Metrics:** ~~persona accuracy~~ **`cluster_k2` label accuracy** under
   **Verifier-B** (never in the loop), MAUVE, length-JS divergence.
-- **n:** 8 conditions x 2 languages x **90** eval-plots x ~~3 personas~~
-  **2 axis levels**, >= 3 seeds.
+- **n:** ~~8~~ **10 conditions** x 2 languages x **90** eval-plots x
+  ~~3 personas~~ **2 axis levels**, >= 3 seeds.
   (90, not 100 — the plot corpus froze at 120 = 30 dev + 90 eval on 2026-07-31;
   see the Deviations entry of that date. **"3 personas" was stale from
   2026-08-03**, when Gate G1 selected K = 2; corrected 2026-08-10.)
 - **Test:** bootstrap CIs, Benjamini-Hochberg correction, effect sizes.
-- **Claims:** win = external verification helps; mixed = helps on some personas
-  only -> report per-persona; negative = prompting suffices, report honestly.
+- **Claims:** a trained-external-verifier claim requires row 6 to beat not only
+  prompting/self-critique but also the external-role control and the matched-
+  compute resampling control. Mixed = helps on some levels only -> report by
+  level; negative = prompting, relabelling, or resampling suffices, named by the
+  winning control and reported honestly.
 
 ## RQ3 -- Hybrid neural + symbolic
-- **H3:** Hybrid gating beats neural-only and symbolic-only.
-- **Pre-commitment:** if hybrid gains < 2 points over neural-only, the hybrid
-  claim is softened; the sensitivity curve is reported regardless.
+- **H3:** ~~Hybrid gating beats neural-only and symbolic-only.~~ **After S4.5a,
+  symbolic diagnostics in the feedback improve the neural-gated loop over the
+  otherwise identical neural-only-feedback row.** Symbolic-only gating remains
+  a secondary ablation; no hybrid gate or selected `w` exists.
+- **Pre-commitment:** row 6 − row 4 ≥ 2 Verifier-B percentage points supports a
+  bounded symbolic-*feedback* contribution; between −2 and +2 is no established
+  contribution; ≤ −2 means the diagnostics harm correction. The S4.5a
+  sensitivity curve is reported regardless. None of these outcomes revives a
+  claim that symbolic scoring adds held-out predictive value to Verifier-A.
 
 ## RQ4 -- Cross-lingual
 - **H4:** Delta_bn > Delta_en (verification matters more in low-resource).
@@ -1661,6 +1670,74 @@ fine-grained scheme over a pass/fail one. ⚠️ **All three are abstracts only.
   self-critique row 7b) block **Phase 5**, not Phase 4 — but decision 10 in
   particular constrains the §5.1 row-1 prompt that becomes α_lo, so it is flagged
   here as due before the τ sweep is interpreted, not before the loop is built.
+
+## S5 pre-run amendment — strong controls frozen 2026-08-20
+
+This amendment is written after S4.5/S4.6 results but **before any Phase-5
+generation**. It closes open decisions 9 and 11. Consensus is unavailable in
+this workspace and the existing quota outage is already recorded; the required
+recent-first search therefore used alphaXiv, then read the primary PDFs.
+
+### Decision 9 — add a compute-matched blind-resampling control
+
+The main table gains row 9: **RAG + blind resampling + Verifier-A
+best-of-budget selection**. For every plot/level, it draws a nested pool of at
+most five independent Writer samples from the exact row-3 RAG prompt. No sample
+sees an earlier draft, a failure notice, critique, or Reflector output.
+
+- Candidate selection uses Verifier-A, the same scorer the proposed loop
+  optimizes. Verifier-B remains evaluation-only.
+- The primary row-9 output is the highest-A candidate in the largest prefix
+  whose realized generator FLOPs do not exceed the proposed row-6 loop's
+  realized generator FLOPs on the same plot/level. The prefix size is chosen
+  from compute only, never from Verifier-B or outcome quality.
+- Approximate generator FLOPs use the same-model cancellation of
+  `2P × (input_tokens + output_tokens)`; raw input/output tokens, calls,
+  latency, and prefixes 1–5 are all retained. The full quality–compute frontier
+  is reported so the primary match cannot hide a different budget reading.
+- The pool is nested and seeded before execution. Prefix results therefore
+  reuse one trajectory rather than rerunning a favorable `N`.
+
+**Why.** `verma2026blindresampling` finds that blind resampling beats or ties
+self-repair under matched retries in small code models and explicitly shows
+that a no-retry baseline credits feedback for persistence. The recent
+counterweight `bilal2026refining` reports refinement gains over best-of-N on
+mathematical reasoning, but its authors state that their main comparison fixes
+sample count rather than total TFLOPs and is **not** a direct equal-budget
+comparison. Those scopes do not decide the Bangla generation result; together
+they make the missing control indefensible. **What the search changed:** the
+old proposal was a fixed best-of-N row. It is replaced by a realized-compute
+match plus the full nested prefix frontier, because equal calls can carry very
+different context and output-token costs.
+
+### Decision 11 — add a byte-identical external-role self-critique control
+
+Rows 7a and 7b share the initial draft and the generated critique string. Row
+7a presents that critique as the model's own prior assistant content; row 7b
+re-presents the **same bytes** as a new `user` message. SHA-256 equality is a
+run-time gate before revision, and both revision calls use the same seed. No
+trained verifier appears in either row. Verifier-B scores only the final texts.
+
+The `user` role is fixed now, rather than selected after outcomes.
+`selfcorrectionillusion2026` holds erroneous claims byte-identical and reports
+23–93 percentage-point correction lifts from external role relabelling across
+13 model/domain cells, including Gemma-3-12B; the best role is domain-dependent.
+User role is the natural carrier for opinion/text claims and avoids installing
+model-generated critique as trusted system memory. The paper's failure-pool,
+reasoning-task scope is a transfer limitation, not a reason to omit the control.
+**What the search changed:** row 7b moves from an optional diagnostic to a main
+paired control. A row-6 gain over intrinsic row 7a is not attributed to the
+trained verifier unless it also survives row 7b and the matched-compute row 9.
+
+### Consequences for the registered table
+
+The main experiment now has **10 conditions**, hence 90 plots × 2 levels × 10
+= **1,800 condition-cases per language**. That count is not represented as LLM
+calls; multi-call costs are measured. S4.5a also supersedes the old phrase
+"full hybrid gate": row 6 is the proposed **neural gate plus symbolic
+diagnostic feedback**, while row 4 removes symbolic diagnostics from feedback
+and row 5 remains the symbolic-only gating ablation. No single hybrid weight is
+selected. All outcome quality remains Verifier-B-only.
 
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.

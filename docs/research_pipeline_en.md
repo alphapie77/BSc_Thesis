@@ -178,7 +178,7 @@
 ☑ 18. Loop dynamics + failure taxonomy [§4.6] — **DONE 2026-08-20.** Non-monotone per-attempt A/symbolic/B curves, per-level retry rates, accepted-stop vs emitted-attempt distributions, frontier figure, and complete census of all **8** observed three-time gate failures. 🔴 Deviations: 8 not the impossible 50; Sabbir waived independent Coder-B after reviewing Coder-A, so the final taxonomy is explicitly single-coder/user-endorsed with `agreement=null`.
 
 **Weeks 9–12 — Experiments (S6)**
-☐ 19. Main run 8×2×100×3 (overnight batches) [§5.1] — all scoring via Verifier-B
+☐ 19. Main run **10 conditions × 2 languages × 90 eval plots × 2 levels = 3,600 condition-cases** (1,800/language; multi-call rows logged separately) [§5.1] — all outcome scoring via Verifier-B
 ☐ 20. Goodhart figures [§5.3] + plot-level realism test [§5.4] + cross-lingual Δ table [§5.5] + mini-ablations [§5.1b]
 ☐ 21. Statistics: bootstrap CIs + BH correction + effect sizes, ≥3 seeds [§5.6]
 ☐ 22. Human eval: 100 generated items × 3 annotators [§5.2]
@@ -225,7 +225,7 @@ Raw 5,000 ──clean (drop dup 204 + short 72 + null 1)──► usable = 4,730
 | **S3** Human gold | nothing | **region-A-**stratified 300 → gold labels + Fleiss κ **and** Krippendorff's α (ordinal) | **G2:** α < 0.667 → revise guideline + re-annotate; failing twice → reframe claim ("theory-driven scheme, validated learnability") |
 | **S4** Verifier training | **bn-A, bn-B, en-A, en-B** (4 classifiers) + symbolic-weight LR ×2 + temperature scaling ×4 | R1/R2 → dual accuracy (weak-label **and** gold), calibration (ECE before/after) | **G3:** gold accuracy < ~55% (chance=33%) → verifier too weak; increase symbolic weight / inspect data |
 | **S5** Loop build + τ sweep | nothing (calibration only) | Verifier-A + R1-RAG → LangGraph loop, τ swept at **quantiles of the observed score distribution** (~~0.30–0.95 uniform~~ struck, decision 17) on dev-plots, operating point | **G4:** ~~if first-attempt pass rate doesn't reach 60–70%, raise τ~~ **STRUCK** (decision 19 — an unreachable target that could not be derived). Replaced: **τ\* = argmax [quality(τ) − α_lo] / E[calls](τ)**, both endpoints scored by **Verifier-B, never A**. The underlying worry survives and is kept: *"everything passes" means the loop is dead* — but it is now read off the frontier, not enforced by a target |
-| **S6** Experiments | nothing (all inference) | 8 conditions × 2 languages × **90 eval-plots** (disjoint from dev-30) × ~~3 personas~~ **2 axis levels** (corrected 2026-08-11) → master table, Goodhart figures, plot-level realism JS (§5.4) | All scoring via **Verifier-B + human eval**; A stays inside the loop only. ⚠️ **Verifier-B's calibration improvement is NOT established** (null fired 2026-08-11) — report that beside the Goodhart test, since B is the scorer here |
+| **S6** Experiments | nothing (all inference) | **10 conditions** × 2 languages × **90 eval-plots** (disjoint from dev-30) × ~~3 personas~~ **2 axis levels** → master table, Goodhart figures, plot-level realism JS (§5.4) | All outcome scoring via **Verifier-B + human eval**; A stays inside the loop/row-9 selection only. ⚠️ **Verifier-B's calibration improvement is NOT established** (null fired 2026-08-11) — report that beside the Goodhart test, since B is the scorer here |
 
 **Total trained artifacts: 10** (4 verifiers + 2 LR + 4 temperature scalings) — all small, all free-Colab. **No LLM is ever trained** — generation is prompted only.
 
@@ -530,17 +530,21 @@ template repeat).
 ### 5.1 Main ablation table (identical in both languages)
 | # | Condition | Tests |
 |---|---|---|
-| 1 | Zero-shot persona prompt | Is prompting enough? |
+| 1 | Zero-shot axis-level prompt | Is prompting enough? |
 | 2 | Few-shot (static examples) | Do examples alone suffice? |
 | 3 | RAG only (no verifier) | Retrieval's contribution |
-| 4 | RAG + neural-only verifier + loop | Is symbolic needed? |
-| 5 | RAG + symbolic-only + loop | Is neural needed? |
-| 6 | **Full hybrid (proposed)** | — |
-| 7 | ⭐ Self-critique (same LLM critiques itself) | **Intrinsic vs extrinsic — the headline baseline** |
+| 4 | RAG + neural-only verifier + loop, **no symbolic diagnostics in feedback** | Do symbolic diagnostics help the correction step? |
+| 5 | RAG + symbolic-only gate + loop | Is neural gating needed? |
+| 6 | **Proposed: RAG + neural gate + symbolic diagnostic feedback** | Gate/diagnosis separation established by S4.5a |
+| 7a | ⭐ Intrinsic self-critique (same LLM critiques itself) | **Intrinsic vs trained-extrinsic — headline baseline** |
+| 7b | External-role self-critique; same critique bytes as 7a, re-presented under `user` role | Does role relabelling explain an apparent external-critic gain? |
 | 8 | LLM-as-judge critic (Gemini judges) | Cheap trained verifier vs large LLM judge |
+| 9 | RAG + blind resampling + Verifier-A best-of-budget selection | Does refinement beat fresh sampling at matched inference compute? |
 
-- **Scale:** **90** eval-plots (never dev-plots) × ~~3 personas~~ **2 axis levels** × 8 conditions = ~~2,160~~ **1,440 generations per language** (~~৳0 on Groq~~ ৳0, local T4 — 2026-08-12; overnight batches). 🔴 **Corrected 2026-08-11.** Stale since K = 2 was selected on 2026-08-03 — **a one-third reduction in experiment size, cost and CI width** that sat unrecorded in the normative spec for eight days.
-- Row 7 < Row 6 → external verification is necessary in low-resource — **the headline, a direct extension of Huang et al.**
+- **Scale:** **90** eval-plots (never dev-plots) × **2 axis levels** × **10 conditions = 1,800 condition-cases per language**. This is not a generation-call count: rows 4–9 are multi-call and every realized input/output token count is logged. 🔴 **Amended 2026-08-20 before Phase-5 generation:** decisions 9 and 11 added two strong controls after the 2025–26 literature audit.
+- **Row 9 matching rule (frozen before generation):** generate a nested pool of at most five independent Writer samples from the exact row-3 RAG prompt, with no prior draft or feedback. Verifier-A selects the best prefix; the primary prefix size is the largest whose realized generator FLOPs do not exceed row 6's realized generator FLOPs for the same plot/level. Selection uses A; outcome scoring uses B. Report the full prefix frontier 1–5 and all token/FLOP totals.
+- **Rows 7a/7b role control (frozen before generation):** share the initial draft and critique text. SHA-256 must confirm identical critique bytes; only the wrapper/chat role changes for the revision, and the revision seed is shared. Row 7b uses the `user` role, selected before data because it is the strongest natural external source for logical/textual claims in `selfcorrectionillusion2026` and avoids treating generated critique as trusted system memory.
+- Row 7a < Row 6, while row 6 also exceeds 7b and row 9 at matched cost → evidence specifically for trained external verification rather than extra compute or role relabelling. Any other ordering narrows the claim and is reported as such.
 - Row 8 ≈ Row 6 at 1/40th the cost → the efficiency claim. (Note LLM-judge biases to discuss: position, verbosity, self-preference; degraded reliability in lower-resource languages — further motivation for a *trained* critic.)
 
 ### 5.1b Mini-ablations (small, on dev-plots, bn only)
@@ -577,7 +581,7 @@ The key table: Δ (improvement over zero-shot) per condition — English column 
 
 ### 5.6 Statistics
 - **Paired bootstrap** (10,000 resamples, 95% CI) for the main metrics; **McNemar** for paired binary outcomes.
-- **Multiple-comparison correction: Benjamini–Hochberg (FDR)** across the 8 conditions (or Holm — state which). Never "p<0.05" alone — always effect sizes (Cohen's d or absolute Δ + CI).
+- **Multiple-comparison correction: Benjamini–Hochberg (FDR)** across the **10 conditions** (or Holm — state which). Never "p<0.05" alone — always effect sizes (Cohen's d or absolute Δ + CI).
 - **≥3 seeds/runs per arm** (API sampling is stochastic) → mean±SD; all comparisons paired.
 - **N=300 justification:** show the bootstrap-CI width at 300 and the minimum detectable effect; cite Card et al. 2020 (EMNLP, "With Little Power Comes Great Responsibility").
 - *Framework: Dror et al. 2018 (ACL), "The Hitchhiker's Guide to Testing Statistical Significance in NLP."*

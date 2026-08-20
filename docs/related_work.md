@@ -94,16 +94,18 @@ the paper that names our direction as the promising one.**
 use an external verifier." They did not test our setting, and an examiner who
 has read the paper will say so.
 
-**Consequences for our design (raised as open questions, not adopted):**
+**Consequences for our design (raised here on 2026-08-01; resolved before
+Phase-5 generation on 2026-08-20):**
 1. **Inference-cost matching.** §6 asks that self-correction be compared against
    baselines *"with comparable inference costs"*. Our ablation rows 1–3 are
    single-call; rows 4–8 loop. Row 6 beating row 1 may be partly a call-count
-   effect. → see open decision 9.
+   effect. → **decision 9 closed: add realized-compute-matched row 9.**
 2. **A self-consistency / best-of-N baseline at matched calls** is the strong
-   baseline they demand, and our table has none. → open decision 9.
+   baseline they demand. → **row 9 now supplies it.**
 3. **Prompt parity.** Row 1's zero-shot persona prompt must state the persona
    requirement as fully as the verifier feedback does, or our gain is §5's
-   confound wearing our variable names. → open decision 10.
+   confound wearing our variable names. → **decision 10 closed by the shared
+   prompt renderer.**
 
 **Follow-up reading this entry generated:** Cobbe et al. 2021 (already Tier-1 —
 now clearly load-bearing, since Huang et al. point at it as the alternative);
@@ -252,11 +254,11 @@ ablation is right to separate them.
 - **Honest difference:** their verifier **ranks** (best-of-N); ours **gates and
   refines**. Best-of-N is also the cost-matched baseline decision 9 needs.
 - ⬛ Body not read (no arXiv HTML for 2021).
-### [~] selfcorrectionillusion2026 — arXiv 2606.05976
+### [x] selfcorrectionillusion2026 — arXiv 2606.05976
 *The Self-Correction Illusion*
 - **Role:** why external-role feedback works — the Critic's justification.
-- **⚠️ Verify this exists and the ID is correct before citing.** Provenance is
-  weaker than the others; do not carry a citation you have not opened.
+- **Read:** full relevant method/results/limitations via the primary PDF on
+  2026-08-20; arXiv ID and authors verified.
 - **Notes:**
 
 ---
@@ -274,7 +276,34 @@ ablation is right to separate them.
   substitute** — which is why our row 7 should lose, mechanistically.
 - ⚠️ **Scope:** measured on a *failure pool* (tasks where intrinsic correction
   already failed), so lifts are on a pre-selected subset.
-- → **open decision 11**: add row 7b, self-critique under an external role.
+- → **decision 11 CLOSED:** row 7b is a main byte-identical `user`-role control.
+
+### [x] verma2026blindresampling — arXiv 2607.26117
+*Try Again, Don't Look Back: Blind Resampling Outperforms Self-Repair in Small
+Code Models*
+- **Role:** strongest recent argument for Phase-5 decision 9.
+- **Read:** method, results, cost analysis and limitations from the primary PDF,
+  2026-08-20.
+- Four matched-retry arms isolate blind resampling, self-exposure placebo,
+  execution feedback, and reflection on MBPP+ at 1.5B/3B/7B. Blind resampling
+  wins below 7B and ties the best 7B arm while using fewer output tokens.
+- **Design consequence:** comparison against one-shot cannot identify feedback
+  value. Row 9 must use fresh samples and preserve the full nested budget curve.
+- **Transfer bound:** code has executable pass/fail and the studied models are
+  small; this motivates the control but does not predict the Bangla result.
+
+### [x] bilal2026refining — arXiv 2608.05643
+*Refining Over Resampling: Test-Time Self-Correction for LLM Reasoning*
+- **Role:** recent counterweight to a blanket "resampling always wins" claim.
+- **Read:** method, baselines, compute accounting, results and limitations from
+  the primary PDF, 2026-08-20.
+- Breadth–depth refinement beats several N=8 sampling/selection baselines on
+  mathematical reasoning in the reported experiments. Crucially, the authors
+  state that the main comparison fixes sample count, **not total TFLOPs**, and
+  is not a direct equal-budget comparison.
+- **Design consequence:** report both quality and realized compute; do not use
+  this paper to assume which Phase-5 arm will win. Open-ended controlled text is
+  outside its evaluated scope.
 ## Tier 2 — Method citations (each defends one design choice)
 
 | Key | Paper | Defends |
