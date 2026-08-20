@@ -31,11 +31,14 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.agents.build_index import (  # noqa: E402
     IndexContractError,
+    assert_matches_committed_manifest,
     assert_rag_contract,
     id_digest,
 )
@@ -99,6 +102,16 @@ def test_digest_is_order_independent_but_membership_sensitive():
         "digest did not change when a row was removed — it is not evidence "
         "of anything"
     )
+
+
+def test_runtime_index_must_match_committed_manifest_without_rewriting(tmp_path):
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps({"result": {"n_indexed": 2}}), encoding="utf-8")
+    before = path.read_bytes()
+    assert_matches_committed_manifest({"n_indexed": 2}, path)
+    assert path.read_bytes() == before
+    with pytest.raises(IndexContractError, match="differs"):
+        assert_matches_committed_manifest({"n_indexed": 3}, path)
 
 
 def test_verifier_b_is_unreachable_from_the_loop_package():

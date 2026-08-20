@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.agents.critic import Critic  # noqa: E402
 from src.agents.prompts import render  # noqa: E402
 from src.agents.researcher import Researcher  # noqa: E402
-from src.common.provenance import stamp  # noqa: E402
+from src.common.provenance import git_hash, stamp  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 from src.eval.gemini_judge import GeminiJudge  # noqa: E402
 from src.eval.preflight_s5 import preflight  # noqa: E402
@@ -31,17 +31,40 @@ from src.eval.s5_engine import (  # noqa: E402
 from src.verifier.split_access import load_training_rows  # noqa: E402
 
 
-def _jsonl_by_key(path: str | Path) -> dict[str, dict]:
+class S5ResumeError(RuntimeError):
+    """A checkpoint cannot be proven compatible with this runner."""
+
+
+def _jsonl_by_key(
+    path: str | Path, *, expected_commit: str | None = None,
+) -> dict[str, dict]:
     p = Path(path)
     if not p.exists():
         return {}
     out = {}
-    for line in p.read_text(encoding="utf-8").splitlines():
+    for lineno, line in enumerate(
+        p.read_text(encoding="utf-8").splitlines(), start=1,
+    ):
+        if not line.strip():
+            continue
         try:
             row = json.loads(line)
-            out[row["key"]] = row
-        except Exception:
-            continue
+            key = row["key"]
+        except Exception as exc:
+            raise S5ResumeError(
+                f"invalid checkpoint row {p}:{lineno}: {exc}"
+            ) from exc
+        if key in out:
+            raise S5ResumeError(f"duplicate checkpoint key in {p}: {key}")
+        if expected_commit is not None:
+            actual = row.get("provenance", {}).get("git_commit")
+            if actual != expected_commit:
+                raise S5ResumeError(
+                    f"checkpoint {p.name} was produced by {actual!r}, expected "
+                    f"clean runner {expected_commit!r}; start fresh or attach a "
+                    "checkpoint exported by this exact notebook"
+                )
+        out[key] = row
     return out
 
 
@@ -158,6 +181,22 @@ def main() -> int:
     else:
         base_cases = base_cases[args.start:]
 
+    expected_commit = git_hash()
+    if expected_commit.endswith("-dirty") or expected_commit == "unknown":
+        raise S5ResumeError(
+            f"refusing generation from non-clean runner checkout {expected_commit!r}"
+        )
+    # Validate every restored archive before loading LaBSE or the 12B Writer.
+    call_archive = _jsonl_by_key(
+        out["calls_jsonl"], expected_commit=expected_commit,
+    )
+    completed = _jsonl_by_key(
+        out["cases_jsonl"], expected_commit=expected_commit,
+    )
+    _jsonl_by_key(
+        out["gemini_calls_jsonl"], expected_commit=expected_commit,
+    )
+
     rows, _ = load_training_rows(
         "A", split_map=inputs["split_map"],
         k2_assignments=inputs["k2_assignments"],
@@ -191,8 +230,6 @@ def main() -> int:
         max_new_tokens=int(writer_cfg["max_new_tokens"]),
         model_path=args.model_path,
     )
-    call_archive = _jsonl_by_key(out["calls_jsonl"])
-    completed = _jsonl_by_key(out["cases_jsonl"])
     total_rows = len(base_cases) * len(CONDITIONS)
     already = sum(
         _case_key(seed, p.plot_id, level, c) in completed

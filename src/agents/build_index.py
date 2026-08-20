@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import sys
 from pathlib import Path
 
@@ -176,6 +177,22 @@ def build(cfg: dict) -> dict:
     }
 
 
+def assert_matches_committed_manifest(res: dict, manifest_path: str | Path) -> None:
+    """Verify a runtime rebuild without rewriting the tracked S4 artifact."""
+    path = Path(manifest_path)
+    try:
+        expected = json.loads(path.read_text(encoding="utf-8"))["result"]
+    except Exception as exc:
+        raise IndexContractError(
+            f"cannot read committed RAG manifest {path}: {exc}"
+        ) from exc
+    if res != expected:
+        raise IndexContractError(
+            "runtime RAG rebuild differs from the committed manifest; refusing "
+            "generation because retrieval membership/configuration drifted"
+        )
+
+
 def render_md(res: dict, cfg: dict) -> str:
     lines = [
         "# S4.1 — the R1-only retrieval index",
@@ -227,6 +244,12 @@ def main() -> None:
              "encoder or writing an index. Runs on CPU in seconds and is what "
              "CI uses -- the wall is testable without a model.",
     )
+    ap.add_argument(
+        "--index-only",
+        action="store_true",
+        help="Build the binary runtime index, verify it against the committed "
+             "manifest, and leave tracked result files untouched.",
+    )
     args = ap.parse_args()
 
     set_seed()
@@ -251,6 +274,13 @@ def main() -> None:
         return
 
     res = build(cfg)
+    if args.index_only:
+        assert_matches_committed_manifest(res, cfg["outputs"]["manifest_json"])
+        print(
+            f"indexed {res['n_indexed']} rows -> {res['persist_dir']} "
+            f"({res['collection']}); committed manifest matched; not rewritten"
+        )
+        return
     write_result(res, cfg["outputs"]["manifest_json"], config_path=args.config)
     write_text_lf(cfg["outputs"]["manifest_md"], render_md(res, cfg))
     print(

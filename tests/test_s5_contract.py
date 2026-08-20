@@ -19,6 +19,7 @@ from src.eval.s5_contract import (
 )
 from src.verifier.split_access import load_training_rows
 from src.eval.preflight_s5 import preflight
+from src.eval.run_s5_main_bn import S5ResumeError, _jsonl_by_key
 
 import yaml
 
@@ -139,3 +140,24 @@ def test_config_preserves_realized_s4_single_item_batch_path():
     with open(ROOT / "configs/s5_main_bn.yaml", encoding="utf-8") as fh:
         cfg = yaml.safe_load(fh)
     assert cfg["writer"]["batch_size"] == 1
+
+
+def test_resume_archive_requires_clean_exact_commit_and_unique_valid_rows(tmp_path):
+    path = tmp_path / "calls.jsonl"
+    clean = {
+        "key": "k1", "provenance": {"git_commit": "abc123"},
+    }
+    path.write_text(json.dumps(clean) + "\n", encoding="utf-8")
+    assert set(_jsonl_by_key(path, expected_commit="abc123")) == {"k1"}
+
+    path.write_text(json.dumps(clean) + "\n" + json.dumps(clean) + "\n", encoding="utf-8")
+    with pytest.raises(S5ResumeError, match="duplicate"):
+        _jsonl_by_key(path, expected_commit="abc123")
+
+    path.write_text(json.dumps(clean) + "\n", encoding="utf-8")
+    with pytest.raises(S5ResumeError, match="expected clean runner"):
+        _jsonl_by_key(path, expected_commit="different")
+
+    path.write_text("not-json\n", encoding="utf-8")
+    with pytest.raises(S5ResumeError, match="invalid checkpoint row"):
+        _jsonl_by_key(path, expected_commit="abc123")
