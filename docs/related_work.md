@@ -641,6 +641,8 @@ or a best-seed selection surface.
 |---|---|---|---|
 | `yang2026judgechanges` | Yang, Hou & Yang, arXiv 2607.08535 | `[x]` primary paper | Replacing a judge changes the measurement even when candidate responses are fixed; model upgrades are not interchangeable. Forces a distinct Gemma-4 condition, full restart of row 8, and separate archival of all Gemini-3.6 traces. |
 | `pombal2026selfpreference` | Pombal, Rei & Martins, COLM 2026 / arXiv 2604.06996 | `[x]` primary paper | Rubric-based judges can favor their own outputs and outputs from their model family; the paper reports family-level effects for Gemma. Forces the label “hosted cross-generation same-family judge,” forbids an independence claim, and keeps Verifier-B as the sole final outcome scorer. |
+| `fu2025multilingualjudge` | Fu & Liu, Findings of EMNLP 2025 | `[x]` primary paper | Across 25 languages, LLM-judge consistency varies substantially and is particularly poor in lower-resource languages. Confirms that the hosted judge is a treatment-side diagnostic only, never a Bangla outcome scorer. |
+| `ponce2026basquejudge` | Ponce et al., LREC 2026 | `[x]` primary paper | In a low-resource Basque case study, state-of-the-art LLM judges correlate poorly with humans and with one another. Confirms the same limitation from a targeted low-resource setting and supports retaining the sealed task-trained Verifier-B for final S6 scoring. |
 
 **Provider evidence.** Google's official Gemma API guide lists
 `gemma-4-26b-a4b-it`; the Interactions reference lists the same model and

@@ -28,15 +28,19 @@ def test_notebook_is_runner_only_and_pins_a_full_commit():
     assert "'--index-only'" in code
 
 
-def test_notebook_defaults_to_smoke_only_and_exports_all_resume_archives():
+def test_notebook_resumes_the_verified_smoke_with_chunk_zero_and_exports_audit_artifacts():
     nb = _nb()
     code = "\n".join("".join(c.get("source", [])) for c in nb["cells"])
-    assert "RUN_SMOKE = True" in code
-    assert "RUN_CHUNK = False" in code
+    assert "RUN_SMOKE = False" in code
+    assert "RUN_CHUNK = True" in code
+    assert "REPLICATE_SEED = 42" in code
+    assert "START_CASE = 0" in code
+    assert "N_CASES = 20" in code
     assert "'--limit','1'" in code
     for name in (
         "s5_main_bn_calls.jsonl", "s5_main_bn_gemini_calls.jsonl",
-        "s5_main_bn_cases.jsonl", "s5_checkpoint.zip",
+        "s5_main_bn_cases.jsonl", "s5_main_bn_preflight.json",
+        "s5_checkpoint.zip",
     ):
         assert name in code
 
@@ -49,11 +53,11 @@ def test_kaggle_work_cells_are_restart_safe_and_model_input_is_unambiguous():
         if cell["cell_type"] == "code"
         and any(marker in "".join(cell.get("source", [])) for marker in (
             "bn_clean.csv", "restore = {", "preflight_s5_kaggle.py",
-            "RUN_SMOKE = True", "RUN_CHUNK = False", "snapshot =",
+            "RUN_SMOKE = False", "RUN_CHUNK = True", "snapshot =",
         ))
     ]
     assert len(work_cells) == 6
-    assert all("REPO = Path('/kaggle/working/s5_repo_510a95c')" in cell for cell in work_cells)
+    assert all("REPO = Path('/kaggle/working/s5_repo_9e00d2e')" in cell for cell in work_cells)
     assert all("os.chdir(REPO)" in cell for cell in work_cells)
     setup = next(cell for cell in work_cells if "bn_clean.csv" in cell)
     assert "assert len(clean) == 1" in setup
