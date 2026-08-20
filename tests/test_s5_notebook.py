@@ -25,6 +25,7 @@ def test_notebook_is_runner_only_and_pins_a_full_commit():
     assert "Verifier-B" not in code and "verifier_b" not in code.lower()
     assert code.index("preflight_s5_kaggle.py") < code.index("build_index.py")
     assert code.index("preflight_s5_kaggle.py") < code.index("run_s5_main_bn.py")
+    assert "'--index-only'" in code
 
 
 def test_notebook_defaults_to_smoke_only_and_exports_all_resume_archives():
@@ -52,7 +53,7 @@ def test_kaggle_work_cells_are_restart_safe_and_model_input_is_unambiguous():
         ))
     ]
     assert len(work_cells) == 6
-    assert all("REPO = Path('/kaggle/working/s5_repo_febae25')" in cell for cell in work_cells)
+    assert all("REPO = Path('/kaggle/working/s5_repo_a70cd28')" in cell for cell in work_cells)
     assert all("os.chdir(REPO)" in cell for cell in work_cells)
     setup = next(cell for cell in work_cells if "bn_clean.csv" in cell)
     assert "assert len(clean) == 1" in setup
