@@ -1,0 +1,20 @@
+# S4.6 -- user-authorized single-coder finalization after double-coding waiver.
+# This is an explicit post-run protocol deviation. No agreement statistic is
+# available, and user endorsement after seeing Coder-A is not a second coding.
+
+step: S4.6-taxonomy-single
+seed: 42
+
+input:
+  coder_a_csv: data/annotation/s4_failure_taxonomy_coder_a.csv
+  expected_cases: 8
+
+audit:
+  coder_a_identity: Codex acting under Sabbir's explicit authorization
+  user_reviewed_coder_a_before_endorsement: true
+  independent_coder_b: false
+  agreement_available: false
+  finalization_status: single_coder_user_endorsed_protocol_deviation
+
+output:
+  taxonomy_json: results/s4_failure_taxonomy.json
