@@ -1,0 +1,23 @@
+# S4.6 -- descriptive loop dynamics on the frozen S4.5b maximum traces.
+# This report does not select tau or alter the loop. Verifier-B remains an
+# evaluation-only signal; oracle quantities are labelled post-hoc diagnostics.
+
+step: S4.6
+seed: 42
+
+input:
+  max_traces_jsonl: results/s4_tau_max_traces.jsonl
+  tau_report_json: results/s4_tau_frontier.json
+  expected_cases: 60
+  expected_attempts: 3
+
+analysis:
+  headline_scope: global
+  per_level_reporting: mandatory
+  edit_distance: character_levenshtein_normalized_by_max_length
+  direction_tolerance: 0.0
+  oracle_status: post_hoc_descriptive_only
+
+output:
+  report_json: results/s4_loop_dynamics.json
+  figure_svg: docs/figures/s4_loop_dynamics.svg

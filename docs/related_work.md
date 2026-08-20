@@ -535,7 +535,7 @@ interesting individually.**
 |---|---|---|---|
 | `axiv2606_23196_intrinsicsc` | arXiv 2606.23196, 2026-06-22 | `[~]` **abstract only** | 🎁 **A scope distinction that protects the thesis rather than threatening it.** Studies **intrinsic** self-correction — a model revisiting its own answer *"without external feedback"* — and reports its reliability is contested. **Ours is extrinsic by construction**: a trained external verifier, and a Critic that is never the Writer's model. **So this literature does not refute the design; it characterises the design ours was built to avoid.** ⚠️ Ch.2 must draw that line explicitly — ignoring the sceptical literature and over-claiming against it are both worse than naming the boundary. |
 | `axiv2606_13156_scmirage` | arXiv 2606.13156, 2026-06-11 | `[~]` **abstract only** | Same scope caveat in a vision-language setting. Cited beside `huang2024selfcorrect` as evidence that apparent self-correction gains are **routinely measurement artefacts** — the argument for closing prompt parity **by construction** (§S4 decision 5) rather than by audit. |
-| `axiv2604_22273_scfeedbackcontrol` | arXiv 2604.22273, 2026-04-24 | `[~]` **abstract only** | Recasts refinement as feedback control with **stability thresholds past which repeated correction degrades**. 🔴 Bears on §4.6's requirement that **max-retry = 3 be earned** by the per-iteration curves rather than assumed, and on §5.1b's retry-temperature ablation. **Must be read in full before the §4.6 dynamics report is written.** |
+| `axiv2604_22273_scfeedbackcontrol` | Liu & Meng, arXiv 2604.22273, 2026-04-24 | `[x]` **full body, 2026-08-20** | Recasts **intrinsic**, same-model refinement on binary-correctness reasoning tasks as feedback control. Its EIR/ECR analysis reinforces that repeated correction can degrade, but its near-zero-EIR threshold is **not transferred** to our external-verifier, graded open-text setting; the paper itself names external feedback and open-ended correctness as future scope. It therefore forces per-iteration improve/worsen reporting, not a new stopping threshold. |
 | `axiv2604_18490_lqm` | arXiv 2604.18490, 2026-04-20 | `[~]` **abstract only** | The general form of our concrete gap: established evaluation schemes including **MQM are "largely language-agnostic"** and miss language-specific phenomena. §4.6's four failure categories inherit exactly such a generic list and **cannot name a Bangla register or honorific failure**. Forces §S4 decision 6. |
 | `axiv2606_10765_arabigee` | arXiv 2606.10765, 2026-06-09 | `[~]` **abstract only** | Precedent for a **language-specific hierarchical error taxonomy** in a non-English language — evidence that extending §4.6's list for Bangla is normal practice, not an ad hoc departure. |
 | `axiv2608_03966_hallutruthqa` | arXiv 2608.03966, 2026-08-04 | `[~]` **abstract only** | Comparable low-resource resources *"often assign a binary label"*; fine-grained is the improvement. Supports a multi-category taxonomy with a **reported `other` rate** over pass/fail coding. |
@@ -554,6 +554,21 @@ interesting individually.**
 | `liu2026openrubrics` | Liu et al., arXiv 2510.07743 v3 (2026) | Separates hard rules from implicit principles. Supports keeping exact symbolic rules as structured diagnostic evidence without treating their scalar combination as a validated gate. |
 | `wang2026nlhf` | Wang et al., ICML 2026, arXiv 2601.07349 | A binary outcome can be correct while the critique is unsound; process-level natural-language feedback supplies information that outcome labels omit. Supports retaining failed-rule traces. |
 | `anugraha2026mr3` | Anugraha et al., ICLR 2026, arXiv 2510.01146 | English LLM-judge performance does not reliably generalise to non-English evaluation. Argues against replacing the Bangla-specific verifier/diagnostic path with a convenient English judge. |
+
+### Tier 10d — Retry dynamics after the frozen tau run (added 2026-08-20)
+
+> Searched before defining the additional **descriptive** S4.6 diagnostics.
+> Consensus was still unavailable until 2026-09-01; alphaXiv discovery was
+> followed by the primary arXiv records. These papers changed the analysis, not
+> the registered gate or selected tau: A/B direction disagreement, independent-
+> B oracle headroom, and raw edit magnitude are now reported. No paper-specific
+> cutoff is imported across domains.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `kiecker2026magicnumber` | Kiecker et al., arXiv 2607.05197 | `[~]` abstract + primary record | Across externally validated software-repair tasks, the first 3–4 repairs capture most gains and later returns are marginal. This supports treating retry budget as measured, but compiler/test feedback and up to ten code repairs do not identify the right cutoff for Bangla audience comments. |
+| `kim2026judgeutility` | Kim, arXiv 2607.13347 | `[~]` abstract + primary record | A judge may evaluate yet fail to select the best revision; mean neutrality can hide severe per-item regressions. Forces A↔B direction tables and a clearly post-hoc independent-B oracle-headroom diagnostic, while Verifier-B remains outside the loop. |
+| `wu2026textualrelaxation` | Wu et al., arXiv 2607.22653 | `[~]` abstract + primary record | Recursive text revisions show large early edits and later soft fixed points. Motivates reporting normalized edit magnitude and word-count movement. Its .02/.03 convergence thresholds come from research abstracts and are not transferred to our three-step Bangla traces. |
 
 ---
 
