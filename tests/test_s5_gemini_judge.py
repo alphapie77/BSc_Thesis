@@ -5,7 +5,7 @@ import pytest
 
 from src.eval.gemini_judge import (
     INTERACTIONS_URL, GeminiJudge, GeminiJudgeError, interaction_request,
-    interaction_text, validate_payload,
+    interaction_text, parse_structured_response, validate_payload,
 )
 
 
@@ -70,6 +70,16 @@ def test_interaction_text_requires_one_completed_model_output():
     raw["status"] = "failed"
     with pytest.raises(GeminiJudgeError, match="not completed"):
         interaction_text(raw)
+
+
+def test_structured_response_accepts_one_valid_object_and_archives_prose_suffix():
+    payload, suffix = parse_structured_response(
+        '{"verdict":"PASS","target_fit_score":100,"feedback":""}\nআর কোনো মন্তব্য নেই।'
+    )
+    assert payload["verdict"] == "PASS"
+    assert suffix == "আর কোনো মন্তব্য নেই।"
+    with pytest.raises(GeminiJudgeError, match="multiple JSON"):
+        parse_structured_response('{"verdict":"PASS"}\n{"verdict":"FAIL"}')
 
 
 def test_call_is_archived_and_second_call_resumes(tmp_path: Path):

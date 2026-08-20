@@ -78,6 +78,34 @@ def interaction_text(raw: dict) -> str:
     return texts[0]
 
 
+def parse_structured_response(text: str) -> tuple[dict, str]:
+    """Decode one JSON object and losslessly retain any non-JSON suffix.
+
+    Gemma's Interactions structured-output mode can occasionally append prose
+    after an otherwise valid object.  The verdict may be used only when the
+    leading object passes the frozen schema below; the suffix is retained in
+    the append-only archive for audit.  A second JSON value is ambiguous and
+    remains a hard failure.
+    """
+    decoder = json.JSONDecoder()
+    start = len(text) - len(text.lstrip())
+    try:
+        payload, end = decoder.raw_decode(text, idx=start)
+    except json.JSONDecodeError as exc:
+        raise GeminiJudgeError(f"response does not begin with JSON: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise GeminiJudgeError("structured Gemini response must begin with an object")
+    suffix = text[end:].strip()
+    if suffix:
+        try:
+            decoder.raw_decode(suffix)
+        except json.JSONDecodeError:
+            pass
+        else:
+            raise GeminiJudgeError("structured Gemini response contains multiple JSON values")
+    return payload, suffix
+
+
 @dataclass(frozen=True)
 class GeminiVerdict:
     verdict: str
@@ -283,7 +311,7 @@ class GeminiJudge:
         raw = response.json()
         try:
             text = interaction_text(raw)
-            parsed = json.loads(text)
+            parsed, trailing_text = parse_structured_response(text)
             verdict, score, feedback = validate_payload(parsed)
         except Exception as exc:
             raise GeminiJudgeError(f"invalid structured Gemini response: {exc}") from exc
@@ -291,6 +319,7 @@ class GeminiJudge:
             "key": key,
             "prompt": prompt,
             "parsed": parsed,
+            "trailing_text": trailing_text,
             "raw": raw,
             "usage": raw.get("usage", {}),
             "model": self.model,
