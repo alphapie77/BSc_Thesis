@@ -3,6 +3,10 @@ step: S5.main.bn
 seed: 42
 replicate_seeds: [42, 43, 44]
 
+runtime:
+  scikit_learn: 1.9.0  # symbolic artifact runtime, frozen by S4.5a repair
+  transformers: 5.15.0  # exact nf4 runtime that produced the S4 archive
+
 inputs:
   plots_csv: data/plots/plots_bn.csv
   split_map: data/splits/split_map_v1.json

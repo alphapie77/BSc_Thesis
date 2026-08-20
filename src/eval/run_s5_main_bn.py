@@ -163,6 +163,12 @@ def main() -> int:
         k2_assignments=inputs["k2_assignments"],
         cleaned_csv=inputs["cleaned_csv"], hold_out_dev=False,
     )
+    # Credential failure must happen before LaBSE and the 12B Writer load.
+    # Construction is network-free: the first request is made inside row 8.
+    gemini = GeminiJudge(
+        model=cfg["gemini_judge"]["model"],
+        archive_path=out["gemini_calls_jsonl"],
+    )
     rag_cfg = cfg["rag"]
     researcher = Researcher(
         rag_cfg["persist_dir"], rag_cfg["collection"], rag_cfg["encoder"],
@@ -171,7 +177,8 @@ def main() -> int:
     critic = Critic(
         verifier_a_path=inputs["verifier_a"],
         symbolic_path=inputs["symbolic_scorer"],
-        required_sklearn_version="1.9.0", encoder_device="cpu",
+        required_sklearn_version=str(cfg["runtime"]["scikit_learn"]),
+        encoder_device="cpu",
     )
     from src.agents.local_writer import LocalWriter
     writer_cfg = cfg["writer"]
@@ -181,10 +188,6 @@ def main() -> int:
         quantization=writer_cfg["quantization"],
         max_new_tokens=int(writer_cfg["max_new_tokens"]),
         model_path=args.model_path,
-    )
-    gemini = GeminiJudge(
-        model=cfg["gemini_judge"]["model"],
-        archive_path=out["gemini_calls_jsonl"],
     )
     call_archive = _jsonl_by_key(out["calls_jsonl"])
     completed = _jsonl_by_key(out["cases_jsonl"])
