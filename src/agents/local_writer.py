@@ -211,11 +211,39 @@ class LocalWriter:
             add_generation_prompt=True,
         )
 
+    def _render_messages(self, messages: list[dict]) -> str:
+        if not messages or any(
+            m.get("role") not in {"user", "assistant", "system"}
+            or not isinstance(m.get("content"), str)
+            for m in messages
+        ):
+            raise ValueError("messages must contain valid role/content strings")
+        return self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+
     def generate_batch(self, items: list[dict]) -> list[Generation]:
         """Generate for a list of {prompt, plot_id, target_level, attempt}."""
         import torch
 
-        texts = [self._render_chat(it["prompt"]) for it in items]
+        if not items or len(items) > self.batch_size:
+            raise ValueError(
+                f"generate_batch received {len(items)} items; registered batch "
+                f"size is {self.batch_size}"
+            )
+        seeds = {int(it.get("sample_seed", SEED)) for it in items}
+        if len(seeds) != 1:
+            raise ValueError("one local batch cannot mix sampling seeds")
+        sample_seed = next(iter(seeds))
+        torch.manual_seed(sample_seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(sample_seed)
+        texts = [
+            self._render_messages(it["messages"])
+            if it.get("messages") is not None
+            else self._render_chat(it["prompt"])
+            for it in items
+        ]
         enc = self.tokenizer(
             texts, return_tensors="pt", padding=True, add_special_tokens=False
         ).to(self.model.device)
@@ -237,7 +265,7 @@ class LocalWriter:
             text = self.tokenizer.decode(completion, skip_special_tokens=True).strip()
             n_completion = int((completion != self.tokenizer.pad_token_id).sum())
             gen = Generation(
-                key=generation_key(
+                key=it.get("key") or generation_key(
                     it["plot_id"], it["target_level"], it.get("attempt", 1),
                     self.arm, self.model_id, "local",
                 ),
@@ -247,11 +275,13 @@ class LocalWriter:
                 arm=self.arm,
                 model=self.model_id,
                 provider="local",
-                prompt=it["prompt"],
+                prompt=(it.get("prompt") or __import__("json").dumps(
+                    it["messages"], ensure_ascii=False
+                )),
                 text=text,
                 temperature=TEMPERATURE,
                 top_p=TOP_P,
-                seed=SEED,
+                seed=sample_seed,
                 # Recorded, and it matters: a completion that stops at the cap
                 # was truncated, and a truncated comment is not a short comment.
                 finish_reason=("length" if n_completion >= self.max_new_tokens
@@ -262,6 +292,9 @@ class LocalWriter:
                     "total_tokens": int(prompt_len) + n_completion,
                 },
                 provenance=stamp(config_path=None, extra=self._env),
+                condition=it.get("condition"),
+                replicate_seed=it.get("replicate_seed"),
+                call_role=it.get("call_role"),
             )
             append_generation(gen, self.jsonl_path)
             gens.append(gen)
@@ -278,5 +311,15 @@ class LocalWriter:
         """
         return self.generate_batch([{
             "prompt": prompt, "plot_id": plot_id,
-            "target_level": target_level, "attempt": attempt,
+            "target_level": target_level, "attempt": attempt, **kw,
+        }])[0]
+
+    def generate_messages(
+        self, *, messages: list[dict], plot_id: str, target_level: int,
+        attempt: int = 1, **kw
+    ) -> Generation:
+        """Role-sensitive Phase-5 call; messages are archived verbatim as JSON."""
+        return self.generate_batch([{
+            "messages": messages, "plot_id": plot_id,
+            "target_level": target_level, "attempt": attempt, **kw,
         }])[0]

@@ -1746,13 +1746,23 @@ selected. All outcome quality remains Verifier-B-only.
 Four details left implicit by the table are fixed here so implementation cannot
 choose them after seeing eval outputs.
 
-1. **Static few-shot (row 2).** Sort the exact R1 region-A review IDs, then make
+1. ~~**Static few-shot (row 2).** Sort the exact R1 region-A review IDs, then make
    one seed-42 stratified random draw of ten examples within each target level.
-   Reuse that fixed ten for every plot, language arm, and replicate. GenICL
+   Reuse that fixed ten for every plot, language arm, and replicate.~~ **Amended
+   before generation:** sort IDs, then make a stratified ten-example draw for
+   each plot × target level × replicate from a SHA-256-derived RNG keyed only by
+   `(42, replicate_seed, plot_id, target_level)`. Plot text and outcomes never
+   enter selection. GenICL
    (`zhang2025genicldemo`) shows that demonstration selection materially changes
    in-context performance; query-conditioned or learned selection would therefore
    collapse row 2 into a second retrieval treatment. The cost is explicit: one
-   pre-declared static draw may be idiosyncratic, and is not tuned.
+   learned/query-specific selection is not adopted. Li et al.
+   (`li2025instance`) show a fixed random-factor setting can synchronously
+   over/under-estimate a system and that instance-level randomization reduces
+   variance; Cegin et al. (`cegin2025randomselection`) find random selection a
+   strong low-resource default. **What changed:** one globally fixed draw became
+   a frozen 540-case instance-randomized schedule; its digest is printed by
+   preflight. It remains non-retrieved few-shot and is never tuned.
 2. **Symbolic-only gate (row 5).** Match row 6's frozen first-pass acceptance
    budget without consulting Verifier-B. Among thresholds induced by the 60
    length-controlled Bangla dev attempt-1 symbolic scores, minimise absolute
@@ -1775,6 +1785,21 @@ choose them after seeing eval outputs.
    both languages. Comparisons pair plot, level and replicate. Seed mean±SD is
    sensitivity reporting only, not a winner rule, consistent with Bethard's
    warning against treating a handful of seeds as an inferential sample.
+5. **Shared initial RAG draft.** Rows 3–9 reuse one byte-identical row-3 draft
+   for each plot/level/replicate. Their logical cost accounts for that initial
+   call separately in every condition; the archive stores it once as a physical
+   call. This is paired common-randomness, not free compute: the results expose
+   both logical and physical calls/tokens. Rows 7a/7b additionally share one
+   critique, and their revision RNG seed is identical; only the critique message
+   role differs. All call RNG seeds are SHA-256-derived from frozen identities,
+   so execution order and resume state cannot consume a shared RNG stream.
+6. **Rows 4/6 feedback parity.** Both make one Reflector call after each failed
+   non-final attempt. Row 4 receives the same renderer with an empty diagnostic
+   list; row 6 receives up to three computed symbolic rule names. Thus the
+   treatment is diagnostic content, not the presence of an extra LLM call.
+   Row 5 gates on the symbolic score and receives symbolic diagnostics. All
+   three stop at three Writer attempts and select their own gate's best attempt,
+   ties earliest.
 
 The Google model identifier and structured-output capability were checked
 against the provider's official model and structured-output documentation on
@@ -1784,11 +1809,24 @@ a machine-validated output schema and an explicit all-fail policy; and the old
 “mean±SD decides” wording was replaced by paired case-level inference with
 replicate blocking.
 
+### S4 batch-path audit discovered while implementing S5 (2026-08-20)
+
+The S4 configs and archived provenance say `batch_size=8`, but both generation
+runners call `LocalWriter.generate()` one case at a time; that method wraps
+`generate_batch([one_item])`. The **realized model batch was therefore 1** for
+all S4 dev and tau generations. The number 8 described constructor metadata,
+not execution. Phase 5 freezes batch 1 to preserve the computational path under
+which tau was fitted. This is an audit correction, not a retrospective rerun:
+S4 results remain the outputs actually generated, and the false batch-8 claim
+must not appear in the paper. Resume keys use independent per-call RNG material,
+so condition order or a partial archive cannot consume a shared RNG stream.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-20 | S5 row 2 and S4/S5 realized batch | The globally fixed static-example draw is superseded before eval generation by deterministic instance-level randomization over plot/level/replicate; selection remains stratified R1-only and non-query-dependent. Phase-5 batch is 1, correcting the nominal `batch_size=8` field to the batch actually used by S4's single-item call path. | Recent primary literature changed the few-shot decision: `li2025instance` shows fixed random settings can bias a whole evaluation and instance-level randomization reduces variance; `cegin2025randomselection` supports random selection as a strong low-resource default. Direct code inspection changed the batch decision: both S4 runners invoke `generate()`, which passes a one-item list. No eval output exists, so both changes precede outcomes. |
 | 2026-08-20 | 🔴 S4 decision 19 / §5.1 endpoint mapping — alpha_lo is row 3 RAG-only, not row 1 zero-shot | The frozen S4 attempt-1 archive contains ten retrieved exemplars in every prompt. Therefore τ=0 ships the RAG-only condition. The numeric frontier, alpha_lo=0.640501 and tau*=0.4384071 remain unchanged; only the incorrect row label and attribution are corrected. Code comments, tests, STATUS, pipeline and handoff now agree. | Found while implementing the Phase-5 runner, before any eval-plot generation. The correction makes the causal comparison cleaner: S4 measures the marginal value of the loop over RAG, while Phase 5 will separately measure zero-shot row 1. No literature search was needed; this is direct prompt-content inspection, not a new method choice. |
 | 2026-08-18 | 🔴 S4 decisions 1, 2 and 19 — gate/diagnosis separation, τ scope correction, explicit upper endpoint | Verifier-A alone now controls PASS/FAIL and best-of-three; symbolic scoring remains active for failed-rule diagnostics. The nonexistent variance-ratio partial-pooling estimator is replaced by one global headline frontier with mandatory per-level reporting and descriptive permutation comparison. α_hi becomes explicit `FORCED_3`, not `τ=1`. | **Observed evidence forced the gate change:** every S4.5a held-out fold selected `w=1` with delta-AUC 0.0000, while symbolic influence on verdicts remained large. **Primary-paper reading forced the scope correction:** Salem et al. (2026) use Bonferroni certification plus leaf-first fallback, not the estimator previously attributed to them; implementing the old text would invent a method. **A code boundary forced the endpoint correction:** calibrated scores can equal 1.0 and `>=` must be retained so α_lo at τ=0 never rejects. Literature searched before deciding; Consensus unavailable until 2026-09-01, so primary arXiv records were used and logged. |
 | 2026-08-18 | 🔴 S4 decision 1 — the three registered `w` outcomes did not cover the observed combination | Both complete conditions produced a **sensitive** verdict curve (50.8% / 39.2% flip share), while all five grouped held-out folds selected the neural-only endpoint `w=1.0` and tied neural-only at delta AUC 0.0000. Thus `SYMBOLIC_INERT` (registered as **flat**), `SYMBOLIC_EARNS_ITS_PLACE` (held-out benefit), and `SYMBOLIC_HARMS` (held-out rejection) all fail literally. The implementation's final catch-all nevertheless emitted `SYMBOLIC_INERT`. The numeric curves and scores are unchanged; the emitted labels are preserved in the JSON and superseded by the audit state `PRECOMMITMENT_UNRESOLVED`, explicitly **not** a fourth post-hoc scientific outcome. | **Third pre-registration coverage defect in three days.** Like the direction error and conjunction gap before it, this came from enumerating expected verbal cases without proving the map covered all combinations of its two measurements. Consequence fixed to the data observed: no hybrid-accuracy claim, no claim of symbolic predictive value, and no single `w` is selected. The symbolic component remains available only for its separately registered failed-rule-naming role. A test now pins the missing sensitive-plus-tie case so it cannot silently fall through again. No literature search was run: this is an audit correction to a logical partition, not a new method, threshold, or scientific design choice. |

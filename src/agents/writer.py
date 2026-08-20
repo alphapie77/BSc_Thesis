@@ -189,6 +189,11 @@ class Generation:
     rate_limits: dict = field(default_factory=dict)
     transport_retries: int = 0
     provenance: dict = field(default_factory=dict)
+    # Phase-5 logical identity. Optional so frozen Phase-4 archives keep their
+    # schema and old call sites remain valid.
+    condition: str | None = None
+    replicate_seed: int | None = None
+    call_role: str | None = None
 
 
 def generation_key(

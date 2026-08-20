@@ -33,6 +33,9 @@ CONDITIONS = (
 )
 
 REPLICATE_SEEDS = (42, 43, 44)
+INTERNAL_CALL_GROUPS = (
+    "shared_rag_initial", "shared_self_critique", "shared_role_revision",
+)
 
 
 class S5ContractError(RuntimeError):
@@ -81,16 +84,22 @@ def load_eval_plots(path: str | Path, *, expected_n: int = 90) -> tuple[EvalPlot
     )
 
 
-def select_static_examples(rows, *, per_level: int = 10, seed: int = 42) -> StaticExamples:
-    """One deterministic stratified draw from a role-A/R1 ``LabelledRows``.
+def select_static_examples(
+    rows, *, per_level: int = 10, seed: int = 42, instance_key: str = ""
+) -> StaticExamples:
+    """A deterministic instance-randomized draw from role-A/R1 rows.
 
+    ``instance_key`` is plot/level/replicate, never plot text or an outcome.
     IDs are sorted before sampling, so an input-file reorder cannot alter the
-    treatment.  The role and partition checks are repeated here at point of use.
+    treatment. The derived RNG isolates one case from execution order and
+    resume state. Role and partition are checked again at point of use.
     """
     if getattr(rows, "role", None) != "A" or getattr(rows, "partition", None) != "R1":
         raise S5ContractError("static examples must come through role A from R1")
     triples = sorted(zip(rows.review_ids, rows.texts, rows.labels), key=lambda x: x[0])
-    rng = random.Random(seed)
+    material = f"S5_STATIC_V1|{seed}|{instance_key}".encode("utf-8")
+    derived_seed = int.from_bytes(hashlib.sha256(material).digest()[:8], "big")
+    rng = random.Random(derived_seed)
     selected: list[tuple[str, str, int]] = []
     for level in (0, 1):
         pool = [x for x in triples if int(x[2]) == level]
@@ -101,7 +110,7 @@ def select_static_examples(rows, *, per_level: int = 10, seed: int = 42) -> Stat
         selected.extend(rng.sample(pool, per_level))
     selected.sort(key=lambda x: (int(x[2]), x[0]))
     return StaticExamples(
-        seed=seed,
+        seed=derived_seed,
         review_ids=tuple(x[0] for x in selected),
         texts=tuple(x[1] for x in selected),
         labels=tuple(int(x[2]) for x in selected),
@@ -177,7 +186,7 @@ def generation_key(
     call_role: str, call_index: int, arm: str, provider: str, model: str
 ) -> str:
     """Collision-resistant identity for every Phase-5 generative call."""
-    if condition not in CONDITIONS:
+    if condition not in (*CONDITIONS, *INTERNAL_CALL_GROUPS):
         raise S5ContractError(f"unknown Phase-5 condition {condition!r}")
     if replicate_seed not in REPLICATE_SEEDS:
         raise S5ContractError(f"unregistered replicate seed {replicate_seed}")
@@ -195,3 +204,9 @@ def generation_key(
         "model": model,
     }
     return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def sampling_seed(call_key: str) -> int:
+    """Stable 31-bit RNG seed; independent of execution order and resume state."""
+    digest = hashlib.sha256(f"S5_SAMPLE_V1|{call_key}".encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big") % (2**31 - 1)

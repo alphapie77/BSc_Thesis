@@ -610,11 +610,15 @@ interesting individually.**
 
 | Key | Source | Read | Defends / forces |
 |---|---|---|---|
-| `zhang2025genicldemo` | Zhang et al., Findings of ACL 2025, 2025.findings-acl.592 | `[x]` primary ACL record + paper | Demonstration selection is a material in-context-learning treatment, not harmless plumbing. Forces row 2 to use one pre-declared, stratified seed-42 draw reused everywhere; learned or query-specific selection would be retrieval and collapse row 2 into row 3. |
+| `zhang2025genicldemo` | Zhang et al., Findings of ACL 2025, 2025.findings-acl.592 | `[x]` primary ACL record + paper | Demonstration selection is a material in-context-learning treatment, not harmless plumbing. Forces row 2's selection schedule to be pre-declared and forbids learned/query-specific selection, which would be retrieval and collapse row 2 into row 3. |
 | `kim2026judgeutility` | Kim, arXiv 2607.13347 | `[~]` abstract + primary record | A judge that evaluates well need not provide a useful closed-loop optimization signal. Forces row 8 to archive both verdict and feedback, retain an explicit all-fail selection rule, and leave final outcome scoring to Verifier-B. |
+| `li2025instance` | Li et al., Findings of EMNLP 2025, 2025.findings-emnlp.182 | `[x]` primary ACL record + method/results | 🔴 Supersedes the same-day globally fixed row-2 draw before generation. Fixed random-factor settings can synchronously bias all instances; instance-level randomization reduces variance and achieved comparable robustness at under half the compute in their benchmarks. Our schedule therefore randomizes examples deterministically per plot/level/replicate while remaining query- and outcome-blind. |
+| `cegin2025randomselection` | Cegin et al., Findings of EMNLP 2025, 2025.findings-emnlp.296 | `[x]` primary ACL record + paper | Across low-resource text-augmentation settings, informed selectors only seldom beat random selection and gains are marginal; random selection is the recommended default. Supports random stratified draws rather than adding another learned/similarity selector that would blur row 2 with RAG. |
 
-**What the search changed.** Static examples became a frozen experimental
-treatment rather than a convenience selected by the runner. The LLM judge got
+**What the search changed.** Static examples first became a frozen experimental
+treatment rather than a convenience selected by the runner; the second pass
+then changed one global fixed draw into a frozen instance-randomized schedule.
+The LLM judge got
 a validated schema and all-fail policy rather than free-form prose. Bethard's
 already-recorded warning also changed the old “mean±SD over seeds” sentence:
 three replicates remain as sensitivity/blocking, not as the inferential sample

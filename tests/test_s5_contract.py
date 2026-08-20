@@ -1,4 +1,5 @@
 import json
+import ast
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,7 @@ from src.eval.s5_contract import (
     largest_prefix_within_budget,
     load_eval_plots,
     select_static_examples,
+    sampling_seed,
     symbolic_scores_from_s4,
     threshold_for_acceptance_rate,
 )
@@ -50,9 +52,11 @@ def test_phase5_surface_is_exactly_the_90_eval_plots():
 
 def test_static_examples_are_stable_stratified_and_r1_only():
     rows = _r1_rows()
-    first = select_static_examples(rows)
-    second = select_static_examples(rows)
+    first = select_static_examples(rows, instance_key="42|BN002|L0")
+    second = select_static_examples(rows, instance_key="42|BN002|L0")
+    other = select_static_examples(rows, instance_key="43|BN002|L0")
     assert first == second
+    assert first.review_ids != other.review_ids
     assert first.labels.count(0) == first.labels.count(1) == 10
     assert set(first.review_ids) <= set(rows.review_ids)
     split = json.loads((ROOT / "data/splits/split_map_v1.json").read_text(encoding="utf-8"))
@@ -98,6 +102,8 @@ def test_generation_keys_separate_conditions_seeds_and_call_roles():
         for role, i in (("writer", 1), ("critic", 1), ("writer", 2))
     }
     assert len(keys) == 10 * 3 * 3
+    assert len({sampling_seed(k) for k in keys}) == len(keys)
+    assert sampling_seed(next(iter(keys))) == sampling_seed(next(iter(keys)))
 
 
 def test_real_config_passes_cpu_preflight_without_loading_verifier_b():
@@ -107,6 +113,25 @@ def test_real_config_passes_cpu_preflight_without_loading_verifier_b():
     assert result["status"] == "READY_NO_GENERATION"
     assert result["condition_cases_per_language_per_replicate"] == 1800
     assert result["condition_cases_per_language"] == 5400
+    assert result["static_schedule_cases"] == 90 * 2 * 3
     assert result["static_counts"] == {"0": 10, "1": 10}
     assert result["symbolic_dev_passes"] == 39
     assert result["verifier_b_loaded"] is False
+
+
+def test_generation_runner_does_not_import_verifier_b():
+    source = (ROOT / "src/eval/run_s5_main_bn.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            imported.append(node.module or "")
+    assert not any("verifier_b" in name.lower() for name in imported)
+
+
+def test_config_preserves_realized_s4_single_item_batch_path():
+    with open(ROOT / "configs/s5_main_bn.yaml", encoding="utf-8") as fh:
+        cfg = yaml.safe_load(fh)
+    assert cfg["writer"]["batch_size"] == 1

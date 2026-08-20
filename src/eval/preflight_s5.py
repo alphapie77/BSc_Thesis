@@ -64,11 +64,18 @@ def preflight(cfg: dict) -> dict:
     )
     if dev is not None:  # defensive: row 2 and RAG share the full registered R1 pool
         raise S5ContractError("unexpected dev subtraction from the static/RAG pool")
-    static = select_static_examples(
-        rows,
-        per_level=int(cfg["static_few_shot"]["per_level"]),
-        seed=int(cfg["static_few_shot"]["selection_seed"]),
-    )
+    static_schedules = {}
+    for replicate_seed in REPLICATE_SEEDS:
+        for plot in plots:
+            for level in sample["levels"]:
+                key = f"{replicate_seed}|{plot.plot_id}|L{level}"
+                static_schedules[key] = select_static_examples(
+                    rows,
+                    per_level=int(cfg["static_few_shot"]["per_level"]),
+                    seed=int(cfg["static_few_shot"]["selection_seed"]),
+                    instance_key=key,
+                )
+    static = static_schedules[f"42|{plots[0].plot_id}|L0"]
     split = _read_split_map(inputs["split_map"])
     if set(static.review_ids) & (set(split["R2"]) | set(split["G"])):
         raise S5ContractError("R2 or G reached the static few-shot prompt")
@@ -114,11 +121,14 @@ def preflight(cfg: dict) -> dict:
         "levels": sample["levels"],
         "condition_cases_per_language_per_replicate": per_replicate,
         "condition_cases_per_language": per_replicate * len(REPLICATE_SEEDS),
-        "static_example_ids": {
-            str(level): [
-                rid for rid, y in zip(static.review_ids, static.labels) if y == level
-            ] for level in (0, 1)
-        },
+        "static_schedule_cases": len(static_schedules),
+        "static_schedule_digest": __import__("hashlib").sha256(
+            "\n".join(
+                f"{key}:{','.join(value.review_ids)}"
+                for key, value in sorted(static_schedules.items())
+            ).encode("utf-8")
+        ).hexdigest(),
+        "sample_static_example_ids": list(static.review_ids),
         "static_counts": {str(k): len(v) for k, v in static.by_level.items()},
         "symbolic_tau": symbolic_tau,
         "symbolic_dev_passes": symbolic_passes,
