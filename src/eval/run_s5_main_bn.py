@@ -132,7 +132,8 @@ def main() -> int:
     ap.add_argument("--config", default="configs/s5_main_bn.yaml")
     ap.add_argument("--model-path")
     ap.add_argument("--replicate-seed", type=int, choices=REPLICATE_SEEDS)
-    ap.add_argument("--limit", type=int, help="first N plot-level pairs; smoke test only")
+    ap.add_argument("--start", type=int, default=0, help="zero-based base-case offset")
+    ap.add_argument("--limit", type=int, help="number of plot-level base cases")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
@@ -148,10 +149,14 @@ def main() -> int:
     inputs, sample, out = cfg["inputs"], cfg["sample"], cfg["outputs"]
     plots = load_eval_plots(inputs["plots_csv"], expected_n=sample["n_plots"])
     base_cases = [(p, int(level)) for p in plots for level in sample["levels"]]
+    if args.start < 0:
+        raise SystemExit("--start must be non-negative")
     if args.limit is not None:
         if args.limit < 1:
             raise SystemExit("--limit must be positive")
-        base_cases = base_cases[:args.limit]
+        base_cases = base_cases[args.start:args.start + args.limit]
+    else:
+        base_cases = base_cases[args.start:]
 
     rows, _ = load_training_rows(
         "A", split_map=inputs["split_map"],
