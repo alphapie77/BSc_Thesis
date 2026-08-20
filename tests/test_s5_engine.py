@@ -59,16 +59,19 @@ def test_neural_loop_generic_feedback_has_same_call_shape_and_stops():
     assert result["logical_generator_calls"] == 3
 
 
-def test_role_controls_share_critique_and_only_role_changes():
+def test_role_controls_share_critique_seed_and_use_valid_role_topology():
     call_fn, calls = caller_factory([0.4, 0.5])
     a, b = run_role_controls(
         initial_gen=Gen("i", "draft 0.2"), base_prompt="base",
         plot_id="BN", target_level=0, call_fn=call_fn,
     )
     assert a["critique_generation"]["key"] == b["critique_generation"]["key"]
-    assert calls[1]["messages"][3]["content"] == calls[2]["messages"][3]["content"]
-    assert calls[1]["messages"][3]["role"] == "assistant"
-    assert calls[2]["messages"][3]["role"] == "user"
+    intrinsic, external = calls[1]["messages"], calls[2]["messages"]
+    assert [m["role"] for m in intrinsic] == ["user", "assistant", "user"]
+    assert [m["role"] for m in external] == ["user", "assistant", "user"]
+    critique = "draft 0.0"
+    assert critique in intrinsic[1]["content"] and critique not in intrinsic[2]["content"]
+    assert critique not in external[1]["content"] and critique in external[2]["content"]
     assert calls[1]["sampling_group"] == calls[2]["sampling_group"] == "shared_role_revision"
 
 

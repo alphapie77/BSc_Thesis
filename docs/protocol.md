@@ -1714,16 +1714,21 @@ different context and output-token costs.
 
 ### Decision 11 — add a byte-identical external-role self-critique control
 
-Rows 7a and 7b share the initial draft and the generated critique string. Row
-7a presents that critique as the model's own prior assistant content; row 7b
-re-presents the **same bytes** as a new `user` message. SHA-256 equality is a
-run-time gate before revision, and both revision calls use the same seed. No
-trained verifier appears in either row. Verifier-B scores only the final texts.
+Rows 7a and 7b share the initial draft and the generated critique string. Both
+use Gemma-3's native three-slot topology `user → assistant → user`; no invalid
+or synthetic filler turn is introduced. In row 7a the critique is appended to
+the model's prior assistant content before the final user revision request. In
+row 7b the **same critique bytes** begin the final user turn and the identical
+revision request follows in that turn. Thus the critique's source role changes
+while the number and sequence of native role slots, critique text, revision
+instruction, and revision sampling seed remain fixed. SHA-256 equality is a
+run-time gate before revision. No trained verifier appears in either row.
+Verifier-B scores only the final texts.
 
 The `user` role is fixed now, rather than selected after outcomes.
 `selfcorrectionillusion2026` holds erroneous claims byte-identical and reports
 23–93 percentage-point correction lifts from external role relabelling across
-13 model/domain cells, including Gemma-3-12B; the best role is domain-dependent.
+12 model/domain cells, including Gemma-3-12B; the best role is domain-dependent.
 User role is the natural carrier for opinion/text claims and avoids installing
 model-generated critique as trusted system memory. The paper's failure-pool,
 reasoning-task scope is a transfer limitation, not a reason to omit the control.
@@ -1826,6 +1831,7 @@ Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-20 | S5 rows 7a/7b — Gemma-native role placement | Before any eval generation, the Kaggle tokenizer gate rejected the proposed external condition because it contained consecutive `user` messages. Both controls now use the same valid `user → assistant → user` topology: the byte-identical critique is placed in the assistant content for 7a and in the final user content for 7b; the revision instruction and shared revision seed remain fixed. | The old five-message construction was not realizable by Gemma-3's native chat template. Google documents only `user`/`model` turns, and `selfcorrectionillusion2026` v2 explicitly records the same Gemma-3 limitation while reporting its user-role effect. A raw-token bypass or filler assistant acknowledgement would leave the native training format or add a second manipulation. The three-slot placement is the smallest valid repair, and the real-tokenizer preflight remains mandatory. |
 | 2026-08-20 | S5 row 2 and S4/S5 realized batch | The globally fixed static-example draw is superseded before eval generation by deterministic instance-level randomization over plot/level/replicate; selection remains stratified R1-only and non-query-dependent. Phase-5 batch is 1, correcting the nominal `batch_size=8` field to the batch actually used by S4's single-item call path. | Recent primary literature changed the few-shot decision: `li2025instance` shows fixed random settings can bias a whole evaluation and instance-level randomization reduces variance; `cegin2025randomselection` supports random selection as a strong low-resource default. Direct code inspection changed the batch decision: both S4 runners invoke `generate()`, which passes a one-item list. No eval output exists, so both changes precede outcomes. |
 | 2026-08-20 | 🔴 S4 decision 19 / §5.1 endpoint mapping — alpha_lo is row 3 RAG-only, not row 1 zero-shot | The frozen S4 attempt-1 archive contains ten retrieved exemplars in every prompt. Therefore τ=0 ships the RAG-only condition. The numeric frontier, alpha_lo=0.640501 and tau*=0.4384071 remain unchanged; only the incorrect row label and attribution are corrected. Code comments, tests, STATUS, pipeline and handoff now agree. | Found while implementing the Phase-5 runner, before any eval-plot generation. The correction makes the causal comparison cleaner: S4 measures the marginal value of the loop over RAG, while Phase 5 will separately measure zero-shot row 1. No literature search was needed; this is direct prompt-content inspection, not a new method choice. |
 | 2026-08-18 | 🔴 S4 decisions 1, 2 and 19 — gate/diagnosis separation, τ scope correction, explicit upper endpoint | Verifier-A alone now controls PASS/FAIL and best-of-three; symbolic scoring remains active for failed-rule diagnostics. The nonexistent variance-ratio partial-pooling estimator is replaced by one global headline frontier with mandatory per-level reporting and descriptive permutation comparison. α_hi becomes explicit `FORCED_3`, not `τ=1`. | **Observed evidence forced the gate change:** every S4.5a held-out fold selected `w=1` with delta-AUC 0.0000, while symbolic influence on verdicts remained large. **Primary-paper reading forced the scope correction:** Salem et al. (2026) use Bonferroni certification plus leaf-first fallback, not the estimator previously attributed to them; implementing the old text would invent a method. **A code boundary forced the endpoint correction:** calibrated scores can equal 1.0 and `>=` must be retained so α_lo at τ=0 never rejects. Literature searched before deciding; Consensus unavailable until 2026-09-01, so primary arXiv records were used and logged. |

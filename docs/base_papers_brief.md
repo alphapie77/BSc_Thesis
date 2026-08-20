@@ -132,8 +132,8 @@ generator never had, that is **asymmetric** and must be disclosed as such.
 
 ## 3. The Self-Correction Illusion, 2026 📗
 
-**LLMs Correct Others but Not Themselves**
-Chen, Su, Chiang · [arXiv:2606.05976](https://arxiv.org/abs/2606.05976) v1 (4 Jun 2026) · `selfcorrectionillusion2026`
+**Role Relabeling Gates Explicit Error Flagging in Large Language Models**
+Chen, Su, Lin, Li, Chiang · [arXiv:2606.05976](https://arxiv.org/abs/2606.05976) v2 (31 Jul 2026; rechecked 20 Aug 2026) · `selfcorrectionillusion2026`
 
 ### The testable claim (§1)
 
@@ -148,7 +148,7 @@ message, a `tool` response, or a `system <memory>` block.
 ### Design (§4.1) — and one caveat that matters
 
 n=30 paired tasks per cell, T=0, fixed seed, 10,000-sample paired bootstrap,
-one-sided p, pre-registered exit criteria. Judged by a locked Qwen-72B judge
+two-sided p, pre-registered exit criteria. Judged by a locked Qwen-72B judge
 (κ=1.0 against hand labels; κ=0.843 on independent re-judge).
 
 ⚠️ **They evaluate on a *failure pool*** — tasks where intrinsic correction
@@ -169,9 +169,9 @@ power on the target regime, and it means the headline lifts are measured on a
 | gpt-oss-20B math | +17 (ceiling, L₀ 77%) |
 | Qwen2.5-72B BBH-LD | +17* (ceiling, L₀ 67%) |
 
-10 of 13 cells significant; the 3 exceptions are all ceiling cases (L₀ ≥ 67%).
-Survives Holm–Bonferroni and Benjamini–Hochberg in 9 of 13. Per-task flips:
-**26 of 30** flippable tasks on Llama-70B logic, **18 of 25** on Qwen-72B math.
+10 of 12 cells have at least one significant relabel; the 2 exceptions have
+high baselines (L₀ ≥ 67%). Nine of 12 survive Holm–Bonferroni. Per-task flips:
+**29 of 30** eligible tasks on Llama-70B logic, **18 of 25** on Qwen-72B math.
 
 ### Mechanism — four controls, and they matter to us
 
@@ -200,11 +200,10 @@ verifier must justify its cost against a formatting change.
 
 Control 4 is the reassuring part: naive self-distrust does **not** work, so our
 row 7 is predicted to lose for a *mechanistic* reason. But row 7b — the same
-critique under an external role — is the real competitor and we do not currently
-run it.
+critique under an external role — is the real competitor and is now a main row.
 
-→ **open decision 11.** If 7b ≈ row 6, the verifier is not earning its cost, and
-that is a negative result we would far rather find than have a reviewer find.
+→ **decision 11 closed.** If 7b ≈ row 6, the verifier is not earning its cost,
+and that is a negative result we would far rather find than have a reviewer find.
 
 ---
 

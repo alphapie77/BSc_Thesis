@@ -16,18 +16,28 @@ def self_critique_prompt(*, base_prompt: str, draft: str, target_level: int) -> 
 def role_control_messages(
     *, base_prompt: str, draft: str, critique: str, role: str
 ) -> list[dict]:
-    """Only the critique message role differs between intrinsic/external rows."""
+    """Place the same critique under a native Gemma assistant or user turn.
+
+    Gemma-3 accepts only alternating user/model turns.  Both conditions therefore
+    use the identical three-slot topology ``user, assistant, user``.  The shared
+    critique is appended to the draft in the intrinsic condition and prepended
+    to the revision request in the external condition.  No synthetic filler
+    turn is introduced.
+    """
     if role not in {"assistant", "user"}:
         raise ValueError("critique role must be assistant or user")
+    critique_block = f"সমালোচনা:\n{critique}"
+    revision = "সমালোচনাটি মেনে মন্তব্যটি সংশোধন করো। শুধু নতুন বাংলা মন্তব্যটি লেখো।"
+    assistant_content = draft.strip()
+    user_content = revision
+    if role == "assistant":
+        assistant_content = f"{assistant_content}\n\n{critique_block}"
+    else:
+        user_content = f"{critique_block}\n\n{revision}"
     return [
         {"role": "user", "content": base_prompt},
-        {"role": "assistant", "content": draft.strip()},
-        {"role": "user", "content": "এখন একটি সমালোচনা দেওয়া হবে।"},
-        {"role": role, "content": critique},
-        {
-            "role": "user",
-            "content": "সমালোচনাটি মেনে মন্তব্যটি সংশোধন করো। শুধু নতুন বাংলা মন্তব্যটি লেখো।",
-        },
+        {"role": "assistant", "content": assistant_content},
+        {"role": "user", "content": user_content},
     ]
 
 

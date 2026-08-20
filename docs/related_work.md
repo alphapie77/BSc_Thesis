@@ -255,18 +255,19 @@ ablation is right to separate them.
   refines**. Best-of-N is also the cost-matched baseline decision 9 needs.
 - ⬛ Body not read (no arXiv HTML for 2021).
 ### [x] selfcorrectionillusion2026 — arXiv 2606.05976
-*The Self-Correction Illusion*
+*The Self-Correction Illusion: Role Relabeling Gates Explicit Error Flagging in Large Language Models*
 - **Role:** why external-role feedback works — the Critic's justification.
-- **Read:** full relevant method/results/limitations via the primary PDF on
-  2026-08-20; arXiv ID and authors verified.
+- **Read:** full relevant method/results/limitations via the primary v2 PDF on
+  2026-08-20; arXiv ID, current title and five authors verified.
 - **Notes:**
 
 ---
 
 - **Claim:** willingness to correct depends on the chat-template **role label**,
   not the claim's content. Byte-identical claim (SHA-256), only the role varies.
-- **Numbers:** +23 to +93 pp; 10/13 cells significant, 3 exceptions all ceiling
-  (L₀ ≥ 67%); 9/13 survive Holm–Bonferroni and BH; 26/30 per-task flips on
+- **Numbers:** +23 to +93 pp; 10/12 cells have a significant relabel, 2
+  exceptions have high baselines (L₀ ≥ 67%); 9/12 survive Holm–Bonferroni;
+  29/30 per-task flips on
   Llama-70B logic.
 - **Mechanism:** bare wrapper 17–23 pp, role tag a further ~30 pp; nonsense
   `<xqzy>` 30% vs `<memory>` 70%; within-thought duplication control only
@@ -277,6 +278,10 @@ ablation is right to separate them.
 - ⚠️ **Scope:** measured on a *failure pool* (tasks where intrinsic correction
   already failed), so lifts are on a pre-selected subset.
 - → **decision 11 CLOSED:** row 7b is a main byte-identical `user`-role control.
+- **Gemma-3 implementation constraint (v2 Appendix E):** its native template
+  exposes only alternating user/model turns. This changed our invalid
+  consecutive-user construction to a shared `user → assistant → user` topology;
+  the critique bytes move between the assistant and final user content.
 
 ### [x] verma2026blindresampling — arXiv 2607.26117
 *Try Again, Don't Look Back: Blind Resampling Outperforms Self-Repair in Small

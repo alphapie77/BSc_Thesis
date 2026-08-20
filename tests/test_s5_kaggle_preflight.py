@@ -11,6 +11,9 @@ from src.eval.preflight_s5_kaggle import (
 
 class Tokenizer:
     def apply_chat_template(self, messages, **kwargs):
+        roles = [m["role"] for m in messages]
+        if roles != ["user", "assistant", "user"]:
+            raise ValueError(f"roles do not alternate: {roles}")
         return "|".join(f"{m['role']}:{m['content']}" for m in messages)
 
 
