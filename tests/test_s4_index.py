@@ -106,12 +106,19 @@ def test_digest_is_order_independent_but_membership_sensitive():
 
 def test_runtime_index_must_match_committed_manifest_without_rewriting(tmp_path):
     path = tmp_path / "manifest.json"
-    path.write_text(json.dumps({"result": {"n_indexed": 2}}), encoding="utf-8")
+    result = {
+        "n_indexed": 2, "partition": "R1", "axis_level_counts": {"0": 2},
+        "encoder": "e", "metric": "cosine", "collection": "c",
+        "persist_dir": "data\\rag\\r1_index", "id_digest_sha256": "digest",
+        "r2_ids_present": 0, "gold_ids_present": 0,
+    }
+    path.write_text(json.dumps({"result": result}), encoding="utf-8")
     before = path.read_bytes()
-    assert_matches_committed_manifest({"n_indexed": 2}, path)
+    runtime = {**result, "persist_dir": "data/rag/r1_index"}
+    assert_matches_committed_manifest(runtime, path)
     assert path.read_bytes() == before
     with pytest.raises(IndexContractError, match="differs"):
-        assert_matches_committed_manifest({"n_indexed": 3}, path)
+        assert_matches_committed_manifest({**runtime, "n_indexed": 3}, path)
 
 
 def test_verifier_b_is_unreachable_from_the_loop_package():

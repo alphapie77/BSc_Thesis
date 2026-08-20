@@ -178,7 +178,7 @@ def build(cfg: dict) -> dict:
 
 
 def assert_matches_committed_manifest(res: dict, manifest_path: str | Path) -> None:
-    """Verify a runtime rebuild without rewriting the tracked S4 artifact."""
+    """Verify scientific index identity without comparing host-local paths."""
     path = Path(manifest_path)
     try:
         expected = json.loads(path.read_text(encoding="utf-8"))["result"]
@@ -186,10 +186,20 @@ def assert_matches_committed_manifest(res: dict, manifest_path: str | Path) -> N
         raise IndexContractError(
             f"cannot read committed RAG manifest {path}: {exc}"
         ) from exc
-    if res != expected:
+    invariants = (
+        "n_indexed", "partition", "axis_level_counts", "encoder", "metric",
+        "collection", "id_digest_sha256", "r2_ids_present", "gold_ids_present",
+    )
+    mismatches = {
+        field: {"expected": expected.get(field), "actual": res.get(field)}
+        for field in invariants
+        if expected.get(field) != res.get(field)
+    }
+    if mismatches:
         raise IndexContractError(
             "runtime RAG rebuild differs from the committed manifest; refusing "
-            "generation because retrieval membership/configuration drifted"
+            "generation because retrieval membership/configuration drifted: "
+            f"{json.dumps(mismatches, ensure_ascii=False, sort_keys=True)}"
         )
 
 
