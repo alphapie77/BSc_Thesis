@@ -1741,6 +1741,49 @@ diagnostic feedback**, while row 4 removes symbolic diagnostics from feedback
 and row 5 remains the symbolic-only gating ablation. No single hybrid weight is
 selected. All outcome quality remains Verifier-B-only.
 
+### Runner contracts — frozen 2026-08-20 before generation
+
+Four details left implicit by the table are fixed here so implementation cannot
+choose them after seeing eval outputs.
+
+1. **Static few-shot (row 2).** Sort the exact R1 region-A review IDs, then make
+   one seed-42 stratified random draw of ten examples within each target level.
+   Reuse that fixed ten for every plot, language arm, and replicate. GenICL
+   (`zhang2025genicldemo`) shows that demonstration selection materially changes
+   in-context performance; query-conditioned or learned selection would therefore
+   collapse row 2 into a second retrieval treatment. The cost is explicit: one
+   pre-declared static draw may be idiosyncratic, and is not tuned.
+2. **Symbolic-only gate (row 5).** Match row 6's frozen first-pass acceptance
+   budget without consulting Verifier-B. Among thresholds induced by the 60
+   length-controlled Bangla dev attempt-1 symbolic scores, minimise absolute
+   distance from 39/60 accepted; break an exact-distance tie toward the stricter
+   threshold. The computed value is **0.18166513482099075**, accepting exactly
+   **39/60 = 0.65**. The threshold is verified again from
+   `results/s4_w_scores.csv` at preflight rather than trusted from this prose.
+3. **LLM judge (row 8).** Use stable model ID `gemini-2.5-flash`, temperature
+   zero and structured JSON: `verdict` PASS/FAIL, integer `target_fit_score`
+   0–100, and Bangla `feedback` of no more than two sentences (empty on PASS).
+   The judge sees the exact axis definition, requested level, plot and draft,
+   but neither verifier. It controls up to three Writer attempts; after three
+   failures, the highest judge score is emitted, ties earliest. Raw JSON, model
+   ID, token usage and latency are archived. `kim2026judgeutility` is the reason
+   evaluation ability is not assumed to imply useful optimization feedback.
+4. **Replicates and estimand.** Sampling replicates are fixed at **42, 43, 44**.
+   The entry point still calls global `set_seed()` with 42 as its first action;
+   the replicate value is a separately logged generation RNG seed. There are
+   1,800 condition-cases/language/replicate, 5,400/language, and 10,800 across
+   both languages. Comparisons pair plot, level and replicate. Seed mean±SD is
+   sensitivity reporting only, not a winner rule, consistent with Bethard's
+   warning against treating a handful of seeds as an inferential sample.
+
+The Google model identifier and structured-output capability were checked
+against the provider's official model and structured-output documentation on
+2026-08-20. **What the literature changed:** demonstration selection became a
+frozen treatment component rather than an implementation detail; the judge got
+a machine-validated output schema and an explicit all-fail policy; and the old
+“mean±SD decides” wording was replaced by paired case-level inference with
+replicate blocking.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 

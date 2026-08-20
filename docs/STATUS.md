@@ -25,8 +25,16 @@ archive, and the frontier recomputes exactly. Attempt 2 improves both A and B on
 average; attempt 3 partially regresses. **Phase-5 pre-run decisions 9 and 11
 are now closed before generation:** add a realized-compute-matched blind-
 resampling/A-selection row and a byte-identical external-role self-critique
-row. The main table is now 10 conditions. Next: implement and test the Bangla
-Phase-5 runner without generating eval outputs locally.**) The
+row. The main table is now 10 conditions. **The remaining runner contracts are
+also frozen before generation:** row 2 uses one deterministic stratified R1
+draw (10 examples/level); row 5 uses symbolic tau **0.18166513482099075**,
+which reproduces the neural gate's 39/60 first-pass rate without B; row 8 uses
+`gemini-2.5-flash` structured PASS/FAIL + score + Bangla feedback; and sampling
+replicates are **42/43/44**, paired as a blocking/sensitivity factor rather than
+a seed-level decision rule. Scale is **1,800/language/replicate = 5,400 per
+language = 10,800 across both languages**, before counting multi-call retries.
+Next: implement and test the Bangla Phase-5 runner without generating eval
+outputs locally.**) The
 long timeline below is retained rather than silently rewritten.
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
@@ -203,7 +211,7 @@ and the post-run verdict-mapping audit are recorded in pipeline row 17e above.
 | Does length help the symbolic scorer? | assumed yes (§3.5 lists "length bucket") | 🔴 **NO — it hurts.** Removing F2 raises CV **0.5150 → 0.6232**. The only family delta exceeding the CV SD, so the only one worth believing. Small-n overfitting, not a contradiction of `length_auc` 0.6764 on full region A |
 | Which symbolic families contribute? | — | Only **F3_ortho (+0.0647, gameable)** and **F6_richness (+0.0386, NOT gameable)**. The pipeline's presence families **F4_connective (−0.0189)** and **F5_sentiment (−0.0188)** contribute *negatively*. ⚠️ All four are inside the CV SD of 0.0713 and are reported as noise-level |
 | Verifier-B's definition | "the fine-tuned BanglaBERT **from S3.2**" | 🔴 **the S3.2 BanglaBERT *recipe*, RETRAINED on R2 (888 rows).** `configs/s3_backbone.yaml` sets `role: A` → every S3.2 arm trained on **R1**. The literal reading would have put A and B on the same data and voided inviolable rule 6. No result affected; corrected before any training |
-| §5.1 experiment size | 90 × 3 personas × 8 = **2,160** per language | **1,800 condition-cases/language** (90 × **2 levels** × **10 conditions**). The first correction was 1,440 after K=2; the pre-generation 2026-08-20 control audit then added rows 7b and 9. Multi-call rows mean this is not an LLM-call count; realized calls/tokens/FLOPs are logged. |
+| §5.1 experiment size | 90 × 3 personas × 8 = **2,160** per language | **1,800 condition-cases/language/replicate** (90 × **2 levels** × **10 conditions**); three fixed replicates give **5,400/language and 10,800 across both languages**. The first correction was 1,440 after K=2; the pre-generation 2026-08-20 control audit then added rows 7b and 9. Multi-call rows mean this is not an LLM-call count; realized calls/tokens/FLOPs are logged. |
 | Does symbolic scoring resist gaming? | assumed yes (proposed 2026-08-11) | **NO — refuted before it was written.** Mahmoud et al. (2026): rule-based rewards *are* hacked; **presence-based criteria are the worst case**, and §3.5's features are almost all presence/count-based. Our Reflector also *names the failing rule to the Writer*. Symbolic is plausibly the **most** gameable component here |
 | Is Verifier-A "natively calibrated"? | assumed yes (decision 16, 2026-08-10) | 🔴 **NO SUPPORT — the clause is withdrawn.** `zhang2026tabpfn` compare nine heads on frozen encoders over **22,820 episodes**: a logistic head takes the **best mean rank on accuracy** and ranks **below kNN and every in-context head on both ECE and NLL** — Top-1 ECE **0.069** vs kNN 0.037, TabPFN 0.031. §3.4 temperature scaling is therefore **mandatory** for Verifier-A. ✅ The **choice** of Verifier-A stands: the same paper keeps logistic regression appropriate at *"high dimensions, or near-ceiling tasks"*, and ours is 768-d at 0.9866. ⚠️ Bounded — their grid is 10-class and the gap narrows at C=2, so the record is *"the claim had no support"*, **not** *"Verifier-A is miscalibrated"* |
 | Verifier-B's learning rate | S3.2's sweep {2e-5, 3e-5} | **2e-5, fixed and never selected** — pipeline §3.1's own default, 5 seeds × 1 lr. `schneider2025overtuning`: **~10% of tuned HPO runs generalise worse than the default**, worst under small data + holdout + binary + accuracy-type metric — **all four describe this run**. Sabbir's call, 2026-08-11 |

@@ -601,6 +601,27 @@ interesting individually.**
 
 ---
 
+## Tier 10e — Phase-5 runner contracts (added 2026-08-20)
+
+> Searched before freezing the implementation details. Consensus remained
+> unavailable until 2026-09-01, so the recent-first search used alphaXiv and
+> was checked against the primary ACL/arXiv records. Provider capabilities were
+> checked only in Google's official documentation.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `zhang2025genicldemo` | Zhang et al., Findings of ACL 2025, 2025.findings-acl.592 | `[x]` primary ACL record + paper | Demonstration selection is a material in-context-learning treatment, not harmless plumbing. Forces row 2 to use one pre-declared, stratified seed-42 draw reused everywhere; learned or query-specific selection would be retrieval and collapse row 2 into row 3. |
+| `kim2026judgeutility` | Kim, arXiv 2607.13347 | `[~]` abstract + primary record | A judge that evaluates well need not provide a useful closed-loop optimization signal. Forces row 8 to archive both verdict and feedback, retain an explicit all-fail selection rule, and leave final outcome scoring to Verifier-B. |
+
+**What the search changed.** Static examples became a frozen experimental
+treatment rather than a convenience selected by the runner. The LLM judge got
+a validated schema and all-fail policy rather than free-form prose. Bethard's
+already-recorded warning also changed the old “mean±SD over seeds” sentence:
+three replicates remain as sensitivity/blocking, not as the inferential sample
+or a best-seed selection surface.
+
+---
+
 ## Gap table — the sentence Ch.2 must end with
 
 Fill as entries complete. The claim we must be able to defend is:

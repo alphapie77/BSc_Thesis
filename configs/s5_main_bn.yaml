@@ -1,0 +1,79 @@
+# S5 main Bangla experiment. Frozen before any eval-plot generation.
+step: S5.main.bn
+seed: 42
+replicate_seeds: [42, 43, 44]
+
+inputs:
+  plots_csv: data/plots/plots_bn.csv
+  split_map: data/splits/split_map_v1.json
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+  cleaned_csv: data/cleaned/bn_clean.csv
+  s4_scores_csv: results/s4_w_scores.csv
+  verifier_a: artifacts/verifier_a.joblib
+  symbolic_scorer: artifacts/symbolic_scorer.joblib
+
+sample:
+  split: eval
+  n_plots: 90  # frozen eval surface; pipeline §5.1 and plots split manifest
+  levels: [0, 1]
+  prompt_arm: bn
+  length_controlled: true
+
+writer:
+  model: google/gemma-3-12b-it
+  provider: local
+  batch_size: 8  # provenance, inherited unchanged from the frozen S4 local run
+  quantization: nf4
+  max_new_tokens: 80
+  temperature: 0.8
+  top_p: 0.9
+
+conditions:
+  - zero_shot
+  - static_few_shot
+  - rag_only
+  - rag_neural_loop
+  - rag_symbolic_loop
+  - rag_neural_symbolic_feedback
+  - intrinsic_self_critique
+  - external_role_self_critique
+  - gemini_judge_loop
+  - blind_resampling
+
+static_few_shot:
+  source_role: A
+  partition: R1
+  selection_seed: 42
+  per_level: 10  # protocol §S5 runner contract 1, frozen before generation
+  query_dependent: false
+
+neural_gate:
+  tau: 0.4384071  # selected by results/s4_tau_frontier.json
+  max_attempts: 3  # frozen S4 loop contract; diminishing returns measured in S4.6
+
+symbolic_gate:
+  target_first_pass_rate: 0.65  # matches S4 neural first-pass 39/60
+  expected_tau: 0.18166513482099075
+  expected_passes: 39
+  expected_cases: 60
+  max_attempts: 3  # identical retry budget to neural loop, protocol §S5
+
+gemini_judge:
+  model: gemini-2.5-flash
+  temperature: 0
+  structured_output: true
+  max_attempts: 3  # identical retry budget to proposed loop, protocol §S5
+  feedback_language: bn
+  feedback_max_sentences: 2  # bounded diagnostic payload, protocol §S5 contract 3
+  all_fail_selection: highest_target_fit_score_then_earliest
+
+blind_resampling:
+  max_candidates: 5  # full nested frontier frozen in protocol decision 9
+  selection: verifier_a
+  primary_budget: matched_realized_generator_flops_to_row6
+  report_prefixes: [1, 2, 3, 4, 5]
+
+outputs:
+  calls_jsonl: data/generated/s5_main_bn_calls.jsonl
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  preflight_json: results/s5_main_bn_preflight.json
