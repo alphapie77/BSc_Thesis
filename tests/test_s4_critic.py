@@ -15,7 +15,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.agents.critic import Critic, CriticContractError, Judgement  # noqa: E402
+from src.agents.critic import (  # noqa: E402
+    Critic,
+    CriticContractError,
+    FrozenBinaryLogisticHead,
+    Judgement,
+)
 
 
 class StubCritic(Critic):
@@ -105,6 +110,33 @@ def test_the_module_never_references_verifier_b():
     """Inviolable rule 6, checked here too and not only by the package scan."""
     src = (ROOT / "src/agents/critic.py").read_text(encoding="utf-8").lower()
     assert "verifier_b" not in src, "the Critic mentions Verifier-B"
+
+
+def test_frozen_logistic_head_uses_portable_binary_arithmetic():
+    """A's sklearn-1.6.1 methods must not run inside the 1.9.0 runtime."""
+    class Fitted:
+        coef_ = [[2.0, -1.0]]
+        intercept_ = [0.5]
+        classes_ = [0, 1]
+
+    head = FrozenBinaryLogisticHead(Fitted())
+    probs = head.predict_proba([[0.0, 0.0], [1.0, 0.0]])
+    assert probs.shape == (2, 2)
+    assert abs(float(probs[0].sum()) - 1.0) < 1e-12
+    assert float(probs[1, 1]) > float(probs[0, 1])
+
+
+def test_frozen_logistic_head_refuses_wrong_class_contract():
+    class WrongClasses:
+        coef_ = [[1.0]]
+        intercept_ = [0.0]
+        classes_ = [1, 2]
+
+    try:
+        FrozenBinaryLogisticHead(WrongClasses())
+    except CriticContractError:
+        return
+    raise AssertionError("a non-[0,1] Verifier-A head was accepted")
 
 
 def _run_all() -> int:

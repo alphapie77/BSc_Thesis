@@ -53,6 +53,51 @@ class CriticContractError(RuntimeError):
     """Raised when the Critic cannot judge to specification."""
 
 
+class FrozenBinaryLogisticHead:
+    """Version-neutral inference from a fitted binary logistic head.
+
+    Verifier-A was fitted with sklearn 1.6.1, while the symbolic scorer requires
+    1.9.0. Calling methods on A's unpickled estimator in that mixed runtime is
+    exactly what sklearn's InconsistentVersionWarning says may produce invalid
+    results. The learned state is only coef/intercept/classes, so snapshot those
+    arrays after loading and perform the defined binary-logistic arithmetic
+    directly. No parameter is refitted or changed.
+    """
+
+    def __init__(self, fitted_head):
+        import numpy as np
+
+        coef = np.asarray(getattr(fitted_head, "coef_", None), dtype=float)
+        intercept = np.asarray(
+            getattr(fitted_head, "intercept_", None), dtype=float
+        )
+        classes = np.asarray(getattr(fitted_head, "classes_", None))
+        if coef.ndim != 2 or coef.shape[0] != 1:
+            raise CriticContractError(
+                f"Verifier-A must be a fitted binary logistic head; coef shape={coef.shape}."
+            )
+        if intercept.shape != (1,) or classes.tolist() != [0, 1]:
+            raise CriticContractError(
+                "Verifier-A logistic state is not the registered binary [0, 1] model."
+            )
+        self.coef = coef[0].copy()
+        self.intercept = float(intercept[0])
+
+    def predict_proba(self, rows):
+        import numpy as np
+
+        x = np.asarray(rows, dtype=float)
+        if x.ndim != 2 or x.shape[1] != self.coef.shape[0]:
+            raise CriticContractError(
+                f"Verifier-A expected {self.coef.shape[0]} features, got {x.shape}."
+            )
+        # Clipping changes nothing in the representable sigmoid range and avoids
+        # overflow warnings for deliberately extreme contract-test inputs.
+        z = np.clip(x @ self.coef + self.intercept, -709.0, 709.0)
+        p1 = 1.0 / (1.0 + np.exp(-z))
+        return np.column_stack((1.0 - p1, p1))
+
+
 @dataclass(frozen=True)
 class Judgement:
     """§4.2: 'Out: verdict + both scores.' Both, always -- the parts are the point."""
@@ -86,7 +131,13 @@ class Critic:
                 "Refusing before joblib can construct an incompatible estimator."
             )
 
-        a = joblib.load(verifier_a_path)
+        # A was trained under sklearn 1.6.1. Its learned arrays are portable,
+        # but invoking the reconstructed 1.6.1 estimator under 1.9.0 is not.
+        # Capture the expected warning, validate the artifact, then discard the
+        # estimator object after snapshotting its learned logistic state below.
+        with warnings.catch_warnings(record=True) as a_caught:
+            warnings.simplefilter("always")
+            a = joblib.load(verifier_a_path)
         if not isinstance(a, dict) or "head" not in a:
             raise CriticContractError(
                 f"{verifier_a_path} is not the expected dict from train_verifier_a.py."
@@ -96,6 +147,19 @@ class Critic:
             raise CriticContractError(
                 f"in-loop verifier must have role 'A', got {a.get('role')!r}. "
                 "Inviolable rule 6: Verifier-B never enters the loop."
+            )
+        unexpected_a_versions = [
+            str(w.message) for w in a_caught
+            if "Version" in type(w.message).__name__
+            and not (
+                "from version 1.6.1" in str(w.message)
+                and "using version 1.9.0" in str(w.message)
+            )
+        ]
+        if unexpected_a_versions:
+            raise CriticContractError(
+                "Verifier-A pickle has an unregistered version mismatch: "
+                + unexpected_a_versions[0].split("\n")[0]
             )
 
         # The symbolic pipeline is a native sklearn object, unlike Verifier-A's
@@ -132,7 +196,7 @@ class Critic:
                 f"  artifact: {s.get('feature_names')}\n  expected: {expected}"
             )
 
-        self._head = a["head"]
+        self._head = FrozenBinaryLogisticHead(a["head"])
         self._temperature = a.get("temperature")
         self._normalize = bool(a.get("normalize_embeddings", True))
         self._encoder_name = a["encoder"]

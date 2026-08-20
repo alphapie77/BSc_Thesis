@@ -1,5 +1,11 @@
-"""Unit tests for prefix replay and explicit FORCED_3 semantics."""
+"""Unit tests for prefix replay, FORCED_3, and the Kaggle runtime contract."""
+import json
+from pathlib import Path
+
 from src.eval.fit_tau import _emit, candidate_thresholds, fit
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _case(plot, level, gate, b):
@@ -50,3 +56,26 @@ def test_symbolic_scores_do_not_change_frontier_or_selection():
     b = fit(cases, shuffles=20)
     assert a["selection"] == b["selection"]
     assert a["frontier"] == b["frontier"]
+
+
+def test_tau_notebook_installs_and_gates_the_registered_nf4_runtime():
+    """The runner refuses every version except the one used by attempt 1.
+
+    This test exists because the first published notebook installed 5.14.1
+    while LocalWriter required 5.15.0; unit-testing the runner alone missed the
+    contradiction and made Save & Run All fail only after model setup.
+    """
+    notebook = json.loads(
+        (ROOT / "notebooks" / "s4_tau_kaggle.ipynb").read_text(encoding="utf-8")
+    )
+    source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in notebook["cells"]
+        if cell.get("cell_type") == "code"
+    )
+    writer = (ROOT / "src" / "agents" / "local_writer.py").read_text(
+        encoding="utf-8"
+    )
+    assert "transformers==5.15.0" in source
+    assert "transformers.__version__=='5.15.0'" in source
+    assert 'REQUIRED_NF4_TRANSFORMERS = "5.15.0"' in writer

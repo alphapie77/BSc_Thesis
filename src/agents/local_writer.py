@@ -51,6 +51,7 @@ from src.common.provenance import stamp  # noqa: E402
 #: single 16 GB T4 with headroom; if it must change, it changes for every arm at
 #: once and the change is logged.
 DEFAULT_BATCH_SIZE = 8
+REQUIRED_NF4_TRANSFORMERS = "5.15.0"
 
 
 class LocalWriter:
@@ -122,13 +123,13 @@ class LocalWriter:
             try:
                 import transformers
                 from packaging.version import parse as _V
-                if _V(transformers.__version__) < _V("5.15.0"):
+                if _V(transformers.__version__) != _V(REQUIRED_NF4_TRANSFORMERS):
                     raise RuntimeError(
-                        f"transformers {transformers.__version__} does not apply "
-                        f"the {quantization!r} config (fp16 is loaded instead, "
-                        "silently). The archive's generations were produced on "
-                        "5.15.0 -- see results/env_snapshot_s4_kaggle.json. "
-                        "Upgrade and restart the kernel."
+                        f"transformers {transformers.__version__} does not match "
+                        f"the registered nf4 runtime {REQUIRED_NF4_TRANSFORMERS}. "
+                        "The archive's generations were produced on that exact "
+                        "version -- see results/env_snapshot_s4_kaggle.json. "
+                        "Install the registered version before continuing."
                     )
             except ImportError:
                 pass

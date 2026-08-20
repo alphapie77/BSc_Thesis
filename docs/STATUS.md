@@ -1,7 +1,12 @@
 # STATUS — single source of truth for "where are we"
 
 **Last updated:** 2026-08-20 (**S4.5b neural-gate/τ runner built and tested;
-not yet run. Publishing the runner is the immediate next action.**) The long
+not yet run. Kaggle attempt 1 exposed a contradictory runtime pin: the notebook
+installed transformers 5.14.1 while the registered nf4 archive requires exactly
+5.15.0. The runner/notebook contract is corrected and regression-tested; the
+sklearn-1.6.1 Verifier-A head now uses version-neutral coefficient inference in
+the symbolic scorer's required sklearn-1.9.0 runtime. No scores or fitted
+parameters changed.**) The long
 line below is the prior chronological
 timeline and is retained rather than silently rewritten.
 
