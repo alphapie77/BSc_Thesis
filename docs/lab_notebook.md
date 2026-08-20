@@ -4365,3 +4365,80 @@ blob, because a digest is readable and a binary is not.
 - Anugraha et al. (ICLR 2026), `anugraha2026mr3`.
 - Salem et al. (2026), `axiv2607_24562_hierarchicalcrc`, corrected after
   reading the method beyond its abstract.
+
+---
+
+## 2026-08-20 -- S4.5b: Neural-gate tau quality-cost frontier
+**Feeds:** Chapter 5: Compound System; RQ2/RQ5 operating point
+**Run commit:** `be3f29e725ed5c58dad61d90e7228e1996fc377e-dirty`
+(dirty only because the resumable call archive and result files were untracked
+while the run was producing them; the code checkout itself was pinned)
+**Artifacts:** `results/s4_tau_frontier.json`, `results/s4_tau_max_traces.jsonl`, `data/generated/s4_tau_calls.jsonl`, `results/env_snapshot_s4tau_kaggle.json`
+
+### Numbers
+- `results/s4_tau_frontier.json`
+  - `method` = global_neural_gate_frontier_with_per_level_reporting
+  - `gate` = verifier_a_only
+  - `symbolic_role` = diagnostic_only
+  - `evaluator` = verifier_b_only
+  - `n_cases` = 60
+  - `threshold_source` = observed_gate_scores
+  - `selection` = {'policy': 'THRESHOLD', 'tau': 0.4384071072784451, 'n': 60, 'quality_b': 0.8022189590778236, 'mean_calls': 2.0, 'first_pass_rate': 0.65, 'final_accept_rate': 0.8666666666666667, 'gave_up_rate': 0.13333333333333333, 'mean_emitted_attempt': 1.3666666666666667, 'efficiency': 0.08085920604312452, 'alpha_lo': 0.6405005469915745, 'alpha_hi': 0.8662716112128444, 'fraction_of_achievable': 0.7162937936446756}
+  - `level_score_permutation` = {'statistic': 'attempt1_mean_gate_score_level1_minus_level0', 'observed': 0.08289439149651345, 'n_level0': 30, 'n_level1': 30, 'shuffles': 5000, 'p_value_two_sided': 0.46870625874825034, 'interpretation': 'descriptive_not_a_gate'}
+- `results/s4_tau_max_traces.jsonl`
+  - (see file; 209045 bytes)
+- `data/generated/s4_tau_calls.jsonl`
+  - (see file; 1615030 bytes)
+- `results/env_snapshot_s4tau_kaggle.json`
+  - `mode` = snapshot_only (requirements.lock.txt NOT modified)
+  - `key_versions` = {'chromadb': '1.5.9', 'hdbscan': '0.8.42', 'langgraph': '1.1.9', 'numpy': '2.0.2', 'pandas': '2.3.3', 'scikit-learn': '1.9.0', 'scipy': '1.16.3', 'sentence-transformers': '5.6.1', 'statsmodels': '0.14.6', 'torch': '2.10.0+cu128', 'transformers': '5.15.0', 'umap-learn': '0.5.12'}
+
+### Decisions made (and why)
+- **None -- mechanical execution of the registered S4.5b rule.** The headline
+  point is the pre-run argmax of independent Verifier-B quality gain per LLM
+  call over all observed Verifier-A score thresholds. No threshold, target pass
+  rate, subgroup gate, or post-run outcome band was added after seeing the data.
+- The wrong `config.json` mounted beside Verifier-B was treated as transport
+  metadata, not as permission to guess an architecture. The exact seed-42
+  `save_pretrained` config is now registered in the repo; the uploaded tensor
+  shapes still have to match it before scoring can proceed. This is an artifact
+  loading repair, not a model or method decision (deviations log, 2026-08-20).
+
+### Findings (things we did not expect)
+- The derived point is **tau*=0.4384071**: first-pass **0.6500**, final
+  acceptance **0.8667**, mean **2.0000 LLM calls**, and independent Verifier-B
+  quality **0.802219**. The 65% first-pass rate falls inside the old struck
+  60--70% target only by coincidence; that target was not an input to the
+  selection. The point buys **71.63%** of the measured alpha_lo-to-alpha_hi
+  quality range.
+- Independent quality rises from **0.640501** at alpha_lo (ship attempt 1,
+  one call) to **0.866272** under explicit `FORCED_3` (five calls). Therefore
+  the loop has measurable headroom, while the selected point declines to pay
+  for all of it.
+- The per-attempt curve is not monotone: mean Verifier-A / Verifier-B scores are
+  **0.64685 / 0.64050**, **0.73404 / 0.72952**, then **0.67132 / 0.71147**.
+  Attempt 2 improves both judges on average; attempt 3 gives part of the gain
+  back. This is the empirical diminishing-return signal S4.6 must report, not a
+  reason to hide attempt 3 after it was generated.
+- At tau*, **8/60** cases exhaust all three attempts (2 level-0, 6 level-1).
+  The normative spec requests a hand-coded taxonomy of 50 three-time failures,
+  but only eight exist. S4.6 must audit all eight and state that the requested
+  sample size is unattainable; it may not manufacture or substitute 42 cases.
+- Attempt-1 score distributions differ by +0.08289 in the level-1 minus level-0
+  mean, but the registered descriptive permutation test gives **p=0.4687**.
+  This is "not detected", never evidence that the levels are equal.
+
+### Consequences for downstream steps
+- Phase 5 must read tau* from `results/s4_tau_frontier.json`; copying a rounded
+  constant into a config would recreate the hand-written-threshold defect this
+  step was designed to remove. The full frontier remains the result; tau* names
+  one operating point on it.
+- S4.6 reports accepted-attempt distribution separately from emitted
+  best-of-three distribution: two gave-up cases emit attempt 1 as their best
+  draft, so the latter is not a retry-stop distribution.
+- The threshold-sweep figure and S4.6 dynamics/failure report remain required
+  before Phase 4 can close. Phase 5 is not opened by this result alone.
+
+### Citations needed
+- None. This run mechanically executes the already registered and cited
+  quality--cost frontier, external-evaluator wall, and permutation instrument.
