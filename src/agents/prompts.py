@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""The one prompt renderer. §5.1 row 1 and the loop are the same function.
+"""The one prompt renderer. §5.1 row 1 and the loop share one base template.
 
 This file exists to make open decision 10 unrepresentable rather than merely
-satisfied. §5.1 row 1 (zero-shot, 1 call) **is** α_lo, the lower endpoint of
-decision 19's τ objective, so if row 1's prompt stated the axis requirement less
-fully than the loop's, the loop's measured "gain" would be partly the difference
-between two prompts -- and τ* would inherit it. Huang et al. §5 document exactly
-that artefact (81.8 standard vs 75.1 self-corrected, once the requirement was
-stated up front).
+satisfied. §5.1 row 1 is zero-shot; the loop adds RAG exemplars and therefore
+its attempt 1 is §5.1 row 3, the measured α_lo endpoint. The shared renderer
+guarantees that the axis definition, plot, length clause and closing instruction
+do not drift; it does **not** make a prompt with ten exemplars byte-identical to
+one with none. Calling α_lo row 1 was corrected on 2026-08-20 before Phase-5
+generation. Huang et al. §5 document why shared base wording still matters.
 
-So there is **one** renderer. Row 1 is `render(exemplars=(), feedback=None)`.
-The two prompts cannot drift because there is nothing for them to drift from:
-the shared text has a single source, and a test asserts the identity.
+So there is **one** renderer. Row 1 is `render(exemplars=(), feedback=None)`;
+row 3 / loop attempt 1 uses the same function with ten exemplars. Tests pin the
+exact row definitions and base-text containment.
 
 THE DEFINITION IS READ FROM DISK, NOT PASTED HERE
 --------------------------------------------------

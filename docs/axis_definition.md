@@ -12,7 +12,9 @@ rational definition *"verbatim from
 > ruling is not Claude's to take.
 >
 > **Why it is a file and not a string in `writer.py`:** the same block feeds the
-> §5.1 row-1 prompt and every loop prompt (decision 5 — parity by construction).
+> §5.1 row-1 prompt and every loop prompt use this same definition block
+> (decision 5 — shared base wording by construction). Loop attempt 1 adds ten
+> RAG exemplars and is therefore row 3 / α_lo, not zero-shot row 1.
 > One source means the two cannot drift; a copy-pasted docstring means they can.
 
 ---

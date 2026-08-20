@@ -18,9 +18,10 @@ loop here would mean choosing a `w` in order to fit `w`. Attempt 1 only.
 WHAT THESE GENERATIONS ARE ALLOWED TO BE USED FOR
 --------------------------------------------------
 1. Fitting `w` as a sensitivity curve (decision 1) and τ (decisions 2, 19).
-2. **§5.1 row 1 evidence, hence α_lo.** `prompts.render()` is the one template
-   shared with the loop's attempt 1 (decision 5), so row-1 parity holds by
-   construction rather than by audit.
+2. **§5.1 row 3 (RAG-only) evidence, hence α_lo.** Every prompt contains ten
+   retrieved exemplars. `prompts.render()` shares the base wording with row 1,
+   but these generations are not zero-shot. The earlier row-1 label was
+   corrected 2026-08-20 before Phase-5 generation.
 
 They are NOT a quality result and no model claim rests on them.
 

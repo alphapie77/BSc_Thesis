@@ -1,9 +1,8 @@
-"""Pin prompt parity. Open decision 10 is closed BY CONSTRUCTION, so test that.
+"""Pin shared-template parity without conflating zero-shot and RAG-only.
 
-§5.1 row 1 is α_lo, the lower endpoint of decision 19's τ objective. If row 1's
-prompt states the axis requirement less fully than the loop's, the loop's
-measured gain is partly a prompt difference and τ* inherits it — the artefact
-Huang et al. §5 document (81.8 standard vs 75.1 self-corrected).
+§5.1 row 3, not row 1, is α_lo: the frozen attempt-1 archive contains ten RAG
+exemplars. Row 1 and row 3 still share one base renderer so the axis requirement
+cannot drift — the artefact Huang et al. §5 document.
 
 Run:  python -m pytest tests/test_s4_prompts.py -q
       python tests/test_s4_prompts.py          (no pytest needed)
@@ -28,16 +27,18 @@ PLOT = "একটি গ্রামের ছেলে শহরে এসে �
 TEN = tuple(f"উদাহরণ {i}" for i in range(EXPECTED_EXEMPLARS))
 
 
-def test_row1_is_the_loop_prompt_with_nothing_added():
-    """The identity that closes decision 10."""
+def test_row1_is_the_zero_shot_renderer_with_nothing_added():
+    """Row 1 is zero-shot and must stay distinct from RAG-only row 3."""
     for arm in ("bn", "en"):
         a = row1_prompt(plot=PLOT, target_level=1, arm=arm)
         b = render(plot=PLOT, target_level=1, arm=arm, exemplars=(), feedback=None)
-        assert a == b, f"[{arm}] row 1 and the loop's attempt-1 prompt differ"
+        assert a == b, f"[{arm}] row 1 is not the zero-shot render"
+        rag = render(plot=PLOT, target_level=1, arm=arm, exemplars=TEN)
+        assert rag != a and "উদাহরণ 0" in rag
 
 
 def test_stripping_exemplars_and_feedback_recovers_row1_byte_for_byte():
-    """The property protocol.md §S4 decision 5 actually registers."""
+    """The shared base survives; exemplars/feedback remain real differences."""
     full = render(
         plot=PLOT, target_level=1, exemplars=TEN,
         previous_draft="আগের মন্তব্য", feedback="আরও নির্দিষ্ট করো",

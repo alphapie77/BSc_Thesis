@@ -499,7 +499,9 @@ Full state snapshot per attempt in `trace`; JSONL dump per run — the substrate
 > The cost objective **alone is degenerate**: calls-per-accepted falls monotonically in the pass rate (16.310 at q=0.10 → 1.020 at q=0.99), so minimising it selects **τ = 0**. The 60–70% target was a constraint wearing an optimum's clothes.
 >
 > **Following `kotte2026ucci` §3, the constraint is bounded by two measured endpoints, and ours are already §5.1 rows:**
-> - **α_lo** — τ=0, the Critic never rejects: **row 1, zero-shot, 1 call**
+> - **α_lo** — τ=0, the Critic never rejects: **row 3, RAG-only, 1 call**.
+>   Corrected 2026-08-20 before Phase-5 generation: the frozen attempt-1
+>   archive contains ten retrieved exemplars and was never zero-shot.
 > - **α_hi** — an explicit **FORCED-3 policy**: every plot runs all 3
 >   attempts and best-of-3 is emitted. This is not represented as `τ=1`,
 >   because calibrated Verifier-A scores can equal exactly 1.0 and the Critic's

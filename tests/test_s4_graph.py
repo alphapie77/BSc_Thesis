@@ -85,7 +85,7 @@ def _run(passes_at, **kwargs):
 def test_pass_on_first_attempt_costs_one_call_and_no_reflection():
     res, _, _, rf = _run(passes_at=1)
     assert res.writer_calls == 1 and rf.calls == 0
-    assert res.llm_calls == 1, "α_lo is defined as row 1 at one call"
+    assert res.llm_calls == 1, "α_lo is row 3 (RAG-only) at one call"
     assert not res.gave_up
 
 

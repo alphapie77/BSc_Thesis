@@ -59,7 +59,7 @@ def test_score_is_probability_of_the_TARGET_level_not_of_level_1():
 
 
 def test_tau_zero_never_rejects_because_alpha_lo_is_defined_as_that():
-    """Decision 19 defines α_lo as 'τ=0, the Critic never rejects, = §5.1 row 1'.
+    """Decision 19 defines α_lo as τ=0, never reject, = §5.1 row 3.
 
     With a strict inequality a hybrid of exactly 0.0 would FAIL, and α_lo would
     not be the row it is defined to be — quietly changing the lower endpoint of

@@ -243,7 +243,7 @@ class Critic:
         s = self.symbolic(draft, target_level)
         # >= not >: at τ = 0 the Critic must never reject, because decision 19
         # defines α_lo as exactly that -- "τ=0, the Critic never rejects, = §5.1
-        # row 1". With a strict inequality a score of 0.0 would FAIL and α_lo
+        # row 3 (RAG-only)". With a strict inequality a score of 0.0 would FAIL and α_lo
         # would not be the row it is defined to be.
         return Judgement(
             neural_score=n,

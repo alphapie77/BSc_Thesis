@@ -27,7 +27,9 @@ tau controls how strict the Critic is, so the two ends of tau ARE the two ends
 of the cost/quality range:
 
     alpha_lo  tau = 0. The Critic never rejects; the first draft ships.
-              Exactly SS5.1 row 1 (zero-shot, no loop). 1 call.
+              Exactly SS5.1 row 3 (RAG-only, no loop). 1 call. The S4 archive
+              has ten retrieved exemplars; calling this row 1 was an audit
+              error corrected 2026-08-20 before Phase-5 generation.
     alpha_hi  FORCED_3. Every plot runs all 3 attempts and emits best-of-3.
               This is explicit rather than tau=1 because calibrated scores may
               equal 1.0 and the Critic correctly uses score >= tau.
@@ -171,7 +173,7 @@ def main() -> int:
               f"{(quality - demo[0][1]) / calls:>11.4f}")
 
     chosen = select_tau(demo)
-    print(f"\n  alpha_lo (row 1, no loop)      = {chosen['alpha_lo']:.3f}")
+    print(f"\n  alpha_lo (row 3, RAG-only)     = {chosen['alpha_lo']:.3f}")
     print(f"  alpha_hi (explicit FORCED_3)    = {chosen['alpha_hi']:.3f}")
     print(f"  headline tau*                  = {chosen['tau']:.2f}")
     print(f"    quality {chosen['quality']:.3f} at {chosen['calls']:.3f} calls, "

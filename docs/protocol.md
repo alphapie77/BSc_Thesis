@@ -1578,8 +1578,8 @@ assumed — `madaan2023selfrefine` report diminishing returns by iteration 3.
 
 ### Registered decision 5 — prompt parity is enforced **by construction**, not by inspection (open decision 10, closed)
 
-**The threat.** §5.1 row 1 (zero-shot, 1 call) *is* α_lo, the lower endpoint of
-decision 19's τ objective. If row 1's prompt states the axis-level requirement
+**The threat.** ⬛ **Corrected 2026-08-20:** §5.1 row 3 (RAG-only, 1 call),
+not row 1, is α_lo. If row 1's prompt states the axis-level requirement
 less fully than the loop's does, then the loop's measured "gain" is partly the
 difference between two prompts, and **every number in RQ2 inherits the
 artefact** — including τ\*, because α_lo sits inside it.
@@ -1593,7 +1593,9 @@ koro."* The choice and reasoning are Claude's, endorsed not authored.**
 two things — retrieved exemplars and Reflector feedback — and **cannot** differ
 in how fully the axis-level requirement is stated, because that text has one
 source. A test asserts that removing exemplars and feedback from the loop's
-attempt-1 prompt yields row 1's prompt **byte-for-byte**.
+attempt-1 prompt yields row 1's prompt **byte-for-byte**. This is shared-base
+parity, not equality of the full prompts; the ten exemplars are the treatment
+that makes loop attempt 1 row 3.
 
 🔑 **Why by construction rather than by audit.** Huang et al. §5 document a
 reported self-correction gain that was really a more informative second prompt
@@ -1668,7 +1670,7 @@ fine-grained scheme over a pass/fail one. ⚠️ **All three are abstracts only.
   *axis / level / the cut* throughout and never *persona* or bare *cluster*.
 - **Decisions 9, 10 and 11** (cost-matched baseline, prompt parity, external-role
   self-critique row 7b) block **Phase 5**, not Phase 4 — but decision 10 in
-  particular constrains the §5.1 row-1 prompt that becomes α_lo, so it is flagged
+  particular constrains the §5.1 row-1 prompt's shared base wording, so it is flagged
   here as due before the τ sweep is interpreted, not before the loop is built.
 
 ## S5 pre-run amendment — strong controls frozen 2026-08-20
@@ -1744,6 +1746,7 @@ Any departure from this document is recorded here with date, reason, and commit.
 
 | Date | Section | Change | Reason |
 |---|---|---|---|
+| 2026-08-20 | 🔴 S4 decision 19 / §5.1 endpoint mapping — alpha_lo is row 3 RAG-only, not row 1 zero-shot | The frozen S4 attempt-1 archive contains ten retrieved exemplars in every prompt. Therefore τ=0 ships the RAG-only condition. The numeric frontier, alpha_lo=0.640501 and tau*=0.4384071 remain unchanged; only the incorrect row label and attribution are corrected. Code comments, tests, STATUS, pipeline and handoff now agree. | Found while implementing the Phase-5 runner, before any eval-plot generation. The correction makes the causal comparison cleaner: S4 measures the marginal value of the loop over RAG, while Phase 5 will separately measure zero-shot row 1. No literature search was needed; this is direct prompt-content inspection, not a new method choice. |
 | 2026-08-18 | 🔴 S4 decisions 1, 2 and 19 — gate/diagnosis separation, τ scope correction, explicit upper endpoint | Verifier-A alone now controls PASS/FAIL and best-of-three; symbolic scoring remains active for failed-rule diagnostics. The nonexistent variance-ratio partial-pooling estimator is replaced by one global headline frontier with mandatory per-level reporting and descriptive permutation comparison. α_hi becomes explicit `FORCED_3`, not `τ=1`. | **Observed evidence forced the gate change:** every S4.5a held-out fold selected `w=1` with delta-AUC 0.0000, while symbolic influence on verdicts remained large. **Primary-paper reading forced the scope correction:** Salem et al. (2026) use Bonferroni certification plus leaf-first fallback, not the estimator previously attributed to them; implementing the old text would invent a method. **A code boundary forced the endpoint correction:** calibrated scores can equal 1.0 and `>=` must be retained so α_lo at τ=0 never rejects. Literature searched before deciding; Consensus unavailable until 2026-09-01, so primary arXiv records were used and logged. |
 | 2026-08-18 | 🔴 S4 decision 1 — the three registered `w` outcomes did not cover the observed combination | Both complete conditions produced a **sensitive** verdict curve (50.8% / 39.2% flip share), while all five grouped held-out folds selected the neural-only endpoint `w=1.0` and tied neural-only at delta AUC 0.0000. Thus `SYMBOLIC_INERT` (registered as **flat**), `SYMBOLIC_EARNS_ITS_PLACE` (held-out benefit), and `SYMBOLIC_HARMS` (held-out rejection) all fail literally. The implementation's final catch-all nevertheless emitted `SYMBOLIC_INERT`. The numeric curves and scores are unchanged; the emitted labels are preserved in the JSON and superseded by the audit state `PRECOMMITMENT_UNRESOLVED`, explicitly **not** a fourth post-hoc scientific outcome. | **Third pre-registration coverage defect in three days.** Like the direction error and conjunction gap before it, this came from enumerating expected verbal cases without proving the map covered all combinations of its two measurements. Consequence fixed to the data observed: no hybrid-accuracy claim, no claim of symbolic predictive value, and no single `w` is selected. The symbolic component remains available only for its separately registered failed-rule-naming role. A test now pins the missing sensitive-plus-tie case so it cannot silently fall through again. No literature search was run: this is an audit correction to a logical partition, not a new method, threshold, or scientific design choice. |
 | 2026-08-18 | S4.5a — first `w` fit attempt **crashed before any result was produced** | The committed symbolic scorer was fitted under scikit-learn **1.9.0**, but the inherited Kaggle environment carried **1.6.1**. Joblib emitted `InconsistentVersionWarning`; the run continued until the first symbolic `predict_proba`, then failed because `LogisticRegression.multi_class` was absent. The appended notebook cells also changed from `/kaggle/working/repo` to `/kaggle/working/repo/repo`, so code and archives could come from different checkouts, and `!python` did not turn the non-zero process exit into a failed cell. | **No scientific outcome was observed and no generation is repeated.** This is an execution/provenance repair, not a method amendment: one dedicated runner uses a single checkout; the runtime must equal the artifact's recorded/locked 1.9.0; a read-only preflight makes an actual prediction through both Critic halves; both registered 120-row archives are mandatory; a symbolic pickle-version warning is fatal; and every subprocess uses `check=True`. No literature search was run because no design choice or threshold changed—the code now enforces the environment under which the already-committed artifact was produced. |

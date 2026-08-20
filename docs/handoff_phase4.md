@@ -45,7 +45,8 @@ FAIL & attempt=3 → emit best-of-3 with `gave_up=True`.
   dev-plots' generations** and reported as a **sensitivity curve, never a
   point**. Do not write a number for it.
 - **τ selection is already pre-registered** — `src/eval/tau_objective.py` and
-  the decision-19 deviation row. Endpoints α_lo (τ=0, = §5.1 row 1) and α_hi
+  the decision-19 deviation row. Endpoints α_lo (τ=0, = §5.1 row 3 RAG-only;
+  corrected 2026-08-20 because the archive has ten exemplars) and α_hi
   (τ=1, all 3 attempts), **both scored by Verifier-B**, headline
   τ\* = argmax[quality(τ) − α_lo]/E[calls](τ). Do not invent a pass-rate target;
   "first-pass 60–70%" was struck.

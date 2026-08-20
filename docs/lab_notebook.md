@@ -3670,9 +3670,10 @@ is the point of the entry.
   Bangla generation. Flagged now; the taxonomy is hand-coded over 50 three-time
   failures, so the category list must be fixed before coding starts.
 - **Decision 10 (prompt parity) is promoted from "blocks Phase 5" to "due before
-  the τ sweep is interpreted"** — §5.1 row 1 *is* α_lo, so an under-specified
-  row-1 prompt inflates the loop's apparent gain, which is precisely the
-  artefact Huang et al. §5 document.
+  the τ sweep is interpreted"** — ⬛ corrected 2026-08-20: §5.1 row 3
+  (RAG-only), not row 1, is α_lo. Shared base wording still prevents an
+  under-specified zero-shot prompt from creating a separate prompt confound,
+  the artefact Huang et al. §5 document.
 - **`axiv2607_24562_hierarchicalcrc` must be read in full before the τ sweep
   runs.** Its estimator is being *adopted*, not merely cited, and the entry rests
   on an abstract.
@@ -4056,7 +4057,8 @@ blob, because a digest is readable and a binary is not.
 
 ### Consequences for downstream steps
 - **No axis-control claim may rest on these 120 generations.** They remain valid
-  as the `w` / tau substrate and as §5.1 row-1 (alpha_lo) evidence, because
+  as the `w` / tau substrate and as §5.1 row-3 RAG-only (alpha_lo) evidence,
+  because
   neither depends on the level contrast being length-neutral.
 - **`length_confound` (AUC-based, direction-free) supersedes
   `length_diagnostic`** for any axis-control claim, and both the AUC and the

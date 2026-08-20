@@ -11,7 +11,7 @@
 # loop first would mean choosing a `w` to fit `w`.
 #
 # These generations ARE, however, quotable in one specific role: they are
-# S5.1 row 1 (zero-shot with retrieval) evidence and therefore feed alpha_lo.
+# S5.1 row 3 (RAG-only: ten retrieved exemplars) evidence and therefore alpha_lo.
 # `prompts.render()` is the single template shared with the loop's attempt 1
 # (protocol.md S4 decision 5), so parity holds by construction.
 
