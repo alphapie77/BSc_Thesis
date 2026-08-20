@@ -14,7 +14,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.common.secrets import require  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
-from src.eval.gemini_judge import SCHEMA, validate_payload  # noqa: E402
+from src.eval.gemini_judge import (  # noqa: E402
+    structured_generation_config, validate_payload,
+)
 from src.eval.s5_prompts import role_control_messages  # noqa: E402
 
 
@@ -93,11 +95,7 @@ def validate_gemini_api(*, api_key: str, model: str, session=None) -> dict:
             "Return a schema-valid evaluation object. Use verdict PASS, "
             "target_fit_score 100, and empty feedback."
         )}]}],
-        "generationConfig": {
-            "temperature": 0,
-            "responseMimeType": "application/json",
-            "responseSchema": SCHEMA,
-        },
+        "generationConfig": structured_generation_config(),
     }
     response = session.post(url, json=body, timeout=60)
     if response.status_code != 200:

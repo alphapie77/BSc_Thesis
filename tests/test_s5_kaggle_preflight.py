@@ -50,6 +50,8 @@ class Response:
 class Session:
     def post(self, url, **kwargs):
         assert "secret" in url
+        schema = kwargs["json"]["generationConfig"]["responseSchema"]
+        assert "additionalProperties" not in schema
         return Response()
 
 

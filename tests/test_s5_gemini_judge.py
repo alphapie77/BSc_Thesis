@@ -3,7 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from src.eval.gemini_judge import GeminiJudge, GeminiJudgeError, validate_payload
+from src.eval.gemini_judge import (
+    GeminiJudge, GeminiJudgeError, structured_generation_config,
+    validate_payload,
+)
 
 
 class Response:
@@ -39,6 +42,16 @@ def test_schema_validation_refuses_extra_fields_and_pass_feedback():
         validate_payload({"verdict": "PASS", "target_fit_score": 90, "feedback": "না"})
     with pytest.raises(GeminiJudgeError):
         validate_payload({"verdict": "FAIL", "target_fit_score": 50, "feedback": "x", "extra": 1})
+
+
+def test_legacy_transport_schema_omits_unsupported_extra_property_keyword():
+    config = structured_generation_config()
+    assert config["temperature"] == 0
+    assert config["responseMimeType"] == "application/json"
+    assert "additionalProperties" not in config["responseSchema"]
+    assert set(config["responseSchema"]["required"]) == {
+        "verdict", "target_fit_score", "feedback",
+    }
 
 
 def test_call_is_archived_and_second_call_resumes(tmp_path: Path):

@@ -20,12 +20,25 @@ SCHEMA = {
         "feedback": {"type": "string"},
     },
     "required": ["verdict", "target_fit_score", "feedback"],
-    "additionalProperties": False,
 }
 
 
 class GeminiJudgeError(RuntimeError):
     pass
+
+
+def structured_generation_config() -> dict:
+    """Return the legacy generateContent-compatible structured-output config.
+
+    The v1beta ``responseSchema`` field accepts an OpenAPI subset and rejected
+    ``additionalProperties`` on the live 2026-08-20 endpoint. Exact-key
+    enforcement remains in :func:`validate_payload`, after JSON parsing.
+    """
+    return {
+        "temperature": 0,
+        "responseMimeType": "application/json",
+        "responseSchema": SCHEMA,
+    }
 
 
 @dataclass(frozen=True)
@@ -104,11 +117,7 @@ class GeminiJudge:
         )
         body = {
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {
-                "temperature": 0,
-                "responseMimeType": "application/json",
-                "responseSchema": SCHEMA,
-            },
+            "generationConfig": structured_generation_config(),
         }
         started = time.monotonic()
         response = self.session.post(url, json=body, timeout=120)
