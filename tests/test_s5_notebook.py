@@ -28,14 +28,14 @@ def test_notebook_is_runner_only_and_pins_a_full_commit():
     assert "'--index-only'" in code
 
 
-def test_notebook_resumes_the_verified_smoke_with_chunk_zero_and_exports_audit_artifacts():
+def test_notebook_resumes_the_repaired_checkpoint_and_exports_audit_artifacts():
     nb = _nb()
     code = "\n".join("".join(c.get("source", [])) for c in nb["cells"])
     assert "RUN_SMOKE = False" in code
     assert "RUN_CHUNK = True" in code
     assert "REPLICATE_SEED = 42" in code
-    assert "START_CASE = 60" in code
-    assert "N_CASES = 40" in code
+    assert "START_CASE = 0" in code
+    assert "N_CASES = 100" in code
     assert "'--limit','1'" in code
     for name in (
         "s5_main_bn_calls.jsonl", "s5_main_bn_gemini_calls.jsonl",
@@ -57,7 +57,7 @@ def test_kaggle_work_cells_are_restart_safe_and_model_input_is_unambiguous():
         ))
     ]
     assert len(work_cells) == 6
-    assert all("REPO = Path('/kaggle/working/s5_repo_19fbee0')" in cell for cell in work_cells)
+    assert all("REPO = Path('/kaggle/working/s5_repo_aaeb3c1')" in cell for cell in work_cells)
     assert all("os.chdir(REPO)" in cell for cell in work_cells)
     setup = next(cell for cell in work_cells if "bn_clean.csv" in cell)
     assert "assert len(clean) == 1" in setup
