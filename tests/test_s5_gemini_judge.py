@@ -87,7 +87,8 @@ def test_call_is_archived_and_second_call_resumes(tmp_path: Path):
     judge = GeminiJudge(
         model="gemma-4-26b-a4b-it", seed=42, thinking_level="high",
         archive_path=tmp_path / "g.jsonl",
-        max_output_tokens=512, requests_per_minute=30,
+        failure_archive_path=tmp_path / "failures.jsonl",
+        max_output_tokens=512, transport_retry_attempts=3, requests_per_minute=30,
         tokens_per_minute=16000, requests_per_pacific_day=14400,
         safety_fraction=0.9,
         api_key="test", session=session,
@@ -97,3 +98,37 @@ def test_call_is_archived_and_second_call_resumes(tmp_path: Path):
     assert first == second
     assert session.calls == 1
     assert first.verdict == "FAIL" and first.target_fit_score == 61
+
+
+class IncompleteThenCompleteSession(Session):
+    def post(self, *args, **kwargs):
+        self.calls += 1
+        if self.calls == 1:
+            class IncompleteResponse:
+                status_code = 200
+                text = ""
+
+                @staticmethod
+                def json():
+                    return {"id": "bad", "model": "gemma-4-26b-a4b-it", "status": "incomplete"}
+            return IncompleteResponse()
+        return Response()
+
+
+def test_incomplete_interaction_is_archived_then_retried_without_scoring_partial_output(tmp_path: Path):
+    session = IncompleteThenCompleteSession()
+    judge = GeminiJudge(
+        model="gemma-4-26b-a4b-it", seed=42, thinking_level="high",
+        archive_path=tmp_path / "g.jsonl", failure_archive_path=tmp_path / "failures.jsonl",
+        max_output_tokens=512, transport_retry_attempts=3, requests_per_minute=30,
+        tokens_per_minute=16000, requests_per_pacific_day=14400,
+        safety_fraction=0.9, api_key="test", session=session,
+    )
+    judge._reserve_rate_slot = lambda: None
+    verdict = judge.judge(key="k", prompt="p")
+    assert verdict.verdict == "FAIL" and session.calls == 2
+    failure = json.loads((tmp_path / "failures.jsonl").read_text(encoding="utf-8"))
+    assert failure["reason"] == "interaction_status_incomplete"
+    accepted = json.loads((tmp_path / "g.jsonl").read_text(encoding="utf-8"))
+    assert accepted["transport_attempts"] == 2
+    assert accepted["discarded_transport_failure_keys"] == [failure["key"]]

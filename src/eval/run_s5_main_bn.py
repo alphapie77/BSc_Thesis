@@ -209,7 +209,9 @@ def main() -> int:
         seed=int(cfg["gemini_judge"]["seed"]),
         thinking_level=cfg["gemini_judge"]["thinking_level"],
         archive_path=out["gemini_calls_jsonl"],
+        failure_archive_path=out["gemini_transport_failures_jsonl"],
         max_output_tokens=int(cfg["gemini_judge"]["max_output_tokens"]),
+        transport_retry_attempts=int(cfg["gemini_judge"]["transport_retry_attempts"]),
         requests_per_minute=int(cfg["gemini_judge"]["requests_per_minute"]),
         tokens_per_minute=int(cfg["gemini_judge"]["tokens_per_minute"]),
         requests_per_pacific_day=int(

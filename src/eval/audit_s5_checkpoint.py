@@ -73,10 +73,12 @@ def audit_checkpoint(
     outputs = cfg["outputs"]
     local = _rows(checkpoint / Path(outputs["calls_jsonl"]).name)
     judge = _rows(checkpoint / Path(outputs["gemini_calls_jsonl"]).name)
+    failures = _rows(checkpoint / Path(outputs["gemini_transport_failures_jsonl"]).name)
     cases = _rows(checkpoint / Path(outputs["cases_jsonl"]).name)
 
     commits = set().union(
         _commit(local, label="local calls"), _commit(judge, label="judge calls"),
+        _commit(failures, label="judge transport failures"),
         _commit(cases, label="cases"),
     )
     if len(commits) > 1:
@@ -128,7 +130,7 @@ def audit_checkpoint(
         "checkpoint_dir": str(checkpoint),
         "runner_commit": commit,
         "seed": seed,
-        "archive_rows": {"local_calls": len(local), "hosted_judge_calls": len(judge), "cases": len(cases)},
+        "archive_rows": {"local_calls": len(local), "hosted_judge_calls": len(judge), "hosted_judge_transport_failures": len(failures), "cases": len(cases)},
         "seed_condition_counts": dict(sorted(Counter(row["condition"] for row in cases if row.get("replicate_seed") == seed).items())),
         "seed_progress": {
             "base_cases_total": len(base_cases),

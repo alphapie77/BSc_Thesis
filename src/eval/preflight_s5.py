@@ -57,6 +57,8 @@ def preflight(cfg: dict) -> dict:
         )
     if int(judge.get("max_output_tokens", 0)) != 512:
         raise S5ContractError("Gemma-4 judge max_output_tokens must be exactly 512")
+    if int(judge.get("transport_retry_attempts", 0)) != 3:
+        raise S5ContractError("Gemma-4 incomplete-response retry budget must be exactly 3")
     observed_limits = (
         int(judge.get("requests_per_minute", 0)),
         int(judge.get("tokens_per_minute", 0)),
@@ -166,6 +168,7 @@ def preflight(cfg: dict) -> dict:
         "gemini_seed": judge["seed"],
         "gemini_thinking_level": judge["thinking_level"],
         "judge_max_output_tokens": judge["max_output_tokens"],
+        "judge_transport_retry_attempts": judge["transport_retry_attempts"],
         "judge_rate_limits": {
             "rpm": judge["requests_per_minute"],
             "tpm": judge["tokens_per_minute"],

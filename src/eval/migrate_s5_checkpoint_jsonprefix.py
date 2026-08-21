@@ -24,6 +24,8 @@ from src.common.seed import set_seed  # noqa: E402
 
 
 SOURCE_COMMIT = "9e00d2e2b2f757166ead317a5eb9139b4d67f737"
+PARSER_REPAIR_COMMIT = "2e919895975da75b2d6e0cfc25c4b0bdc4d7475e"
+SOURCE_COMMITS = (SOURCE_COMMIT, PARSER_REPAIR_COMMIT)
 MIGRATION_ID = "s5_gemma4_json_prefix_parser_v1"
 
 
@@ -67,10 +69,10 @@ def migrate_rows(rows: list[dict], *, destination_commit: str, migration: dict) 
         if source_commit == destination_commit:
             migrated.append(row)
             continue
-        if source_commit != SOURCE_COMMIT:
+        if source_commit not in SOURCE_COMMITS:
             raise S5JsonPrefixMigrationError(
                 f"unsupported checkpoint commit {source_commit!r}; expected "
-                f"{SOURCE_COMMIT!r} or destination {destination_commit!r}"
+                f"one of {SOURCE_COMMITS!r} or destination {destination_commit!r}"
             )
         row["source_provenance"] = provenance
         row["provenance"] = {
@@ -94,13 +96,14 @@ def migrate(root: Path, cfg: dict) -> dict:
         "configs/s5_main_bn.yaml",
         {
             "migration_id": MIGRATION_ID,
-            "source_git_commit": SOURCE_COMMIT,
+            "source_git_commits": list(SOURCE_COMMITS),
             "destination_git_commit": destination,
         },
     )
     paths = [
         root / cfg["outputs"]["calls_jsonl"],
         root / cfg["outputs"]["gemini_calls_jsonl"],
+        root / cfg["outputs"]["gemini_transport_failures_jsonl"],
         root / cfg["outputs"]["cases_jsonl"],
     ]
     report = {}
@@ -111,7 +114,7 @@ def migrate(root: Path, cfg: dict) -> dict:
         report[path.name] = {"rows": len(rewritten)}
     return {
         "migration_id": MIGRATION_ID,
-        "source_commit": SOURCE_COMMIT,
+        "source_commits": list(SOURCE_COMMITS),
         "destination_commit": destination,
         "files": report,
     }

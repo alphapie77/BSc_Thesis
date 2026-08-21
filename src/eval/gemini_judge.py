@@ -156,7 +156,9 @@ class GeminiJudge:
     def __init__(
         self, *, model: str, seed: int, thinking_level: str,
         archive_path: str | Path,
+        failure_archive_path: str | Path,
         max_output_tokens: int,
+        transport_retry_attempts: int,
         requests_per_minute: int,
         tokens_per_minute: int,
         requests_per_pacific_day: int,
@@ -177,6 +179,9 @@ class GeminiJudge:
         if not 128 <= max_output_tokens <= 1024:
             raise GeminiJudgeError("judge max_output_tokens must be in [128,1024]")
         self.max_output_tokens = int(max_output_tokens)
+        if transport_retry_attempts != 3:
+            raise GeminiJudgeError("incomplete-response retry budget must be exactly 3")
+        self.transport_retry_attempts = int(transport_retry_attempts)
         if requests_per_minute != 30 or tokens_per_minute != 16000:
             raise GeminiJudgeError("Gemma-4 limits must match AI Studio: 30 RPM, 16K TPM")
         if requests_per_pacific_day != 14400:
@@ -191,12 +196,14 @@ class GeminiJudge:
         self.safe_tpm = max(1, int(self.tokens_per_minute * self.safety_fraction))
         self.safe_rpd = max(1, int(self.requests_per_pacific_day * self.safety_fraction))
         self.archive_path = Path(archive_path)
+        self.failure_archive_path = Path(failure_archive_path)
         self.api_key = api_key or require("GOOGLE_API_KEY")
         if session is None:
             import requests
             session = requests
         self.session = session
         self.cached = load_archive(self.archive_path)
+        self.failed = load_archive(self.failure_archive_path)
         self._last_request_epoch = self._latest_request_epoch()
 
     @staticmethod
@@ -215,7 +222,7 @@ class GeminiJudge:
     def _latest_request_epoch(self) -> float | None:
         timestamps = [
             parsed.timestamp()
-            for row in self.cached.values()
+            for row in [*self.cached.values(), *self.failed.values()]
             if (parsed := self._row_timestamp(row)) is not None
         ]
         return max(timestamps, default=None)
@@ -223,7 +230,7 @@ class GeminiJudge:
     def _requests_today(self) -> int:
         today = datetime.now(timezone.utc).astimezone(PACIFIC).date()
         return sum(
-            1 for row in self.cached.values()
+            1 for row in [*self.cached.values(), *self.failed.values()]
             if (parsed := self._row_timestamp(row)) is not None
             and parsed.astimezone(PACIFIC).date() == today
         )
@@ -243,7 +250,7 @@ class GeminiJudge:
 
     def _recent_usage(self, now_epoch: float) -> tuple[int, int, float | None]:
         recent = []
-        for row in self.cached.values():
+        for row in [*self.cached.values(), *self.failed.values()]:
             parsed = self._row_timestamp(row)
             if parsed is None:
                 continue
@@ -283,6 +290,35 @@ class GeminiJudge:
                 time.sleep(remaining)
         self._last_request_epoch = time.time()
 
+    @staticmethod
+    def _append(path: Path, row: dict) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+            fh.flush()
+
+    def _archive_incomplete(
+        self, *, key: str, prompt: str, raw: dict, attempt: int,
+    ) -> str:
+        failure_key = f"{key}|transport_incomplete={attempt}"
+        row = {
+            "key": failure_key,
+            "judge_key": key,
+            "prompt": prompt,
+            "transport_attempt": attempt,
+            "raw": raw,
+            "usage": raw.get("usage", {}),
+            "model": self.model,
+            "seed": self.seed,
+            "thinking_level": self.thinking_level,
+            "max_output_tokens": self.max_output_tokens,
+            "reason": "interaction_status_incomplete",
+            "provenance": stamp(config_path="configs/s5_main_bn.yaml"),
+        }
+        self._append(self.failure_archive_path, row)
+        self.failed[failure_key] = row
+        return failure_key
+
     def judge(self, *, key: str, prompt: str) -> GeminiVerdict:
         if key in self.cached:
             row = self.cached[key]
@@ -296,19 +332,31 @@ class GeminiJudge:
             thinking_level=self.thinking_level,
             max_output_tokens=self.max_output_tokens,
         )
-        self._reserve_rate_slot()
         started = time.monotonic()
-        response = self.session.post(
-            INTERACTIONS_URL,
-            headers={"x-goog-api-key": self.api_key, "Content-Type": "application/json"},
-            json=body,
-            timeout=120,
-        )
-        if response.status_code != 200:
-            raise GeminiJudgeError(
-                f"Gemini HTTP {response.status_code}: {response.text[:300]}"
+        discarded_keys = []
+        for transport_attempt in range(1, self.transport_retry_attempts + 1):
+            self._reserve_rate_slot()
+            response = self.session.post(
+                INTERACTIONS_URL,
+                headers={"x-goog-api-key": self.api_key, "Content-Type": "application/json"},
+                json=body,
+                timeout=120,
             )
-        raw = response.json()
+            if response.status_code != 200:
+                raise GeminiJudgeError(
+                    f"Gemini HTTP {response.status_code}: {response.text[:300]}"
+                )
+            raw = response.json()
+            if raw.get("status") != "incomplete":
+                break
+            discarded_keys.append(self._archive_incomplete(
+                key=key, prompt=prompt, raw=raw, attempt=transport_attempt,
+            ))
+        else:
+            raise GeminiJudgeError(
+                f"Gemini returned status='incomplete' {self.transport_retry_attempts} times; "
+                f"archived transport failures: {discarded_keys}"
+            )
         try:
             text = interaction_text(raw)
             parsed, trailing_text = parse_structured_response(text)
@@ -329,12 +377,11 @@ class GeminiJudge:
             "model_version": raw.get("model"),
             "response_id": raw.get("id"),
             "latency_seconds": time.monotonic() - started,
+            "transport_attempts": transport_attempt,
+            "discarded_transport_failure_keys": discarded_keys,
             "provenance": stamp(config_path="configs/s5_main_bn.yaml"),
         }
-        self.archive_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.archive_path, "a", encoding="utf-8", newline="\n") as fh:
-            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-            fh.flush()
+        self._append(self.archive_path, row)
         self.cached[key] = row
         return GeminiVerdict(
             verdict, score, feedback, row["usage"], row["model_version"],

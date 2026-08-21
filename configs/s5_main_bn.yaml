@@ -79,6 +79,7 @@ gemini_judge:
   seed: 42  # global reproducibility contract; supported by Interactions API
   thinking_level: high  # Gemma 4 supports only minimal/high; freeze judge reasoning on
   max_output_tokens: 512  # bounded structured verdict + hidden reasoning budget
+  transport_retry_attempts: 3  # incomplete provider responses are archived, never scored
   structured_output: true
   max_attempts: 3  # identical retry budget to proposed loop, protocol §S5
   feedback_language: bn
@@ -101,6 +102,7 @@ blind_resampling:
 outputs:
   calls_jsonl: data/generated/s5_main_bn_calls.jsonl
   gemini_calls_jsonl: data/generated/s5_main_bn_gemini_calls.jsonl
+  gemini_transport_failures_jsonl: data/generated/s5_main_bn_gemini_transport_failures.jsonl
   superseded_gemini36_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_calls.jsonl
   superseded_gemini36_writer_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_writer_calls.jsonl
   superseded_gemini36_cases_jsonl: results/s5_main_bn_gemini36_superseded_cases.jsonl
