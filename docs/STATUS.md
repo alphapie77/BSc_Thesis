@@ -84,7 +84,9 @@ long timeline below is retained rather than silently rewritten.
 > 162 schema-valid hosted-judge calls, zero transport failures, no duplicate
 > keys, and no Verifier-B score. The prior 60 row-8 cases/68 hosted calls/8
 > dependent Writer retries remain separately superseded; the next run is the
-> complete seed-43 replicate (bases 0–179; 1,800 condition cases).
+> complete seed-43 replicate (bases 0–179; 1,800 condition cases). The
+> already-prepared downstream runner uses the same single-GPU, batch-1 path for
+> seed 44 after the seed-43 checkpoint is audited.
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
 (120 + 120 generations), with no generation rerun.** In both conditions every

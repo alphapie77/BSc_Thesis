@@ -33,7 +33,7 @@ def test_notebook_resumes_the_repaired_checkpoint_and_exports_audit_artifacts():
     code = "\n".join("".join(c.get("source", [])) for c in nb["cells"])
     assert "RUN_SMOKE = False" in code
     assert "RUN_CHUNK = True" in code
-    assert "REPLICATE_SEED = 43" in code
+    assert "REPLICATE_SEED = 44" in code
     assert "START_CASE = 0" in code
     assert "N_CASES = 180" in code
     assert "'--limit','1'" in code
