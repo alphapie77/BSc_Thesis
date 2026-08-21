@@ -35,7 +35,7 @@ def test_notebook_resumes_the_verified_smoke_with_chunk_zero_and_exports_audit_a
     assert "RUN_CHUNK = True" in code
     assert "REPLICATE_SEED = 42" in code
     assert "START_CASE = 20" in code
-    assert "N_CASES = 20" in code
+    assert "N_CASES = 40" in code
     assert "'--limit','1'" in code
     for name in (
         "s5_main_bn_calls.jsonl", "s5_main_bn_gemini_calls.jsonl",
