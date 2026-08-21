@@ -4704,3 +4704,12 @@ while the run was producing them; the code checkout itself was pinned)
   response before the local Writer can load.
 - No S5 result claim is made yet. The exported checkpoint remains a resumable
   operational artifact, not a final result file.
+
+### Follow-up compatibility check
+
+- The next Kaggle restore exposed the earlier clean `2e919895` checkpoint,
+  which contains **600** condition cases rather than the later 640-case export.
+  The migration now accepts that finite predecessor as well as `19fbee01` and
+  was manually partition-checked: it retains 540 non-row-8 rows and retires 60
+  row-8 rows. This is checkpoint compatibility only; it does not change the
+  repaired judge interface or any scientific condition.

@@ -24,7 +24,13 @@ from src.common.provenance import git_hash, stamp, write_text_lf  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 
 
-SOURCE_COMMIT = "19fbee01d0a584f13a8e6f4f4d615729d71bad21"
+# Both clean checkpoints used the same unbounded row-8 feedback interface.
+# The 2e archive predates transport-failure archiving; 19f adds that sidecar.
+# Either may be safely partitioned into the repaired row-8 restart.
+SOURCE_COMMITS = (
+    "2e919895975da75b2d6e0cfc25c4b0bdc4d7475e",
+    "19fbee01d0a584f13a8e6f4f4d615729d71bad21",
+)
 CONDITION = "gemma4_26b_a4b_judge_loop"
 MIGRATION_ID = "s5_gemma4_feedback_enum_v1"
 
@@ -78,10 +84,10 @@ def partition_rows(
         if source == destination_commit:
             active.append(row)
             continue
-        if source != SOURCE_COMMIT:
+        if source not in SOURCE_COMMITS:
             raise S5FeedbackEnumMigrationError(
-                f"unsupported checkpoint commit {source!r}; expected {SOURCE_COMMIT!r} "
-                f"or destination {destination_commit!r}"
+                f"unsupported checkpoint commit {source!r}; expected one of "
+                f"{SOURCE_COMMITS!r} or destination {destination_commit!r}"
             )
         if _condition(row) == CONDITION:
             row["source_provenance"] = provenance
@@ -112,7 +118,7 @@ def migrate(root: Path, cfg: dict) -> dict:
         )
     migration = stamp("configs/s5_main_bn.yaml", {
         "migration_id": MIGRATION_ID,
-        "source_git_commit": SOURCE_COMMIT,
+        "source_git_commits": list(SOURCE_COMMITS),
         "destination_git_commit": destination,
     })
     outputs = cfg["outputs"]
@@ -136,7 +142,7 @@ def migrate(root: Path, cfg: dict) -> dict:
         report[active_path.name] = {"active": len(active), "superseded": len(retired)}
     return {
         "migration_id": MIGRATION_ID,
-        "source_commit": SOURCE_COMMIT,
+        "source_commits": list(SOURCE_COMMITS),
         "destination_commit": destination,
         "files": report,
     }
