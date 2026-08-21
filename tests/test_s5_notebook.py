@@ -34,7 +34,7 @@ def test_notebook_resumes_the_repaired_checkpoint_and_exports_audit_artifacts():
     assert "RUN_SMOKE = False" in code
     assert "RUN_CHUNK = True" in code
     assert "REPLICATE_SEED = 42" in code
-    assert "START_CASE = 100" in code
+    assert "START_CASE = 140" in code
     assert "N_CASES = 40" in code
     assert "'--limit','1'" in code
     for name in (

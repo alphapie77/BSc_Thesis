@@ -4723,3 +4723,13 @@ while the run was producing them; the code checkout itself was pinned)
   every generation row.
 - This is a verified resumable checkpoint, not a reported S5 result. The next
   operational chunk is bases 100–139 under the same frozen seed-42 protocol.
+
+### Checkpoint 4 audit
+
+- `s5_checkpoint (4).zip` completes seed 42 through base case 139:
+  **1,400/1,400** condition cases, exactly 140 per condition, and no duplicate
+  case key.
+- It contains **162** accepted schema-valid hosted-Gemma judgments and **zero**
+  active incomplete transport failures; Verifier-B remains absent.
+- This remains a verified resumable checkpoint, not a reported S5 result. The
+  next and final seed-42 chunk is bases 140–179.
