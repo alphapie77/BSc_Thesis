@@ -83,8 +83,8 @@ long timeline below is retained rather than silently rewritten.
 > condition cases for seed 42 through base case 139: exactly 140 per condition,
 > 162 schema-valid hosted-judge calls, zero transport failures, no duplicate
 > keys, and no Verifier-B score. The prior 60 row-8 cases/68 hosted calls/8
-> dependent Writer retries remain separately superseded; the final seed-42
-> chunk is bases 140–179.
+> dependent Writer retries remain separately superseded; the next run is the
+> complete seed-43 replicate (bases 0–179; 1,800 condition cases).
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
 (120 + 120 generations), with no generation rerun.** In both conditions every
