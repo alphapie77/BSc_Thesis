@@ -78,10 +78,12 @@ attach the checkpoint, run the new PASS+FAIL live preflight, then resume base
 cases 60–99.**) The
 long timeline below is retained rather than silently rewritten.
 
-> **Current S5 state (2026-08-21):** `s5_checkpoint (2).zip` was inspected,
-> not ingested as a thesis result. It has 640 completed condition cases. The
-> next runner deliberately redoes row 8 only, preserving the other nine rows
-> and their cached shared initials through an explicit provenance migration.
+> **Current S5 state (2026-08-21):** `s5_checkpoint (3).zip` was inspected,
+> not ingested as a final thesis result. It has **1,000/1,000** complete
+> condition cases for seed 42 through base case 99: exactly 100 per condition,
+> 118 schema-valid hosted-judge calls, zero transport failures, and no
+> Verifier-B score. The prior 60 row-8 cases/68 hosted calls/8 dependent Writer
+> retries remain separately superseded; the next chunk is seed-42 bases 100–139.
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
 (120 + 120 generations), with no generation rerun.** In both conditions every

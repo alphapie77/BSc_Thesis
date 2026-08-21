@@ -4713,3 +4713,13 @@ while the run was producing them; the code checkout itself was pinned)
   was manually partition-checked: it retains 540 non-row-8 rows and retires 60
   row-8 rows. This is checkpoint compatibility only; it does not change the
   repaired judge interface or any scientific condition.
+
+### Checkpoint 3 audit
+
+- `s5_checkpoint (3).zip` completes seed 42 through base case 99:
+  **1,000/1,000** condition cases, exactly 100 for each of the ten conditions.
+- It contains **118** accepted hosted-Gemma judge calls, all schema-valid, and
+  **zero** active incomplete transport failures. Verifier-B remains absent from
+  every generation row.
+- This is a verified resumable checkpoint, not a reported S5 result. The next
+  operational chunk is bases 100–139 under the same frozen seed-42 protocol.
