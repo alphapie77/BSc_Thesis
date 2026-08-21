@@ -1,0 +1,20 @@
+# Post-generation S5 Bangla scoring.  This config is deliberately separate
+# from the generation config: Verifier-B may be loaded here, and nowhere in S5
+# generation.
+step: S5.score.bn
+seed: 42
+replicate_seeds: [42, 43, 44]
+
+inputs:
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  plots_csv: data/plots/plots_bn.csv
+  verifier_b_artifact: artifacts/verifier_b.joblib
+
+scoring:
+  batch_size: 32
+  binary_success_threshold: 0.5  # BanglaBERT's registered binary decision boundary
+
+outputs:
+  b_scores_jsonl: results/s5_main_bn_verifier_b_scores.jsonl
+  scored_cases_csv: results/s5_main_bn_scored_cases.csv
+  score_manifest_json: results/s5_main_bn_score_manifest.json
