@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from src.agents.prompts import load_definition
+from src.eval.gemini_judge import FAIL_FEEDBACK_BY_TARGET
 
 
 def self_critique_prompt(*, base_prompt: str, draft: str, target_level: int) -> str:
@@ -51,6 +52,8 @@ def gemini_judge_prompt(
         f"OPERATIONAL DEFINITION:\n{definition}\n\n"
         f"REQUESTED LEVEL: {target_level}\n\nPLOT:\n{plot.strip()}\n\n"
         f"DRAFT:\n{draft.strip()}\n\n"
-        "PASS হলে feedback খালি রাখো। FAIL হলে সর্বোচ্চ দুইটি বাংলা বাক্যে "
-        "নির্দিষ্ট সংশোধন বলো। target_fit_score 0 থেকে 100-এর পূর্ণসংখ্যা।"
+        "শুধু schema-র JSON object দাও, অন্য কোনো লেখা নয়। "
+        "PASS হলে feedback অবশ্যই খালি string। FAIL হলে feedback অবশ্যই হুবহু এই "
+        f"একটি string: {FAIL_FEEDBACK_BY_TARGET[target_level]!r}। "
+        "target_fit_score 0 থেকে 100-এর পূর্ণসংখ্যা।"
     )

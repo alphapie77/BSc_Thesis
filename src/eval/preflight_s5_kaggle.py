@@ -15,7 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.common.secrets import require  # noqa: E402
 from src.common.seed import set_seed  # noqa: E402
 from src.eval.gemini_judge import (  # noqa: E402
-    INTERACTIONS_URL, interaction_request, interaction_text, validate_payload,
+    FAIL_FEEDBACK_BY_TARGET, INTERACTIONS_URL, interaction_request,
+    interaction_text, validate_payload,
 )
 from src.eval.s5_prompts import role_control_messages  # noqa: E402
 
@@ -89,38 +90,54 @@ def validate_gemini_api(
     if session is None:
         import requests
         session = requests
-    prompt = (
-            "Return a schema-valid evaluation object. Use verdict PASS, "
-            "target_fit_score 100, and empty feedback."
-    )
-    body = interaction_request(
-        model=model, prompt=prompt, seed=seed,
-        thinking_level=thinking_level, max_output_tokens=max_output_tokens,
-    )
-    response = session.post(
-        INTERACTIONS_URL,
-        headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
-        json=body,
-        timeout=60,
-    )
-    if response.status_code != 200:
-        # Never echo the URL: it contains the API key.
-        raise KagglePreflightError(
-            f"Gemini structured-output preflight HTTP {response.status_code}: "
-            f"{response.text[:200]}"
+    probes = [
+        ("PASS", None, "Return PASS, score 100, and empty feedback."),
+        (
+            "FAIL", 0,
+            "Return FAIL, score 0, and this exact feedback string: "
+            f"{FAIL_FEEDBACK_BY_TARGET[0]!r}.",
+        ),
+    ]
+    checked = []
+    for expected_verdict, target_level, instruction in probes:
+        body = interaction_request(
+            model=model,
+            prompt="Return only the schema-valid JSON object. " + instruction,
+            seed=seed, thinking_level=thinking_level,
+            max_output_tokens=max_output_tokens,
         )
-    raw = response.json()
-    try:
-        payload = json.loads(interaction_text(raw))
-        verdict, score, feedback = validate_payload(payload)
-    except Exception as exc:
-        raise KagglePreflightError(
-            f"Gemini did not honor the registered JSON schema: {exc}"
-        ) from exc
+        response = session.post(
+            INTERACTIONS_URL,
+            headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
+            json=body, timeout=60,
+        )
+        if response.status_code != 200:
+            raise KagglePreflightError(
+                f"Gemini structured-output preflight HTTP {response.status_code}: "
+                f"{response.text[:200]}"
+            )
+        raw = response.json()
+        try:
+            payload = json.loads(interaction_text(raw))
+            verdict, score, feedback = validate_payload(
+                payload, target_level=target_level,
+            )
+            if verdict != expected_verdict:
+                raise KagglePreflightError(
+                    f"Gemini preflight returned {verdict!r}, expected {expected_verdict!r}"
+                )
+        except KagglePreflightError:
+            raise
+        except Exception as exc:
+            raise KagglePreflightError(
+                f"Gemini did not honor the registered JSON schema: {exc}"
+            ) from exc
+        checked.append({
+            "verdict": verdict, "target_fit_score": score,
+            "feedback_chars": len(feedback), "model_version": raw.get("model"),
+        })
     return {
-        "verdict": verdict, "target_fit_score": score,
-        "feedback_chars": len(feedback),
-        "model_version": raw.get("model"),
+        "probes": checked, "model_version": checked[-1]["model_version"],
     }
 
 

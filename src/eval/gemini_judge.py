@@ -14,12 +14,29 @@ from src.common.provenance import stamp
 from src.common.secrets import require
 
 
+PASS_FEEDBACK = ""
+FAIL_FEEDBACK_BY_TARGET = {
+    0: "কাহিনি, চরিত্র বা দৃশ্যের নির্দিষ্ট উল্লেখ বাদ দিয়ে সাধারণ অনুভূতি বলো।",
+    1: "কাহিনি, চরিত্র বা দৃশ্যের একটি নির্দিষ্ট দিক নিয়ে নিজের প্রতিক্রিয়া বলো।",
+}
+
+
 SCHEMA = {
     "type": "object",
     "properties": {
         "verdict": {"type": "string", "enum": ["PASS", "FAIL"]},
         "target_fit_score": {"type": "integer", "minimum": 0, "maximum": 100},
-        "feedback": {"type": "string"},
+        # `enum` is an API-supported structured-output constraint.  The first
+        # live failure showed an unconstrained FAIL string repeating until the
+        # 512-token cap; JSON Schema maxLength is not supported by this API.
+        "feedback": {
+            "type": "string",
+            "enum": [PASS_FEEDBACK, *FAIL_FEEDBACK_BY_TARGET.values()],
+            "description": (
+                "PASS হলে খালি string; FAIL হলে requested level-এর জন্য "
+                "নির্ধারিত একটিমাত্র বাংলা সংশোধন।"
+            ),
+        },
     },
     "required": ["verdict", "target_fit_score", "feedback"],
 }
@@ -121,7 +138,9 @@ def _sentence_count(text: str) -> int:
     return sum(text.count(mark) for mark in ("।", ".", "?", "!"))
 
 
-def validate_payload(payload: dict) -> tuple[str, int, str]:
+def validate_payload(
+    payload: dict, *, target_level: int | None = None,
+) -> tuple[str, int, str]:
     if set(payload) != {"verdict", "target_fit_score", "feedback"}:
         raise GeminiJudgeError("Gemini judge JSON has missing or extra fields")
     verdict = payload["verdict"]
@@ -131,10 +150,15 @@ def validate_payload(payload: dict) -> tuple[str, int, str]:
         raise GeminiJudgeError(f"invalid judge verdict {verdict!r}")
     if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
         raise GeminiJudgeError("target_fit_score must be an integer in [0,100]")
-    if verdict == "PASS" and feedback:
+    if verdict == "PASS" and feedback != PASS_FEEDBACK:
         raise GeminiJudgeError("PASS feedback must be empty")
-    if verdict == "FAIL" and (not feedback or _sentence_count(feedback) > 2):
-        raise GeminiJudgeError("FAIL feedback must be one or two Bangla sentences")
+    if verdict == "FAIL" and feedback not in FAIL_FEEDBACK_BY_TARGET.values():
+        raise GeminiJudgeError("FAIL feedback must be one registered Bangla template")
+    if target_level is not None:
+        if target_level not in FAIL_FEEDBACK_BY_TARGET:
+            raise GeminiJudgeError(f"invalid requested target level {target_level!r}")
+        if verdict == "FAIL" and feedback != FAIL_FEEDBACK_BY_TARGET[target_level]:
+            raise GeminiJudgeError("FAIL feedback does not match the requested level")
     return verdict, score, feedback
 
 
@@ -319,10 +343,14 @@ class GeminiJudge:
         self.failed[failure_key] = row
         return failure_key
 
-    def judge(self, *, key: str, prompt: str) -> GeminiVerdict:
+    def judge(
+        self, *, key: str, prompt: str, target_level: int | None = None,
+    ) -> GeminiVerdict:
         if key in self.cached:
             row = self.cached[key]
-            verdict, score, feedback = validate_payload(row["parsed"])
+            verdict, score, feedback = validate_payload(
+                row["parsed"], target_level=target_level,
+            )
             return GeminiVerdict(
                 verdict, score, feedback, row.get("usage", {}),
                 row.get("model_version"), row.get("response_id"), key,
@@ -360,7 +388,9 @@ class GeminiJudge:
         try:
             text = interaction_text(raw)
             parsed, trailing_text = parse_structured_response(text)
-            verdict, score, feedback = validate_payload(parsed)
+            verdict, score, feedback = validate_payload(
+                parsed, target_level=target_level,
+            )
         except Exception as exc:
             raise GeminiJudgeError(f"invalid structured Gemini response: {exc}") from exc
         row = {

@@ -69,10 +69,19 @@ the index because the committed Windows `data\\rag\\...` path and Kaggle POSIX
 fields matched. The comparator now excludes only that host-local path and
 reports any real field mismatch. The notebook is repinned to this cross-host
 repair. The hosted-Gemma replacement, checkpoint migrator and rolling quota
-guards now pass **328 full-suite tests** locally. Next: pin/push the new notebook,
-attach the latest clean checkpoint, and run the Gemma-4 live preflight before
-any 12B load.**) The
+guards now pass **328 full-suite tests** locally. **Latest live evidence:** all
+three BN047/L0 incomplete row-8 responses exhausted exactly 512 output tokens
+while repeating an unbounded `feedback` string. Row 8 now restarts with a
+bounded API-supported feedback enum; only its old cases/calls are superseded,
+while the other nine conditions remain reusable. Next: pin/push the repair,
+attach the checkpoint, run the new PASS+FAIL live preflight, then resume base
+cases 60–99.**) The
 long timeline below is retained rather than silently rewritten.
+
+> **Current S5 state (2026-08-21):** `s5_checkpoint (2).zip` was inspected,
+> not ingested as a thesis result. It has 640 completed condition cases. The
+> next runner deliberately redoes row 8 only, preserving the other nine rows
+> and their cached shared initials through an explicit provenance migration.
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
 (120 + 120 generations), with no generation rerun.** In both conditions every

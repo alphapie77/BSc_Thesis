@@ -79,10 +79,14 @@ class Judge:
     def __init__(self):
         self.n = 0
 
-    def judge(self, *, key, prompt):
+    def judge(self, *, key, prompt, target_level):
         self.n += 1
         verdict = "PASS" if self.n == 2 else "FAIL"
-        return GeminiVerdict(verdict, 40 + self.n, "আরও ঠিক করো।" if verdict == "FAIL" else "", {}, "m", "r", key)
+        feedback = (
+            "কাহিনি, চরিত্র বা দৃশ্যের নির্দিষ্ট উল্লেখ বাদ দিয়ে সাধারণ অনুভূতি বলো।"
+            if verdict == "FAIL" else ""
+        )
+        return GeminiVerdict(verdict, 40 + self.n, feedback, {}, "m", "r", key)
 
 
 def test_gemini_loop_obeys_structured_verdict():

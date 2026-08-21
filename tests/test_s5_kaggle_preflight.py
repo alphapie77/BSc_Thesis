@@ -7,6 +7,7 @@ from src.eval.preflight_s5_kaggle import (
     KagglePreflightError, validate_gemini_api, validate_model_path,
     validate_role_templates,
 )
+from src.eval.gemini_judge import FAIL_FEEDBACK_BY_TARGET
 
 
 class Tokenizer:
@@ -38,19 +39,27 @@ class Response:
     status_code = 200
     text = ""
 
+    def __init__(self, verdict="PASS"):
+        self.verdict = verdict
+
     def json(self):
+        feedback = "" if self.verdict == "PASS" else FAIL_FEEDBACK_BY_TARGET[0]
         return {
             "id": "r", "model": "gemma-4-26b-a4b-it", "status": "completed",
             "steps": [{"type": "model_output", "content": [{
                 "type": "text", "text": json.dumps({
-                    "verdict": "PASS", "target_fit_score": 100, "feedback": ""
+                    "verdict": self.verdict, "target_fit_score": 100, "feedback": feedback
                 }),
             }]}],
         }
 
 
 class Session:
+    def __init__(self):
+        self.calls = 0
+
     def post(self, url, **kwargs):
+        self.calls += 1
         assert "secret" not in url
         assert kwargs["headers"]["x-goog-api-key"] == "secret"
         assert kwargs["json"]["generation_config"] == {
@@ -58,7 +67,7 @@ class Session:
         }
         schema = kwargs["json"]["response_format"]["schema"]
         assert "additionalProperties" not in schema
-        return Response()
+        return Response("PASS" if self.calls == 1 else "FAIL")
 
 
 def test_gemini_runtime_gate_uses_the_registered_schema():
@@ -66,4 +75,5 @@ def test_gemini_runtime_gate_uses_the_registered_schema():
         api_key="secret", model="gemma-4-26b-a4b-it", seed=42,
         thinking_level="high", max_output_tokens=512, session=Session()
     )
-    assert out["verdict"] == "PASS" and out["model_version"] == "gemma-4-26b-a4b-it"
+    assert [x["verdict"] for x in out["probes"]] == ["PASS", "FAIL"]
+    assert out["model_version"] == "gemma-4-26b-a4b-it"

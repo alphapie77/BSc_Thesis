@@ -81,6 +81,7 @@ gemini_judge:
   max_output_tokens: 512  # bounded structured verdict + hidden reasoning budget
   transport_retry_attempts: 3  # incomplete provider responses are archived, never scored
   structured_output: true
+  feedback_contract: enum_target_template_v1  # bounded API-supported judge feedback
   max_attempts: 3  # identical retry budget to proposed loop, protocol §S5
   feedback_language: bn
   feedback_max_sentences: 2  # bounded diagnostic payload, protocol §S5 contract 3
@@ -103,6 +104,10 @@ outputs:
   calls_jsonl: data/generated/s5_main_bn_calls.jsonl
   gemini_calls_jsonl: data/generated/s5_main_bn_gemini_calls.jsonl
   gemini_transport_failures_jsonl: data/generated/s5_main_bn_gemini_transport_failures.jsonl
+  superseded_gemma4_feedback_v1_calls_jsonl: data/generated/s5_main_bn_gemma4_feedback_v1_superseded_calls.jsonl
+  superseded_gemma4_feedback_v1_judge_calls_jsonl: data/generated/s5_main_bn_gemma4_feedback_v1_superseded_judge_calls.jsonl
+  superseded_gemma4_feedback_v1_transport_failures_jsonl: data/generated/s5_main_bn_gemma4_feedback_v1_superseded_transport_failures.jsonl
+  superseded_gemma4_feedback_v1_cases_jsonl: results/s5_main_bn_gemma4_feedback_v1_superseded_cases.jsonl
   superseded_gemini36_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_calls.jsonl
   superseded_gemini36_writer_calls_jsonl: data/generated/s5_main_bn_gemini36_superseded_writer_calls.jsonl
   superseded_gemini36_cases_jsonl: results/s5_main_bn_gemini36_superseded_cases.jsonl

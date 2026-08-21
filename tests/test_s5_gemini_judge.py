@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from src.eval.gemini_judge import (
-    INTERACTIONS_URL, GeminiJudge, GeminiJudgeError, interaction_request,
-    interaction_text, parse_structured_response, validate_payload,
+    FAIL_FEEDBACK_BY_TARGET, INTERACTIONS_URL, GeminiJudge, GeminiJudgeError,
+    interaction_request, interaction_text, parse_structured_response, validate_payload,
 )
 
 
@@ -19,7 +19,7 @@ class Response:
             "steps": [{"type": "model_output", "content": [{
                 "type": "text", "text": json.dumps({
                     "verdict": "FAIL", "target_fit_score": 61,
-                    "feedback": "আরও নির্দিষ্ট করে লেখো।",
+                    "feedback": FAIL_FEEDBACK_BY_TARGET[0],
                 }, ensure_ascii=False),
             }]}],
             "usage": {"total_input_tokens": 10, "total_output_tokens": 8},
@@ -48,6 +48,15 @@ def test_schema_validation_refuses_extra_fields_and_pass_feedback():
         validate_payload({"verdict": "PASS", "target_fit_score": 90, "feedback": "না"})
     with pytest.raises(GeminiJudgeError):
         validate_payload({"verdict": "FAIL", "target_fit_score": 50, "feedback": "x", "extra": 1})
+    assert validate_payload({
+        "verdict": "FAIL", "target_fit_score": 50,
+        "feedback": FAIL_FEEDBACK_BY_TARGET[0],
+    }, target_level=0)
+    with pytest.raises(GeminiJudgeError, match="requested level"):
+        validate_payload({
+            "verdict": "FAIL", "target_fit_score": 50,
+            "feedback": FAIL_FEEDBACK_BY_TARGET[1],
+        }, target_level=0)
 
 
 def test_interactions_transport_uses_structured_output_without_sampling_knobs():
@@ -62,6 +71,9 @@ def test_interactions_transport_uses_structured_output_without_sampling_knobs():
     assert set(schema["required"]) == {
         "verdict", "target_fit_score", "feedback",
     }
+    assert schema["properties"]["feedback"]["enum"] == [
+        "", FAIL_FEEDBACK_BY_TARGET[0], FAIL_FEEDBACK_BY_TARGET[1],
+    ]
 
 
 def test_interaction_text_requires_one_completed_model_output():

@@ -4669,3 +4669,38 @@ while the run was producing them; the code checkout itself was pinned)
 - Pombal, Rei & Martins (2026), `pombal2026selfpreference`, primary COLM paper
   read: rubric judges can favor their own model family, including Gemma-family
   effects. Both are recorded in `related_work.md` and `references.bib`.
+
+---
+
+## 2026-08-21 -- S5i: bounded feedback repair after archived Gemma-4 cap failure
+**Feeds:** Chapter 3 condition definition; reproducibility appendix; Chapter 5 limitations
+**Commit:** recorded by the enclosing implementation commit
+**Artifacts:** `s5_checkpoint (2).zip` (inspected, not ingested),
+`src/eval/gemini_judge.py`, `src/eval/migrate_s5_gemma4_feedback_enum.py`,
+`notebooks/s5_main_bn_kaggle.ipynb`
+
+### Numbers
+
+- Checkpoint contains **640** completed condition-case rows.
+- BN047/L0 produced **3/3** `status=incomplete` responses.
+- Each used exactly **512 output tokens**; no partial response entered the
+  accepted judge archive.
+
+### Findings
+
+- This is not a quota failure: the raw payload starts a FAIL JSON object, then
+  repeats words inside the free-text `feedback` value until the configured cap.
+- The documented structured-output subset supports string `enum`, but not a
+  string-length constraint. The repair therefore bounds feedback through an
+  enum rather than increasing the cap.
+
+### Consequences for downstream steps
+
+- The old row-8 interface is retired in named superseded archives. Its cases,
+  hosted judgments, dependent Writer retries and incomplete raw responses do
+  not mix with the repaired row.
+- The other nine conditions and shared initial drafts are retained with source
+  provenance. The new preflight requires both a PASS and a FAIL structured
+  response before the local Writer can load.
+- No S5 result claim is made yet. The exported checkpoint remains a resumable
+  operational artifact, not a final result file.

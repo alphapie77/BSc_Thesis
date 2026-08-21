@@ -172,6 +172,7 @@ def run_gemini_loop(
                 plot=plot, draft=_field(gen, "text"),
                 target_level=target_level, arm=arm,
             ),
+            target_level=target_level,
         )
         attempts.append({
             "attempt": attempt,

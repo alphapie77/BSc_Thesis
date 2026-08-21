@@ -123,6 +123,7 @@ def test_real_config_passes_cpu_preflight_without_loading_verifier_b():
     assert result["gemini_thinking_level"] == "high"
     assert result["judge_max_output_tokens"] == 512
     assert result["judge_transport_retry_attempts"] == 3
+    assert result["judge_feedback_contract"] == "enum_target_template_v1"
     assert result["judge_rate_limits"] == {
         "rpm": 30, "tpm": 16000, "rpd": 14400, "safety_fraction": 0.9,
     }
