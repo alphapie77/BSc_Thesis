@@ -13,6 +13,7 @@ import csv
 import json
 import math
 import sys
+import warnings
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -74,10 +75,15 @@ def self_bleu(texts: list[str], order: int) -> float:
     tokenized = [text.split() for text in texts]
     # No smoothing: a zero is a real signal for short Bangla outputs, not an
     # imputed overlap. This preserves the metric's conventional interpretation.
-    scores = [
-        sentence_bleu(tokenized[:i] + tokenized[i + 1:], hypothesis, weights=weights)
-        for i, hypothesis in enumerate(tokenized)
-    ]
+    # NLTK warns for every short hypothesis with no higher-order overlap. The
+    # zero is retained and its rate is reported beside the metric; the warning
+    # itself is repetitive rather than diagnostic once that rate is visible.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, module="nltk.translate.bleu_score")
+        scores = [
+            sentence_bleu(tokenized[:i] + tokenized[i + 1:], hypothesis, weights=weights)
+            for i, hypothesis in enumerate(tokenized)
+        ]
     return sum(scores) / len(scores)
 
 
@@ -140,6 +146,8 @@ def main() -> int:
         lengths = [len(text.split()) for text in texts]
         diversity_rows.append({
             "condition": condition, "target_level": level, "n": len(texts),
+            "n_texts_under_4_words": sum(length < order for length in lengths),
+            "rate_texts_under_4_words": sum(length < order for length in lengths) / len(lengths),
             "distinct_1": distinct(texts, 1), "distinct_2": distinct(texts, 2),
             "self_bleu_4": self_bleu(texts, order),
         })
