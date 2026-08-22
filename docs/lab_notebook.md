@@ -4862,3 +4862,51 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 - **None new.** The 15% same-input length-matching criterion and its source
   (`2607.18508`) were already recorded when S4.dev-LC registered this deferred
   analysis. This run introduces no additional method.
+
+---
+
+## 2026-08-23 -- S5.goodhart.figure.bn: Bangla Goodhart diagnostic figure
+**Feeds:** Chapter 6 Goodhart diagnostic and Chapter 7 limitations
+**Commit:** `c959022dfa71ac6ccb5ea319340dc01ac7876d5e`
+**Artifacts:** `results/s5_main_bn_goodhart_figure.png`, `results/s5_main_bn_goodhart_figure_manifest.json`
+
+### Numbers
+- `results/s5_main_bn_goodhart_figure.png`
+  - (see file; 197343 bytes)
+- `results/s5_main_bn_goodhart_figure_manifest.json`
+  - `status` = S5_BN_GOODHART_FIGURE_PASS
+  - `figure` = results/s5_main_bn_goodhart_figure.png
+  - `figure_sha256` = da716f1359846d4e85e2d1555ec894120b4e7fbd583a6f172a840c596b0ef48d
+  - `attempt_summary_sha256` = 73e5a895cb44746b831c91ac72510601eefcfbea2b3dee6f703640407e935ede
+  - `paired_transitions_sha256` = 84228e0203e750265106a674bce59eaaf315f4deb148f70e87c743ed8a85070c
+  - `panels` = {'A': 'descriptive A/B attempt means; later attempts are failure-selected', 'B': 'same-case adjacent transition in A-B gap; positive indicates widening'}
+
+### Decisions made (and why)
+- The figure separates the failure-selected attempt means from the same-case
+  adjacent transitions. Joining those quantities in one trajectory would imply
+  that attempts 2 and 3 contain the original case population; they contain only
+  cases that failed the preceding attempt.
+- The paired panel plots `delta(A-B)` rather than either verifier alone. This is
+  the registered Goodhart diagnostic: positive values mean the in-loop and
+  outcome-only verifiers diverged on the same continuing cases.
+
+### Findings (things we did not expect)
+- The paired A-B gap widens under the neural loop by **0.182802** from attempts
+  1->2 (n=147) and **0.114836** from 2->3 (n=67), and under neural+symbolic
+  feedback by **0.141481** (n=147) and **0.145979** (n=58).
+- The symbolic loop does not show the same pattern: its paired gap changes by
+  **-0.042224** (n=193) and **0.001396** (n=165). These are descriptive paired
+  transitions, not population estimates for all 540 cases per condition.
+
+### Consequences for downstream steps
+- Chapter 6 must show the paired panel beside the attempt trajectories and state
+  the changing paired-case counts. It may describe verifier-gap widening for the
+  neural and combined loops, but may not compare raw later-attempt means as if
+  they came from a common population.
+- This is a presentation artifact over the already audited Goodhart tables; it
+  changes no registered analysis, creates no new statistic and requires no
+  protocol deviation or generation rerun.
+
+### Citations needed
+- None new. The figure visualizes the registered, already documented
+  selection-aware Goodhart analysis without adding a method.

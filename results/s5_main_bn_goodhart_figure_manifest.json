@@ -1,0 +1,21 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T19:11:03.553267+00:00",
+    "git_commit": "c959022dfa71ac6ccb5ea319340dc01ac7876d5e",
+    "untracked_files": 2,
+    "config": "configs/s5_goodhart_figure_bn.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "status": "S5_BN_GOODHART_FIGURE_PASS",
+    "figure": "results/s5_main_bn_goodhart_figure.png",
+    "figure_sha256": "da716f1359846d4e85e2d1555ec894120b4e7fbd583a6f172a840c596b0ef48d",
+    "attempt_summary_sha256": "73e5a895cb44746b831c91ac72510601eefcfbea2b3dee6f703640407e935ede",
+    "paired_transitions_sha256": "84228e0203e750265106a674bce59eaaf315f4deb148f70e87c743ed8a85070c",
+    "panels": {
+      "A": "descriptive A/B attempt means; later attempts are failure-selected",
+      "B": "same-case adjacent transition in A-B gap; positive indicates widening"
+    }
+  }
+}
