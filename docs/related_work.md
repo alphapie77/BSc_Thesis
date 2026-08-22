@@ -668,6 +668,27 @@ method citations.
 
 ---
 
+## Tier 10 — S5 human-evaluation design (added 2026-08-23)
+
+> **Search record.** Consensus was searched first with eight narrow queries over
+> sampling, rater allocation, forced choice, pairwise evaluation and agreement,
+> targeting 2025--2026 before widening one allocation query to 2024. Load-bearing
+> papers were then read through alphaXiv. This search changed the interface: the
+> unregistered `uncertain` response was removed, replicate balance and minimal
+> repeated plot/text exposure became enforced invariants, and automated-score-
+> informed subset selection was explicitly rejected as evaluator conditioning.
+
+| Key | Source | Read | Defends / forces |
+|---|---|---|---|
+| `zouhar2025selectdatapoints` | Zouhar, Cui & Sachan, TACL 2025 / arXiv 2501.18251 | `[x]` full relevant sections | Diversity/metric/IRT selectors can beat random selection for preserving system rankings, including under domain balancing. But metric-based selection can unfairly disadvantage evaluated model families. Because our human test validates Verifier-B, sampling on A/B would condition the validation set on its evaluators; forces outcome-blind balanced selection while minimizing duplicate exposure. |
+| `riley2024stableranking` | Riley et al., NAACL 2024 / arXiv 2404.01474 | `[x]` relevant sections | Treats item allocation and ratings per item as design variables for replicable evaluation. Supports having persistent rater IDs and repeated ratings on the same cases; does not by itself justify transferring MQM ranking prescriptions to short Bangla attribute classification. |
+| `pandita2026annotatormodeling` | Pandita et al., arXiv 2605.13801 | `[x]` relevant sections | Shows the N-items/K-ratings trade-off and that persistent rater identifiers are necessary to model annotator variance. Confirms all three annotators should rate the same 100 cases rather than disjoint sheets. |
+| `levtsov2025globalscores` | Levtsov & Ustalov, arXiv 2507.01633 | `[x]` full relevant sections | Global scores are more reliable for overall rankings; pairwise comparisons help where quality is difficult to define but require more comparisons when ties are frequent. Confirms pointwise binary target matching because the construct and per-output estimand are already defined. |
+| `james2026agreement` | James, arXiv 2603.06865 | `[x]` metric table and interpretation sections | For three nominal raters, Fleiss kappa assumes complete equal ratings and is imbalance-sensitive; nominal Krippendorff alpha supports 2+ raters and missingness. Forces CI and disagreement-pattern reporting and forbids treating a universal agreement cutoff as construct validity. |
+| `belz2025heds3` | Belz & Thomson, GEM 2025 | `[x]` paper/record | HEDS 3.0 requires the instrument, interface, recruitment, allocation and analysis choices to be documented consistently. Confirms that the interface alone is not the human-evaluation record; a completed HEDS remains a Phase-7 deliverable. |
+
+---
+
 ## Gap table — the sentence Ch.2 must end with
 
 Fill as entries complete. The claim we must be able to defend is:

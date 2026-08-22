@@ -1,0 +1,23 @@
+# S5 Bangla human evaluation. The 5,400 generations are frozen inputs.
+step: S5.human_eval.bn
+seed: 42
+
+inputs:
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  score_manifest_json: results/s5_main_bn_score_manifest.json
+
+sampling:
+  n_items: 100
+  per_condition_level: 5
+  annotators: [A, B, C]
+
+outputs:
+  directory: data/annotation/s5_human_eval_bn
+  key_csv: data/annotation/s5_human_eval_bn/researcher_key.csv
+  responses_csv: results/s5_human_eval_bn_responses.csv
+  summary_csv: results/s5_human_eval_bn_summary.csv
+  report_json: results/s5_human_eval_bn_report.json
+
+analysis:
+  bootstrap_resamples: 10000
+  confidence_level: 0.95

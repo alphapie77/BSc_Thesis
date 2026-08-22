@@ -1852,6 +1852,67 @@ S4 results remain the outputs actually generated, and the false batch-8 claim
 must not appear in the paper. Resume keys use independent per-call RNG material,
 so condition order or a partial archive cannot consume a shared RNG stream.
 
+## S5 Bangla human evaluation — pre-commitment frozen 2026-08-23
+
+Written after the sealed 5,400-case computational post-run, but **before any
+human-evaluation sheet is generated or any response is collected**. It does not
+select, regenerate, filter, or modify a generation. Consensus was searched first
+with multiple 2025--2026 queries; the load-bearing primary papers were then read
+through alphaXiv.
+
+### Estimand and instrument
+
+The estimand is **human target-level match accuracy** on a fixed 100-case Bangla
+subset, not preference, general quality, or system ranking. Each annotator sees
+the plot and one generated review and makes a forced binary choice between the
+two already validated engagement-specificity levels. The exact axis definition
+is shown; condition, requested level, replicate seed, case key, Verifier-A/B
+scores and all model identities are hidden. There is no ordinal scale: the
+G-300 scale-collapse result and the successful forced-choice RQ1-H instrument
+make another unregistered scale indefensible. There is no abstention category;
+adding one would create an unregistered missingness/coverage estimand.
+
+### Sampling and allocation
+
+- Exactly **5 cases from every condition x target-level cell**: 10 x 2 x 5 =
+  **100 unique frozen case keys**. This estimates the registered balanced main
+  table rather than the archive's pooled condition frequency.
+- Selection is deterministic from global seed 42 and is **outcome blind**. It
+  never uses Verifier-A, Verifier-B, success, gave-up state, cost, or attempts.
+  Zouhar et al. (2025) show that metric-informed selection can improve ranking
+  efficiency, but also document unfair-evaluation bias when evaluated systems
+  help define the subset. Here it would additionally condition the human test
+  on the automatic scorer it is meant to validate, so it is rejected.
+- Each five-item cell has replicate allocation **2/2/1**, with the singleton
+  seed rotated across cells. Globally, the allocator minimizes repeated plots
+  and exact repeated emitted texts before applying its frozen SHA-256 rank.
+- All **three annotators rate all 100 items**, under independently shuffled
+  presentation orders and persistent anonymized annotator IDs. This yields 300
+  judgments and makes per-item agreement identifiable. No best annotator or
+  post-hoc item removal is permitted.
+- Before interface creation, the input cases file must be exactly 5,400 rows and
+  its SHA-256 must match the sealed Verifier-B score manifest. The researcher
+  key is separate and never sent to annotators.
+
+### Analysis contract
+
+Primary reporting is per-annotator and pooled forced-choice accuracy against
+the hidden requested level, with case-level confidence intervals; condition x
+level cells are reported descriptively because n=5 per cell is not a powered
+system-ranking experiment. Report raw three-way percentage agreement and
+nominal Krippendorff alpha with a bootstrap confidence interval, plus the
+confusion/disagreement pattern by target level. Alpha is chosen because it
+supports more than two raters and nominal labels; no universal threshold is
+treated as a validity gate. Agreement is reliability, not construct validity.
+The latter remains grounded in RQ1-H's independent corpus-text validation.
+
+Pointwise classification is retained rather than pairwise system ranking:
+Levtsov and Ustalov (2025) find global scores more reliable for overall ranking,
+while pairwise comparison is useful when quality is hard to define but needs
+more comparisons when ties are common. Our target is already a defined binary
+attribute and the registered metric is individual-output match accuracy, so a
+pairwise redesign would change the estimand rather than improve this one.
+
 ## Deviations log
 Any departure from this document is recorded here with date, reason, and commit.
 
