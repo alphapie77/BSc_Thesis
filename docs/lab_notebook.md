@@ -4910,3 +4910,55 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 ### Citations needed
 - None new. The figure visualizes the registered, already documented
   selection-aware Goodhart analysis without adding a method.
+
+---
+
+## 2026-08-23 -- S5.realism.figure.bn: Bangla corpus-level realism figure
+**Feeds:** Chapter 6 realism diagnostics and Chapter 7 limitations
+**Commit:** `c8bac298317bcae6e250ce4aa9462f6d1ec02215`
+**Artifacts:** `results/s5_main_bn_realism_figure.png`, `results/s5_main_bn_realism_figure_manifest.json`
+
+### Numbers
+- `results/s5_main_bn_realism_figure.png`
+  - (see file; 147000 bytes)
+- `results/s5_main_bn_realism_figure_manifest.json`
+  - `status` = S5_BN_REALISM_FIGURE_PASS
+  - `figure` = results/s5_main_bn_realism_figure.png
+  - `figure_sha256` = 96481e1f1c85dea57c6e62bbf7dd8229a2d1a2f8e2bd72ceb756e1d536881848
+  - `input_sha256` = {'length_js_csv': 'c1c6720c2723e54491b06c61cb4bc560f98be46b1aee5175a5a266c83cce3ad1', 'diversity_csv': '01ad5746cc3af3bf692a1c3cf52cd6f24a1c7a6a625b1d22ab0765ed8e57ff5c', 'labse_mauve_csv': 'a49546a149f189ee68af3747a9c3426915a74cc1febc1a9addd0b4a755eb5ec8'}
+  - `n_cells` = 20
+  - `n_generated_per_cell` = 270
+  - `sentiment_js_status` = NOT_MEASURED_NO_INDEPENDENT_REGISTERED_SCORER
+  - `mauve_standing` = LaBSE-feature small-sample sensitivity; not default-GPT2/MoP comparable
+
+### Decisions made (and why)
+- The figure displays the three already audited diagnostics in separate panels
+  with shared condition rows and level-specific marks. They are not collapsed
+  into a composite realism score because no such weighting was registered.
+- Sentiment JS is visibly marked as unmeasured. Reusing Verifier-B or introducing
+  a post-run sentiment classifier would not satisfy the specified independent,
+  registered scorer requirement.
+
+### Findings (things we did not expect)
+- Length realism depends strongly on level. Exact word-count JS ranges from
+  **0.153390** (neural+symbolic, level 0) to **0.611987** (zero-shot, level 1),
+  reinforcing that the generator does not reproduce the corpus length signature
+  uniformly across axis levels.
+- The extreme short-output rate is condition-specific: external-role critique
+  emits under-four-word text in **115/270 = 42.59%** of level-0 cases, while
+  several cells emit none. This diagnostic is descriptive, not a quality rank.
+- LaBSE-feature MAUVE is low throughout: **0.010463--0.035995**. The largest
+  cell is blind resampling level 0 and the smallest is zero-shot level 0, but
+  these n=270 feature-space values are sensitivity evidence only.
+
+### Consequences for downstream steps
+- Chapter 6 presents the three panels without a composite ranking and states
+  both MAUVE qualifications beside the figure. Chapter 7 retains the lack of an
+  independent sentiment-distribution score and the corpus-level-only scope.
+- No protocol deviation or generation rerun is introduced: this is a tracked
+  visualization of existing tables, and the missing sentiment panel remains an
+  explicit unresolved measurement rather than an invented substitute.
+
+### Citations needed
+- None new. JS and the LaBSE-feature MAUVE sensitivity method were already
+  recorded with their source analyses; this step adds no estimator.
