@@ -1,0 +1,10 @@
+step: S5.realism.figure.bn
+seed: 42
+inputs:
+  length_js_csv: results/s5_main_bn_length_js.csv
+  diversity_csv: results/s5_main_bn_diversity.csv
+  labse_mauve_csv: results/s5_main_bn_labse_mauve.csv
+outputs:
+  figure_png: results/s5_main_bn_realism_figure.png
+  manifest_json: results/s5_main_bn_realism_figure_manifest.json
+
