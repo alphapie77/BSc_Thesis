@@ -96,6 +96,13 @@ def load_cases(path: Path) -> list[dict]:
 
 
 def real_lengths(cleaned: Path, assignments: Path, region: str) -> dict[int, list[int]]:
+    if not cleaned.is_file():
+        raise S5RealismError(
+            f"missing {cleaned}; attach the frozen bn_clean.csv dataset and copy it "
+            "to data/cleaned before running diversity/realism analysis"
+        )
+    if not assignments.is_file():
+        raise S5RealismError(f"missing frozen axis assignments: {assignments}")
     with open(cleaned, encoding="utf-8", newline="") as fh:
         reviews = {r["review_id"]: r["Movie Review"] for r in csv.DictReader(fh)}
     groups = defaultdict(list)
