@@ -1,0 +1,22 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T19:24:21.639943+00:00",
+    "git_commit": "f992328506f913ce77f5cc3829f85cd78dbddefe",
+    "untracked_files": 2,
+    "config": "configs/s5_reporting_tables_bn.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "status": "S5_BN_REPORTING_TABLES_PASS",
+    "n_master_cells": 20,
+    "n_paired_comparisons": 9,
+    "report_sha256": "e62b8f8689cdfcbdd2e66ff614d24f1270b93a347e30559e9522443829008306",
+    "input_sha256": {
+      "master_csv": "74565bd15a643eca80b77cf9c9f853c3f5a07c8feb3906577a145673e545c6aa",
+      "paired_csv": "98b5720ea25096929d11a3b544298cec31c880d05abfd6fd1bf61afb2ef79688",
+      "analysis_json": "3afeee67d815b1da45ca9a36675c3e01989b8fa83f2e8e468dd6cf36e44eb2c1"
+    },
+    "standing": "formatting only; no inference recomputed"
+  }
+}

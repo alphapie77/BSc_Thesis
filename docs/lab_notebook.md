@@ -4962,3 +4962,49 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 ### Citations needed
 - None new. JS and the LaBSE-feature MAUVE sensitivity method were already
   recorded with their source analyses; this step adds no estimator.
+
+---
+
+## 2026-08-23 -- S5.reporting.tables.bn: Bangla thesis-ready main and statistics tables
+**Feeds:** Chapter 6 main ablation and statistics appendix
+**Commit:** `f992328506f913ce77f5cc3829f85cd78dbddefe`
+**Artifacts:** `results/s5_main_bn_reporting_tables.md`, `results/s5_main_bn_reporting_tables_manifest.json`
+
+### Numbers
+- `results/s5_main_bn_reporting_tables.md`
+  - (see file; 3483 bytes)
+- `results/s5_main_bn_reporting_tables_manifest.json`
+  - `status` = S5_BN_REPORTING_TABLES_PASS
+  - `n_master_cells` = 20
+  - `n_paired_comparisons` = 9
+  - `report_sha256` = e62b8f8689cdfcbdd2e66ff614d24f1270b93a347e30559e9522443829008306
+  - `input_sha256` = {'master_csv': '74565bd15a643eca80b77cf9c9f853c3f5a07c8feb3906577a145673e545c6aa', 'paired_csv': '98b5720ea25096929d11a3b544298cec31c880d05abfd6fd1bf61afb2ef79688', 'analysis_json': '3afeee67d815b1da45ca9a36675c3e01989b8fa83f2e8e468dd6cf36e44eb2c1'}
+  - `standing` = formatting only; no inference recomputed
+
+### Decisions made (and why)
+- None -- mechanical formatting of the audited S5 master and paired-statistics
+  tables. No comparison, estimator, correction family or decision rule changed.
+- The report explicitly excludes the registered dev-plot mini-ablations instead
+  of relabelling main-run conditions as those experiments; doing so would invent
+  evidence for experiments that were not represented in these two source tables.
+
+### Findings (things we did not expect)
+- All nine planned condition-versus-zero-shot target-probability deltas are
+  positive and their paired 95% bootstrap intervals exclude zero. The largest
+  is neural+symbolic feedback: **+0.256986 [0.215052, 0.298721]**.
+- This table cannot establish that neural+symbolic exceeds neural-only, or that
+  any component earns its place, because the registered inferential family has
+  only nine comparisons against zero-shot. Such direct contrasts are not
+  retrofitted after observing the main table.
+
+### Consequences for downstream steps
+- Chapter 6 can copy these rounded tables while retaining the CSVs as the exact
+  numerical source. It must report Verifier-B's calibration null beside scores,
+  treat seeds as blocks rather than independent replications, and add human
+  accuracy only after the three-file ingestion gate passes.
+- The four dev-plot mini-ablations remain a separate scope item; this formatting
+  step neither completes nor silently replaces them.
+
+### Citations needed
+- None new. Paired bootstrap, McNemar and BH were already registered and computed
+  upstream; this artifact only renders their frozen outputs.
