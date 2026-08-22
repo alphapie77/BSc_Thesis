@@ -4802,3 +4802,63 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
   active incomplete transport failures; Verifier-B remains absent.
 - This remains a verified resumable checkpoint, not a reported S5 result. The
   next and final seed-42 chunk is bases 140–179.
+
+---
+
+## 2026-08-23 -- S5.length-matched.bn: Bangla length-matched post-run sensitivity analysis
+**Feeds:** Chapter 6 experiments and Chapter 7 limitations
+**Commit:** `8e4c63a66c92445b7d502af4b2a127edef337b65`
+**Artifacts:** `results/s5_main_bn_length_matched.csv`, `results/s5_main_bn_length_matched_report.json`
+
+### Numbers
+- `results/s5_main_bn_length_matched.csv`
+  - (see file; 2982 bytes)
+- `results/s5_main_bn_length_matched_report.json`
+  - `status` = S5_BN_LENGTH_MATCHED_SENSITIVITY_PASS
+  - `relative_tolerance` = 0.15
+  - `n_source_cases` = 5400
+  - `n_source_scores` = 5400
+  - `source_cases_sha256` = 816a631be36f7e0a5918eb0298f7dce0c62b195ec80f43c8873ed923f94b3fd3
+  - `source_scores_sha256` = 0a7de4b67fe41186d291cc15578401c21df4ae8fe378cf21c0f1c52385ca23f4
+  - `total_matched_pairs` = 486
+  - `standing` = post-treatment sensitivity slice; full-surface analysis remains primary
+
+### Decisions made (and why)
+- **None -- mechanical execution of the criterion frozen in S4.dev-LC.** A pair
+  is included iff its same-plot, same-condition, same-replicate L0/L1 word
+  counts satisfy `|l0-l1| < 0.15 * max(l0,l1)`. Verifier-B, success, condition
+  performance and the observed matched count do not affect inclusion.
+- The full 5,400-case analysis remains primary. Calling this slice a primary
+  estimate was not an alternative: generated length is post-treatment, and the
+  registered purpose was a confound sensitivity check, not a new ranking rule.
+
+### Findings (things we did not expect)
+- Across the ten conditions, **486 of 2,700** same-condition L0/L1 pairs meet
+  the frozen tolerance, but coverage is highly condition-dependent: **9/270
+  (3.33%)** for external-role self-critique and **11/270 (4.07%)** for intrinsic
+  self-critique, versus **80/270 (29.63%)** for blind resampling. The other
+  conditions span 30--70 matched pairs.
+- The S4 projection of roughly 24 Bangla matched pairs was not a reliable
+  Phase-5-wide count: it came from one dev condition, while the main table
+  contains interventions that change emitted length differently.
+- Apparent matched-slice accuracies are correspondingly selection-sensitive.
+  For example, intrinsic/external self-critique show 0.955/0.944 pooled
+  Verifier-B accuracy, but on only 11/9 matched pairs. Those values are not
+  evidence that either condition outranks a row with a larger matched slice.
+- Input integrity passed: both source files contain 5,400 rows; the cases hash
+  matches the sealed score manifest and both exact SHA-256 values are recorded.
+
+### Consequences for downstream steps
+- Chapter 6 reports matched-pair **coverage beside every matched accuracy** and
+  does not order conditions by this table. The audited 5,400-case master table
+  remains the system comparison.
+- Chapter 7 states that conditioning on generated length changes the evaluated
+  population differently by condition; the sensitivity slice cannot establish
+  length-neutral axis control or remove the standing length limitation.
+- No protocol deviation is logged: the registered criterion ran unchanged and
+  a small/unequal slice is an observed result, not a reason to relax tolerance.
+
+### Citations needed
+- **None new.** The 15% same-input length-matching criterion and its source
+  (`2607.18508`) were already recorded when S4.dev-LC registered this deferred
+  analysis. This run introduces no additional method.

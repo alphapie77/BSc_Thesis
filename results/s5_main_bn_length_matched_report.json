@@ -1,0 +1,20 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T18:53:21.299273+00:00",
+    "git_commit": "8e4c63a66c92445b7d502af4b2a127edef337b65",
+    "untracked_files": 2,
+    "config": "configs/s5_length_matched_bn.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "status": "S5_BN_LENGTH_MATCHED_SENSITIVITY_PASS",
+    "relative_tolerance": 0.15,
+    "n_source_cases": 5400,
+    "n_source_scores": 5400,
+    "source_cases_sha256": "816a631be36f7e0a5918eb0298f7dce0c62b195ec80f43c8873ed923f94b3fd3",
+    "source_scores_sha256": "0a7de4b67fe41186d291cc15578401c21df4ae8fe378cf21c0f1c52385ca23f4",
+    "total_matched_pairs": 486,
+    "standing": "post-treatment sensitivity slice; full-surface analysis remains primary"
+  }
+}
