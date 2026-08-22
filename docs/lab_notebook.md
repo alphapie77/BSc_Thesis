@@ -4615,8 +4615,9 @@ while the run was producing them; the code checkout itself was pinned)
 ## 2026-08-22 -- S5j: Bangla post-generation scoring and realism diagnostics
 **Feeds:** Chapter 4 ablation results; Chapter 5 realism, Goodhart and limitations
 **Commit:** S5 post-run archival commit
-**Artifacts:** `results/s5_main_bn_*`; S5 post-run scripts/configuration and
-`notebooks/s5_bn_postrun_kaggle.ipynb`
+**Artifacts:** `results/s5_main_bn_*`,
+`results/env_snapshot_s5_bn_kaggle.json`, `docs/s5_archive_manifest.md`; S5
+post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 
 ### Numbers
 
@@ -4631,6 +4632,12 @@ while the run was producing them; the code checkout itself was pinned)
   selection-aware Goodhart outputs, diversity/length outputs, and **20**
   LaBSE-feature MAUVE rows. Each MAUVE row compares **270** generated with
   **270** region-A real texts.
+- The hash-registered final generation checkpoint contains **7,068** local
+  Writer/Reflector calls, **654** hosted Gemma-4 judge calls, and zero active
+  hosted transport failures. Cases and environment both carry clean runner
+  commit `22124a8`; runtime is transformers **5.15.0**, scikit-learn **1.9.0**,
+  Python **3.12.13**, Tesla T4. Kaggle exposed two T4 devices, while the frozen
+  Writer path deliberately used only `cuda:0`.
 
 ### Decisions made (and why)
 
