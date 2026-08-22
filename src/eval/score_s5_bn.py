@@ -12,10 +12,15 @@ import argparse
 import csv
 import hashlib
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 import yaml
+
+# Support the documented direct-script invocation as well as ``python -m``.
+# Kaggle invokes this runner from a cloned checkout, not an installed package.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.common.provenance import stamp, write_csv_result, write_result, write_text_lf
 from src.common.seed import set_seed

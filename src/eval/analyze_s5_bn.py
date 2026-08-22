@@ -6,11 +6,14 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.common.provenance import write_csv_result, write_result
 from src.common.seed import set_seed

@@ -1,6 +1,15 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-21 (**S4.6 COMPLETE under two documented protocol
+**Last updated:** 2026-08-22 (**S5 Bangla generation COMPLETE; outcome scoring
+is next.** The final checkpoint audit finds the exact frozen **5,400/5,400**
+Bangla surface: seeds 42/43/44 each contribute 1,800 condition-cases and all
+ten conditions contribute 540. There are zero missing, extra, or duplicate
+case keys; every case has an emitted output and final Verifier-A score; all 540
+hosted-Gemma judge cases have valid verdict/score fields; no hosted transport
+failure was accepted; and `verifier_b_score` is null in all generation cases.
+The active rows share clean runner commit `22124a8`. The separate post-run
+scorer now needs the registered Verifier-B artifact plus uploaded weights; it
+must write a new score archive, never alter this generation archive.**) **S4.6 COMPLETE under two documented protocol
 deviations; Phase 4 is complete.** At tau*=0.4384071, accepted stops are
 **39/12/1** across attempts 1/2/3 and **8/60 gave up**. Attempt 1→2 improves
 mean Verifier-A/B by **+0.08719/+0.08902**; attempt 2→3 regresses by
@@ -78,15 +87,14 @@ attach the checkpoint, run the new PASS+FAIL live preflight, then resume base
 cases 60–99.**) The
 long timeline below is retained rather than silently rewritten.
 
-> **Current S5 state (2026-08-21):** `s5_checkpoint (4).zip` was inspected,
-> not ingested as a final thesis result. It has **1,400/1,400** complete
-> condition cases for seed 42 through base case 139: exactly 140 per condition,
-> 162 schema-valid hosted-judge calls, zero transport failures, no duplicate
-> keys, and no Verifier-B score. The prior 60 row-8 cases/68 hosted calls/8
-> dependent Writer retries remain separately superseded; the next run is the
-> complete seed-43 replicate (bases 0–179; 1,800 condition cases). The
-> already-prepared downstream runner uses the same single-GPU, batch-1 path for
-> seed 44 after the seed-43 checkpoint is audited.
+> **Current S5 state (2026-08-22):** the final `s5_checkpoint.zip` was
+> read-only audited, not yet ingested as a thesis result. It contains the exact
+> **5,400/5,400** Bangla generation surface: seeds 42/43/44 each have 1,800
+> complete condition-cases, every condition has 540, and the expected
+> plot×level×condition×seed key set has no missing, extra, or duplicate row.
+> The active checkpoint has zero hosted transport failures, 540 schema-valid
+> hosted-Gemma final rows, and no Verifier-B score. Next is post-generation
+> scoring in a separate archive; no generator rerun is authorised.
 
 **Prior update — 2026-08-18:** **S4.5a completed on both registered archives
 (120 + 120 generations), with no generation rerun.** In both conditions every
