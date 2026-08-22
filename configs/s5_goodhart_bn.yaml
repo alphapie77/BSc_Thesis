@@ -1,0 +1,11 @@
+# Selection-aware Goodhart analysis for the sealed S5 Bangla score archive.
+step: S5.goodhart.bn
+seed: 42
+
+inputs:
+  b_scores_jsonl: results/s5_main_bn_verifier_b_scores.jsonl
+
+outputs:
+  attempt_summary_csv: results/s5_main_bn_goodhart_attempt_summary.csv
+  paired_transitions_csv: results/s5_main_bn_goodhart_paired_transitions.csv
+  report_json: results/s5_main_bn_goodhart_report.json
