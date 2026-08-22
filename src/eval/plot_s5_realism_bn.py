@@ -20,13 +20,13 @@ from src.common.seed import set_seed  # noqa: E402
 
 
 CONDITIONS = [
-    "zero_shot", "rag_only", "blind_resampling", "matched_compute_a_selection",
+    "zero_shot", "static_few_shot", "rag_only", "blind_resampling",
     "intrinsic_self_critique", "external_role_self_critique", "rag_symbolic_loop",
     "rag_neural_loop", "rag_neural_symbolic_feedback", "gemma4_26b_a4b_judge_loop",
 ]
 LABELS = {
     "zero_shot": "Zero-shot", "rag_only": "RAG only",
-    "blind_resampling": "Blind resampling", "matched_compute_a_selection": "A-selection",
+    "static_few_shot": "Static few-shot", "blind_resampling": "Blind resampling",
     "intrinsic_self_critique": "Intrinsic critique",
     "external_role_self_critique": "External-role critique",
     "rag_symbolic_loop": "Symbolic loop", "rag_neural_loop": "Neural loop",
@@ -121,4 +121,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
