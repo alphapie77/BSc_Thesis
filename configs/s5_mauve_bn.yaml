@@ -1,0 +1,19 @@
+# Bangla-primary MAUVE via the existing multilingual LaBSE representation.
+# The package default GPT-2 Large is deliberately not treated as a Bangla
+# semantic metric; it remains an optional compatibility sensitivity only.
+step: S5.mauve.bn
+seed: 42
+
+inputs:
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  cleaned_csv: data/cleaned/bn_clean.csv
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+
+reference:
+  region: A_organic
+  encoder: sentence-transformers/LaBSE
+  per_level_n: 270  # match every condition × target-level generated corpus
+
+outputs:
+  labse_mauve_csv: results/s5_main_bn_labse_mauve.csv
+  report_json: results/s5_main_bn_mauve_report.json
