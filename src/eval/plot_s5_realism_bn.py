@@ -63,7 +63,7 @@ def build_figure(lengths: pd.DataFrame, diversity: pd.DataFrame, mauve: pd.DataF
         (diversity, "rate_texts_under_4_words", "B. Generated texts under 4 words", (0, 1)),
         (mauve, "labse_feature_mauve", "C. LaBSE-feature MAUVE ↑ (sensitivity)", (0, None)),
     ]
-    fig, axes = plt.subplots(1, 3, figsize=(14, 6.2), sharey=True, constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(14, 6.8), sharey=True)
     y = list(range(len(CONDITIONS)))
     for ax, (frame, metric, title, limits) in zip(axes, frames):
         indexed = frame.set_index(["condition", "target_level"])
@@ -79,10 +79,11 @@ def build_figure(lengths: pd.DataFrame, diversity: pd.DataFrame, mauve: pd.DataF
     axes[0].legend(loc="lower right", fontsize=8)
     fig.suptitle("S5 Bangla corpus-level realism diagnostics (n=270 generated per cell)",
                  fontsize=13, fontweight="bold")
-    fig.text(.5, .005,
-             "No sentiment-JS panel: no independent registered generated-text sentiment scorer. "
+    fig.subplots_adjust(left=.15, right=.985, top=.87, bottom=.16, wspace=.08)
+    fig.text(.5, .055,
+             "No sentiment-JS panel: no independent registered generated-text sentiment scorer.\n"
              "MAUVE uses LaBSE features and is not default-GPT2/MoP comparable.",
-             ha="center", fontsize=8, color="#374151")
+             ha="center", va="center", fontsize=8, color="#374151")
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=220, metadata={"Software": "thesis/plot_s5_realism_bn.py",
                                            "Title": "S5 Bangla realism figure",
