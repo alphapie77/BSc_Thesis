@@ -59,10 +59,15 @@ def build_figure(attempts: pd.DataFrame, transitions: pd.DataFrame,
                 label=f"{LABELS[condition]} — A")
         ax.plot(x, part["mean_verifier_b"], marker="s", color=color, linewidth=1.8,
                 linestyle="--", label=f"{LABELS[condition]} — B")
-        for _, row in part.iterrows():
+        label_shift = {"rag_neural_loop": -17, "rag_symbolic_loop": -14,
+                       "rag_neural_symbolic_feedback": 7}[condition]
+        for _, row in part[part["attempt"] > 1].iterrows():
             ax.annotate(f"n={int(row['n_cases'])}", (row["attempt"], row["mean_verifier_b"]),
-                        xytext=(0, -14), textcoords="offset points", ha="center", fontsize=7,
-                        color=color)
+                        xytext=(0, label_shift), textcoords="offset points", ha="center",
+                        fontsize=7, color=color)
+    ax.annotate("all n=540", (1, attempts.loc[attempts["attempt"] == 1, "mean_verifier_b"].mean()),
+                xytext=(0, -18), textcoords="offset points", ha="center", fontsize=8,
+                color="#374151")
     ax.set(title="A. Descriptive attempt trajectories (failure-selected)",
            xlabel="Attempt", ylabel="Mean target probability", xticks=[1, 2, 3], ylim=(0, 1))
     ax.grid(alpha=.22)
@@ -136,4 +141,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
