@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from src.annotate.s5_human_eval_score import (
-    HumanEvalScoreError, nominal_krippendorff_alpha, validate_responses,
+    HumanEvalScoreError, nominal_krippendorff_alpha, summarize, validate_responses,
 )
 
 
@@ -36,3 +36,12 @@ def test_missing_or_abstaining_response_is_rejected():
 def test_nominal_alpha_endpoints():
     assert nominal_krippendorff_alpha(pd.DataFrame([[0, 0, 0], [1, 1, 1]]).to_numpy()) == 1.0
     assert nominal_krippendorff_alpha(pd.DataFrame([[0, 1, 0], [1, 0, 1]]).to_numpy()) < 0
+
+
+def test_summary_has_precommitted_intervals_and_target_disagreement():
+    joined = validate_responses(_key(), _responses(), ("A", "B", "C"))
+    rows, report = summarize(joined, n_boot=100, confidence=.95)
+    annotator_rows = [r for r in rows if r["scope"] == "annotator"]
+    assert all(r["accuracy_ci_low"] == r["accuracy_ci_high"] == 1.0 for r in annotator_rows)
+    assert set(report["confusion_by_target_level"]) == {"target_level_0", "target_level_1"}
+    assert report["disagreement_by_target_level"]["target_level_0"]["split_2_to_1_items"] == 0

@@ -82,28 +82,62 @@ def bootstrap_items(joined: pd.DataFrame, *, n: int, confidence: float,
 
 
 def summarize(joined: pd.DataFrame, *, n_boot: int, confidence: float) -> tuple[list[dict], dict]:
+    rng = np.random.default_rng(42)
+    alpha_q = [(1 - confidence) / 2, 1 - (1 - confidence) / 2]
+
+    def accuracy_ci(group: pd.DataFrame) -> tuple[float, float]:
+        # Resample items, retaining every rating attached to each sampled item.
+        item_values = [g["correct"].to_numpy(float) for _, g in group.groupby("item_id")]
+        estimates = np.empty(n_boot)
+        for i in range(n_boot):
+            draw = rng.integers(0, len(item_values), len(item_values))
+            estimates[i] = np.concatenate([item_values[j] for j in draw]).mean()
+        return tuple(float(x) for x in np.quantile(estimates, alpha_q))
+
     rows = []
     for annotator, group in joined.groupby("annotator", sort=True):
+        lo, hi = accuracy_ci(group)
         rows.append({"scope": "annotator", "annotator": annotator,
                      "condition": "ALL", "target_level": "ALL", "n": len(group),
-                     "accuracy": float(group["correct"].mean())})
+                     "accuracy": float(group["correct"].mean()),
+                     "accuracy_ci_low": lo, "accuracy_ci_high": hi})
     for (condition, level), group in joined.groupby(["condition", "target_level"], sort=True):
         rows.append({"scope": "cell_pooled", "annotator": "ALL",
                      "condition": condition, "target_level": int(level), "n": len(group),
-                     "accuracy": float(group["correct"].mean())})
+                     "accuracy": float(group["correct"].mean()),
+                     "accuracy_ci_low": None, "accuracy_ci_high": None})
+    overall_lo, overall_hi = accuracy_ci(joined)
     rows.append({"scope": "overall_pooled", "annotator": "ALL", "condition": "ALL",
                  "target_level": "ALL", "n": len(joined),
-                 "accuracy": float(joined["correct"].mean())})
+                 "accuracy": float(joined["correct"].mean()),
+                 "accuracy_ci_low": overall_lo, "accuracy_ci_high": overall_hi})
     pivot = joined.pivot(index="item_id", columns="annotator", values="response")
     matrix = pivot.to_numpy(int)
     unanimous = float(np.mean(np.all(matrix == matrix[:, [0]], axis=1)))
     alpha = nominal_krippendorff_alpha(matrix)
     ci = bootstrap_items(joined, n=n_boot, confidence=confidence,
                          rng=np.random.default_rng(42))
+    confusion = {}
+    disagreement = {}
+    for level, group in joined.groupby("target_level", sort=True):
+        confusion[f"target_level_{int(level)}"] = {
+            "n_judgments": len(group),
+            "responses_level_0": int((group["response"] == 0).sum()),
+            "responses_level_1": int((group["response"] == 1).sum()),
+            "accuracy": float(group["correct"].mean()),
+        }
+        item_matrix = group.pivot(index="item_id", columns="annotator", values="response").to_numpy(int)
+        disagreement[f"target_level_{int(level)}"] = {
+            "n_items": len(item_matrix),
+            "unanimous_items": int(np.sum(np.all(item_matrix == item_matrix[:, [0]], axis=1))),
+            "split_2_to_1_items": int(np.sum(~np.all(item_matrix == item_matrix[:, [0]], axis=1))),
+        }
     report = {"status": "S5_BN_HUMAN_EVAL_PASS", "n_items": len(pivot),
               "n_judgments": len(joined), "pooled_accuracy": float(joined["correct"].mean()),
               "raw_three_way_agreement": unanimous, "krippendorff_alpha_nominal": alpha,
               **ci, "bootstrap_resamples": n_boot, "confidence_level": confidence,
+              "confusion_by_target_level": confusion,
+              "disagreement_by_target_level": disagreement,
               "standing": "human target-level match on the frozen balanced 100-case subset"}
     return rows, report
 
@@ -137,4 +171,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
