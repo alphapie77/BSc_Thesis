@@ -1,0 +1,17 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T14:55:15.599503+00:00",
+    "git_commit": "916d3fdf33d31c8421a8e534eb5cedb4d5f974d0",
+    "untracked_files": 10,
+    "config": "configs/s5_goodhart_bn.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "status": "S5_BN_GOODHART_ANALYSIS_PASS",
+    "n_scored_cases": 5400,
+    "n_descriptive_attempt_rows": 9,
+    "n_selection_controlled_transitions": 6,
+    "warning": "Attempt 2/3 descriptive rows are failure-selected; use paired transitions for Goodhart direction."
+  }
+}

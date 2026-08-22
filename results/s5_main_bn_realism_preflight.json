@@ -1,0 +1,24 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T15:04:52.826301+00:00",
+    "git_commit": "ea69e8e1a4eaf3845c261968e1c4934af34e75ae",
+    "untracked_files": 14,
+    "config": "configs/s5_diversity_realism_bn.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "status": "S5_BN_DIVERSITY_LENGTH_REALISM_PASS",
+    "n_cases": 5400,
+    "self_bleu_order": 4,
+    "mauve": {
+      "status": "PENDING",
+      "reason": "mauve-text defaults to English gpt2-large; no Bangla feature model is registered"
+    },
+    "sentiment_js": {
+      "status": "PENDING",
+      "reason": "no independent registered generated-text sentiment scorer exists"
+    },
+    "warning": "No MAUVE or generated-sentiment claim may be made from this output."
+  }
+}

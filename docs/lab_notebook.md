@@ -4612,6 +4612,68 @@ while the run was producing them; the code checkout itself was pinned)
 
 ---
 
+## 2026-08-22 -- S5j: Bangla post-generation scoring and realism diagnostics
+**Feeds:** Chapter 4 ablation results; Chapter 5 realism, Goodhart and limitations
+**Commit:** S5 post-run archival commit
+**Artifacts:** `results/s5_main_bn_*`; S5 post-run scripts/configuration and
+`notebooks/s5_bn_postrun_kaggle.ipynb`
+
+### Numbers
+
+- **5,400/5,400** unique generation cases: 90 plots × 2 levels × 10 conditions
+  × 3 seeds. Seeds 42/43/44 each contribute **1,800** rows; every condition
+  contributes **540**.
+- Separate outcome-only Verifier-B scoring produced **5,400** rows. The source
+  cases SHA-256 in the score manifest is
+  `816a631be36f7e0a5918eb0298f7dce0c62b195ec80f43c8873ed923f94b3fd3`, exactly
+  matching the archived cases file.
+- The bundle holds the 20-cell master table, 9 planned paired comparisons,
+  selection-aware Goodhart outputs, diversity/length outputs, and **20**
+  LaBSE-feature MAUVE rows. Each MAUVE row compares **270** generated with
+  **270** region-A real texts.
+
+### Decisions made (and why)
+
+- Verifier-B was loaded only after all generation was complete. It remains
+  absent from every generator prompt, retry decision and generation case, so the
+  RQ5 wall survives the post-run.
+- Default raw-text MAUVE was not reported as a Bangla semantic result because
+  `mauve-text` defaults to GPT-2-large features. Its supported precomputed
+  feature path was run with LaBSE and reported under the explicit label
+  **LaBSE-feature MAUVE**. This is a language-capable sensitivity diagnostic,
+  not an interchangeable replacement for standard GPT-2 MAUVE.
+- The package recommends thousands of samples per distribution; the available
+  270 per condition × level makes every MAUVE number sensitivity evidence only.
+  No system ranking or MoP comparison rests on it. Generated-sentiment JS stays
+  pending because no independent, registered scorer exists.
+
+### Findings (things we did not expect)
+
+- The computational surface completed without needing a generator rerun. The
+  result archive has no missing or duplicate case key and retains the sealed
+  scoring boundary.
+- The prior realism preflight still says MAUVE `PENDING` because it predates the
+  dedicated MAUVE run. The later `s5_main_bn_mauve_report.json` is the
+  authoritative result for that metric; the two files are chronological, not
+  competing estimates.
+
+### Consequences for downstream steps
+
+- S5 Bangla computational analysis closes. The generator and its cases are
+  frozen; no outcome-driven re-run or filtering is authorised.
+- Next is the blinded human-evaluation/interface preparation. Chapter claims
+  must distinguish final Verifier-B results from descriptive in-loop Verifier-A
+  trajectories, and must retain the MAUVE/sentiment limitations.
+
+### Citations needed
+
+- Pillutla et al. (2021), `pillutla2021mauve`, for MAUVE and its embedding
+  distributional interpretation; Shaib et al. (2025), `shaib2025diversity`,
+  for combining rather than over-reading diversity measures. Both are now in
+  `docs/related_work.md` and `docs/references.bib`.
+
+---
+
 ## 2026-08-21 -- S5h: quota-safe hosted Gemma-4 judge replacement
 **Feeds:** Chapter 3 experimental conditions; Chapter 5 limitations; S5 row 8
 **Commit:** recorded by the enclosing implementation commit

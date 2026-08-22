@@ -193,6 +193,7 @@ without a trained verifier).
 | MoP SST-2 | 1.131 | 0.855 | 0.319 |
 | MoP IMDB | 0.771 | 0.865 | 0.039 |
 | best baseline (PICLe/ProGen/AttrPrompt) | 1.769–4.736 | 0.537–0.767 | — |
+
 | MoP improvement | 46–69% | **+13.6% to +41.3%** | 33–80% |
 
 **Table 2 — downstream F1** (DistilBERT trained on 5,000 synthetic samples,
@@ -227,6 +228,21 @@ ablation is right to separate them.
   ⚠️ **"IMDB/SST-2" unverified** — abstract names no dataset.
 - ⚠️ **Venue still unverified** — arXiv shows none; the pipeline's "Findings of
   ACL 2025" remains unconfirmed. Everything else in this entry is now filled.
+
+### [x] S5 post-run metric boundary — MAUVE and diversity (2026-08-22)
+
+- **`pillutla2021mauve`:** MAUVE compares two distributions through a
+  quantized embedding space. Its implementation accepts precomputed features,
+  but its default raw-text pathway is GPT-2-large and its guidance recommends
+  a few thousand samples per distribution. Therefore our 270-vs-270
+  condition-level comparisons are labelled **LaBSE-feature MAUVE sensitivity
+  analyses**, not ordinary/default-GPT2 MAUVE and not comparable to MoP's
+  5,000-sample English-encoder values.
+- **`shaib2025diversity`:** recent diversity validation finds that combining
+  low-correlated measures is preferable to treating a single score as a
+  diversity conclusion. Accordingly Self-BLEU is retained beside length
+  diagnostics and short-text rate; it is not a standalone realism claim.
+
 ### [~] sands2026 — Sands et al., NCAA 2026 (doi 10.1007/s00521-026-12247-0)
 - **Role:** English persona-prompted movie reviews. Their gaps = our motivation.
 - **Feeds:** Ch.1 §1.1(2), Ch.2, and directly the §5.5 cross-lingual framing.

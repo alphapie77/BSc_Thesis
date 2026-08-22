@@ -1,0 +1,19 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T15:18:22.936905+00:00",
+    "git_commit": "e2478cc73f05c9de68b1489bcfa6cf4aa993e725",
+    "untracked_files": 15,
+    "config": "configs/s5_mauve_bn.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "status": "S5_BN_LABSE_MAUVE_PASS",
+    "n_cases": 5400,
+    "feature_encoder": "sentence-transformers/LaBSE",
+    "per_level_n": 270,
+    "default_gpt2_mauve": "NOT_RUN: unsuitable as a Bangla semantic headline; MoP comparability is not claimed",
+    "sample_size_limitation": "mauve-text recommends thousands of texts; n=270 per cell is a small-sample sensitivity analysis only",
+    "generated_sentiment_js": "PENDING: no independent registered generated-text sentiment scorer"
+  }
+}

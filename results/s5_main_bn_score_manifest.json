@@ -1,0 +1,34 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-22T14:42:51.164145+00:00",
+    "git_commit": "4bfefe903b840b826e3ce577b5faf3a6e8576ddf",
+    "untracked_files": 3,
+    "config": "configs/s5_score_bn.yaml",
+    "python": "3.12.13",
+    "platform": "Linux-6.12.90+-x86_64-with-glibc2.35"
+  },
+  "result": {
+    "status": "S5_BN_VERIFIER_B_SCORING_PASS",
+    "n_cases": 5400,
+    "counts_by_condition": {
+      "blind_resampling": 540,
+      "external_role_self_critique": 540,
+      "gemma4_26b_a4b_judge_loop": 540,
+      "intrinsic_self_critique": 540,
+      "rag_neural_loop": 540,
+      "rag_neural_symbolic_feedback": 540,
+      "rag_only": 540,
+      "rag_symbolic_loop": 540,
+      "static_few_shot": 540,
+      "zero_shot": 540
+    },
+    "replicate_seeds": [
+      42,
+      43,
+      44
+    ],
+    "binary_success_threshold": 0.5,
+    "source_cases_sha256": "816a631be36f7e0a5918eb0298f7dce0c62b195ec80f43c8873ed923f94b3fd3",
+    "verifier_b_loaded_only_in_this_post_generation_step": true
+  }
+}
