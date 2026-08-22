@@ -10,6 +10,7 @@ slice and not a replacement for the full-surface primary estimate.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from collections import defaultdict
@@ -89,12 +90,18 @@ def main() -> int:
     args = ap.parse_args()
     root = Path(__file__).resolve().parents[2]
     cfg = yaml.safe_load((root / args.config).read_text(encoding="utf-8"))
-    rows = summarize(read_jsonl(root / cfg["inputs"]["cases_jsonl"]),
-                     read_jsonl(root / cfg["inputs"]["b_scores_jsonl"]),
+    cases_path = root / cfg["inputs"]["cases_jsonl"]
+    scores_path = root / cfg["inputs"]["b_scores_jsonl"]
+    cases = read_jsonl(cases_path)
+    scores = read_jsonl(scores_path)
+    rows = summarize(cases, scores,
                      float(cfg["matching"]["relative_tolerance"]))
     write_csv_result(rows, root / cfg["outputs"]["summary_csv"], list(rows[0]), args.config)
     write_result({"status": "S5_BN_LENGTH_MATCHED_SENSITIVITY_PASS",
                   "relative_tolerance": cfg["matching"]["relative_tolerance"],
+                  "n_source_cases": len(cases), "n_source_scores": len(scores),
+                  "source_cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
+                  "source_scores_sha256": hashlib.sha256(scores_path.read_bytes()).hexdigest(),
                   "total_matched_pairs": sum(r["n_matched_pairs"] for r in rows),
                   "standing": "post-treatment sensitivity slice; full-surface analysis remains primary"},
                  root / cfg["outputs"]["report_json"], args.config)
@@ -103,4 +110,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
