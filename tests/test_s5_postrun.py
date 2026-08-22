@@ -40,7 +40,7 @@ def test_statistics_helpers_are_deterministic_and_conservative():
     rng = np.random.default_rng(42)
     point, lo, hi, p = paired_bootstrap(np.array([0.2, 0.1, 0.3]), n=1000, rng=rng, confidence=.95)
     assert point == pytest.approx(.2)
-    assert lo > 0 and hi >= point and 0 <= p <= 1
+    assert lo > 0 and hi >= point and 0 < p <= 1
     assert benjamini_hochberg([.01, .04, .03]) == pytest.approx([.03, .04, .04])
     assert mcnemar_exact(0, 0) == 1.0
     assert mcnemar_exact(10, 0) < .01

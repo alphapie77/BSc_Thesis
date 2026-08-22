@@ -49,7 +49,11 @@ def paired_bootstrap(delta: np.ndarray, *, n: int, rng: np.random.Generator,
     alpha = (1.0 - confidence) / 2.0
     lo, hi = np.quantile(means, [alpha, 1.0 - alpha]).tolist()
     # Two-sided bootstrap sign test, kept as a descriptive p-value for BH.
-    p = min(1.0, 2.0 * min(float(np.mean(means <= 0)), float(np.mean(means >= 0))))
+    # The +1 correction prevents an impossible literal p=0 when a finite
+    # bootstrap draw happens not to cross zero.
+    lower = int(np.sum(means <= 0))
+    upper = int(np.sum(means >= 0))
+    p = min(1.0, 2.0 * (min(lower, upper) + 1) / (n + 1))
     return point, float(lo), float(hi), p
 
 
