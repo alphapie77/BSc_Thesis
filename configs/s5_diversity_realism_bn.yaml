@@ -1,0 +1,17 @@
+# Non-model-dependent S5 Bangla diversity and realism diagnostics.
+step: S5.diversity_realism.bn
+seed: 42
+
+inputs:
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  cleaned_csv: data/cleaned/bn_clean.csv
+  k2_assignments: results/s2e_regionA_k2_assignments.csv
+
+metrics:
+  self_bleu_max_order: 4
+  real_reference_region: A_organic
+
+outputs:
+  diversity_csv: results/s5_main_bn_diversity.csv
+  length_js_csv: results/s5_main_bn_length_js.csv
+  preflight_json: results/s5_main_bn_realism_preflight.json
