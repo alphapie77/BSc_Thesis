@@ -73,6 +73,35 @@ Either way, say so out loud rather than silently picking one.
   proposal assumes, **flag the conflict and stop**. Silently overwriting is how
   a verified number gets replaced by an unverified one.
 
+### Output and archive lifecycle
+
+- **A checkpoint is not a result.** Partial, resumable, smoke-test and diagnostic
+  files never occupy the canonical final path in `results/`. A file becomes a
+  result only after its registered completeness and integrity gates pass.
+- **Large raw archives stay outside Git, but never become unauditable.** Raw
+  prompts, provider payloads, append-only call logs and ZIP checkpoints may be
+  stored externally. Their tracked manifest must record the filename, SHA-256,
+  byte size, producing commit, row/call counts and scientific standing
+  (`final`, `superseded`, or `diagnostic`). A pathname alone is not identity.
+- **Final ingestion is a gate, not a copy operation.** Before external output
+  enters `results/`, verify the exact registered key set, expected row counts,
+  duplicate/missing/extra keys, source-file hash, provenance commit, and every
+  phase-specific isolation rule. Ingest only the files that pass; never unpack
+  a ZIP blindly over the repository.
+- **Runtime provenance must belong to the final run.** An environment snapshot
+  is evidence only when it carries the same clean producing commit as the final
+  archive (or a documented post-run commit for a separately defined scoring
+  step). A smoke, partial or predecessor snapshot cannot stand in for it.
+- **Active and retired archives never share live paths.** Superseded model
+  calls, failed interfaces, transport diagnostics and partial cases move to
+  explicitly named `superseded`/`diagnostic` storage. They must not remain at a
+  config's active resume path, where a later run could silently load them.
+- **Canonical results are append-only in scientific meaning.** Replacing an
+  audited final result requires a new version/name, a documented reason, a
+  fresh integrity audit, and the corresponding lab-notebook/STATUS/deviation
+  update. Silent in-place replacement is forbidden even if the new file has
+  more rows or comes from a newer model.
+
 ## Literature: search Consensus first, and prefer recent work
 
 **Standing instruction from Sabbir (2026-08-08).** Before proposing or defending
