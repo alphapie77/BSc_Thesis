@@ -1,0 +1,9 @@
+step: S5.goodhart.figure.bn
+seed: 42
+inputs:
+  attempt_summary_csv: results/s5_main_bn_goodhart_attempt_summary.csv
+  paired_transitions_csv: results/s5_main_bn_goodhart_paired_transitions.csv
+outputs:
+  figure_png: results/s5_main_bn_goodhart_figure.png
+  manifest_json: results/s5_main_bn_goodhart_figure_manifest.json
+
