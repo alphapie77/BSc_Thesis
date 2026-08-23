@@ -1,0 +1,12 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.lock.txt requirements.lock.txt
+RUN pip install --no-cache-dir -r requirements.lock.txt fastapi==0.123.10
+COPY src src
+COPY configs configs
+COPY docs/axis_definition.md docs/axis_definition.md
+COPY artifacts/verifier_a.joblib artifacts/verifier_a.joblib
+COPY artifacts/symbolic_scorer.joblib artifacts/symbolic_scorer.joblib
+COPY data/rag/r1_index data/rag/r1_index
+ENV PORT=8080
+CMD ["sh", "-c", "uvicorn src.demo.api:app --host 0.0.0.0 --port ${PORT}"]

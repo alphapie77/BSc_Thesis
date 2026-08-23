@@ -1,0 +1,31 @@
+# DRAFT ONLY — no sampling or scoring is authorised from this file.
+# The 5,400 frozen generations are inputs; generation reruns are forbidden.
+step: S5.plot_faithfulness.bn
+status: draft_not_preregistered
+seed: 42
+inputs:
+  cases_jsonl: results/s5_main_bn_cases.jsonl
+  score_manifest: results/s5_main_bn_score_manifest.json
+  plots_csv: data/plots/plots_bn.csv
+sampling:
+  n_cases: null  # freeze from a declared precision/power target before building sheets
+  stratify_by: [condition, target_level]
+  outcome_blind: true
+  forbidden_selection_fields: [verifier_a_score, verifier_b_score, verdict, gave_up]
+annotation:
+  unit: plot_output_pair
+  labels: [SUPPORTED, CONTRADICTED, UNSUPPORTED_DETAIL, UNDECIDABLE]
+  subjective_opinion_is_hallucination: false
+  span_localization: true
+  suspected_source: [plot_conflict, invented_character, invented_actor, invented_event, invented_scene, retrieved_exemplar_leakage, other]
+  condition_hidden: true
+  model_hidden: true
+  verifier_scores_hidden: true
+analysis:
+  primary: unsupported_or_contradicted_rate
+  report_by: [condition, target_level]
+  uncertainty: case_bootstrap_ci
+  human_validation_required_for_headline: true
+outputs:
+  directory: data/annotation/s5_plot_faithfulness_bn
+

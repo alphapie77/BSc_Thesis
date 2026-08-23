@@ -26,6 +26,8 @@ langgraph
 chromadb
 groq                  # generator, primary (pipeline SS4.4)
 google-generativeai   # generator, secondary on a subset (pipeline SS4.4)
+fastapi               # demo API; server-side key, RAG and verifier orchestration
+uvicorn               # ASGI server for the demo API
 
 # # --- eval (Phase 5) ---
 # mauve-text

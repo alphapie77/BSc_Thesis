@@ -1,0 +1,26 @@
+step: Demo.live.bn
+seed: 42
+backend_disclosure: live_gemma4_not_reported_s5_writer
+rag:
+  persist_dir: data/rag/r1_index
+  collection: r1_regionA_k2
+  encoder: sentence-transformers/LaBSE
+  top_k: 10
+verifier:
+  verifier_a: artifacts/verifier_a.joblib
+  symbolic_scorer: artifacts/symbolic_scorer.joblib
+  required_sklearn: 1.9.0
+  tau: 0.4384071
+writer:
+  provider: gemini
+  model: gemma-4-26b-a4b-it
+  transport: interactions_v1beta
+  seed: 42
+  thinking_level: minimal
+  max_output_tokens: 80
+  request_timeout_seconds: 120
+privacy:
+  persist_user_plots: false
+  persist_live_calls: false
+  in_memory_idempotency_entries: 128
+

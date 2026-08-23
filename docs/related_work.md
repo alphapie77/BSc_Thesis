@@ -707,3 +707,14 @@ low-resource language.*
 ⚠️ The empty cells are claims. Each must be verified by actually reading the
 paper before the table enters the thesis — an unverified "no one has done this"
 is the fastest way to lose a reviewer.
+# Post-run plot-faithfulness audit (2026-08-23)
+
+Consensus-first review added a separate plot-faithfulness measurement rather
+than treating axis controllability as evidence of factual consistency.
+RAGEval separates hallucination and irrelevance from completeness
+[@zhu2024rageval], while Rahman et al.'s recent review warns that automatic
+factuality metrics remain limited and depend on validated evidence
+[@rahman2025hallucination]. This changed the interface design: it now carries a
+visible “not independently validated” state, and the proposed human audit is a
+separate frozen-output post-run analysis rather than a generation rerun or an
+addition to the human instrument already in progress.

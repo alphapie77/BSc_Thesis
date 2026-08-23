@@ -5008,3 +5008,57 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 ### Citations needed
 - None new. Paired bootstrap, McNemar and BH were already registered and computed
   upstream; this artifact only renders their frozen outputs.
+
+---
+
+## 2026-08-23 -- S8.demo.local: Live Bangla audience-response demo interface
+**Feeds:** Phase 8 demo and defence
+**Commit:** `c012dc50711f64be800b83bb1d93a26bee57a91b-dirty`
+**Artifacts:** `results/env_snapshot.json`
+
+### Numbers
+- `results/env_snapshot.json`
+  - `key_versions` = {'chromadb': '1.4.1', 'langgraph': '1.0.6', 'numpy': '2.3.4', 'pandas': '2.3.3', 'scikit-learn': '1.9.0', 'scipy': '1.16.3', 'sentence-transformers': '5.2.0', 'torch': '2.9.1', 'transformers': '4.57.3'}
+
+### Decisions made (and why)
+- The live path uses the already frozen R1-only retriever, Verifier-A threshold
+  and symbolic diagnostic/feedback loop, with a hard three-attempt cap. It does
+  not expose a menu that could be mistaken for rerunning the ten S5 conditions.
+- Hosted `gemma-4-26b-a4b-it` is used for the live Writer/Reflector because it is
+  available through the supplied Gemini key. The interface discloses that the
+  frozen S5 Writer was local `google/gemma-3-12b-it`; live output is therefore a
+  demonstration, not an additional S5 observation.
+- Batch simulation was omitted at Sabbir's request. User plots are held only for
+  the request lifetime and an in-memory idempotency cache; no plot or response is
+  written to the thesis data/results tree.
+- The frozen ten-condition table is copied into frontend source as display-only
+  audited data. No generation runner is called and none of the 5,400 rows is
+  regenerated.
+
+### Findings (things we did not expect)
+- `research_pipeline_en.md` schedules Phase-8 wrappers only after S6. Sabbir
+  explicitly requested the interface while S5 human annotation is still in
+  progress, so this is recorded as an engineering-order deviation in
+  `docs/protocol.md`; it does not complete or replace S6.
+- The first cold start exposed a Keras-3 auto-import path in transformers. Setting
+  the documented no-TensorFlow environment flags before importing
+  sentence-transformers kept this PyTorch-only service on its intended backend.
+- A direct live call and an HTTP call both completed with one accepted output,
+  top-10 retrieval and `verifier_b_loaded=false`. These are generic smoke tests,
+  not sampled evidence and not thesis results.
+
+### Consequences for downstream steps
+- Public always-on hosting remains operational work: the attempted Sites creation
+  returned no site id, and no authorised billed Cloud Run project/minimum-instance
+  decision is available. The Docker image and split frontend/API configuration
+  are ready, but local completion is not represented as public deployment.
+- The draft plot-faithfulness audit must remain unscored until its sampling and
+  human rubric are registered. The interface labels hallucination/faithfulness as
+  unvalidated and makes no automated factuality claim.
+- Human evaluation continues independently in the three frozen HTML instruments;
+  this demo neither writes nor reads annotator response files.
+
+### Citations needed
+- New interface/hallucination-audit literature is recorded in
+  `docs/related_work.md` and `docs/references.bib`; no citation turns the live
+  smoke test into scientific evidence.
