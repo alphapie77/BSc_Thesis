@@ -1,0 +1,25 @@
+3.4 PHASE 2: Validator Training 23
+batches and 77 testing batches were created from the tokenized data, facilitating efficient
+training and evaluation using GPU resources.
+3.4.3 Persona Classification Model Training
+Two BanglaBERT-based classification models were trained to evaluate the impact of different hyperparameter configurations on model performance. Prior studies indicate that variations in learning rates and training epochs during transformer fine-tuning can significantly
+influence classification outcomes [34, 35].
+1. BanglaBERT (Standard Configuration): The model was trained with a learning
+rate of 2 × 10−5 for four epochs. Early stopping was applied, and convergence was
+achieved after two epochs. The model obtained an accuracy of 85.04% and an F1-
+score of 0.8445.
+2. BanglaBERT (Advanced Configuration): This model used a learning rate of 2.5 ×
+10−5 and was trained for six full epochs without early stopping. It achieved the best performance, reaching 87.49% accuracy and an F1-score of 0.8733. Figure 3.7 illustrates
+the details of the training dynamics. Based on prior findings that extended fine-tuning
+can enhance transformer performance [34], This model (Advanced configured model)
+was selected as the primary validation model for subsequent stages.
+3.4.4 Cross-Validation Analysis
+The research team conducted a 5-fold cross-validation to evaluate the model’s performance
+using a logistic regression classifier applied to the extracted feature data. Cross-validation
+is a standard statistical method for assessing model stability while mitigating the risk of
+overfitting [36]. The analysis produced an F1-score of 0.9750 with a standard deviation of
+±0.0046, indicating that the model maintained consistent performance and generalizability
+across unseen data. The detailed performance metrics are illustrated in Figure 3.6.
+3.4.5 Model Evaluation and Statistical Significance
+The study results indicated that advanced models outperformed the standard models in comparative evaluations:
+• Accuracy: The advanced model achieved a gain of 2.45% over the baseline.

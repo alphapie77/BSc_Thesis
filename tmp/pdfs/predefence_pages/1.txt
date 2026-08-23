@@ -1,0 +1,13 @@
+A Neuro-Symbolic Multi-Agent
+framework for Pre-release Audience
+Simulation in Bangla Cinema
+Sabbir Hossain
+Student ID: 21701082
+Session: 2020-2021
+Supervisor: Prof. Dr. Mohammad
+Shahadat Hossain
+Department of Computer Science and Engineering
+UNIVERSITY OF CHITTAGONG
+This dissertation is submitted for the degree of
+Bachelor of Science in Engineering (B.Sc. Engg.) in CSE
+CSECU February 2026

@@ -1,0 +1,34 @@
+Bibliography 35
+[13] S. Zerhoudi and M. Granitzer, “PersonaRAG: Enhancing retrieval-augmented generation systems with user-centric agents,” arXiv preprint arXiv:2407.09394, 2024.
+[14] D. Platnick et al., “ID-RAG: Identity retrieval-augmented generation for long-horizon
+persona coherence in generative agents,” arXiv preprint arXiv:2509.25299, 2025.
+[15] Y.-C. Lin et al., “Creativity in LLM-based multi-agent systems: A survey,” arXiv
+preprint arXiv:2505.21116, 2025.
+[16] J. Li, X. Liu, and Y. Feng, “From single to societal: Analyzing persona-induced bias
+in multi-agent interactions,” arXiv preprint arXiv:2511.11789, 2025.
+[17] P. Hitzler et al., “Neuro-symbolic approaches in artificial intelligence,” National Science Review, vol. 9, no. 6, p. nwac035, 2022.
+[18] A. d. Garcez et al., “Neural-symbolic computing: An effective methodology for principled integration of machine learning and reasoning,” arXiv preprint arXiv:1905.06088,
+2019.
+[19] M. K. Sarker et al., “Neuro-symbolic artificial intelligence: Current trends,” AI Communications, vol. 34, no. 3, pp. 197–209, 2022.
+[20] D. Yu et al., “A survey on neural-symbolic learning systems,” Neural Networks, vol.
+166, pp. 105–126, 2023.
+[21] T. R. Besold et al., “Neural-symbolic learning and reasoning: A survey and interpretation,” in Neuro-symbolic artificial intelligence: The state of the art. IOS Press, 2021,
+pp. 1–51.
+[22] J. Zhang et al., “Neural, symbolic and neural-symbolic reasoning on knowledge
+graphs,” AI Open, vol. 2, pp. 14–35, 2021.
+[23] S. Badreddine et al., “Logic tensor networks,” Artificial Intelligence, vol. 303, p.
+103649, 2022.
+[24] M. Zimmer et al., “Differentiable logic machines,” arXiv preprint arXiv:2102.11529,
+2021.
+[25] U. Nawaz, M. Anees-ur Rahaman, and Z. Saeed, “A review of neuro-symbolic AI integrating reasoning and learning for advanced cognitive systems,” Intelligent Systems
+with Applications, p. 200541, 2025.
+[26] L. De Raedt et al., “From statistical relational to neuro-symbolic artificial intelligence,”
+arXiv preprint arXiv:2003.08316, 2020.
+[27] R. Evans and E. Grefenstette, “Learning explanatory rules from noisy data,” Journal
+of Artificial Intelligence Research, vol. 61, pp. 1–64, 2018.
+[28] B. Liang, Y. Wang, and C. Tong, “AI reasoning in deep learning era: From symbolic
+AI to neural–symbolic AI,” Mathematics, vol. 13, no. 11, p. 1707, 2025.
+[29] M. A. Hasan et al., “Zero-and few-shot prompting with LLMs: A comparative study
+with fine-tuned models for Bangla sentiment analysis,” in Proceedings of the 2024
+Joint International Conference on Computational Linguistics, Language Resources
+and Evaluation (LREC-COLING 2024), 2024.

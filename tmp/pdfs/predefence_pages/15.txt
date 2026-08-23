@@ -1,0 +1,20 @@
+1.7 Thesis Organization 7
+• Empirical Evaluation: The system has been rigorously evaluated, achieving an accuracy of 87.5% and an F1-score of 0.873, demonstrating its effectiveness in classifying
+and generating distinct personas.
+• Generalizability and Interpretability: The architecture supports implementation
+across diverse languages and domains while ensuring the output remains explainable
+to end-users.
+• Practical Impact: This system empowers the Bangladeshi film industry to simulate
+audience responses prior to release, facilitating data-driven marketing strategies and
+critical decision-making.
+1.7 Thesis Organization
+The rest of the thesis is organized as follows:
+• Chapter 1: Introduction – outlines the research motivation, problem statement, and
+objectives. It introduces the neuro-symbolic multi-agent framework as a solution to
+the lack of automated audience analysis tools.
+• Chapter 2: Literature Review – surveys existing works on sentiment analysis, persona modeling, and Bangla NLP. It highlights the research gap and positions the proposed work within the domain of neuro-symbolic AI.
+• Chapter 3: Methodology – describes the system architecture, including data collection, weak supervision for persona discovery, and the implementation of the multiagent framework.
+• Chapter 4: Experiments and Results – presents the quantitative and qualitative analysis of the system, comparing its performance against baseline models in terms of
+accuracy and persona consistency.
+• Chapter 5: Conclusion and Future Work – concludes the thesis with a summary of
+contributions and outlines potential directions for future research.

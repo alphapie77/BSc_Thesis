@@ -33,6 +33,11 @@ The interface's `SUPPORTED`, `REVIEW`, and `UNSUPPORTED` faithfulness labels are
 operational aids, not human-validated thesis metrics. Repeated live calls may
 vary and do not reproduce a Phase-5 condition.
 
+The Plot Judge runs only after the bounded generation loop and does not trigger
+retrieval or rewriting. On failed attempts, the registered loop itself returns
+to R1-only retrieval with feedback-anchored query terms; the expert trace shows
+the retrieved identifiers for each attempt.
+
 ## H.4 Reproducible local entry points
 
 The interface configuration is `configs/demo.yaml`; the backend is under
@@ -40,3 +45,5 @@ The interface configuration is `configs/demo.yaml`; the backend is under
 launcher is `start_demo.cmd`. `tests/test_demo.py` checks the principal data and
 privilege boundaries. API secrets remain server-side and are not written to the
 repository or browser bundle.
+The launcher uses the repository-local frontend runner when dependencies are
+present and waits for a full artifact-readiness endpoint before opening the UI.

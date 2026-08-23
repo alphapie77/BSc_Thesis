@@ -1,0 +1,10 @@
+3.4 PHASE 2: Validator Training 25
+• Advanced Model: Stored in trainedmodelprofessional/bestadvanced/, representing the best-performing configuration.
+• Best Practices: Saving models along with metadata ensures reproducibility and deployment readiness [38].
+3.4.7 Phase 2 Outcome
+This phase successfully developed a persona classification model that satisfies statistical validation requirements for Bengali movie review analysis. The final validator achieved:
+• Accuracy: 87.49%
+• F1 score: 0.8733
+Figure 3.7 Training Dynamics of BanglaBERT with Advanced Configuration
+The trained model demonstrates robust and generalizable capabilities, making it ready
+for Phase 3 of the neuro-symbolic multi-agent framework.

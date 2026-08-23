@@ -1,0 +1,19 @@
+Chapter 2
+Related Work
+This chapter surveys current research studies relevant to the present work. It presents main
+contributions to existing research while identifying research gaps which the proposed work
+will address. The literature is categorized into four key areas: Retrieval-Augmented Generation (RAG) frameworks, Agentic Systems and Personas, Neuro-Symbolic AI, and Bangla
+Natural Language Processing.
+2.1 Retrieval-Augmented Generation (RAG) Frameworks
+Retrieval-Augmented Generation (RAG) has become a fundamental technique for enhancing Large Language Models. Lewis et al. [5] originally presented RAG models utilizing
+a pre-trained seq2seq model as a parametric memory system alongside a dense vector index. Their work achieved state-of-the-art results on open-domain QA tasks. Brown et al.
+[6] further noted that RAG functions to decrease hallucinations and outdated knowledge by
+using retrieved proof to validate LLM results, although empirical data shows inconsistent
+outcomes due to varying assessment methods.
+To address these inconsistencies and improve performance, several advanced frameworks have been proposed. Zhao et al. [7] provided a complete examination of RAG methods
+applied to AIGC use cases, establishing foundation categories for retriever-enabled generator enhancement. Specific improvements include the work of Chang et al. [8], who proposed
+MAIN-RAG. This approach uses inter-agent consensus for dependable document selection,
+achieving a 2-11 percent enhancement in answer accuracy. Similarly, Yao et al. [9] introduced a framework using reflective tags to control the retrieval process, effectively reducing
+hallucinations by focusing on high-scoring documents.
+Moving beyond standard RAG, Zhang et al. [10] proposed Chain-of-Agents (CoA), a
+framework using natural language to enable multiple agents to collaborate. Their testing

@@ -1,0 +1,15 @@
+5.2 Future Direction 33
+5.2.4 Phase 7: Generalization & Multi-Domain Expansion
+• The system enables expansion into different fields, which include OTT platforms,
+marketing, and storytelling domains.
+• The system uses multiple methods to combine different types of content, which includes posters, trailers, and plot analysis.
+• The system uses hybrid reranking methods to achieve improved operational performance.
+Time-line:
+2025 2026
+Sep Oct Nov Dec Jan Feb Mar Apr May Jun
+Problem Identification
+Defining Objectives
+Design & Development
+Demonstration
+Evaluation
+Communication

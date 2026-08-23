@@ -1,0 +1,30 @@
+Bibliography
+[1] L.-C. Cheng and Y. Yang, “The effect of online reviews on movie box office sales: An
+integration of aspect-based sentiment analysis and economic modeling,” Journal of
+Global Information Management (JGIM), vol. 30, no. 1, pp. 1–16, 2022.
+[2] M. Hur, P. Kang, and S. Cho, “Box-office forecasting based on sentiments of movie
+reviews and independent subspace method,” Information Sciences, vol. 372, pp. 608–
+624, 2016.
+[3] A. Gosai, S. De, and K. Thankachan, “Sentiment analysis on movie reviews: A deep
+dive into modern techniques and open challenges,” arXiv preprint arXiv:2601.07235,
+2026.
+[4] S. B. Hakim et al., “SymRAG: Efficient neuro-symbolic retrieval through adaptive
+query routing,” in Proceedings of the 19th International Conference on Neurosymbolic
+Learning and Reasoning, 2025.
+[5] P. Lewis et al., “Retrieval-augmented generation for knowledge-intensive NLP tasks,”
+in Advances in Neural Information Processing Systems (NeurIPS), vol. 33, 2020, pp.
+9459–9474.
+[6] A. Brown, M. Roman, and B. Devereux, “A systematic literature review of
+retrieval-augmented generation: Techniques, metrics, and challenges,” arXiv preprint
+arXiv:2508.06401, 2025.
+[7] P. Zhao, H. Zhang, Q. Yu et al., “Retrieval-augmented generation for AI-generated
+content: A survey,” Data Science and Engineering, 2026.
+[8] C.-Y. Chang et al., “Main-RAG: Multi-agent filtering retrieval-augmented generation,”
+in Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), 2025.
+[9] C. Yao and S. Fujita, “Adaptive control of retrieval-augmented generation for large
+language models through reflective tags,” Electronics, vol. 13, no. 23, p. 4643, 2024.
+[10] Y. Zhang et al., “Chain of agents: Large language models collaborating on long-context
+tasks,” in Advances in Neural Information Processing Systems (NeurIPS), vol. 37, 2024,
+pp. 132 208–132 237.
+[11] Y. Wang et al., “Unveiling knowledge utilization mechanisms in LLM-based retrievalaugmented generation,” in Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval, 2025.
+[12] R. Y. Maragheh et al., “ARAG: Agentic retrieval augmented generation for personalized recommendation,” arXiv preprint arXiv:2506.21931, 2025.

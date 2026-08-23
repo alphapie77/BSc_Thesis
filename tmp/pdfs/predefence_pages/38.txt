@@ -1,0 +1,24 @@
+30 Experiments and Evaluation
+4.3 Results and Analysis
+4.3.1 Dataset & Personas:
+The researchers cleaned 6,114 Bengali reviews, representing 612 of the total 9,998 reviews.
+Three distinct personas were identified:
+• Indifferent Casual: 2,773 reviews (45.4%)
+• Enthusiastic Casual: 1,964 reviews (32.1%)
+• Die-hard Fan: 1,377 reviews (22.5%)
+User engagement was measured through sentiment scores, which increased from 2.87 to
+3.46.
+4.3.2 Validator Performance (BanglaBERT):
+• Accuracy: 87.49%, F1-Score: 0.8733
+• Fivefold cross-validation F1-score: 97.5% with 𝑝 < 0.05
+• Capable of identifying minor differences between distinct user personas
+4.3.3 Multi-Agent System Results:
+• The four-agent system included: Researcher, Writer, Critic, and Reflector
+• Achieved (90+)% accuracy in matching users with their respective personas
+• Successfully produced reviews on the first attempt without retries
+• Hybrid validation (neural + linguistic) effectively resolves persona identity challenges
+• Self-correcting system generates reliable and dependable results
+4.3.4 Key Outcome:
+• Successfully produced Bengali reviews that incorporated persona information
+• Provides efficient output that is explainable and usable in practical scenarios
+• Established a framework for upcoming tasks, including multi-agent simulation, evaluation, and explanation processes

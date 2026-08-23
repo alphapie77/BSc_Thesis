@@ -1,0 +1,16 @@
+4.2 Chosen Models for Reasoning and Reranking 27
+symbolic components ensure persona consistency through rule-based validation constraints.
+The reasoning process involves multiple specialized agents that collaboratively retrieve contextual information, generate persona-aware responses, and evaluate outputs through an iterative self-correction mechanism. This design enables structured reasoning while maintaining
+linguistic fluency. For reranking and validation, the system applies a hybrid neural-symbolic
+strategy. The primary neural validator is a fine-tuned BanglaBERT classifier that evaluates
+persona alignment and produces confidence scores. The neural confidence score is then
+combined with a symbolic scorer that analyzes linguistic features, stylistic patterns, and
+emotional indicators associated with specific personas.
+The final reranking decision is computed using a weighted scoring function:
+𝐹 𝑖𝑛𝑎𝑙𝑆𝑐𝑜𝑟𝑒 = 0.60 × 𝑁𝑒𝑢𝑟𝑎𝑙𝑆𝑐𝑜𝑟𝑒 + 0.40 × 𝑆𝑦𝑚𝑏𝑜𝑙𝑖𝑐𝑆𝑐𝑜𝑟𝑒 (4.1)
+This weighted combination enhances system reliability, interpretability, and robustness,
+while achieving improved performance compared to purely neural reranking approaches. By
+integrating neural reasoning with symbolic reranking mechanisms, the proposed framework
+effectively generates persona-consistent content in low-resource languages. At the same
+time, it maintains transparency, explainability, and deployment readiness.
+Figure 4.1 Hybrid Validation Architecture

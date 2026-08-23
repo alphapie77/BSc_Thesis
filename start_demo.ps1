@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $demoRoot = $PSScriptRoot
 $demoPython = Join-Path $demoRoot ".venv\Scripts\python.exe"
 $demoInterface = Join-Path $demoRoot "interface"
+$demoVinext = Join-Path $demoInterface "node_modules\.bin\vinext.cmd"
 $demoEnv = Join-Path $demoRoot ".env"
 $demoBackendLog = Join-Path $env:TEMP "thesis-demo-backend.log"
 $demoBackendErrorLog = Join-Path $env:TEMP "thesis-demo-backend-error.log"
@@ -20,6 +21,8 @@ function Stop-DemoProcess {
 
 try {
     Set-Location -LiteralPath $demoRoot
+    $env:HF_HUB_OFFLINE = "1"
+    $env:TRANSFORMERS_OFFLINE = "1"
 
     if (-not (Test-Path -LiteralPath $demoPython)) {
         throw "Python environment not found: $demoPython"
@@ -30,10 +33,6 @@ try {
     if (-not (Select-String -LiteralPath $demoEnv -Pattern '^GOOGLE_API_KEY=.+$' -Quiet)) {
         throw "GOOGLE_API_KEY is missing or empty in .env."
     }
-    if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-        throw "npm not found. Install Node.js and try again."
-    }
-
     $savedErrorPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     & $demoPython -c "import fastapi" *> $null
@@ -51,6 +50,13 @@ try {
     }
 
     if (-not (Test-Path -LiteralPath (Join-Path $demoInterface "node_modules"))) {
+        if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+            throw "npm not found. Install Node.js and try again."
+        }
+        & npm --version *> $null
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm is installed but not working. Repair Node.js/npm and try again."
+        }
         Write-Host "Installing frontend dependencies for the first run..." -ForegroundColor Yellow
         Push-Location -LiteralPath $demoInterface
         try {
@@ -65,6 +71,9 @@ try {
         finally {
             Pop-Location
         }
+    }
+    if (-not (Test-Path -LiteralPath $demoVinext)) {
+        throw "Frontend runner not found: $demoVinext"
     }
 
     Remove-Item -LiteralPath $demoBackendLog, $demoBackendErrorLog, $demoFrontendLog, $demoFrontendErrorLog -Force -ErrorAction SilentlyContinue
@@ -99,6 +108,13 @@ try {
     if (-not $backendReady) {
         throw "Backend was not ready within 3 minutes. Log: $demoBackendLog"
     }
+    Write-Host "Loading R1 and verifier artifacts..." -ForegroundColor Cyan
+    try {
+        Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/ready" -TimeoutSec 300 | Out-Null
+    }
+    catch {
+        throw "Backend artifacts failed readiness. Log: $demoBackendErrorLog"
+    }
 
     $frontendReady = $false
     try {
@@ -108,7 +124,7 @@ try {
     }
     catch {
         Write-Host "Starting interface..." -ForegroundColor Cyan
-        $demoFrontend = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" `
+        $demoFrontend = Start-Process -FilePath $demoVinext -ArgumentList "dev" `
             -WorkingDirectory $demoInterface -WindowStyle Hidden -PassThru `
             -RedirectStandardOutput $demoFrontendLog -RedirectStandardError $demoFrontendErrorLog
 

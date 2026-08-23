@@ -1,0 +1,25 @@
+4 Introduction
+and Reflector agents allows for continuous self-correction, producing outputs that are very
+much in line with the particular features of the respective persona. Thus, the AI-powered
+approach as a whole seeks to furnish the Bengali film industry with a highly robust, scalable,
+and less costly tool for audience simulation before the release, thus enabling the industry
+to come up with marketing strategies based on data, curtail content designing, and shrink
+the financial risk tied to theatrical releases. Likewise, the research not only serves its practical purpose but also impacts the general area of low-resource natural language processing
+and neuro-symbolic AI positively by providing an example of how hybrid systems can bring
+together learning-based and rule-based approaches in a single system.
+1.3 Problem Statement
+The film industry in Bangladesh has no automatic and systematic method for audience analysis before release; hence, the producers are left with their intuition, expensive focus groups,
+or feedback from the audience after the release as their only options. The existing AI-backed
+sentiment analysis techniques categorize the viewers into one group and do not present
+persona-specific conduct, especially in the case of Bangla, which is a low-resourced language
+with very little high-quality labeled data. Besides, the upsurge in the adoption of foreign film
+influences has led to a decrease in the cultural affiliation with the local viewers, while the
+current neural models are working as black boxes with very little explainability, and the validation of the generated responses is not reliable. Consequently, the need for an integrated,
+production-ready AI framework that can simulate, validate, and explain persona-aware audience reactions specifically to the Bangladeshi cinema ecosystem is of utmost importance.
+The research questions focusing on these problems are as follows:
+1. What methods could be employed to map out the audience personas for Bangladeshi
+cinema using supervision techniques on vast amounts of unlabeled Bangla movie reviews?
+2. How far can a neuro-symbolic multi-agent system go in producing reviews of Bengali
+movies that are persona-aware and culturally aligned for pre-release audience simulation in a very similar manner?
+3. What is the impact of Retrieval-Augmented Generation (RAG) on the creation of
+persona-specific Bengali texts in terms of concealment of the context and loss of linguistic authenticity?

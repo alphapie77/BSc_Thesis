@@ -1,0 +1,27 @@
+1.2 Motivation 3
+pretability, and reasoning in language tasks. Neuro-symbolic hybrid methods that integrate
+human-like reasoning with machine learning have been recognized to boost precision, which
+in turn could lead to promising hybrid approaches for audience simulation systems [4].
+Even with the progress made, the majority of earlier works still concentrated on analyzing the time after release or used aggregated sentiment polarity, which caused them to miss
+the specific persona-related differences that form the various audience segments. The restrictions imposed by such limitations render the existing methods inapplicable for pre-release
+decision-making, where understanding the different audience expectations is of utmost importance. This situation is more serious in the case of low-resource languages like Bengali,
+where the lack of labeled persona-specific datasets, combined with rich linguistic variability create further hurdles for automated sentiment modeling. The recent advancements in
+retrieval-augmented generation and neuro-symbolic artificial intelligence are making it clear
+that the merging of structured knowledge representations with neural models would lead
+to improving contextual grounding, interpretability, and reasoning capabilities in language
+tasks. The present work, inspired by these insights, suggests a neuro-symbolic multi-agent
+framework that not just analyzes sentiment patterns but also mimics audience reactions with
+respect to persona-awareness prior to a movie’s release, thus filling a major gap in the prediction of audience for low-resource language contexts at the pre-release stage.
+1.2 Motivation
+The main reason for doing this research is a significant shortcoming in the Bengali film
+industry: the lack of automated, data-driven tools to forecast pre-release reactions of the
+audience. At present, filmmakers completely depend on traditional focus groups and their
+instincts, which not only are slow but also come at a hefty cost and, often, cannot even recognize the different viewpoints of the various audience groups. The conventional systems for
+analyzing sentiments are not good enough for such languages as Bengali, which have limited
+labeled datasets and where linguistically speaking it is very difficult to come up with personaspecific predictions due to the nuances involved. This work proposes the development of a
+neuro-symbolic multi-agent framework that allows for the explainable, persona-aware text
+generation by integrating the contextual understanding of neural language models with the
+structured reasoning of symbolic systems. The model is built such that weak supervision can
+be utilized in a way where the audience can be identified in different segments without needing a large amount of manual labeling, whereas at the same time the retrieval-augmented
+generation (RAG) method ensures the reviews created are both contextually grounded and
+semantically accurate. The multi-agent structure consisting of Researcher, Writer, Critic,

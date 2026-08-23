@@ -48,6 +48,21 @@ def health() -> dict:
     }
 
 
+@app.get("/api/ready")
+def ready() -> dict:
+    """Initialize every local artifact before declaring the demo ready."""
+    try:
+        demo = service()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Demo artifacts could not be initialized") from exc
+    return {
+        "status": "ready",
+        "backend_initialized": True,
+        "verifier_b_loaded": False,
+        "rag": demo.cfg["rag"]["collection"],
+    }
+
+
 @app.post("/api/generate")
 def generate(body: GenerateRequest) -> dict:
     with _cache_lock:
@@ -70,4 +85,3 @@ def generate(body: GenerateRequest) -> dict:
         while len(_cache) > 128:
             _cache.popitem(last=False)
     return result
-

@@ -1,0 +1,25 @@
+28 Experiments and Evaluation
+Experimental Setup
+The current phase of research uses a new hybrid validation-based self-correction system
+which employs both neural and rule-based reasoning methods to create explainable persona
+alignment for its research requirements. The research phase uses elements from three recent
+areas of progress which include multi-agent LLM frameworks, retrieval-augmented generation (RAG) system, and neuro-symbolic artificial intelligence approaches [39, 40].
+The system establishes four interactive agents through its LangGraph implementation,
+which uses closed feedback loops to assign each agent its designated work functions. The
+system processes an input movie plot together with a target persona to generate a validated
+Bengali movie review that matches the required persona presentation style. The overall
+workflow consists of three core implementation steps:
+4.2.1 System Configuration
+Agents:
+• Researcher
+• Writer
+• Critic
+• Reflector
+Tools:
+• RAG Retriever Tool: 6,114 pre-collected Bengali reviews with LaBSE embeddings
+• BanglaBERT Validator Tool: Phase 2 Advanced Model (87.49% accuracy)
+• Hybrid Validation: Neural Score (60%) + Linguistic Feature Score (40%)
+Persona Thresholds:
+• Die-hard Fan: 0.7
+• Enthusiastic Casual: 0.45
+• Indifferent Casual: 0.6

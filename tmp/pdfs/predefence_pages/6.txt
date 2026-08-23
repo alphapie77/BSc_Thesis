@@ -1,0 +1,30 @@
+vi Contents
+3.3.7 Phase 1 Outcome . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+3.4 PHASE 2: Validator Training . . . . . . . . . . . . . . . . . . . . . . . . . 22
+3.4.1 Dataset Splitting . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+3.4.2 Tokenization and Input Encoding . . . . . . . . . . . . . . . . . . 22
+3.4.3 Persona Classification Model Training . . . . . . . . . . . . . . . . 23
+3.4.4 Cross-Validation Analysis . . . . . . . . . . . . . . . . . . . . . . 23
+3.4.5 Model Evaluation and Statistical Significance . . . . . . . . . . . . 23
+3.4.6 Model Persistence and Deployment Readiness . . . . . . . . . . . . 24
+3.4.7 Phase 2 Outcome . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+4 Experiments and Evaluation 26
+4.1 Dataset Description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+4.2 Chosen Models for Reasoning and Reranking . . . . . . . . . . . . . . . . 26
+4.2.1 System Configuration . . . . . . . . . . . . . . . . . . . . . . . . . 28
+4.2.2 Evaluation Data: . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+4.2.3 Metrics: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+4.2.4 Experimental Procedure . . . . . . . . . . . . . . . . . . . . . . . 29
+4.3 Results and Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+4.3.1 Dataset & Personas: . . . . . . . . . . . . . . . . . . . . . . . . . 30
+4.3.2 Validator Performance (BanglaBERT): . . . . . . . . . . . . . . . 30
+4.3.3 Multi-Agent System Results: . . . . . . . . . . . . . . . . . . . . . 30
+4.3.4 Key Outcome: . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+5 Conclusion and Future Direction 31
+5.1 Conclusion . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+5.2 Future Direction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+5.2.1 Phase 4: System Deployment & User Interface . . . . . . . . . . . 32
+5.2.2 Phase 5: Explainability Enhancement . . . . . . . . . . . . . . . . 32
+5.2.3 Phase 6: Comprehensive Evaluation . . . . . . . . . . . . . . . . . 32
+5.2.4 Phase 7: Generalization & Multi-Domain Expansion . . . . . . . . 33
+Bibliography 34

@@ -1,0 +1,23 @@
+1.4 Aims & Objectives 5
+4. Will a combined neural-symbolic validation system be able to demonstrate better performance than pure neural models in terms of accurately detecting persona consistency
+in the audience responses generated?
+5. What are the effects of a self-correcting multi-agent architecture on the reliability,
+consistency, and quality of the audience simulations generated across the different
+personas?
+1.4 Aims & Objectives
+The main goal of this study is to create an automated, persona-aware, and explainable AI
+framework capable of simulating the pre-release audience responses to films from Bangladesh.
+With the use of actual Bangla-language audience data, the research intends to facilitate culturally compatible filmmaking and promote decision-making based on data before the finalization of the script and the commencement of the shooting. The particular objectives of this
+research are as follows:
+• To identify distinct Bangladeshi audience personas hidden in vast arrays of unlabeled
+Bangla movie reviews by combining weak supervision and clustering techniques.
+• To design and implement a neuro-symbolic multi-agent system capable of producing
+culturally relevant and persona-tailored Bengali movie reviews for simulating the audience reception of pre-release films.
+• To integrate Retrieval-Augmented Generation (RAG) and hybrid neural-symbolic validation to enhance contextual relevance, maintain steady persona consistency, and
+improve the reliability of generated audience responses.
+• To evaluate the proposed framework’s effectiveness through quantifiable metrics, comparison with baselines, and explainability analysis, thereby demonstrating its relevance to decision-making in the Bangladeshi film industry.
+1.5 Research Challenges
+The development of a pre-release audience simulation system driven by AI for the Bangladeshi
+cinema industry poses numerous technical and practical problems. One of the main issues
+is the low-resource characteristic of the Bangla language, which restricts the availability of
+top-quality labeled data. This unavailability makes it very hard to train and evaluate the

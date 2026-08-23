@@ -1,0 +1,26 @@
+Contents
+List of Figures vii
+List of Tables viii
+1 Introduction 1
+1.1 Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1
+1.2 Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.3 Problem Statement . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+1.4 Aims & Objectives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+1.5 Research Challenges . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+1.6 Research Contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+1.7 Thesis Organization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+2 Related Work 8
+2.1 Retrieval-Augmented Generation (RAG) Frameworks . . . . . . . . . . . . 8
+2.2 Agentic Systems, Personas, and Bias . . . . . . . . . . . . . . . . . . . . . 9
+2.3 Neuro-Symbolic Artificial Intelligence . . . . . . . . . . . . . . . . . . . . 9
+2.4 Bangla Natural Language Processing . . . . . . . . . . . . . . . . . . . . . 10
+3 Proposed Methodology 11
+3.1 Design Science Research Methodology . . . . . . . . . . . . . . . . . . . 11
+3.2 Proposed Methodology . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+3.3 Phase 1: Data Engineering . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+3.3.1 Preprocessing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+3.3.2 Semantic Embedding Generation . . . . . . . . . . . . . . . . . . 19
+3.3.3 Persona Discovery via K-Means Clustering . . . . . . . . . . . . . 19
+3.3.4 Cluster-wise Sentiment Estimation . . . . . . . . . . . . . . . . . . 20
+3.3.5 Persona Assignment and Interpretation . . . . . . . . . . . . . . . 20
+3.3.6 Dataset Finalization . . . . . . . . . . . . . . . . . . . . . . . . . 21

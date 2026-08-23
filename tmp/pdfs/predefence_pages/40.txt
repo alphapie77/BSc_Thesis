@@ -1,0 +1,24 @@
+32 Conclusion and Future Direction
+5.2.1 Phase 4: System Deployment & User Interface
+• Develop a web-based interactive platform.
+• The system provides a real-time simulation of audience behavior based on different
+user personas.
+• The system provides an interface that filmmakers and marketers can use to create their
+projects.
+5.2.2 Phase 5: Explainability Enhancement
+• The system uses LIMEand SHAP explanations to provide validation for BanglaBERT.
+• The study analyzes linguistic markers to determine their attribution to different elements.
+• The study tracks the impact of RAG examples on its implementation.
+• The system displays word importance through its visual representation.
+• The researchers conducted a study to examine the accuracy of confidence assessment.
+5.2.3 Phase 6: Comprehensive Evaluation
+• The research examines automated evaluation processes through its study of 50 to 100
+measurement sites.
+• The study uses three evaluation metrics, which include BLEU, ROUGE, and Semantic similarity metrics.
+• The system uses a method which tests if users maintain their designated persona throughout the evaluation process.
+• The research compares three systems, which include LLM, RAG, and Hybrid system,
+through its ablation study.
+• The evaluation process uses human assessors to measure three criteria, which include
+realism, persona match, and usefulness.
+• The research employs statistical methods to determine the validity of its experimental
+results.

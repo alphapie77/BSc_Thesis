@@ -1,0 +1,26 @@
+3.3 Phase 1: Data Engineering 15
+discovery and retrieval and generation tasks. Preprocessing involves cleaning tasks that get
+the data set ready for analysis after data collection. Here is a detailed explanation of the
+preprocessing techniques used:
+Regex-Based Text Cleaning:
+The process involves using regular expressions to execute text cleaning operations which
+remove all non-informative elements and noisy components that frequently occur in social
+media data. The process involved deleting all URL links and email address data and HTML
+tag elements and special entities and user mentions and hashtag symbols. The team standardized excessive whitespace while they removed all leading and trailing spaces. The step
+eliminated non-linguistic artifacts which would have hindered the analysis, but it maintained
+the Bangla text’s essential semantic meaning.
+Word Count Calculation Using Bengali-Aware Tokenization:
+The team used Bengali-aware regular expression patterns, which detect Bangla Unicode characters, to calculate word counts needed for accurate textual length assessment. The approach
+enabled researchers to correctly manage the morphology of the Bangla language while maintaining accurate results, which originated from tokenization methods based on English. The
+team used word count numbers to conduct both data quality assessment and review filtering
+processes.
+Removal of Short Reviews:
+The lack of sufficient semantic content in extremely short reviews leads to negative effects on
+multiple downstream processes, including persona modeling and retrieval tasks. The dataset
+lost all reviews which contained fewer than three words. The filtering process removed nonessential samples from the dataset, which enabled us to keep authentic views of the audience
+material.
+Duplicate Review Removal:
+The team used cleaned text material to locate duplicate reviews, which they then removed
+from the dataset to stop redundant content and biasing effects. The team kept only the first
+version of each distinct review. The process cut down on duplicated content, which came
+from users who copied and shared material, while it brought in new content to the dataset.

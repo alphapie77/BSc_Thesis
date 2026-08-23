@@ -1,0 +1,10 @@
+APPROVAL FOR SUBMISSION
+This thesis entitled “A Neuro-Symbolic Multi-Agent framework for Pre-release Audience Simulation in Bangla Cinema”, by Sabbir Hossain, Student ID: 21701082, Session: 2020-2021,
+has been approved for submission to the Department of Computer Science and Engineering,
+University of Chittagong, in partial fulfillment of the requirements for the Bachelor of Science in Engineeering (B.Sc. Engg.) in Computer Science and Engineering.
+Prof. Dr. Mohammad Shahadat Hossain
+Professor
+Department of Computer Science and Engineering
+University of Chittagong
+Chattogram-4331, Bangladesh.
+Email: hossain_ms@cu.ac.bd

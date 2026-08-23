@@ -1,0 +1,6 @@
+List of Tables
+3.1 Cleaning the data with the Regex content removed . . . . . . . . . . . . . . 16
+3.2 Cleaned data after removing and adding space . . . . . . . . . . . . . . . . 17
+3.3 Cleaned data after removing stopwords . . . . . . . . . . . . . . . . . . . . 17
+3.4 Cleaned data after stemming with Emojis . . . . . . . . . . . . . . . . . . 18
+4.1 Sample Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26

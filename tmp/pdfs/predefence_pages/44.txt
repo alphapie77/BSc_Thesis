@@ -1,0 +1,26 @@
+36 Bibliography
+[30] A. Islam et al., “BanglaASTE: A novel framework for aspect-sentiment-opinion extraction in Bangla e-commerce reviews using ensemble deep learning,” arXiv preprint
+arXiv:2511.21381, 2025.
+[31] K. Peffers, T. Tuunanen, M. Rothenberger, and S. Chatterjee, “A design science research methodology for information systems research,” Journal of Management Information Systems, vol. 24, no. 3, pp. 45–77, 2007.
+[32] A. Bhattacharjee et al., “BanglaBERT: Combating embedding barrier in multilingual
+models for low-resource language understanding,” arXiv preprint arXiv:2101.00204,
+2021.
+[33] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “BERT: Pre-training of deep bidirectional transformers for language understanding,” in Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics:
+Human Language Technologies (Volume 1: Long and Short Papers), 2019, pp. 4171–
+4186.
+[34] C. Sun et al., “How to fine-tune BERT for text classification?” in Proceedings of the
+China National Conference on Chinese Computational Linguistics. Springer, 2019,
+pp. 194–206.
+[35] A. Géron, Hands-on machine learning with Scikit-Learn, Keras, and TensorFlow.
+O’Reilly Media, Inc., 2022.
+[36] R. Kohavi, “A study of cross-validation and bootstrap for accuracy estimation and
+model selection,” in Proceedings of the 14th International Joint Conference on Artificial Intelligence (IJCAI), vol. 14, no. 2. Morgan Kaufmann, 1995, pp. 1137–1143.
+[37] M. Sokolova and G. Lapalme, “A systematic analysis of performance measures for
+classification tasks,” Information Processing & Management, vol. 45, no. 4, pp. 427–
+437, 2009.
+[38] J. Pineau et al., “Improving reproducibility in machine learning research (a report from
+the NeurIPS 2019 reproducibility program),” Journal of Machine Learning Research,
+vol. 22, no. 164, pp. 1–20, 2021.
+[39] M. Wooldridge, An introduction to multiagent systems. Chichester, UK: John Wiley
+& Sons, 2009.
+[40] S. Russell and P. Norvig, Artificial Intelligence: A Modern Approach, 4th ed. Hoboken, NJ: Pearson, 2021.

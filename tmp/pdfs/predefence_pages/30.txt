@@ -1,0 +1,19 @@
+22 Proposed Methodology
+3.4 PHASE 2: Validator Training
+The second phase of the proposed framework focuses on training a robust persona validation model which can accurately classify Bengali movie reviews into predefined audience
+personas. The research demonstrates that transformer-based language models show high
+effectiveness for low-resource language classification tasks which include Bengali text analysis. The phase establishes that unsupervised clustering results in valid persona assignments
+which possess both reliability and generalization capabilities.
+3.4.1 Dataset Splitting
+The complete persona-labeled dataset, containing 6,114 Bengali movie reviews, was divided
+into training and testing subsets using an 80:20 distribution. A total of 4,891 samples were
+used for training, while 1,223 samples were reserved for evaluation. This split strategy is
+commonly used in supervised text classification tasks, as it facilitates effective model learning while ensuring reliable performance assessment [28].
+Figure 3.5 Dataset Splitting
+3.4.2 Tokenization and Input Encoding
+The bangla-bert-base model was used to generate textual representations for the project.
+This model has been pre-trained on extensive Bangla language corpora, enabling effective
+performance on downstream Bangla natural language processing tasks [32]. The architecture
+is based on the original BERT framework [33].
+The reviews were tokenized while preserving contextual information from longer texts,
+following the standard transformer fine-tuning methodology [34]. A total of 306 training

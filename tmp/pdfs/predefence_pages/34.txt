@@ -1,0 +1,20 @@
+Chapter 4
+Experiments and Evaluation
+This chapter presents the detailed experiments and results of the Phase 3: Multi-Agent
+System, which demonstrates its capability to produce Bengali reviews that match specific
+user personas. The system demonstrates its effectiveness and reliability through performance
+metrics, hybrid validation, and self-correction mechanisms.
+4.1 Dataset Description
+The dataset consists of 9,998 Bengali movie reviews collected from multiple online platforms, reflecting diverse audience opinions and engagement levels. The final cleaned dataset
+contains 6,114 unique reviews after pre-processing removed all short reviews and duplicated
+entries.
+Table 4.1 Sample Data
+Movie Review Sentiment
+মুিভটা অেনক ভােলা েলেগেছ, পিরবার িনেয় একসােথ বেস েদখার মত
+একটা মুিভ
+Positive
+মুিভটা েদেখ সময় নষ্ট হেলা 😠 😡 Negative
+িসেনমাটা েদখেত খারাপ লােগিন, তেব খুব উপেভাগও কিরিন। Neutral
+4.2 Chosen Models for Reasoning and Reranking
+The proposed framework adopts a neuro-symbolic multi-agent architecture that integrates
+large language models (LLMs) with symbolic validation mechanisms. The neural components are responsible for contextual reasoning and natural language generation, while the

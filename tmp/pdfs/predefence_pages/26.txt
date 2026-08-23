@@ -1,0 +1,35 @@
+18 Proposed Methodology
+Table 3.4 Cleaned data after stemming with Emojis
+Sample Text After Stemming
+আিম গান কির, েস গান করিছল, তারা গান
+কেরেছ
+আিম গান কর, েস গান কর, তারা গান কর
+আিম আজ িসেনমা েদখিছ ❤😎 আিম আজ িসেনমা েদখ
+আিম বই িলখিছ, েস বই িলেখিছল, আমরা বই
+িলেখিছ
+আিম বই িলখ, েস বই িলখ, আমরা বই িলখ
+তুিম েখলছ, আিম েখেলিছ, েস েখেলেছ তুিম েখল, আিম েখল, েস েখল
+Feature Extraction Technique (TF-IDF):
+TF-IDF (Term Frequency-Inverse Document Frequency) is an estimation in numbers that
+indicates a word’s significance in a particular text concerning a total of documents (corpus).
+TF-IDF is the result of the synthesis of two parts:
+Term Frequency (TF): The primary aspect of this component is to find the number of
+times a certain term occurs in the particular document. The method used to obtain this
+number is the ratio of the number of occurrences of that term in the document to the total
+number of terms in the document.
+𝑇 𝐹 (𝑡, 𝑑) =
+Number of times term 𝑡 appears in document 𝑑
+Total number of terms in document 𝑑
+Inverse Document Frequency (IDF): This part of the component indicates the relative
+infrequency of the term throughout the entire corpus. The calculation involves taking the
+logarithm of the ratio that has the total number of documents in the corpus as its dividend
+and the number of documents with the term in question as its divisor.
+𝐼𝐷𝐹 (𝑡, 𝐷) = log (
+Total number of documents in corpus 𝐷
+Number of documents containing term 𝑡)
+To find the TF-IDF score of a term 𝑡 in document 𝑑, it is necessary to multiply the TF
+value by the IDF value:
+𝑇 𝐹-𝐼𝐷𝐹 (𝑡, 𝑑, 𝐷) = 𝑇 𝐹 (𝑡, 𝑑) × 𝐼𝐷𝐹 (𝑡, 𝐷) (3.1)
+These preprocessing techniques play an important role in bringing the data to the required level for sentiment analysis tasks through cleaning, standardizing, and transforming
+processes. Ultimately, it is easier for the sentiment analysis models to detect the significant
+patterns and relationships between words and sentiments in movie reviews.

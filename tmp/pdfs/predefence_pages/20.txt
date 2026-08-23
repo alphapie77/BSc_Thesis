@@ -1,0 +1,17 @@
+12 Proposed Methodology
+opment. The design and development phase of our project introduces a neuro-symbolic
+multi-agent framework which combines weak supervision with Retrieval-Augmented Generation (RAG) technology. The system comprises multiple autonomous agents which execute persona-based audience response generation and assessment processes to refine and
+confirm generated audience feedback. The system uses symbolic linguistic rules and neural
+models to maintain both organizational identity and user understanding. The demonstration
+phase requires testing the framework through its implementation on actual Bangla movie
+review data which researchers obtained from social media and online platforms. The system
+simulates audience reactions for various personas by using pre-release scenarios to conduct
+both qualitative and quantitative assessments of its generated results. The evaluation phase
+measures system performance through four evaluation methods which include classification
+accuracy and F1-score and cross-validation and persona consistency metrics. The research
+framework assessment uses a comparative study between two systems which include fully
+neural networks and hybrid neuro-symbolic systems.
+Finally, The thesis communication phase shares research findings and methodology and
+experimental results and practical implications through the thesis which benefits both academic research and real-world applications in the Bangladeshi film industry. The methodology followed in this research is based on the six-phase Design Science Research (DSR)
+process illustrated in Figure 3.1.
+Figure 3.1 Design Science Research Methodology

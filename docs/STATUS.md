@@ -1,6 +1,10 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-23 (**S5 Bangla computational post-run, registered
+**Last updated:** 2026-08-23 (**The separate local Phase-8 interface now has a
+full artifact-readiness gate, repository-local frontend startup, offline cached
+LaBSE loading, honest hosted-seed disclosure, bounded-agent wording, and
+per-attempt R1 evidence traces; four focused tests and a production build pass.
+No S5 generation was rerun.**) (**S5 Bangla computational post-run, registered
 length-matched sensitivity analysis and blinded human evaluation COMPLETE; a separate local Phase-8
 diagnostic demo is built and end-to-end validated.**) The final, separately
 scored archive contains the exact frozen **5,400/5,400** Bangla generation

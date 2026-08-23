@@ -1,0 +1,31 @@
+16 Proposed Methodology
+Word Count and Character Length Analysis:
+The process of word count and character length analysis begins at step 6. The process of
+dataset quality assessment started after we completed the cleaning process through descriptive statistics. The study calculated word count metrics through five measurements which
+include mean, median, standard deviation, minimum, and maximum values. The researchers
+conducted character-level length analysis as part of their study to measure how much text differs from each other. The dataset contained three different review lengths which researchers
+used to assess their personas and create new ones.
+Review Length Distribution Analysis:
+The cleaned reviews were categorized into three word count groups which include short (3
+to 9 words), medium (10 to 49 words), and long (50 plus words). The distribution analysis
+showed how people communicate through their writing while confirming that the dataset
+contained authentic user content variations.
+Data Quality Validation and Storage:
+The team stored the cleaned and validated dataset in a structured format which will support
+upcoming steps of persona discovery and model training and retrieval-augmented generation.
+The processing system maintained substantial quantities of vital data because it managed to
+enhance the quality and consistency of textual content.
+Remove emoticons, hashtags, punctuation, null values, and numbers:
+Mentions, hashtags, and numbers could be present in the review data. While punctuation
+is typically used to compose a sentence, it can also emphasize a word or phrase. Therefore,
+each of these terms must be removed. Table 3.1 illustrates the data before and after this
+cleaning process.
+Table 3.1 Cleaning the data with the Regex content removed
+Sample Text After Cleaned Data
+িক সুন্দর একটা িসেনমা,,,,,,,,,!! আিম
+েছাটেবলায় এই িসেনমাটা েদেখিছলাম। 😊
+িক সুন্দর একটা িসেনমা আিম েছাটেবলায় এই
+িসেনমাটা েদেখিছলাম
+#অহংকার পতেনর মূল ",,,,,,,,,,,,,,,ছিবেত
+এটাই ফুেট উেঠেছ।
+অহংকার পতেনর মূল ছিবেত এটাই ফুেট উেঠেছ

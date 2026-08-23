@@ -5855,3 +5855,18 @@ and chapter scan cannot disagree after a future rebuild.
 **Boundary.** Consensus remained quota-unavailable. This pass used only
 previously read and metadata-verified records; no new method, result, generation,
 training or analysis was introduced.
+
+### 2026-08-23 — Phase-8 local interface readiness repair
+
+The diagnostic interface was hardened without touching the frozen S5 archive.
+The launcher now uses the repository-local frontend runner and waits for a real
+artifact-readiness endpoint. Readiness exposed and resolved an unnecessary
+Hugging Face network probe by enforcing offline use of the cached registered
+LaBSE model. The UI now describes hosted seeding probabilistically, separates
+the post-generation Plot Judge from the correction loop, exposes per-attempt R1
+identifiers, and adds connection, timeout, retry and accessibility feedback.
+
+Verification: `tests/test_demo.py` passed 4/4; Vinext production build passed;
+PowerShell parsing passed; `/api/ready` returned `backend_initialized=true`,
+`verifier_b_loaded=false`, and collection `r1_regionA_k2`. No Gemini request and
+no scientific generation rerun occurred.

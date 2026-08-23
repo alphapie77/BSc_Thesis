@@ -1,0 +1,28 @@
+14 Proposed Methodology
+method of this research exists in Phase 3: Neuro-Symbolic Multi-Agent System which uses
+an agentic RAG architecture. The system accepts a movie plot and target persona as input
+and processes it through four autonomous agents. The Researcher Agent creates personabased search queries to find relevant examples which it retrieves from a ChromaDB RAG
+module through semantic search. The Writer Agent creates Bangla audience reviews which
+depend on the context that has been retrieved. The Critic Agent analyzes the produced text
+while the Reflector Agent supplies feedback when the validation process does not succeed
+which allows the system to fix itself within certain limits. A Hybrid Validation Module
+guarantees system reliability by merging neural persona confidence at 60% with symbolic
+linguistic rules which operate at 40% through thresholds that depend on specific personas.
+The system routes outputs that do not pass validation back through the feedback loop while
+validated outputs move forward to the last stage. The interactive interface of Phase 4: Web
+Interface and Deployment allows filmmakers and scriptwriters to choose their personas
+and generate reviews in real time for their practical work. The system uses Explainable AI
+methods which include LIME and SHAP and attention visualization and decision tracing to
+achieve its explainability goals in Phase 5: Explainability. The phase reveals how persona
+classification works and how generation processes operate because it removes the black-box
+restriction that exists in neural-only systems. The system evaluation in Phase 6: Evaluation
+uses human evaluation studies together with ablation tests and baseline comparisons and statistical significance analysis. The proposed approach achieves both qualitative realism and
+quantitative robustness through this process.
+The proposed methodology creates a complete neuro-symbolic framework which functions as a production system for explaining pre-release audience simulation in Bangla cinema
+through its person-based audience simulation system.
+3.3 Phase 1: Data Engineering
+The first phase of the proposed framework focuses on transforming raw Bengali movie reviews into a structured, semantically rich, and persona-aware dataset. The current stage establishes essential elements which will support upcoming tasks that include persona creation
+and validation procedures and neuro-symbolic multi-agent development.
+3.3.1 Preprocessing
+The collected Bangla movie review dataset received a thorough multi-stage preprocessing
+pipeline, which ensured that high-quality input materials supported the process of persona

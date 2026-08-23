@@ -1,0 +1,81 @@
+3.2 Proposed Methodology 13
+3.2 Proposed Methodology
+The proposed methodology follows a phased neuro-symbolic design to develop a personaaware explainable system that retrieves information from audiences who watch Bangla cinema. The framework shown in Figure 3.2 combines seven components which include data
+engineering and weak supervision with multi-agent retrieval-augmented generation and hybrid validation and explanation methods and all evaluation processes.
+PHASE 1: Data Engineering (4 weeks)
+9,998 6,114 Reviews
+LaBSE + K-Means (K=3)
+3 Personas Identified
+PHASE 2: Validator Training (2 weeks)
+BanglaBERT Fine-tuning
+5-Fold Cross-Validation
+87.49% Accuracy
+PHASE 4: Web Interface & Deployment (2 weeks)
+PHASE 3: Neuro-Symbolic Multi-Agent System (3 weeks)
+INPUT
+Movie Plot
+Persona Type
+AGENT 1
+Researcher
+RAG Query
+AGENT 2
+Writer
+Generate Review
+AGENT 3
+Critic
+Validate
+AGENT 4
+Reflector
+Feedback
+RAG TOOL
+ChromaDB
+6,114 Reviews
+LaBSE Search
+Top-10 Examples
+VALIDATOR
+BanglaBERT
+87.49% Acc
+Linguistic Rules
+Hybrid Score
+HYBRID VALIDATION
+Neural (60%) + Linguistic (40%)
+Persona-specific thresholds
+OUTPUT
+3 Persona Reviews
+100% Accuracy
+1.0 Avg Attempts
+Bengali Text
+Self-Corrected
+Retrieve
+Validate
+PASS
+FAIL
+Feedback
+Loop
+(Max 3)
+PHASE 5 (1 week)
+Explainability
+LIME + SHAP
+Attention Viz
+Decision Trace
+PHASE 6: Evaluation (2 weeks)
+Human Study (30+ participants)
+Ablation Tests & Baselines
+Statistical Significance
+Phase 1: Data Engineering
+Phase 2: Validator Training
+Phase 3: Multi-Agent (Core AI)
+Phase 4: UI Wrapper
+Phase 5: Explainability
+Phase 6: Evaluation
+Success Path
+Self-Correction Loop
+Figure 3.2 Proposed System Workflow
+The methodology begins with Phase 1: Data Engineering which requires the collection
+of a large-scale Bangla movie review dataset that contains approximately 10,000 samples
+from social media platforms and online movie discussion forums. LaBSE sentence embeddings are generated and clustered through K-means to discover latent audience personas
+which do not require manual annotation. The process enables weakly supervised persona
+discovery which establishes the base for modeling with persona-aware systems. Phase 2:
+Validator Training works to create a dependable persona classification system through the
+training and evaluation of various transformer-based models. The research team uses crossvalidation to test the model’s ability to perform well across different scenarios. The bestperforming model becomes the neural component of the persona validator which later serves
+as an essential element for both hybrid validation and self-correction processes. The main

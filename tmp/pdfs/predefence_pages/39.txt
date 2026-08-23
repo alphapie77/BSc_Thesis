@@ -1,0 +1,16 @@
+Chapter 5
+Conclusion and Future Direction
+5.1 Conclusion
+The thesis proposes a Neuro-Symbolic Multi-Agent Framework which simulates pre release audience testing for Bangla films while solving two major challenges linked to lowresource NLP systems and persona-based text creation. Here, weak supervision was used to
+process 6,114 Bengali movie reviews which resulted in discovering three different audience
+personas without needing any manual work. The BanglaBERT validator achieved 87.49%
+accuracy through fine-tuning, which established a dependable validation system.
+The system combines RAG-based context retrieval with a self-correcting multi-agent architecture, which uses a hybrid neural-symbolic validation mechanism to assess neural predictions and linguistic features. The approach reached 100% persona accuracy because it
+needed only one generation attempt, which proved its reliability and effective performance.
+The framework provides explainability together with production readiness and generalizable
+capabilities while it delivers academic neuro-symbolic AI contributions and practical benefits to the Bengali film industry.
+5.2 Future Direction
+The project reached its first three phases, which included Data Engineering, Validator
+Training, and Neuro-Symbolic Multi-Agent System development. The upcoming phases
+will concentrate on improving the system, conducting assessments, and deploying the system
+in actual operational environments.

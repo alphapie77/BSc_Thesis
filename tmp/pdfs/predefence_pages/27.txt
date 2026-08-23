@@ -1,0 +1,23 @@
+3.3 Phase 1: Data Engineering 19
+Count Vectorization:
+Count Vectorization is an approach utilized in the fields of natural language processing and
+text analysis for the transformation of text data into numerical vectors, which could be comprehended by machine learning algorithms. The technique consists of calculating the number of occurrences of each word in a document or a whole corpus and thereby depicting
+these occurrences as vectors. The operation of Count Vectorization may be mathematically
+represented as follows:
+𝑋𝑖 = [𝑥𝑖,1, 𝑥𝑖,2, … , 𝑥𝑖,𝑀] (3.2)
+The preprocessing pipeline successfully removed noisy, duplicate, and low-quality entries while preserving linguistically rich Bangla reviews. The final dataset exhibited wellbalanced word-length distributions and strong textual consistency which made it suitable for
+three different research purposes.
+3.3.2 Semantic Embedding Generation
+The research utilized the Language-agnostic BERT Sentence Embedding (LaBSE) model,
+which exists in the sentence-transformers library, to create sentence-level embeddings
+that capture the semantic meaning of Bengali text. The researchers converted each review
+into a 768-dimensional dense vector, which resulted in an embedding matrix of 6,114 rows
+and 768 columns. These embeddings make it possible to calculate similarity and perform
+clustering in environments that use multiple languages and have limited resources, including
+the Bangla language.
+3.3.3 Persona Discovery via K-Means Clustering
+Unsupervised clustering was performed on the generated embeddings using the K-Means
+algorithm with 𝐾 = 3. The choice of three clusters was motivated by interpretability and
+alignment with audience engagement levels observed in Bengali cinema discourse. The
+clustering process grouped reviews into three distinct semantic clusters representing different audience behavior patterns. The resulting clusters consisted of 2,773 (45.4%), 1,964
+(32.1%), and 1,377 (22.5%) reviews, respectively, indicating a natural stratification of audience engagement within the dataset.

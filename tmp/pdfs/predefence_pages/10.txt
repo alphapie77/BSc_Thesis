@@ -1,0 +1,30 @@
+2 Introduction
+forms for this purpose. The dataset mirrors the true feelings, likes, and the mindset of the
+viewers; thus, it portrays the opinion of Bangladeshi viewers as a whole instead of depending on transliteration or external data sources. Through the cutting-edge AI techniques, the
+proposed solution would facilitate the movie directors and screenwriters to assess the storylines slowly yet surely before coming up with a script or starting production. The imaginary
+pre-release audience simulation will provide the filmmakers with the approximate reception
+of their movie in Bangladesh, where the weak points could be corrected and the storytelling
+improved to the audience’s liking. The researchers are determined to make the culturally
+grounded filmmaking process sustainable, preserve the peculiar character of the Bangladeshi
+film industry, and play a role in the revitalization and maintenance of the national film sector.
+Nowadays, sentiment analysis of textual data has developed into an indispensable instrument
+for determining the public’s views and forecasting the results in the cinema industry. Automated opinion mining is a method that allows researchers and the film industry to get the
+signals of understanding coming from large numbers of movie reviews and social media interactions that are increasingly powerful in deciding the consumers’ choice. For example, studies that combine aspect-based sentiment analysis with econometric modeling have provided
+evidence that the content of textual reviews, not just ratings, has a significant impact on box
+office revenues and viewer choices, thereby indicating the use of sentiment analytics as a potentially powerful tool for predicting commercial success [1]. In addition, studies concerned
+with box office forecasting declared that the use of sentiment scores derived from movie
+review texts combined with predictive models sharpened the forecasting accuracy, attaining
+better results than traditional quantitative indicators used alone. The findings have been such
+that the forecasting models with sentiment infusion have been proven to be superior to the
+baseline econometric models in predicting both the opening-week and long-term revenue
+trends [2]. Not just in predictive analytics, but also in deep learning-based models, which
+include convolutional, recurrent, and attention-based neural network models, advances have
+been made to model the sentiment pattern of movie reviews through deep learning techniques, thus providing better classification performance and comprehension of context than
+traditional machine learning methods. Such deep learning methods are able to recognize the
+nuances in syntax and semantics of the text feed more expertly, hence providing a superior
+representation of emotions for further analytics tasks [3]. This constraint is especially severe
+in the case of low-resource languages like Bengali, where the lack of labeled persona data
+and the rich linguistic diversity that complicates automated analysis are both factors that
+contribute to the problem. Research done in parallel on Retrieval-Augmented Generation
+(RAG) and neuro-symbolic artificial intelligence has also pointed out the need for merging
+structured knowledge with neural models in order to improve contextual grounding, inter-

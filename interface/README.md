@@ -27,3 +27,9 @@ From the repository root, double-click `start_demo.cmd`. It checks the API key
 and local environments, installs only a missing first-run dependency, starts
 both services, and opens `http://localhost:3000`. Keep the launcher window open;
 press Ctrl+C there to stop both services.
+
+When `node_modules` is present, the launcher uses the repository-local Vinext
+runner instead of depending on a global npm shim. It opens the UI only after
+R1 and the in-loop verifier artifacts pass `/api/ready`. Seed 42 is a
+best-effort hosted-model setting; repeated responses are not promised to be
+byte-identical.

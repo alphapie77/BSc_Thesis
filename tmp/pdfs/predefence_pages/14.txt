@@ -1,0 +1,25 @@
+6 Introduction
+models properly. Collecting audience reviews from social media is another issue; these reviews are very informal, noisy, and diverse language-wise, which creates a problem for the
+discovery of reliable profiles and for modeling the sentiments expressed. While one of the
+most significant hurdles is to make sure that the system is in sync with the cultural and social values of the country, at the same time, it should not be influenced by the bias from
+the foreign cinematic impacts. Maintaining the consistency of the personas in the generated
+text in addition to the automated yet reliable output validation are some of the complexities
+that have to be managed along the way. The inherent complexities in the system due to the
+requirement of very high predictive performance along with the interpretability in a multiagent neuro-symbolic architecture are also quite severe. As a result, the integration of data
+collection, weak supervision, retrieval-augmented generation, validation, and self-correction
+into a single end-to-end production-ready framework becomes not only a design but also a
+computational challenge that is very intense.
+1.6 Research Contributions
+This paper presents the following key contributions to the fields of Natural Language Processing and Computational Social Science:
+• Neuro-Symbolic Multi-Agent Framework: We introduce the first comprehensive
+system capable of generating persona-based text outputs, specifically tailored for the
+low-resource Bangla language.
+• Weak Supervision for Persona Discovery: The proposed framework utilizes an automated process to detect essential audience groups, effectively eliminating the need
+for manual human annotation.
+• Hybrid Neural-Symbolic Validation: We developed a validation mechanism that
+combines neural scoring methods with symbolic rule systems to achieve high-precision
+persona matching.
+• RAG Integration: The integration of Retrieval-Augmented Generation (RAG) allows
+the system to retrieve specific persona examples, significantly improving the contextual accuracy and linguistic authenticity of the generated text.
+• Production-Ready Pipeline: The research offers a complete, operational pipeline
+designed for deployment in actual business environments for real-world applications.

@@ -1,0 +1,14 @@
+3.3 Phase 1: Data Engineering 21
+3.3.6 Dataset Finalization
+The final output of Phase 1 is a complete dataset containing 6,114 Bengali movie reviews that
+have been processed and assigned specific persona labels. Each entry includes the cleaned
+text along with its semantic embeddings, cluster assignments, sentiment estimates, and corresponding persona label.
+The dataset was stored as step2_clustered_data.csv and serves as the primary input for
+validator training and multi-agent simulation in the subsequent phases.
+3.3.7 Phase 1 Outcome
+This phase successfully transforms raw and noisy Bengali movie reviews into a structured
+dataset containing semantic information and identity-based attributes. The proposed method
+establishes a scalable solution that requires minimal manual annotation to generate audience
+simulations for low-resource language environments. By leveraging unsupervised clustering and weak sentiment signals, the framework ensures efficient persona construction while
+preserving meaningful semantic representation of the data.
+Figure 3.4 Data Engineering Pipeline

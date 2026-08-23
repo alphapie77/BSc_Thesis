@@ -1,0 +1,21 @@
+Chapter 1
+Introduction
+The prediction of audience reactions has turned into an essential challenge in the contemporary film sector, especially concerning the decision-making based on releasing and marketing strategies. This study tackles the drawbacks of current systems that analyze sentiments
+after the release by putting forward a framework for pre-release audience simulation that is
+aware of the persona’s needs and is designed for Bengali cinema. This chapter describes the
+research context and gives an overview of the suggested neuro-symbolic multi-agent system.
+The organization of the chapter is as follows: Background, Motivation, Problem Statement,
+Objectives, Research Challenges, and Thesis Organization.
+1.1 Background
+Over the past few years, the Bangladesh film industry has been heavily dependent on copying foreign cinema styles, plots, and storytellers’ skills rather than being creative, which has
+probably been a downfall for the industry’s relationship with the audience and for the films
+resonating with the audience. Consequently, numerous films that are made locally do not
+meet the emotional, social, and cultural expectations of the viewers, being the Bangladeshi
+audience. This escalating gap between filmmakers and the audience has caused a drop in audience engagement and uncertainty regarding the commercial and critical success of a film.
+Hence, it has become a pressing need for the film industry to understand the Bangladeshi
+audience’s perception and emotional response towards the local cinema for its sustainable
+development. In the hunt for a solution to the aforementioned problem, the researchers here
+relied on the assumption that the making of a culturally inclined, audience-perceived film
+could only come through the analytical study of audience opinions. A dataset containing
+around 10,000 manually gathered and precisely chosen Bangla language audience reviews
+and social media interactions about Bangladeshi films was collected from various online plat-

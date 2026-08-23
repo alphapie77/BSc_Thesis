@@ -53,6 +53,21 @@ def test_live_writer_uses_interactions_without_persisting(monkeypatch):
     assert "test-secret-not-written" not in str(body)
 
 
+def test_ready_initializes_artifacts_without_verifier_b(monkeypatch):
+    from src.demo import api
+
+    class _Demo:
+        cfg = {"rag": {"collection": "reviews_r1"}}
+
+    monkeypatch.setattr(api, "service", lambda: _Demo())
+    assert api.ready() == {
+        "status": "ready",
+        "backend_initialized": True,
+        "verifier_b_loaded": False,
+        "rag": "reviews_r1",
+    }
+
+
 def test_demo_config_keeps_verifier_b_out():
     import yaml
 

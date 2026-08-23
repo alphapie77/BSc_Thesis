@@ -1,0 +1,34 @@
+3.3 Phase 1: Data Engineering 17
+Space Removal:
+From time to time, there are reviews with double spacing among the data sampling. So,
+removal of excessive spacing is a must. On the other hand, some reviews lack spacing after
+a stop or a comma. Here, adding a space is necessary to ensure that after the punctuation is
+removed, there will still be a space. Table 3.2 demonstrates this transformation.
+Table 3.2 Cleaned data after removing and adding space
+Sample Text After Cleaned Data
+খুব ভােলা একটা ছিব েদখলাম দারুণ লাগেলা খুব ভােলা একটা ছিব েদখলাম দারুণ লাগেলা
+ছিবটা দারুণ,দশর্ক সবাই মুগ্ধ ছিবটা দারুণ, দশর্ক সবাই মুগ্ধ
+আিম 😊 এই িসেনমা অেনক পছন্দ করলাম আিম 😊এই িসেনমা অেনক পছন্দ করলাম
+অিভনয়,,,,দারুণ!!িচত্রনাটয্ও ভােলা অিভনয়, দারুণ! িচত্রনাটয্ও ভােলা
+Removing Stopwords:
+Commonly used words that have little importance in sentiment analysis, such as articles
+(a, an, the), prepositions (on, in, at), and conjunctions (and, but, or), are removed. Stop
+word removal helps to diminish data noise. In the same way, in Bangla, the terms "অতএব",
+"অথচ", "অথবা", "অনুযায়ী", "এটা", "এটাই" etc. are also recognized as stopwords. Table 3.3
+shows examples of stopword removal.
+Table 3.3 Cleaned data after removing stopwords
+Sample Text After Stopword Removal
+আিম মেন কির এটা একিট অসাধারণ িসেনমা,
+দশর্ক সবাই মুগ্ধ
+মেন কির অসাধারণ িসেনমা, দশর্ক সবাই মুগ্ধ
+অতএব 😊 এই ছিবটা সিতয্ই দারুণ এই ছিবটা সিতয্ই দারুণ
+িতিন ভােলা অিভনয় কেরেছন, িকন্তু িচত্রনাটয্টা
+একটুদুবলর্
+ভােলা অিভনয় কেরেছন, িচত্রনাটয্টা একটুদুবলর্
+এটাই আমার িপ্রয় িসেনমা, এবং গল্পও অননয্ আমার িপ্রয় িসেনমা, গল্পও অননয্
+Stemming:
+The word stemming is used to denote the process of reducing different forms of a word to
+its root. Depending on the usage, a word can have different forms. To illustrate, "করা",
+"করিছ", "করিছলাম", "করিছেল", "কেরেছ", "কেরিছ" etc. are different forms of the same root
+"কর". Stemming is primarily intended to combine different conjugational forms of a word
+into one basic form.

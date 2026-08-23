@@ -1,0 +1,24 @@
+2.2 Agentic Systems, Personas, and Bias 9
+showed that CoA achieved results up to 10% better than RAG and multi-agent LLM base systems on long-context tasks. Regarding the internal mechanism of such systems, Wang et al.
+[11] introduced the knowledge activation probability entropy (KAPE) approach to identify
+neurons processing internal versus external knowledge, allowing for selective deactivation
+to control knowledge sources.
+2.2 Agentic Systems, Personas, and Bias
+Recent research has increasingly integrated persona-based agents into generation frameworks. Maragheh et al. [12] presented ARAG, an Agentic RAG framework for Personalized
+Recommendation, where a User Understanding Agent summarizes preferences to guide an
+Item Ranker Agent. In a similar vein, Zerhoudi et al. [13] introduced PersonaRAG, utilizing
+user-centric agents to adapt retrieval processes based on actual user data, thereby outperforming baseline models.
+The concept of identity in agents was further explored by Platnick et al. [14], who proposed Identity Retrieval-Augmented Generation (ID-RAG). This enables agents to establish permanent character and continuous behavior patterns, termed as Human-AI Agents
+(HAis). Lin et al. [15] focused on creativity in Multi-Agent Systems (MAS), presenting a
+taxonomy of agent proactivity and persona design. However, the use of personas introduces
+challenges. Li et al. [16] investigated how different personas create bias problems, noting
+that agents demonstrated a strong preference for in-group members who shared their same
+persona. These biases persisted across different group sizes and interaction rounds.
+2.3 Neuro-Symbolic Artificial Intelligence
+Neuro-symbolic AI combines machine learning methods based on artificial neural networks
+with symbolic approaches to computing [17]. Garcez et al. [18] highlighted this as a fundamental method for building explainable AI systems. Several surveys have mapped this field:
+Sarker et al. [19] analyzed contemporary research trends, Yu et al. [20] surveyed advancements from the perspective of challenges and methods, and Besold et al. [21] examined the
+theoretical foundations of neural-symbolic computation.
+In terms of specific reasoning frameworks, Zhang et al. [22] examined hybrid reasoning
+with knowledge graphs. Badreddine et al. [23] presented Logic Tensor Networks (LTN),
+which support reasoning with both rich data and abstract knowledge using Real Logic. Similarly, Zimmer et al. [24] introduced a differentiable logic machine for inductive logic programming tasks.

@@ -1,0 +1,16 @@
+20 Proposed Methodology
+3.3.4 Cluster-wise Sentiment Estimation
+The researchers used a lightweight pattern-based sentiment estimation method to create cluster descriptions. The average sentiment scores for each cluster were calculated, producing a
+clear measure of emotional intensity. The results showed that Cluster 2 exhibited the highest
+average sentiment, while Clusters 0 and 1 demonstrated relatively lower sentiment intensity.
+This analysis enabled cluster differentiation through both semantic similarities and varying
+levels of emotional engagement.
+3.3.5 Persona Assignment and Interpretation
+The researchers created audience personas corresponding to each cluster based on its distribution pattern and average sentiment strength. Three distinct personas were identified:
+• Indifferent Casual: Low engagement and weak emotional response
+• Enthusiastic Casual: Moderate engagement with balanced sentiment
+• Die-hard Fan: High engagement with strong positive sentiment
+Figure 3.3 Persona Distribution
+The persona mapping enabled the dataset to be labeled using weakly supervised methods,
+as it required no manual annotation. This approach reduced labeling costs while maintaining
+meaningful data interpretation.

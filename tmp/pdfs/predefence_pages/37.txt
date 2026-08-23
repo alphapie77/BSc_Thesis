@@ -1,0 +1,20 @@
+4.2 Chosen Models for Reasoning and Reranking 29
+Generation Settings:
+• Retry Mechanism: Maximum 3 attempts per review
+• Generation Settings: temperature=0.8, top_p=0.9, top_k=40
+4.2.2 Evaluation Data:
+• Randomly selected 50 Bengali movie plots from the dataset
+• Each plot evaluated for all 3 personas (total 150 review attempts)
+4.2.3 Metrics:
+• Persona Accuracy (match with target persona)
+• Average Attempts per review
+• Hybrid Validation Score
+• Compliance with persona-specific linguistic markers
+4.2.4 Experimental Procedure
+1. Researcher Agent: Retrieves 10 persona-specific examples relevant to the input plot.
+2. Writer Agent: Uses Gemini API to create the first Bengali review.
+3. Critic Agent: Uses hybrid validation methods to determine whether the review maintains or fails to meet requirements.
+4. Reflector Agent: Delivers practical review feedback which the Writer uses to create
+new content.
+5. Iteration Tracking: Records all attempts together with their validation scores and
+ultimate outcomes.

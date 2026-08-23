@@ -21,6 +21,8 @@ import yaml
 # from being auto-imported by Transformers before sentence-transformers loads.
 os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
 os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
 from src.agents.critic import Critic
 from src.agents.graph import run_loop

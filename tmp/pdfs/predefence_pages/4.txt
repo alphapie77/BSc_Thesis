@@ -1,0 +1,23 @@
+Abstract
+The accurate foreshadowing of the audience’s responses and reactions to a film even before
+its release continues to present a major challenge in the Bengali film industry; very often,
+the result is wrong marketing campaigns, and ultimately, the financial risk goes up. The
+majority of the current sentiment analysis methods are reliant on data collected after the release and first getting the general character of the audience’s reactions, therefore missing out
+on behavior that is specific to each persona. These drawbacks are made even worse in the
+case of low-resource languages like Bengali, where it is hard to find labeled datasets, and
+the language is extremely context-dependent. The dissertation introduces a neuro-symbolic
+multi-agent framework that is designed for audience simulation before a movie release and
+specifically tailored for the Bengali film industry. The proposed approach addresses three
+main concerns: through weak supervision, it cuts back on the need for manually labeled persona data, it gives way to persona-aware audience response generation by utilizing a coordinated multi-agent architecture, and it strengthens the reliability of the output through hybrid
+neural-symbolic validation. In the framework, a three-stage pipeline is followed. To start
+with, 6,114 Bengali movie reviews are turned into vectors using Language-Agnostic BERT
+Sentence Embeddings (LaBSE) and grouped with K-means (K = 3) in order to discover three
+main audience personas automatically without any manual annotation. In the second stage,
+a model based on BanglaBERT is fine-tuned to classify personas, which is then utilized as a
+neural validator, reaching an accuracy of 87.49% and an F1-score of 0.8733 under five-fold
+cross-validation. The results of the experiments show that persona conformity was achieved
+for all three personas with a mere single generation attempt on average, thus indicating high
+efficiency and stability. The hybrid validation strategy was able to effectively deal with the
+ambiguous persona cases, especially for the Enthusiastic Casual persona, where purely neural methods were not enough. This study presents a neuro-symbolic multi-agent audience
+simulation framework for a low-resource language, a hybrid validation strategy for personaaware text generation, and a weakly supervised persona discovery pipeline, thus providing
+practical value for data-driven decision-making in the Bengali film industry.

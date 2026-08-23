@@ -1,0 +1,19 @@
+Chapter 3
+Proposed Methodology
+This chapter describes the methodology followed to design and develop the proposed neurosymbolic multi-agent framework for pre-release audience simulation in Bangla cinema. The
+system presents its complete operational process which includes data collection and persona
+discovery and retrieval-augmented generation and hybrid validation.
+3.1 Design Science Research Methodology
+This research follows the Design Science Research (DSR) methodology which enables researchers to create and assess new solutions that solve real-world problems while developing
+theoretical knowledge. DSR requires researchers to develop new systems which they must
+test under real-world conditions. DSR methodology is an approach to issue resolution that
+focuses on the development and assessment of novel products that con-tribute to theoretical
+understanding and real-world implementations [31].
+The first phase of our process begins with problem identification which demonstrates that
+the Bangladeshi film industry lacks a system that can automatically and systematically assess audience reactions before films are released. Existing sentiment analysis approaches
+limit their assessments to post-release periods because they treat audiences as one group.
+The existing methods for sentiment analysis in the Bangla language remain ineffective because they only focus on audience groups instead of individual audience members. The
+neural text generation models lack both interpretability and cultural grounding which makes
+them unsuitable for creative decision-making processes. The second phase focuses on defining the objectives of the solution. The primary objective is to develop a system that can
+accurately simulate persona-aware audience responses before release, while ensuring contextual relevance, cultural alignment, and explainability. The system provides data-driven
+insights to filmmakers and scriptwriters during the initial stages of script and plot devel-

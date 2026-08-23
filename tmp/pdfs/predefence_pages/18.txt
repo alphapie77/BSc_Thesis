@@ -1,0 +1,11 @@
+10 Related Work
+Integration paradigms have also been a focus. Nawaz et al. [25] investigated models linking reasoning with learning, such as Neural Theorem Provers. De Raedt et al. [26] examined
+the integration of NeSy and StarAI paradigms through frameworks like DeepProbLog. Furthermore, Evans et al. [27] developed a system using backpropagation to handle uncertain
+data, while Liang et al. [28] analyzed logic-aware Transformers and LLM-based symbolic
+planning.
+2.4 Bangla Natural Language Processing
+Significant contributions have been made in the domain of Bangla NLP. Hasan et al. [29]
+presented a large manually annotated dataset of 33,606 Bangla news tweets and comments.
+Their study demonstrated that monolingual transformer-based models delivered superior performance compared to larger models like GPT-4 in zero-shot settings.
+Focusing on sentiment analysis, Islam et al. [30] introduced BanglaASTE, a novel framework for Aspect Sentiment Triplet Extraction. Their work included the creation of the first
+annotated Bangla ASTE dataset with 3,345 reviews and the development of a hybrid classification framework combining BanglaBERT contextual embeddings with XGBoost algorithms.
