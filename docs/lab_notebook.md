@@ -5265,3 +5265,51 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
   `lappas2026syntheticaudiences`. Corrected `shihab2025est` metadata from its
   Consensus full record. Both are recorded in `docs/related_work.md` /
   `docs/references.bib` as applicable.
+
+---
+
+## 2026-08-23 -- S6.chapters.1-5.bn: Bangla introduction through system chapter drafts
+**Feeds:** Thesis Chapters 1 through 5
+**Commit:** `e6739305d267ee69b684aad4c1120f5775358b0f`
+**Artifacts:** `docs/chapters/chapter1_introduction.md`, `docs/chapters/chapter2_related_work.md`, `docs/chapters/chapter3_data_axis.md`, `docs/chapters/chapter4_verifiers.md`, `docs/chapters/chapter5_multi_agent_system.md`
+
+### Numbers
+- Five chapter drafts, **4,515 words** total: Ch.1 798; Ch.2 961; Ch.3 955;
+  Ch.4 752; Ch.5 1,049.
+- Citation audit resolves all **9** citation keys against
+  `docs/references.bib`; no unresolved citation placeholder remains.
+- No generation, scoring, split, model, config or result artifact changed.
+
+### Decisions made (and why)
+- The Introduction does not freeze the unresolved title. It names the scientific
+  object as axis-level-conditioned response generation and preserves RQ4 as
+  unanswered rather than presenting a completed cross-lingual contribution.
+- Chapter 3 presents K=2 as a reproducible continuum cut after the full-corpus
+  source-confound and clusterability failures; it never restores “discovered
+  personas” from the superseded pipeline prose.
+- Chapter 4 treats all verifier scores as label reproduction, reports the
+  seven-arm tie and circularity result, and keeps Verifier-B's calibration null.
+- Chapter 5 describes agents by their executable roles and privileges. The
+  symbolic component is defended as diagnostic feedback, not as a predictive
+  hybrid score, because the registered w study was unresolved.
+
+### Findings (things we did not expect)
+- The old Introduction blueprint contains four claims that current STATUS makes
+  false or unresolved: discrete/persona discovery, a human-validated verifier,
+  established Verifier-B calibration, and cross-lingual evidence. The drafts use
+  the verified replacements and leave the blueprint as historical specification.
+- The split wording required care: dev is a registered surface within the frozen
+  contract, not a fourth disjoint partition added to G/R1/R2 counts.
+
+### Consequences for downstream steps
+- All seven substantive chapter drafts now exist in `docs/chapters/`. Next work
+  is thesis-template integration, front matter/conclusion/appendices, consistent
+  numbering, and supervisor review—not another generation run.
+- The exact title, university template, author/supervisor metadata, ethics
+  determination and final English-arm decision still require Sabbir's input and
+  are not guessed into the drafts.
+
+### Citations needed
+- None new. These chapters synthesize the already recorded literature; all used
+  keys resolve to `docs/references.bib` and have corresponding related-work
+  records.
