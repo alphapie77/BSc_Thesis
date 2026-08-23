@@ -84,6 +84,12 @@ def bootstrap_items(joined: pd.DataFrame, *, n: int, confidence: float,
 def summarize(joined: pd.DataFrame, *, n_boot: int, confidence: float) -> tuple[list[dict], dict]:
     rng = np.random.default_rng(42)
     alpha_q = [(1 - confidence) / 2, 1 - (1 - confidence) / 2]
+    # One canonical pooled item-bootstrap draw feeds both the summary row and
+    # the headline report.  Independent RNG streams would be equally valid
+    # Monte Carlo estimates but could print slightly different intervals for
+    # the same registered statistic.
+    pooled_ci = bootstrap_items(joined, n=n_boot, confidence=confidence,
+                                rng=np.random.default_rng(42))
 
     def accuracy_ci(group: pd.DataFrame) -> tuple[float, float]:
         # Resample items, retaining every rating attached to each sampled item.
@@ -106,17 +112,15 @@ def summarize(joined: pd.DataFrame, *, n_boot: int, confidence: float) -> tuple[
                      "condition": condition, "target_level": int(level), "n": len(group),
                      "accuracy": float(group["correct"].mean()),
                      "accuracy_ci_low": None, "accuracy_ci_high": None})
-    overall_lo, overall_hi = accuracy_ci(joined)
     rows.append({"scope": "overall_pooled", "annotator": "ALL", "condition": "ALL",
                  "target_level": "ALL", "n": len(joined),
                  "accuracy": float(joined["correct"].mean()),
-                 "accuracy_ci_low": overall_lo, "accuracy_ci_high": overall_hi})
+                 "accuracy_ci_low": pooled_ci["accuracy_ci_low"],
+                 "accuracy_ci_high": pooled_ci["accuracy_ci_high"]})
     pivot = joined.pivot(index="item_id", columns="annotator", values="response")
     matrix = pivot.to_numpy(int)
     unanimous = float(np.mean(np.all(matrix == matrix[:, [0]], axis=1)))
     alpha = nominal_krippendorff_alpha(matrix)
-    ci = bootstrap_items(joined, n=n_boot, confidence=confidence,
-                         rng=np.random.default_rng(42))
     confusion = {}
     disagreement = {}
     for level, group in joined.groupby("target_level", sort=True):
@@ -135,7 +139,7 @@ def summarize(joined: pd.DataFrame, *, n_boot: int, confidence: float) -> tuple[
     report = {"status": "S5_BN_HUMAN_EVAL_PASS", "n_items": len(pivot),
               "n_judgments": len(joined), "pooled_accuracy": float(joined["correct"].mean()),
               "raw_three_way_agreement": unanimous, "krippendorff_alpha_nominal": alpha,
-              **ci, "bootstrap_resamples": n_boot, "confidence_level": confidence,
+              **pooled_ci, "bootstrap_resamples": n_boot, "confidence_level": confidence,
               "confusion_by_target_level": confusion,
               "disagreement_by_target_level": disagreement,
               "standing": "human target-level match on the frozen balanced 100-case subset"}

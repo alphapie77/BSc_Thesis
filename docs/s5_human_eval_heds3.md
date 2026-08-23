@@ -118,8 +118,16 @@ target for supplementary material.
   case-level 10,000-resample bootstrap CI; descriptive condition × level cells;
   raw three-way agreement; nominal Krippendorff alpha with item-bootstrap CI;
   disagreement/confusion by target level. No best-annotator selection.
-- **Observed responses/results:** `PENDING` until all three exact CSVs pass the
-  registered ingestion gate.
+- **Observed responses/results (2026-08-23):** all three exact CSVs passed the
+  registered ingestion gate: 100 items and 300 judgments, with no missing,
+  extra, duplicate or non-binary responses. Pooled target-match accuracy is
+  **0.9133** (case-bootstrap 95% CI **0.8667--0.9567**). Per-evaluator accuracy
+  is A **0.91** (0.85--0.96), B **0.93** (0.88--0.98), and C **0.90**
+  (0.84--0.95). Raw three-way agreement is **0.88**; nominal Krippendorff alpha
+  is **0.8405** (item-bootstrap 95% CI **0.7473--0.9200**). Both target levels
+  have 137/150 correct judgments (0.9133). Five of 50 level-0 items and seven of
+  50 level-1 items split 2-to-1. Condition × level cells remain descriptive
+  (`n=15` judgments each), not a system-ranking analysis.
 
 ## 5. Ethics
 
@@ -139,10 +147,10 @@ target for supplementary material.
 
 ## Post-collection completion checklist
 
-- [ ] Record received judgments and exact completeness gate.
+- [x] Record received judgments and exact completeness gate.
 - [ ] Record voluntarily reported completion times and procedural feedback, if any.
-- [ ] Insert per-evaluator/pooled accuracy and confidence intervals.
-- [ ] Insert raw agreement, nominal Krippendorff alpha/CI and disagreement pattern.
+- [x] Insert per-evaluator/pooled accuracy and confidence intervals.
+- [x] Insert raw agreement, nominal Krippendorff alpha/CI and disagreement pattern.
 - [ ] Record institutional ethics determination accurately.
 - [ ] Export the final answers through the official HEDS 3.0 form for the thesis
       supplementary package.

@@ -5111,3 +5111,65 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 - `papageorgiou2025agenticfaithfulness` and
   `ramprasad2024factualitymetrics` are recorded in `docs/related_work.md` and
   `docs/references.bib`. `zhu2024rageval` remains the metric-separation basis.
+
+---
+
+## 2026-08-23 -- S5.human_eval.bn: Blinded Bangla human evaluation
+**Feeds:** Chapter 6 human validation and HEDS
+**Commit:** `170402fae0fe1fce6ab59eb4cd6eb9e7d679e7bb`
+**Artifacts:** `results/s5_human_eval_bn_responses.csv`, `results/s5_human_eval_bn_summary.csv`, `results/s5_human_eval_bn_report.json`
+
+### Numbers
+- `results/s5_human_eval_bn_responses.csv`
+  - (see file; 45406 bytes)
+- `results/s5_human_eval_bn_summary.csv`
+  - (see file; 4779 bytes)
+- `results/s5_human_eval_bn_report.json`
+  - `status` = S5_BN_HUMAN_EVAL_PASS
+  - `n_items` = 100
+  - `n_judgments` = 300
+  - `pooled_accuracy` = 0.9133333333333333
+  - `raw_three_way_agreement` = 0.88
+  - `krippendorff_alpha_nominal` = 0.8405333333333334
+  - `accuracy_ci_low` = 0.8666666666666667
+  - `accuracy_ci_high` = 0.9566666666666667
+  - `alpha_ci_low` = 0.7473289061914056
+  - `alpha_ci_high` = 0.9199785895891878
+  - `bootstrap_resamples` = 10000
+  - `confidence_level` = 0.95
+  - `standing` = human target-level match on the frozen balanced 100-case subset
+
+### Decisions made (and why)
+- The three returned CSVs were accepted only after the registered exact-surface
+  gate passed: 300/300 judgments, no missing, extra, duplicate or non-binary
+  response. Their download and repository SHA-256 values match and are sealed
+  in `response_ingestion_manifest.json`; no incomplete file was scored.
+- The preregistered pooled, per-annotator, agreement and case-bootstrap analyses
+  are reported unchanged. Condition × level cells remain descriptive because
+  each contains only 15 judgments; they are not used to rank the ten systems.
+- No generated text was rerun. Human scoring joins blinded responses to the
+  already frozen 100-item key and therefore cannot change the 5,400-case archive.
+
+### Findings (things we did not expect)
+- Target match is 0.9133 overall and exactly 0.9133 within each target level
+  (137/150 correct for both), so the headline is not driven by one easier level.
+- Raw three-way agreement is 0.88 and nominal Krippendorff alpha is 0.8405
+  (item-bootstrap 95% CI 0.7473--0.9200). Disagreement is modest but not absent:
+  5/50 level-0 and 7/50 level-1 items split 2-to-1.
+- Per-annotator accuracies are 0.91 (A), 0.93 (B) and 0.90 (C). This narrow
+  range gives no basis for excluding or selecting an annotator post hoc.
+
+### Consequences for downstream steps
+- The thesis may report that native-Bangla readers usually recover the requested
+  engagement-specificity level on the frozen balanced subset. It may not turn
+  this into a claim of predictive audience modelling, general response quality,
+  plot faithfulness, or system superiority.
+- The computational Verifier-B result and the human result remain distinct.
+  Their agreement is supportive construct evidence, not a human validation of
+  Verifier-B over the complete 5,400-case surface.
+- Completion time, procedural feedback and institutional ethics determination
+  remain open HEDS fields; none is inferred from the response CSVs.
+
+### Citations needed
+- None new. The comparative-judgment, HEDS, Krippendorff-alpha and bootstrap
+  rationale was recorded during preregistration before annotation.

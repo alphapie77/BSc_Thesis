@@ -45,3 +45,6 @@ def test_summary_has_precommitted_intervals_and_target_disagreement():
     assert all(r["accuracy_ci_low"] == r["accuracy_ci_high"] == 1.0 for r in annotator_rows)
     assert set(report["confusion_by_target_level"]) == {"target_level_0", "target_level_1"}
     assert report["disagreement_by_target_level"]["target_level_0"]["split_2_to_1_items"] == 0
+    overall = next(r for r in rows if r["scope"] == "overall_pooled")
+    assert overall["accuracy_ci_low"] == report["accuracy_ci_low"]
+    assert overall["accuracy_ci_high"] == report["accuracy_ci_high"]
