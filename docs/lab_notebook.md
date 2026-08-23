@@ -5219,3 +5219,49 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 
 ### Citations needed
 - None new; no method or inferential rule was introduced.
+
+---
+
+## 2026-08-23 -- S6.chapters.6-7.bn: Bangla results and discussion chapter drafts
+**Feeds:** Thesis Chapters 6 and 7
+**Commit:** `9299c2ae4d7efb1fd2eb8ee9cb1085369dc2c9db-dirty`
+**Artifacts:** `docs/chapters/chapter6_experiments_results.md`, `docs/chapters/chapter7_discussion_limitations.md`
+
+### Numbers
+- Chapter 6: **2,082 words**, 231 lines, full 20-cell table and nine planned
+  paired comparisons.
+- Chapter 7: **2,148 words**, 278 lines, limitations organized under construct,
+  internal, external and statistical-conclusion validity.
+- No generation, scoring, estimator or result file changed.
+
+### Decisions made (and why)
+- The chapters report the completed Bangla arm as a defensible standalone study
+  and mark RQ4 unanswered. An empty, partial or invented English comparison is
+  not rendered because Sabbir has deferred that arm.
+- RQ2 is supported only as Bangla axis-level controllability; RQ3 is mixed
+  because no registered neural+symbolic-versus-neural contrast exists; RQ5 is a
+  verifier-divergence diagnostic rather than proof of human-quality decline.
+- Human target match is separated from automatic system scoring. The 100-item
+  study supports overall recoverability but not a 20-cell system ranking.
+
+### Findings (things we did not expect)
+- The required 2025--2026 Consensus check did not add an experiment. It tightened
+  wording: recent proxy-gaming work supports independent stress checks but not
+  treating the held-out evaluator as an oracle; the 2026 synthetic-audience
+  review reinforces the ban on anthropomorphic/predictive audience claims.
+- Consensus full metadata showed the local `shihab2025est` title and author list
+  were stale. The bibliography entry was corrected rather than silently cited.
+
+### Consequences for downstream steps
+- These drafts become the working source for Chapters 6 and 7. They still need
+  integration into the university thesis template, supervisor review, and final
+  figure/table numbering.
+- The exact thesis title, institutional ethics determination, HEDS timing/feedback
+  fields, and the decision whether to run English remain outside this writing
+  step and must not be guessed into final prose.
+
+### Citations needed
+- Added and read through Consensus full record:
+  `lappas2026syntheticaudiences`. Corrected `shihab2025est` metadata from its
+  Consensus full record. Both are recorded in `docs/related_work.md` /
+  `docs/references.bib` as applicable.

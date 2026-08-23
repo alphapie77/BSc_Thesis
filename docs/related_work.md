@@ -686,6 +686,7 @@ method citations.
 | `levtsov2025globalscores` | Levtsov & Ustalov, arXiv 2507.01633 | `[x]` full relevant sections | Global scores are more reliable for overall rankings; pairwise comparisons help where quality is difficult to define but require more comparisons when ties are frequent. Confirms pointwise binary target matching because the construct and per-output estimand are already defined. |
 | `james2026agreement` | James, arXiv 2603.06865 | `[x]` metric table and interpretation sections | For three nominal raters, Fleiss kappa assumes complete equal ratings and is imbalance-sensitive; nominal Krippendorff alpha supports 2+ raters and missingness. Forces CI and disagreement-pattern reporting and forbids treating a universal agreement cutoff as construct validity. |
 | `belz2025heds3` | Belz & Thomson, GEM 2025 | `[x]` paper/record | HEDS 3.0 requires the instrument, interface, recruitment, allocation and analysis choices to be documented consistently. Confirms that the interface alone is not the human-evaluation record; a completed HEDS remains a Phase-7 deliverable. |
+| `lappas2026syntheticaudiences` | Lappas & Filippas, IEEE Access 2026 | `[x]` Consensus full record | Systematic review of synthetic audiences. Its catalogue of hallucination, bias, prompt sensitivity and anthropomorphic overgeneralization confirms that this thesis must describe its output as axis-level-conditioned response generation, not a substitute for real viewers or film-level audience prediction. |
 
 ---
 
