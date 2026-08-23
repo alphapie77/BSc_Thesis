@@ -27,3 +27,20 @@ def test_render_rejects_duplicate_master_cell():
     master.iloc[-1] = master.iloc[0]
     with pytest.raises(ReportingTableError, match="duplicate"):
         render(master, paired, {"timestamp_utc": "now", "git_commit": "clean"})
+
+
+def test_render_includes_completed_human_validation():
+    report = {"status": "S5_BN_HUMAN_EVAL_PASS", "n_items": 100,
+              "n_judgments": 300, "pooled_accuracy": .91,
+              "accuracy_ci_low": .86, "accuracy_ci_high": .96,
+              "raw_three_way_agreement": .88,
+              "krippendorff_alpha_nominal": .84,
+              "alpha_ci_low": .74, "alpha_ci_high": .92}
+    summary = pd.DataFrame([{"scope": "annotator", "annotator": a, "n": 100,
+                             "accuracy": acc, "accuracy_ci_low": .8,
+                             "accuracy_ci_high": .99}
+                            for a, acc in zip("ABC", (.91, .93, .90))])
+    text = render(*_frames(), {"timestamp_utc": "now", "git_commit": "clean"},
+                  report, summary)
+    assert "Blinded human validation" in text
+    assert "English mirror is deferred" in text

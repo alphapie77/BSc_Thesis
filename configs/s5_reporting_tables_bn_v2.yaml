@@ -1,0 +1,11 @@
+step: S5.reporting.tables.bn.v2
+seed: 42
+inputs:
+  master_csv: results/s5_main_bn_master_table.csv
+  paired_csv: results/s5_main_bn_paired_statistics.csv
+  analysis_json: results/s5_main_bn_analysis.json
+  human_report_json: results/s5_human_eval_bn_report.json
+  human_summary_csv: results/s5_human_eval_bn_summary.csv
+outputs:
+  report_md: results/s5_main_bn_reporting_tables_v2.md
+  manifest_json: results/s5_main_bn_reporting_tables_v2_manifest.json
