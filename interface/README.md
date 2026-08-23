@@ -8,10 +8,17 @@ Current state:
 - implemented: Bangla plot input, fixed two-level output contract, transparent
   R1 → Writer → Verifier-A → symbolic-feedback loop display, isolation badges,
   and a read-only ten-condition table copied from the audited S5 master table;
-- intentionally disconnected: live generation, until a server-side Gemini API
-  secret and the R1/Verifier-A backend are configured;
+- implemented locally: live generation through the server-side Gemini secret,
+  frozen R1-only retrieval, Verifier-A and symbolic feedback;
 - forbidden: Verifier-B in the live loop, Gold-300/R2 retrieval, fabricated
   demo outputs, and a hallucination-free claim before the separate audit.
 
 `results/s5_main_bn_master_table.csv` remains the canonical numerical source;
 `app/experiment-data.ts` is a display-only copy.
+
+## Run locally on Windows
+
+From the repository root, double-click `start_demo.cmd`. It checks the API key
+and local environments, installs only a missing first-run dependency, starts
+both services, and opens `http://localhost:3000`. Keep the launcher window open;
+press Ctrl+C there to stop both services.
