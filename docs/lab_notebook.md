@@ -5116,7 +5116,7 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 
 ## 2026-08-23 -- S5.human_eval.bn: Blinded Bangla human evaluation
 **Feeds:** Chapter 6 human validation and HEDS
-**Commit:** `170402fae0fe1fce6ab59eb4cd6eb9e7d679e7bb`
+**Commit:** `ab062211713499288c0eafc46cc7b9456c0019ec`
 **Artifacts:** `results/s5_human_eval_bn_responses.csv`, `results/s5_human_eval_bn_summary.csv`, `results/s5_human_eval_bn_report.json`
 
 ### Numbers
@@ -5149,6 +5149,9 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
   each contains only 15 judgments; they are not used to rank the ten systems.
 - No generated text was rerun. Human scoring joins blinded responses to the
   already frozen 100-item key and therefore cannot change the 5,400-case archive.
+- The pooled bootstrap draw is reused by the summary row and headline report;
+  this removes a reporting-only Monte Carlo discrepancy between two files while
+  leaving the preregistered resampling unit, seed and 10,000 draws unchanged.
 
 ### Findings (things we did not expect)
 - Target match is 0.9133 overall and exactly 0.9133 within each target level
