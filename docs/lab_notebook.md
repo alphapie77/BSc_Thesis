@@ -5176,3 +5176,46 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 ### Citations needed
 - None new. The comparative-judgment, HEDS, Krippendorff-alpha and bootstrap
   rationale was recorded during preregistration before annotation.
+
+---
+
+## 2026-08-23 -- S5.reporting.tables.bn.v2: Human-inclusive Bangla thesis reporting bundle
+**Feeds:** Chapter 6 experiments and appendix
+**Commit:** `0bda93f10055191bd9942108b7b343092f8b72c2`
+**Artifacts:** `results/s5_main_bn_reporting_tables_v2.md`, `results/s5_main_bn_reporting_tables_v2_manifest.json`
+
+### Numbers
+- `results/s5_main_bn_reporting_tables_v2.md`
+  - (see file; 4249 bytes)
+- `results/s5_main_bn_reporting_tables_v2_manifest.json`
+  - `status` = S5_BN_REPORTING_TABLES_PASS
+  - `n_master_cells` = 20
+  - `n_paired_comparisons` = 9
+  - `human_validation_included` = True
+  - `report_sha256` = 5d8f1bb01a858db5f75824bc3971265b58dd7e2421eaabd9765a563682891419
+  - `input_sha256` = {'master_csv': '74565bd15a643eca80b77cf9c9f853c3f5a07c8feb3906577a145673e545c6aa', 'paired_csv': '98b5720ea25096929d11a3b544298cec31c880d05abfd6fd1bf61afb2ef79688', 'analysis_json': '3afeee67d815b1da45ca9a36675c3e01989b8fa83f2e8e468dd6cf36e44eb2c1', 'human_report_json': 'ebd14b6be2a0554533f8e2b39f427623cc420ada30ae7b6722a9a22bf21f3388', 'human_summary_csv': '17b449c942de89bac103c07a0f4559be2650528489a3bb52a2defe4d4b7bcc8a'}
+  - `standing` = formatting only; no inference recomputed
+
+### Decisions made (and why)
+- The audited pre-human report remains unchanged. A versioned `v2` bundle was
+  created because canonical results are append-only in scientific meaning.
+- Human results are shown as a separate validation section rather than joined
+  cell-by-cell to Verifier-B. The frozen human sample supports an overall
+  construct check; its 15 judgments per condition × level do not support a
+  system-ranking analysis.
+- No empty English column is rendered. Sabbir has deferred the English mirror
+  for a later decision, so the bundle states that boundary explicitly.
+
+### Findings (things we did not expect)
+- None. This is a formatting-only integration of already audited computational
+  and human results; hashes bind all five inputs and no inference was recomputed.
+
+### Consequences for downstream steps
+- Chapter 6 and its appendix should now use the `v2` bundle, not the earlier
+  pre-human rendering. The older file remains an auditable historical version.
+- Phase 6 writing must preserve the report's scope: human recoverability on the
+  balanced subset, not audience prediction, output quality, or a ten-system
+  human ranking.
+
+### Citations needed
+- None new; no method or inferential rule was introduced.
