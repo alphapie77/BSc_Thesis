@@ -34,11 +34,18 @@ try {
         throw "npm not found. Install Node.js and try again."
     }
 
-    & $demoPython -c "import fastapi" 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    $savedErrorPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    & $demoPython -c "import fastapi" *> $null
+    $fastApiCheckExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $savedErrorPreference
+    if ($fastApiCheckExitCode -ne 0) {
         Write-Host "Installing the missing FastAPI dependency..." -ForegroundColor Yellow
+        $ErrorActionPreference = "Continue"
         & $demoPython -m pip install fastapi
-        if ($LASTEXITCODE -ne 0) {
+        $fastApiInstallExitCode = $LASTEXITCODE
+        $ErrorActionPreference = $savedErrorPreference
+        if ($fastApiInstallExitCode -ne 0) {
             throw "FastAPI installation failed."
         }
     }
@@ -47,8 +54,11 @@ try {
         Write-Host "Installing frontend dependencies for the first run..." -ForegroundColor Yellow
         Push-Location -LiteralPath $demoInterface
         try {
+            $ErrorActionPreference = "Continue"
             & npm install
-            if ($LASTEXITCODE -ne 0) {
+            $npmInstallExitCode = $LASTEXITCODE
+            $ErrorActionPreference = $savedErrorPreference
+            if ($npmInstallExitCode -ne 0) {
                 throw "npm install failed."
             }
         }
