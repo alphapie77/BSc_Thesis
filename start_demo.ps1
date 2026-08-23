@@ -69,47 +69,61 @@ try {
 
     Remove-Item -LiteralPath $demoBackendLog, $demoBackendErrorLog, $demoFrontendLog, $demoFrontendErrorLog -Force -ErrorAction SilentlyContinue
 
-    Write-Host "Starting backend..." -ForegroundColor Cyan
-    $demoBackend = Start-Process -FilePath $demoPython `
-        -ArgumentList "-m", "uvicorn", "src.demo.api:app", "--host", "127.0.0.1", "--port", "8000" `
-        -WorkingDirectory $demoRoot -WindowStyle Hidden -PassThru `
-        -RedirectStandardOutput $demoBackendLog -RedirectStandardError $demoBackendErrorLog
-
     $backendReady = $false
-    foreach ($attempt in 1..180) {
-        if ($demoBackend.HasExited) {
-            throw "Backend failed to start. Log: $demoBackendLog"
-        }
-        try {
-            Invoke-RestMethod -Uri "http://127.0.0.1:8000/health" -TimeoutSec 2 | Out-Null
-            $backendReady = $true
-            break
-        }
-        catch {
-            Start-Sleep -Seconds 1
+    try {
+        Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/health" -TimeoutSec 2 | Out-Null
+        $backendReady = $true
+        Write-Host "Using the backend already running on port 8000." -ForegroundColor Cyan
+    }
+    catch {
+        Write-Host "Starting backend..." -ForegroundColor Cyan
+        $demoBackend = Start-Process -FilePath $demoPython `
+            -ArgumentList "-m", "uvicorn", "src.demo.api:app", "--host", "127.0.0.1", "--port", "8000" `
+            -WorkingDirectory $demoRoot -WindowStyle Hidden -PassThru `
+            -RedirectStandardOutput $demoBackendLog -RedirectStandardError $demoBackendErrorLog
+
+        foreach ($attempt in 1..180) {
+            if ($demoBackend.HasExited) {
+                throw "Backend failed to start. Logs: $demoBackendLog and $demoBackendErrorLog"
+            }
+            try {
+                Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/health" -TimeoutSec 2 | Out-Null
+                $backendReady = $true
+                break
+            }
+            catch {
+                Start-Sleep -Seconds 1
+            }
         }
     }
     if (-not $backendReady) {
         throw "Backend was not ready within 3 minutes. Log: $demoBackendLog"
     }
 
-    Write-Host "Starting interface..." -ForegroundColor Cyan
-    $demoFrontend = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" `
-        -WorkingDirectory $demoInterface -WindowStyle Hidden -PassThru `
-        -RedirectStandardOutput $demoFrontendLog -RedirectStandardError $demoFrontendErrorLog
-
     $frontendReady = $false
-    foreach ($attempt in 1..120) {
-        if ($demoFrontend.HasExited) {
-            throw "Interface failed to start. Log: $demoFrontendLog"
-        }
-        try {
-            Invoke-WebRequest -Uri "http://127.0.0.1:3000" -UseBasicParsing -TimeoutSec 2 | Out-Null
-            $frontendReady = $true
-            break
-        }
-        catch {
-            Start-Sleep -Seconds 1
+    try {
+        Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -TimeoutSec 2 | Out-Null
+        $frontendReady = $true
+        Write-Host "Using the interface already running on port 3000." -ForegroundColor Cyan
+    }
+    catch {
+        Write-Host "Starting interface..." -ForegroundColor Cyan
+        $demoFrontend = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" `
+            -WorkingDirectory $demoInterface -WindowStyle Hidden -PassThru `
+            -RedirectStandardOutput $demoFrontendLog -RedirectStandardError $demoFrontendErrorLog
+
+        foreach ($attempt in 1..120) {
+            if ($demoFrontend.HasExited) {
+                throw "Interface failed to start. Logs: $demoFrontendLog and $demoFrontendErrorLog"
+            }
+            try {
+                Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -TimeoutSec 2 | Out-Null
+                $frontendReady = $true
+                break
+            }
+            catch {
+                Start-Sleep -Seconds 1
+            }
         }
     }
     if (-not $frontendReady) {
@@ -118,9 +132,15 @@ try {
 
     Write-Host "`nDemo ready: http://localhost:3000" -ForegroundColor Green
     Write-Host "Keep this window open. Press Ctrl+C to stop both services."
-    Start-Process "http://localhost:3000"
+    try {
+        Start-Process "http://localhost:3000" -ErrorAction Stop
+    }
+    catch {
+        Write-Host "Browser could not open automatically. Open http://localhost:3000 manually." -ForegroundColor Yellow
+    }
 
-    while (-not $demoBackend.HasExited -and -not $demoFrontend.HasExited) {
+    while (($null -eq $demoBackend -or -not $demoBackend.HasExited) -and
+           ($null -eq $demoFrontend -or -not $demoFrontend.HasExited)) {
         Start-Sleep -Seconds 2
     }
     throw "A service stopped unexpectedly. Logs: $demoBackendLog and $demoFrontendLog"
