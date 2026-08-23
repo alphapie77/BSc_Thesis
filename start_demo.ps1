@@ -22,34 +22,34 @@ try {
     Set-Location -LiteralPath $demoRoot
 
     if (-not (Test-Path -LiteralPath $demoPython)) {
-        throw "Python environment পাওয়া যায়নি: $demoPython"
+        throw "Python environment not found: $demoPython"
     }
     if (-not (Test-Path -LiteralPath $demoEnv)) {
-        throw ".env পাওয়া যায়নি। Repository root-এ GOOGLE_API_KEY সহ .env রাখুন।"
+        throw ".env not found. Put .env with GOOGLE_API_KEY in the repository root."
     }
     if (-not (Select-String -LiteralPath $demoEnv -Pattern '^GOOGLE_API_KEY=.+$' -Quiet)) {
-        throw ".env-এ GOOGLE_API_KEY পাওয়া যায়নি বা value খালি।"
+        throw "GOOGLE_API_KEY is missing or empty in .env."
     }
     if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-        throw "npm পাওয়া যায়নি। Node.js install করে আবার চালান।"
+        throw "npm not found. Install Node.js and try again."
     }
 
     & $demoPython -c "import fastapi" 2>$null
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "FastAPI প্রথমবারের জন্য install হচ্ছে..." -ForegroundColor Yellow
+        Write-Host "Installing the missing FastAPI dependency..." -ForegroundColor Yellow
         & $demoPython -m pip install fastapi
         if ($LASTEXITCODE -ne 0) {
-            throw "FastAPI install ব্যর্থ হয়েছে।"
+            throw "FastAPI installation failed."
         }
     }
 
     if (-not (Test-Path -LiteralPath (Join-Path $demoInterface "node_modules"))) {
-        Write-Host "Frontend dependencies প্রথমবারের জন্য install হচ্ছে..." -ForegroundColor Yellow
+        Write-Host "Installing frontend dependencies for the first run..." -ForegroundColor Yellow
         Push-Location -LiteralPath $demoInterface
         try {
             & npm install
             if ($LASTEXITCODE -ne 0) {
-                throw "npm install ব্যর্থ হয়েছে।"
+                throw "npm install failed."
             }
         }
         finally {
@@ -59,7 +59,7 @@ try {
 
     Remove-Item -LiteralPath $demoBackendLog, $demoBackendErrorLog, $demoFrontendLog, $demoFrontendErrorLog -Force -ErrorAction SilentlyContinue
 
-    Write-Host "Backend চালু হচ্ছে..." -ForegroundColor Cyan
+    Write-Host "Starting backend..." -ForegroundColor Cyan
     $demoBackend = Start-Process -FilePath $demoPython `
         -ArgumentList "-m", "uvicorn", "src.demo.api:app", "--host", "127.0.0.1", "--port", "8000" `
         -WorkingDirectory $demoRoot -WindowStyle Hidden -PassThru `
@@ -68,7 +68,7 @@ try {
     $backendReady = $false
     foreach ($attempt in 1..180) {
         if ($demoBackend.HasExited) {
-            throw "Backend চালু হয়নি। Log: $demoBackendLog"
+            throw "Backend failed to start. Log: $demoBackendLog"
         }
         try {
             Invoke-RestMethod -Uri "http://127.0.0.1:8000/health" -TimeoutSec 2 | Out-Null
@@ -80,10 +80,10 @@ try {
         }
     }
     if (-not $backendReady) {
-        throw "Backend ৩ মিনিটের মধ্যে ready হয়নি। Log: $demoBackendLog"
+        throw "Backend was not ready within 3 minutes. Log: $demoBackendLog"
     }
 
-    Write-Host "Interface চালু হচ্ছে..." -ForegroundColor Cyan
+    Write-Host "Starting interface..." -ForegroundColor Cyan
     $demoFrontend = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" `
         -WorkingDirectory $demoInterface -WindowStyle Hidden -PassThru `
         -RedirectStandardOutput $demoFrontendLog -RedirectStandardError $demoFrontendErrorLog
@@ -91,7 +91,7 @@ try {
     $frontendReady = $false
     foreach ($attempt in 1..120) {
         if ($demoFrontend.HasExited) {
-            throw "Interface চালু হয়নি। Log: $demoFrontendLog"
+            throw "Interface failed to start. Log: $demoFrontendLog"
         }
         try {
             Invoke-WebRequest -Uri "http://127.0.0.1:3000" -UseBasicParsing -TimeoutSec 2 | Out-Null
@@ -103,21 +103,21 @@ try {
         }
     }
     if (-not $frontendReady) {
-        throw "Interface ২ মিনিটের মধ্যে ready হয়নি। Log: $demoFrontendLog"
+        throw "Interface was not ready within 2 minutes. Log: $demoFrontendLog"
     }
 
     Write-Host "`nDemo ready: http://localhost:3000" -ForegroundColor Green
-    Write-Host "এই window খোলা রাখুন। বন্ধ করতে Ctrl+C চাপুন।"
+    Write-Host "Keep this window open. Press Ctrl+C to stop both services."
     Start-Process "http://localhost:3000"
 
     while (-not $demoBackend.HasExited -and -not $demoFrontend.HasExited) {
         Start-Sleep -Seconds 2
     }
-    throw "একটি service অপ্রত্যাশিতভাবে বন্ধ হয়েছে। Logs: $demoBackendLog এবং $demoFrontendLog"
+    throw "A service stopped unexpectedly. Logs: $demoBackendLog and $demoFrontendLog"
 }
 catch {
-    Write-Host "`nDemo চালু করা যায়নি: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "বন্ধ করতে Enter চাপুন।"
+    Write-Host "`nDemo could not start: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Press Enter to close."
     Read-Host | Out-Null
 }
 finally {
