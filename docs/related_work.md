@@ -732,3 +732,65 @@ source-grounded explanation and any unsupported claims; it does **not** call
 the score human-validated, does not feed it into generation, and does not add it
 to the frozen S5 results. This search changed the design from the user's
 requested generic “faithfulness verification” into an inspectable triage check.
+## 2026-08-23 — Final thesis `b`-key literature audit
+
+The thesis-facing bibliography is now `docs/references_ieee.bib`; its 143 stable
+keys render numerically under IEEE style. The 55 chapter-cited records and
+all legacy-key links are recorded in `docs/reference_key_map_full.csv`. The older `docs/references.bib`
+remains the research-stage audit trail, not the final render source.
+
+| Keys | Literature line | What the audit establishes |
+|---|---|---|
+| `b1` | synthetic-audience systematic review | synthetic-user claims require validity boundaries |
+| `b2`–`b4` | BanglaBERT, LaBSE, and the Mendeley V3 dataset | primary model and dataset identities |
+| `b5`–`b6`, `b13`–`b18` | self-correction, refinement, resampling, and feedback control | motivates separated feedback, role controls, matched compute, and attempt reporting |
+| `b7` | Evaluator Stress Tests | supports proxy-gaming diagnostics, not treating Verifier-B as truth |
+| `b8` | RAG | foundational retrieval method; not itself the proposed bounded retry architecture |
+| `b9`–`b10` | MoP and SimAB | synthetic-population adjacency and its validity boundary |
+| `b11`–`b12` | classifier-guided generation and generated movie reviews | controlled-generation and application-domain precedents |
+| `b19`–`b21` | Bangla hybrid RAG, symbolic diagnosis, and bounded multi-agent comparison | nearest architectural adjacencies and their transfer limits |
+| `b22`–`b25` | judge replacement, self-preference, multilingual judging, and low-resource judging | keeps the hosted judge treatment-side rather than an outcome oracle |
+| `b26`–`b28` | recent Bangla backbone comparisons | shows task-dependent winners and blocks a generic BanglaBERT-superiority claim |
+| `b29`–`b37` | comparative annotation, HEDS, item selection, rater allocation/modeling, and agreement | supports the two human instruments and their reporting boundaries |
+| `b38`–`b45` | prediction strength, ARI, gap, HDBSCAN method/software, silhouette, and AC1 interpretation | clusterability and agreement diagnostics; no single metric becomes construct validity |
+| `b46`–`b48` | randomness and fine-tuning stability | supports multi-seed sensitivity without treating seeds as independent studies |
+| `b49`–`b50` | paired NLP significance testing and BH | paired inference and multiplicity reporting |
+| `b51`–`b52` | small-data transfer and discriminative classification | justifies trained verifier baselines alongside generative judges |
+| `b53`–`b54` | temperature scaling and calibration under scarcity | calibration method and bounded small-dev interpretation |
+| `b55` | MAUVE | distributional sensitivity and its feature/sample limitations |
+
+**Search effect.** AlphaXiv discovery added HybridRAG-BN, SymDiag, SimAB and
+the equal-token resampling study to the final related-work comparison. It also
+resolved all five authors of arXiv 2602.08033. The exact-title resolver exposed
+two metadata hazards: it did not index the Lappas–Filippas IEEE paper under its
+title, and its PDF response for arXiv 2507.05619 reflected a stale version.
+Those two records were closed against DOI/DBLP and the ACL Anthology primary
+record respectively, rather than trusting the first resolver output.
+
+**Consolidation correction.** The initial audit stopped at 29 chapter-cited
+records and therefore understated the available literature. The corrected and
+subsequently extended build contains 143 unique records: 55 cited by the active
+seven chapters and 88 retained as an uncited research library. Stable `b` keys
+and legacy links are preserved, author and publisher metadata corrections are
+recorded in the CSV audit map, and internal discovery/read notes remain outside
+submission BibTeX.
+# Thesis-wide literature audit additions (2026-08-23)
+
+## Multi-agent decomposition requires a bounded claim
+
+- **Saleh et al. (2026), “The Illusion of Agentic Complexity in README.md
+  Generation.”** Full text checked through alphaXiv. In a controlled
+  repository-documentation task, a specialized multi-agent RAG workflow
+  improved structural consistency but did not beat a simpler single-agent
+  pipeline on lexical quality and incurred substantially greater token cost.
+  This changed the thesis wording: Chapter 5 now defines the implementation as
+  a bounded multi-agent workflow, identifies which roles actually call a model,
+  and explicitly says the experiment does not prove that role decomposition
+  itself is superior. arXiv:2606.30524.
+# Dataset citation closure (2026-08-23)
+
+- **Hossain et al. (2026), Raw Bangla Movie Review Comment Dataset for
+  Sentiment Analysis and Natural Language Processing.** Researcher-confirmed
+  Mendeley Data V3 record, DOI `10.17632/vwp7gnj3d6.3`. This is the formal
+  citation for the primary 5,000-row review resource; the local workbook hash
+  remains the authority for the exact bytes and row identities used.

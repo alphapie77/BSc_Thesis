@@ -12,8 +12,9 @@
 Dear `[Supervisor/Chair/Ethics Committee]`,
 
 I am conducting the BSc thesis *A Neuro-Symbolic Multi-Agent Framework for
-Pre-release Audience Simulation in Bangla Cinema: A Verifier-in-the-Loop
-Approach* at `[department and university]` under `[supervisor]`.
+Pre-Release Audience Response Generation in Bangla Cinema: A
+Verifier-in-the-Loop Approach* at `[department and university]` under
+`[supervisor]`.
 
 I request a written institutional determination for a minimal-risk human
 evaluation component conducted on 23 August 2026:

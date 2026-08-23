@@ -1,10 +1,11 @@
-# Dataset Card -- STUB (complete during Phase 1)
+# Dataset Card — Bangla review and plot resources
 
 Follows Gebru et al. (2021) Datasheets for Datasets + Bender & Friedman (2018)
 Data Statement.
 
 - **Language (Bender Rule):** Bangla (Bengali), Bangladeshi variety, Bengali script.
-- **Source:** Mendeley Data, "Raw Bangla Movie Review Comment Dataset..."
+- **Source:** Hossain et al. (2026), Mendeley Data, version 3,
+  DOI `10.17632/vwp7gnj3d6.3`.
 - **Size:** 5,000 rows x 2 columns (Movie Review, Sentiment).
 - **HONEST NOTE (to verify in S0):** despite "Raw" in the title, the file appears
   partially pre-cleaned -- zero emoji, zero URLs/mentions. State this explicitly;
@@ -18,6 +19,7 @@ Data Statement.
 | Property | Value |
 |---|---|
 | Filename | `Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing.xlsx` |
+| Published resource | Version 3; DOI `10.17632/vwp7gnj3d6.3` |
 | **SHA-256** | `8f972734fc3629427cdf8d01716aa817f7b325410b2fdd0f26cbc2e68506db9f` |
 | Size | 195,186 bytes |
 | Sheet / shape | `Sheet1`, 5,000 rows × 2 cols (`Movie Review`, `Sentiment`) |
@@ -136,19 +138,21 @@ biography section — passes everything, and nothing happens in it.
 (দ্য নেমসেক) is Mira Nair's **English-language** film, in bn.wikipedia because
 its subject is a Bengali immigrant family. Kept as a scope decision (2026-07-31).
 
-### ⚠️ Attribution obligation — must be discharged before publication
+### Attribution obligation — discharged in the thesis package
 
 bn.wikipedia text is **CC BY-SA 4.0**: reuse requires **attribution** and
 **share-alike**. This is a licence condition, not a courtesy.
 
-Required before any release or submission:
+The thesis package now supplies the required record in
+`docs/appendices/appendix_d_plot_attribution.md`:
 
-1. Attribute bn.wikipedia and its contributors, listing the article titles and
-   **revision ids** used (they are stored per row for exactly this purpose).
-2. Release any distributed derivative of the plot set under a compatible
-   share-alike licence.
-3. State the harvest date — article text changes, which is why revision ids are
-   recorded rather than titles alone.
+1. bn.wikipedia and its contributors are attributed through all 120 article
+   titles and exact **revision ids**.
+2. The CC BY-SA 4.0 licence and share-alike requirement are stated.
+3. The 2026-07-31 harvest date is stated.
+
+Appendix D must ship with the thesis and with any distributed derivative of the
+plot set. Removing it would reopen the licence obligation.
 
 Unlike the review corpus, this one has **complete, checkable provenance**: any
 reader can fetch the exact revision used. That contrast is deliberate and is

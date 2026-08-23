@@ -1,0 +1,144 @@
+b_key,legacy_key,title,identifier,metadata_status,reading_status
+b1,,Synthetic Audiences as Proxies for Human Users: A Systematic Literature Review,10.1109/ACCESS.2026.3703706,curated_verified,chapter_cited
+b2,,{BanglaBERT}: Language Model Pretraining and Benchmarks for Low-Resource Language Understanding Evaluation in Bangla,10.18653/v1/2022.findings-naacl.98,curated_verified,chapter_cited
+b3,,Language-Agnostic {BERT} Sentence Embedding,10.18653/v1/2022.acl-long.62,curated_verified,chapter_cited
+b4,hossain2026banglamoviereviews,Raw Bangla Movie Review Comment Dataset for Sentiment Analysis and Natural Language Processing,10.17632/vwp7gnj3d6.3,researcher_confirmed_dataset_v3,chapter_cited
+b5,,Large Language Models Cannot Self-Correct Reasoning Yet,,curated_verified,chapter_cited
+b6,,When Can {LLMs} Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of {LLMs},10.1162/tacl_a_00713,curated_verified,chapter_cited
+b7,,Detecting Proxy Gaming in {RL} and {LLM} Alignment via Evaluator Stress Tests,10.18653/v1/2026.findings-acl.513,curated_verified,chapter_cited
+b8,,Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks,,curated_verified,chapter_cited
+b9,,Mixture-of-Personas Language Models for Population Simulation,2504.05019,curated_verified,chapter_cited
+b10,,{SimAB}: Simulating {A/B} Tests with Persona-Conditioned {AI} Agents for Rapid Design Evaluation,2603.01024,curated_verified,chapter_cited
+b11,,{FUDGE}: Controlled Text Generation With Future Discriminators,10.18653/v1/2021.naacl-main.276,curated_verified,chapter_cited
+b12,sands2026,An evaluation of {LLMs} for generating movie reviews: {GPT-4o,10.1007/s00521-026-12247-0,registry_metadata_preserved,chapter_cited
+b13,,Self-Refine: Iterative Refinement with Self-Feedback,2303.17651,curated_verified,chapter_cited
+b14,,Reflexion: Language Agents with Verbal Reinforcement Learning,,curated_verified,chapter_cited
+b15,selfcorrectionillusion2026,The Self-Correction Illusion: Role Relabeling Gates Explicit Error Flagging in Large Language Models,2606.05976,registry_metadata_preserved,chapter_cited
+b16,,"Sample More, Reflect Less: Self-Refine and Reflexion Lose to Repeated Sampling at Equal Token Cost, from 1.5B to 7B",2607.28576,curated_verified,chapter_cited
+b17,bilal2026refining,Refining Over Resampling: Test-Time Self-Correction for {LLM} Reasoning,2608.05643,registry_metadata_preserved,chapter_cited
+b18,,"Self-Correction as Feedback Control: Error Dynamics, Stability Thresholds, and Prompt Interventions in {LLMs}",2604.22273,curated_verified,chapter_cited
+b19,,{HybridRAG-BN}: A Retrieval-Augmented Framework with Fine-Tuned Verification for Bangla {KBQA},2608.13004,curated_verified,chapter_cited
+b20,,{SymDiag}: Explainable Diagnosis for {LLM} Reasoning via Neuro-Symbolic Verification,10.1145/3770855.3818004,curated_verified,chapter_cited
+b21,saleh2026agenticcomplexity,The Illusion of Agentic Complexity in {README.md} Generation: Evaluating Single-Agent vs. Multi-Agent {RAG} Systems,10.48550/arXiv.2606.30524,registry_metadata_preserved,chapter_cited
+b22,yang2026judgechanges,"When the Judge Changes, So Does the Measurement: Auditing {LLM}-as-Judge Reliability",2607.08535,registry_metadata_preserved,chapter_cited
+b23,pombal2026selfpreference,Self-Preference Bias in Rubric-Based Evaluation of Large Language Models,2604.06996,registry_metadata_preserved,chapter_cited
+b24,fu2025multilingualjudge,How Reliable is Multilingual {LLM}-as-a-Judge?,,registry_metadata_preserved,chapter_cited
+b25,ponce2026basquejudge,Judging Instruction Responses in a Low-Resource Language: A Case Study on Basque,10.63317/32e7ij6myh5i,registry_metadata_preserved,chapter_cited
+b26,mitra2025muril,Exploring {MuRIL} for Emotion Detection in {Bangla} Text,,primary_author_resolved,chapter_cited
+b27,hassin2026banglablend,Banglablend Based Evaluation of {Bengali} Formal and Colloquial Text Classification,,primary_author_resolved,chapter_cited
+b28,mazumder2025banglaforms,Transformer-Based Approach for Accurately Identifying Saint and Common Forms of {Bangla} Language,,primary_author_resolved,chapter_cited
+b29,,Best-Worst Scaling More Reliable than Rating Scales: A Case Study on Sentiment Intensity Annotation,10.18653/v1/P17-2074,curated_verified,chapter_cited
+b30,,The Benefits of Diversity: Combining Comparisons and Ratings for Efficient Scoring,2602.08033,curated_verified,chapter_cited
+b31,,Content Analysis: An Introduction to Its Methodology,,curated_verified,chapter_cited
+b32,,{HEDS} 3.0: The Human Evaluation Data Sheet Version 3.0,10.18653/v1/2025.gem-1.6,curated_verified,chapter_cited
+b33,zouhar2025selectdatapoints,How to Select Datapoints for Efficient Human Evaluation of {NLG} Models?,10.1162/tacl.a.60,registry_metadata_preserved,chapter_cited
+b34,riley2024stableranking,Finding Replicable Human Evaluations via Stable Ranking Probability,,registry_metadata_preserved,chapter_cited
+b35,pandita2026annotatormodeling,Improving Reproducibility in Evaluation through Multi-Level Annotator Modeling,,registry_metadata_preserved,chapter_cited
+b36,levtsov2025globalscores,Confidence and Stability of Global and Pairwise Scores in {NLP} Evaluation,,registry_metadata_preserved,chapter_cited
+b37,james2026agreement,Counting on Consensus: Selecting the Right Inter-annotator Agreement Metric for {NLP} Annotation and Evaluation,,registry_metadata_preserved,chapter_cited
+b38,,Cluster Validation by Prediction Strength,10.1198/106186005X59243,curated_verified,chapter_cited
+b39,,Comparing Partitions,10.1007/BF01908075,curated_verified,chapter_cited
+b40,,Estimating the Number of Clusters in a Data Set via the Gap Statistic,10.1111/1467-9868.00293,curated_verified,chapter_cited
+b41,campello2013,Density-Based Clustering Based on Hierarchical Density Estimates,,registry_metadata_preserved,chapter_cited
+b42,,{hdbscan}: Hierarchical Density Based Clustering,10.21105/joss.00205,curated_verified,chapter_cited
+b43,,Silhouettes: A Graphical Aid to the Interpretation and Validation of Cluster Analysis,10.1016/0377-0427(87)90125-7,curated_verified,chapter_cited
+b44,gwet2008ac1,Computing Inter-Rater Reliability and Its Variance in the Presence of High Agreement,,registry_metadata_preserved,chapter_cited
+b45,vach2023ac1,Gwet's {AC1} Is Not a Substitute for {Cohen's} Kappa -- A Comparison of Basic Properties,,registry_metadata_preserved,chapter_cited
+b46,gundersen2023conclusions,On Reporting Robust and Trustworthy Conclusions from Model Comparison Studies Involving Neural Networks and Randomness,,primary_author_resolved,chapter_cited
+b47,casola2022transformers,Pre-trained transformers: an empirical comparison,,primary_author_resolved,chapter_cited
+b48,fu2023stability,A Stability Analysis of Fine-Tuning a Pre-Trained Model,2301.09820,primary_metadata_corrected,chapter_cited
+b49,,The Hitchhiker's Guide to Testing Statistical Significance in Natural Language Processing,10.18653/v1/P18-1128,curated_verified,chapter_cited
+b50,,Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing,10.1111/j.2517-6161.1995.tb02031.x,curated_verified,chapter_cited
+b51,laurer2023bertnli,"Less Annotating, More Classifying: Addressing the Data Scarcity Issue of Supervised Machine Learning with Deep Transfer Learning and {BERT-NLI}",,primary_author_resolved,chapter_cited
+b52,bucher2024finetuned,Fine-Tuned 'Small' {LLMs} (Still) Significantly Outperform Zero-Shot Generative {AI} Models in Text Classification,,primary_author_resolved,chapter_cited
+b53,,On Calibration of Modern Neural Networks,,curated_verified,chapter_cited
+b54,balanya2022adaptivetemp,Adaptive temperature scaling for robust calibration of deep neural networks,,primary_author_resolved,chapter_cited
+b55,,{MAUVE}: Measuring the Gap Between Neural Text and Human Text Using Divergence Frontiers,,curated_verified,chapter_cited
+b56,monroe2008fightinwords,Fightin' Words: Lexical Feature Selection and Evaluation for Identifying the Content of Political Conflict,10.1093/pan/mpn018,registry_metadata_preserved,full_or_primary_record
+b57,verma2026blindresampling,"Try Again, Don't Look Back: Blind Resampling Outperforms Self-Repair in Small Code Models",2607.26117,registry_metadata_preserved,full_or_primary_record
+b58,cobbe2021verifiers,Training Verifiers to Solve Math Word Problems,2110.14168,registry_metadata_preserved,full_or_primary_record
+b59,bethard2022seeds,We Need to Talk About Random Seeds,10.48550/arXiv.2210.13393,primary_metadata_corrected,metadata_verified_not_full_read
+b60,xue2023reproducibility,We Need to Talk About Reproducibility in {NLP} Model Comparison,10.18653/v1/2023.emnlp-main.586,primary_metadata_corrected,metadata_verified_not_full_read
+b61,tunstall2022setfit,Efficient Few-Shot Learning Without Prompts,,primary_author_resolved,metadata_verified_not_full_read
+b62,beliveau2024smalldata,Classification of Radiological Text in Small and Imbalanced Datasets in a Non-English Language,,primary_author_resolved,metadata_verified_not_full_read
+b63,guo2025smart,Sample Margin-Aware Recalibration of Temperature Scaling,,primary_author_resolved,metadata_verified_not_full_read
+b64,hasan2025banglaemotion,"Emotion Classification in {Bangla}: A Comprehensive Comparison of {BanglaBERT}, {mBERT}, and {XLM-RoBERTa} with Error Analysis and Significance Testing",,primary_author_resolved,metadata_verified_not_full_read
+b65,hasan2023banglawar,Natural Language Processing and Sentiment Analysis on {Bangla,,primary_author_resolved,metadata_verified_not_full_read
+b66,mukherjee2023blp,{UFAL-ULD} at {BLP-2023} Task 2: Sentiment Classification in {Bangla} Text,,primary_author_resolved,metadata_verified_not_full_read
+b67,coakley2022implementation,Examining the Effect of Implementation Factors on Deep Learning Reproducibility,,primary_author_resolved,metadata_verified_not_full_read
+b68,teodorescu2025kfold,Assessing the Validity of k-Fold Cross-Validation for Model Selection: Evidence from Bankruptcy Prediction Using Random Forest and XGBoost,,primary_author_resolved,full_or_primary_record
+b69,mahmoud2026rubric,Reward Hacking in Rubric-Based Reinforcement Learning,,registry_metadata_preserved,full_or_primary_record
+b70,wang2026rewardhacking,"Reward Hacking in the Era of Large Models: Mechanisms, Emergent Misalignment, Challenges",,primary_author_resolved,metadata_verified_not_full_read
+b71,baker2025monitoring,Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation,,primary_author_resolved,metadata_verified_not_full_read
+b72,zhou2026convincing,"More Convincing, Not More Correct: Self-Play Reward Hacking of Reference-Free {LLM} Judges",,registry_metadata_preserved,metadata_verified_not_full_read
+b73,pinto2026drawinglines,Drawing Lines in Psychological Space: What {K}-means Clustering Reveals in Simulated and Real Psychometric Data,,registry_metadata_preserved,full_or_primary_record
+b74,cornelissen2026contour,Melodic contour does not cluster: Reconsidering contour typology,,registry_metadata_preserved,full_or_primary_record
+b75,chen2023selectiveinference,Selective inference for {K}-means clustering,,registry_metadata_preserved,metadata_verified_not_full_read
+b76,adolfsson2019clusterability,"To Cluster, or Not to Cluster: An Analysis of Clusterability Methods",,registry_metadata_preserved,metadata_verified_not_full_read
+b77,vonluxburg2010stability,Clustering Stability: An Overview,,registry_metadata_preserved,metadata_verified_not_full_read
+b78,kalogeratos2012distdip,Dip-means: an incremental clustering method for estimating the number of clusters,,registry_metadata_preserved,metadata_verified_not_full_read
+b79,kuai2026entanglement,How Independent are Large Language Models? A Statistical Framework for Auditing Behavioral Entanglement and Reweighting Verifier Ensembles,,registry_metadata_preserved,full_or_primary_record
+b80,ko2019specificity,Domain Agnostic Real-Valued Specificity Prediction,,registry_metadata_preserved,full_or_primary_record
+b81,kapur2026length,When More Words Say Less: Decoupling Length and Specificity in Image Description Evaluation,,registry_metadata_preserved,full_or_primary_record
+b82,schneider2025overtuning,Overtuning in Hyperparameter Optimization,2506.19540,registry_metadata_preserved,full_or_primary_record
+b83,zhang2026tabpfn,TabPFN beyond Tabular Data: Calibration and Accuracy on Multimodal Embeddings,,registry_metadata_preserved,full_or_primary_record
+b84,clavie2026latentterms,Latent Terms: Dense Retrievers Contain Trivially Extractable BM25-ready Zipfian Vocabularies,,registry_metadata_preserved,full_or_primary_record
+b85,barata2026hybrid,Do Static Embeddings Add Value to Hybrid Dutch Retrieval? Cross-Validated Weighted RRF with Paired Inference and Cross-Domain Transfer,,registry_metadata_preserved,full_or_primary_record
+b86,magsarjav2026preprocessing,Best Preprocessing Techniques for Sentiment Analysis,10.48550/arxiv.2606.24055,registry_metadata_preserved,full_or_primary_record
+b87,mattei2026welltempered,The Well-Tempered Classifier: Some Elementary Properties of Temperature Scaling,,registry_metadata_preserved,full_or_primary_record
+b88,kotte2026ucci,UCCI: Calibrated Uncertainty for Cost-Optimal LLM Cascade Routing,,registry_metadata_preserved,full_or_primary_record
+b89,axiv2607_24562_hierarchicalcrc,Hierarchical Group-Conditional Conformal Risk Control for Selective Prediction in Language Models,2607.24562,registry_metadata_preserved,full_or_primary_record
+b90,ackermann2025offpolicy,Off-Policy Corrected Reward Modeling for Reinforcement Learning from Human Feedback,,registry_metadata_preserved,full_or_primary_record
+b91,liu2026openrubrics,OpenRubrics: Towards Scalable Synthetic Rubric Generation for Reward Modeling and {LLM} Alignment,,registry_metadata_preserved,full_or_primary_record
+b92,wang2026nlhf,Reward Modeling from Natural Language Human Feedback,,registry_metadata_preserved,full_or_primary_record
+b93,anugraha2026mr3,{mR3}: Multilingual Rubric-Agnostic Reward Reasoning Models,,registry_metadata_preserved,full_or_primary_record
+b94,axiv2605_14260_fairnessburden,On the Burden of Achieving Fairness in Conformal Prediction,2605.14260,alphaxiv_author_resolved,metadata_verified_not_full_read
+b95,axiv2605_05562_socioconformal,Socio-Conformal Calibration in Complex Survey Data: Marginal Validity Is Not Enough for Subgroup Reliability,2605.05562,alphaxiv_author_resolved,metadata_verified_not_full_read
+b96,axiv2606_29403_selforganizedcp,Self-Organized Conformal Prediction: Reducing Regional Coverage Gaps with Unsupervised Group Discovery,2606.29403,alphaxiv_author_resolved,metadata_verified_not_full_read
+b97,axiv2605_10405_bestmodelid,Valid Best-Model Identification for LLM Evaluation via Low-Rank Factorization,2605.10405,alphaxiv_author_resolved,metadata_verified_not_full_read
+b98,axiv2605_31483_benhallueval,BenHalluEval: A Multi-Task Hallucination Evaluation Framework for Large Language Models on Bengali,2605.31483,alphaxiv_author_resolved,metadata_verified_not_full_read
+b99,axiv2605_22487_banglahonorific,"Polite on the Surface, Wrong in Practice: A Curated Dataset for Fixing Honorific Failures in Multilingual Bangla Generation",2605.22487,alphaxiv_author_resolved,metadata_verified_not_full_read
+b100,axiv2606_23196_intrinsicsc,When Does Intrinsic Self-Correction Help? A Task-Sensitive Analysis,2606.23196,alphaxiv_author_resolved,metadata_verified_not_full_read
+b101,axiv2606_13156_scmirage,Iterative Visual Thinking and the Self-Correction Mirage in VLM Grounding,2606.13156,alphaxiv_author_resolved,metadata_verified_not_full_read
+b102,axiv2604_18490_lqm,LQM: Linguistically Motivated Multidimensional Quality Metrics for Machine Translation,2604.18490,alphaxiv_author_resolved,metadata_verified_not_full_read
+b103,axiv2606_10765_arabigee,ArabiGEE: A Hierarchical Taxonomy for Arabic Grammatical Error Explanation,2606.10765,alphaxiv_author_resolved,metadata_verified_not_full_read
+b104,axiv2608_03966_hallutruthqa,HalluTruthQA-4K: A Fine-Grained Corpus and Annotation Process for Arabic Hallucination Detection and Truth Verification,2608.03966,alphaxiv_author_resolved,metadata_verified_not_full_read
+b105,axiv2601_08070_gravitywells,Semantic Gravity Wells: Why Negative Constraints Backfire,2601.08070,alphaxiv_author_resolved,metadata_verified_not_full_read
+b106,axiv2605_03052_negation,How Language Models Process Negation,2605.03052,alphaxiv_author_resolved,metadata_verified_not_full_read
+b107,axiv2605_20382_instructioninduction,"Do as I Say, Not as I Do: Instruction-Induction Conflict in LLMs",2605.20382,alphaxiv_author_resolved,metadata_verified_not_full_read
+b108,axiv2410_15956_englishaccent,Do Large Language Models Have an English Accent? Evaluating and Improving the Naturalness of Multilingual LLMs,2410.15956,alphaxiv_author_resolved,metadata_verified_not_full_read
+b109,axiv2503_04369_literalism,Lost in Literalism: How Supervised Training Shapes Translationese in LLMs,2503.04369,alphaxiv_author_resolved,metadata_verified_not_full_read
+b110,axiv2603_15949_banglasocialbench,BanglaSocialBench: A Benchmark for Evaluating Sociopragmatic and Cultural Alignment of LLMs in Bangladeshi Social Interaction,2603.15949,alphaxiv_author_resolved,metadata_verified_not_full_read
+b111,axiv2512_13487_informalbangla,Advancing Bangla Machine Translation Through Informal Datasets,2512.13487,alphaxiv_author_resolved,metadata_verified_not_full_read
+b112,axiv2502_15603_thinkinenglish,Do Multilingual LLMs Think In English?,2502.15603,alphaxiv_author_resolved,metadata_verified_not_full_read
+b113,axiv2402_10588_llamasinenglish,Do Llamas Work in English? On the Latent Language of Multilingual Transformers,2402.10588,alphaxiv_author_resolved,metadata_verified_not_full_read
+b114,axiv2504_11833_thinkmultilingually,Could Thinking Multilingually Empower LLM Reasoning?,2504.11833,alphaxiv_author_resolved,metadata_verified_not_full_read
+b115,axiv2605_27649_languageroles,Disentangling Language Roles in Multilingual LLM Task Execution,2605.27649,alphaxiv_author_resolved,metadata_verified_not_full_read
+b116,axiv2606_08994_languageconfusion,Language-Aware Token Boosting: LLM Language Confusion Reduction Without Tuning,2606.08994,alphaxiv_author_resolved,metadata_verified_not_full_read
+b117,axiv2606_19668_languageanchoring,Code-Switching Reveals Language Anchoring in Multilingual LLMs,2606.19668,alphaxiv_author_resolved,metadata_verified_not_full_read
+b118,axiv2506_14012_lostinthemix,Lost in the Mix: Evaluating LLM Understanding of Code-Switched Text,2506.14012,alphaxiv_author_resolved,metadata_verified_not_full_read
+b119,axiv2603_25015_imperativeinterference,Imperative Interference: Social Register Shapes Instruction Topology in Large Language Models,2603.25015,alphaxiv_author_resolved,metadata_verified_not_full_read
+b120,axiv2604_16937_nooneftsall,No One Fits All: From Fixed Prompting to Learned Routing in Multilingual LLMs,2604.16937,alphaxiv_author_resolved,metadata_verified_not_full_read
+b121,axiv2601_17768_llm42,LLM-42: Enabling Determinism in LLM Inference with Verified Speculation,2601.17768,alphaxiv_author_resolved,metadata_verified_not_full_read
+b122,axiv2604_22411_backgroundtemp,Introducing Background Temperature to Characterise Hidden Randomness in Large Language Models,2604.22411,alphaxiv_author_resolved,metadata_verified_not_full_read
+b123,axiv2605_19537_silenthyperparameter,The Silent Hyperparameter: Quantifying the Impact of Inference Backends on LLM Reproducibility,2605.19537,alphaxiv_author_resolved,metadata_verified_not_full_read
+b124,axiv2602_14349_samepromptdifferent,"Same Prompt, Different Outcomes: Evaluating the Reproducibility of Data Analysis by LLMs",2602.14349,alphaxiv_author_resolved,metadata_verified_not_full_read
+b125,axiv2408_13586_diversityrisk,Balancing Diversity and Risk in LLM Sampling: How to Select Your Method and Parameter for Open-Ended Text Generation,2408.13586,alphaxiv_author_resolved,metadata_verified_not_full_read
+b126,shaib2025diversity,Standardizing the Measurement of Text Diversity: A Tool and Comparative Analysis,,primary_author_resolved,full_or_primary_record
+b127,axiv2407_01082_minp,Turning Up the Heat: Min-p Sampling for Creative and Coherent LLM Outputs,2407.01082,alphaxiv_author_resolved,metadata_verified_not_full_read
+b128,axiv2602_18292_decodingoptimisation,Decoding as Optimisation on the Probability Simplex: From Top-K to Top-P (Nucleus) to Best-of-K Samplers,2602.18292,alphaxiv_author_resolved,metadata_verified_not_full_read
+b129,axiv2202_12837_rethinkingdemos,Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?,2202.12837,alphaxiv_author_resolved,metadata_verified_not_full_read
+b130,axiv2605_08295_incontextfixation,In-Context Fixation: When Demonstrated Labels Override Semantics in Few-Shot Classification,2605.08295,alphaxiv_author_resolved,metadata_verified_not_full_read
+b131,axiv2603_04464_democonflict,Understanding the Dynamics of Demonstration Conflict in In-Context Learning,2603.04464,alphaxiv_author_resolved,metadata_verified_not_full_read
+b132,axiv2303_03846_largermodelsicl,Larger language models do in-context learning differently,2303.03846,alphaxiv_author_resolved,metadata_verified_not_full_read
+b133,axiv2604_17022_interpretablecriteria,Beyond Black-Box Labels: Interpretable Criteria for Diagnosing Subjective NLP Tasks,2604.17022,alphaxiv_author_resolved,metadata_verified_not_full_read
+b134,kiecker2026magicnumber,Is Three the Magic Number? An Empirical Evaluation of LLM-Based Repair Loops,,registry_metadata_preserved,full_or_primary_record
+b135,kim2026judgeutility,Evaluation Ability Does Not Imply Optimization Utility: LLM-as-a-Judge Signals in Closed-Loop Table Recognition,,registry_metadata_preserved,full_or_primary_record
+b136,wu2026textualrelaxation,Do Language Models Converge to Themselves? Recursive Self-Refinement as Textual Relaxation,,registry_metadata_preserved,full_or_primary_record
+b137,zhang2025genicldemo,GenICL: Training-Free In-Context Learning by Demonstration Generation,10.18653/v1/2025.findings-acl.592,registry_metadata_preserved,full_or_primary_record
+b138,li2025instance,Instance-level Randomization: Toward More Stable {LLM,10.18653/v1/2025.findings-emnlp.182,registry_metadata_preserved,full_or_primary_record
+b139,cegin2025randomselection,Use Random Selection for Now: Investigation of Few-Shot Selection Strategies in {LLM}-based Text Augmentation,10.18653/v1/2025.findings-emnlp.296,registry_metadata_preserved,full_or_primary_record
+b140,rahman2025hallucination,Hallucination to Truth: A Review of Fact-checking and Factuality Evaluation in Large Language Models,,primary_author_resolved,full_or_primary_record
+b141,zhu2024rageval,{RAGEval}: Scenario Specific {RAG} Evaluation Dataset Generation Framework,,primary_author_resolved,full_or_primary_record
+b142,ramprasad2024factualitymetrics,Do Automatic Factuality Metrics Measure Factuality? A Critical Evaluation,,registry_metadata_preserved,full_or_primary_record
+b143,papageorgiou2025agenticfaithfulness,Evaluating Faithfulness in Agentic RAG Systems for e-Governance Applications Using LLM-Based Judging Frameworks,,registry_metadata_preserved,full_or_primary_record

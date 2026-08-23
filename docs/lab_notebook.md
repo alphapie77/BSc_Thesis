@@ -5313,3 +5313,545 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 - None new. These chapters synthesize the already recorded literature; all used
   keys resolve to `docs/references.bib` and have corresponding related-work
   records.
+
+---
+
+## 2026-08-23 -- Thesis integration: audited RQ/evidence map
+**Feeds:** Thesis Chapters 1, 3, 6, 7 and 8
+**Commit:** `2d1c413c0ca199e4cd9a96d2c03cd6a460fba286-dirty`
+**Artifacts:** `docs/thesis_rq_evidence_map.md`
+
+### Numbers
+- Five research questions mapped to frozen evidence, bounded conclusions and
+  planned thesis tables/figures.
+- No generation, score, statistical test, split, prompt, model or result file
+  changed.
+
+### Decisions made (and why)
+- The map uses current Chapter 1 wording rather than the pipeline blueprint's
+  stale persona wording. STATUS records that the evidence supports a
+  human-recognizable continuum cut and prohibits a discovered-persona claim.
+- RQ2 is not attributed exclusively to the proposed loop because all nine
+  registered active conditions improve over zero-shot.
+- RQ3 remains mixed because the frozen inferential family omitted a direct
+  neural-plus-symbolic versus neural-only contrast. No post-hoc test is invented.
+- RQ4 remains unanswered under Sabbir's decision to defer English.
+- RQ5 remains a verifier-divergence diagnostic because Verifier-B is not human
+  ground truth and its calibration improvement was not established.
+
+### Findings
+- The normative pipeline's original RQ1 sentence still asks for persona
+  discovery and therefore conflicts with the later verified axis terminology.
+  The conflict is recorded in the map for an explicit amendment; historical
+  protocol text is not silently rewritten.
+
+### Consequences for downstream steps
+- Chapter 1 Table 1.1 and Chapter 7's final RQ-verdict table must be rendered
+  from this map.
+- Literature and figure/table work must support these bounded claims rather than
+  the superseded persona or cross-lingual claims.
+
+### Citations needed
+- None introduced by the mapping step. Method-specific citation repair is the
+  next separate thesis-integration task.
+
+---
+
+## 2026-08-23 -- Thesis integration: alphaXiv literature and IEEE bibliography audit
+**Feeds:** Thesis Chapters 2--7 and final references
+**Commit:** `2d1c413c0ca199e4cd9a96d2c03cd6a460fba286-dirty`
+**Artifacts:** `docs/references_ieee.bib`, `docs/reference_key_map.md`,
+`docs/chapters/chapter2_related_work.md`
+
+### Numbers
+- 29 unique stable BibTeX keys (`b1`--`b29`).
+- 29 distinct citation keys across the seven chapter drafts; zero missing and
+  zero duplicate bibliography keys.
+- Chapter 2 now compares eight verified systems/lines, including the present
+  study, rather than asserting novelty without a table.
+- No generation, score, inference, model, split or result file changed.
+
+### Decisions made (and why)
+- A new thesis-facing bibliography is used instead of silently replacing the
+  research-stage registry, which contains deliberately unresolved candidates.
+  IEEE rendering supplies `[1]`, `[2]`, etc.; `b1`, `b2`, etc. remain stable
+  source keys so later additions do not require renumbering existing prose.
+- HybridRAG-BN is reported as adjacent rather than direct prior work: it is
+  Bangla KBQA with a fine-tuned Gemma verifier and query-relevant evidence,
+  whereas this thesis performs prompted cinema-response generation and keeps an
+  independent scorer outside the loop.
+- SymDiag supports diagnosis-versus-gating separation, not transfer of its
+  formal reasoning claims to audience comments.
+
+### Findings
+- AlphaXiv resolved all authors of arXiv 2602.08033, closing the only unresolved
+  citation used in the original chapter drafts.
+- AlphaXiv's exact-title resolver returned SimAB for the Lappas--Filippas title;
+  the IEEE article was verified by DOI and DBLP instead.
+- AlphaXiv returned stale PDF content for arXiv 2507.05619. The final ACL
+  Anthology record establishes the title, author order, venue, pages and DOI for
+  Evaluator Stress Tests. The final bibliography uses that primary record.
+- Recent equal-token evidence strengthens the need for the already frozen blind
+  resampling condition; it does not justify a new experiment or rerun.
+
+### Consequences for downstream steps
+- Final thesis rendering must point to `docs/references_ieee.bib` with
+  `IEEEtran` or an IEEE CSL file.
+- The older `docs/references.bib` is a research registry, not a submission
+  bibliography.
+- Consensus search remains required after its monthly quota resets; until then,
+  literature completeness is not represented as fully closed.
+
+### Citations needed
+- No unresolved metadata remains among the 29 currently cited thesis entries.
+  New citations discovered during figure/table prose integration must be added
+  with the next unused stable `b` key and logged in
+  `docs/reference_key_map.md`.
+
+---
+
+## 2026-08-23 -- Correction: full literature-registry consolidation
+**Feeds:** All thesis chapters and final references
+**Artifacts:** `docs/references_ieee.bib`, `docs/reference_key_map_full.csv`,
+`src/common/build_thesis_bibliography.py`
+
+### Correction and numbers
+- The preceding entry audited only the 29 chapter-cited core records and
+  incorrectly called that set the final bibliography. The older research
+  registry actually contained 127 entries and had to be consolidated, not
+  ignored.
+- The reproducible build preserves `b1`--`b29`, deduplicates the registry by
+  DOI, arXiv eprint and normalized title, and appends 112 unique records. The
+  canonical total is **141 (`b1`--`b141`)**.
+- Integrity audit: 141 unique keys; 141 unique normalized titles; every entry
+  has author, title and year; all 29 chapter citations resolve; no internal
+  `and others`, unresolved, unverified or not-read marker remains in submission
+  BibTeX.
+
+### Metadata decisions
+- Forty arXiv discovery records received exact author lists from alphaXiv
+  metadata. Twenty-one abbreviated non-arXiv records were checked against
+  publisher, proceedings, ACL Anthology or primary-paper metadata.
+- Internal reading/discovery status was not erased: it is carried in the
+  141-row `reference_key_map_full.csv`, while the old `references.bib` remains
+  untouched as the historical research registry.
+- The script selects only the frozen `b1`--`b29` core on every rebuild, so
+  repeated execution is idempotent and cannot recursively append its output.
+
+### Scientific standing
+- This repairs bibliography coverage and metadata only. It does not assert that
+  all 141 papers are cited, read in full, or equally relevant, and it changes no
+  experiment, model, generation, score or inference.
+- Consensus remains unavailable until its stated quota reset; that pending
+  search is a literature-completeness limitation, not a metadata gap in the
+  consolidated records.
+
+---
+
+## 2026-08-23 -- Thesis table and figure manifest
+**Feeds:** Final thesis integration and defence preparation
+**Artifacts:** `docs/thesis_table_figure_manifest.md`
+
+### Decision
+- Main-text visuals are retained only when they define a claim, prove an
+  isolation/reproducibility wall, report load-bearing evidence, or place a
+  limitation beside that evidence.
+- The resulting Bangla-only manifest contains 14 tables and 8 figures. Two
+  tables already exist in prose, two Phase-5 figures already exist as manifested
+  PNGs, and the development dynamics figure exists as SVG; the rest require
+  rendering or schematic construction.
+- Exact configs, per-seed rows, complete transition rows, rules, prompts and
+  environment mappings are appendix material rather than main-text clutter.
+
+### Claim protection
+- No English result visual is permitted while RQ4 remains unanswered.
+- The diagnostic interface is post-run software and cannot appear as Phase-5
+  experimental evidence.
+- No sentiment-JS, film-level realism, audience-demographic/persona, composite
+  score or unregistered condition ranking is introduced.
+- Every numeric visual must be generated from its named audited artifact with a
+  recorded rounding rule. The frozen 5,400 generations are not rerun.
+
+### Next action
+- Place the two existing Phase-5 figures in Chapter 6 and render Tables
+  6.2--6.4 from the paired-statistics, human-evaluation and length-matched
+  artifacts.
+
+### Rendering completion
+- Chapter 6 now embeds the two hash-manifested Phase-5 PNGs. Figure 6.1's
+  caption separates failure-selected attempt means from same-case transitions;
+  Figure 6.2 defines no composite realism score.
+- Table 6.2 contains only the nine registered zero-shot contrasts. Table 6.3
+  reports pooled and per-rater human accuracy plus agreement. Table 6.4 places
+  matched-pair coverage beside every post-treatment sensitivity accuracy.
+- Values were rounded for presentation from the named frozen CSV/JSON files;
+  no statistic was recomputed and no generation was rerun.
+
+---
+
+## 2026-08-23 -- All main-text thesis tables placed
+**Feeds:** Chapters 1--7 and final thesis formatting
+**Artifacts:** Seven files under `docs/chapters/` and
+`docs/thesis_table_figure_manifest.md`
+
+### Completion
+- All 14 planned main-text tables now occupy their target chapters: 1 in
+  Chapter 1, 1 in Chapter 2, 3 in Chapter 3, 1 in Chapter 4, 2 in Chapter 5,
+  4 in Chapter 6 and 2 in Chapter 7.
+- Table 4.1 combines the seven fine-tuned recipes with majority, length-rule and
+  frozen-LaBSE baselines. This prevents the nominal ablation ordering from
+  hiding the registered circularity result.
+- Table 5.1 expresses the conditions as interventions and shows Verifier-B
+  outside every loop. Table 5.2 retains the missing precommitment outcome rather
+  than inventing a hybrid win.
+- Tables 1.1 and 7.2 keep RQ4 visibly unanswered. Tables 3.1--3.3 retain the
+  source-confounded partition, negative control and failed first human
+  instrument beside the positive evidence.
+
+### Standing
+- The pass is presentation-only: it creates no new statistic and performs no
+  test, model call, inference or generation rerun.
+- Final column widths, page breaks and IEEE/university typography will be
+  handled when the chapter drafts enter the thesis template.
+
+---
+
+## 2026-08-23 -- Final thesis scope reduced to four research questions
+**Feeds:** Chapters 1, 4, 6 and 7; RQ evidence map; defence materials
+**Decision owner:** Sabbir
+
+### Change
+- The cross-language question is removed from the active thesis rather than
+  reported as unanswered or future work.
+- Historical RQ5 (Verifier-A versus Verifier-B divergence) is renumbered active
+  thesis RQ4. Tables 1.1 and 7.2 now contain four rows.
+- Active chapter drafts and thesis-integration manifests contain no English-arm
+  or cross-language scope statement.
+
+### Audit boundary
+- The normative pipeline previously kept the English work active. A dated scope
+  amendment now supersedes that method scope, and the protocol deviations log
+  records the disagreement explicitly; historical text is not erased.
+- This is not selective reporting of an observed result. No English experiment
+  exists, and every completed Bangla result and limitation remains unchanged.
+
+---
+
+## 2026-08-23 -- Thesis hierarchy and end-to-end process audit
+**Feeds:** All chapters and final-document assembly
+**Artifacts:** `docs/thesis_structure_process_audit.md`, chapter drafts,
+`data/plots/README.md`
+
+### Findings and repairs
+- Table captions had been represented as level-3 headings. All 14 are now
+  captions, preventing false subsubsection and table-of-contents entries.
+- Chapter 7's RQ discussion began at RQ2. A bounded RQ1 subsection was added and
+  the four active discussions are now numbered 7.2.1--7.2.4.
+- The chapters named 90 evaluation plots but did not explain their construction.
+  Chapter 3 now records harvesting, mechanical gating, human review, the 120-row
+  freeze, 30/90 seed-42 split, revision provenance and CC BY-SA obligation.
+- Chapter 3 now states the 0.95 LaBSE near-duplicate threshold and its frozen
+  sensitivity standing. Chapter 5 now states the Writer sampling settings,
+  paired-case construction, shared initial drafts, logical-call accounting,
+  checkpoint gate and separate outcome-scoring join.
+- The plot README's header still claimed the superseded 130/100 target. Its
+  current-state banner now reports the frozen 120/90 file and prevents rerun as
+  replacement.
+
+### Conclusion
+- The seven chapters now cover the scientific process continuously from raw
+  corpus and plot stimuli through frozen data walls, construct validation,
+  verifier development, multi-agent execution, 5,400-case scoring, human
+  evaluation, sensitivity analyses and bounded conclusions.
+- Remaining omissions are explicitly non-completions: ethics determination,
+  licence attribution, six new figures/one placement and final template matter.
+  No experimental result or process stage is silently absent.
+
+---
+
+## 2026-08-23 -- Pre-figure thesis package and CC BY-SA closure
+**Feeds:** Front matter, end matter, reproducibility and submission compliance
+**Artifacts:** `docs/thesis_front_matter.md`, `docs/thesis_assembly_order.md`,
+`docs/appendices/appendix_{a,b,c,d}_*.md`,
+`docs/generative_ai_declaration.md`, `src/common/build_plot_attribution.py`
+
+### Work completed
+- Drafted a bounded abstract from audited chapter/result evidence and supplied
+  keywords. Unknown university identity, signature and template wording remain
+  explicit placeholders rather than guesses.
+- Added reproducibility, human-evaluation/ethics and responsible-NLP appendices.
+  The ethics appendix records consent and participant standing but does not
+  represent the still-pending institutional determination as approval.
+- Added a transparent generative-AI assistance declaration and a final assembly
+  order so that disclosure, references and appendices have stable locations.
+- Generated the plot-attribution appendix from the frozen 120-row CSV. The
+  builder requires 120 unique, complete records and emits article links, exact
+  revision links/timestamps, harvest date and CC BY-SA/share-alike terms.
+- Corrected the stale README claim that Phase 2/persona discovery was next and
+  clarified the split: G=300, R1=2,162 and R2=2,163, with the registered
+  200-row development subset drawn from within R1 (leaving 1,962 non-dev R1
+  rows).
+
+### Boundary
+- No frozen generation, model scoring, inference or experimental analysis was
+  rerun. Remaining external inputs are the university template/identity text,
+  researcher-authored acknowledgements and written ethics determination.
+- Exact aggregate compute hours are not reconstructed from memory; they require
+  an auditable timestamp-derived calculation only if the submission form asks
+  for a scalar.
+
+---
+
+## 2026-08-23 -- Data-to-result narrative integration
+**Feeds:** Chapters 1 and 3; final methods readability
+**Artifacts:** `docs/chapters/chapter1_introduction.md`,
+`docs/chapters/chapter3_data_axis.md`, `docs/dataset_card.md`
+
+### Reason for the edit
+The underlying methods were present across Chapters 3--6, but the thesis did
+not yet give a new reader one continuous account of how the two data resources
+feed the experiment. Chapter 3 also named the raw workbook generically while
+the dataset card alone carried its Mendeley title and file identity.
+
+### Changes
+- Added a compact Chapter-1 research workflow that separates review-derived
+  construct/training evidence from Wikipedia-derived generation stimuli and
+  follows the chain through the frozen 5,400 cases and human validation.
+- Added the full Mendeley dataset title, exact workbook name, hash and size to
+  Chapter 3. Hosting provenance is not confused with the missing underlying
+  row-level collection provenance.
+- Made the absence of movie titles and resulting impossibility of a held-out-
+  film review split explicit.
+- Clarified that frozen R1 has 2,162 rows and contains the 200-row development
+  subset; 1,962 is the non-development remainder, not the top-level R1 count.
+- Connected the 120-row Wikipedia corpus to its MediaWiki harvesting method,
+  generation-only role and complete Appendix-D revision attribution.
+
+No count was recomputed and no frozen generation or analysis was rerun.
+
+---
+
+## 2026-08-23 -- Central architecture figures
+**Feeds:** Chapters 4 and 5; defence explanation of the title
+**Artifacts:** `docs/figures/dual_verifier_isolation.svg`,
+`docs/figures/multi_agent_state_graph.svg`,
+`docs/figures/s4_loop_dynamics.svg`, `docs/figures/README.md`
+
+### Design decisions
+- Figure 4.1 organizes the system by both data source and privilege. The central
+  wall prevents the common but invalid reading that Verifier-B participates in
+  generation simply because it appears in the same framework.
+- Figure 5.1 depicts autonomy as implemented routing rather than anthropomorphic
+  independence: failed evidence can revise retrieval and failed drafts can
+  trigger feedback/retry, while thresholds and a three-attempt ceiling remain
+  fixed.
+- Existing Figure 5.2 is retained rather than redrawn. Its caption now states
+  that the selected threshold is an operating point and that the plotted
+  dynamics are development evidence, not the 5,400-case main result.
+
+All numeric labels reproduce frozen split, verifier, RAG or S4 records. No
+generation, scoring or inferential analysis was rerun.
+
+### Visual revision after researcher review
+- The first schematic drafts were rejected as visually weak. They were replaced
+  with a restrained publication layout: aligned data/artifact/privilege columns
+  for Figure 4.1 and a single dominant state graph plus an outside-evaluation
+  band for Figure 5.1.
+- The revision changes only visual hierarchy and routing legibility. Counts,
+  privileges, agent functions and the B-outside-loop claim are unchanged.
+- Both revised SVGs were raster-rendered and inspected at 1,200-pixel width;
+  labels, arrows and panel boundaries were checked after rendering rather than
+  accepted from XML validity alone.
+
+### Gold-300 label correction
+- Researcher review identified that “evaluation-only holdout” hid Gold-300's
+  actual scientific fate. Gold-300 was used for Attempt 1: 300 reviews received
+  598/600 ratings, ordinal alpha was 0.497, and the reliability gate stopped
+  Gate 2. It contributed a failed-instrument result, not the final positive
+  construct validation.
+- Attempt 2 used fresh Region-A items excluding Gold-300 because both annotators
+  had already seen the Gold items. Figure 4.1 and its caption now state this
+  explicitly while retaining the no-training/no-RAG wall.
+## 2026-08-23 — Chapter 1 thesis-prose pass
+
+**Decision.** Recast the introduction from an artifact/status summary into a
+reader-facing research argument. The chapter now motivates pre-release response
+generation without treating generated comments as audience evidence, derives
+the verifier-in-the-loop problem from construct validity, self-correction and
+proxy-gaming risks, and separates contributions from unsupported audience-
+prediction claims.
+
+**Evidence control.** All quantities were carried from the audited thesis
+artifacts. Citations were added for the V3 dataset, BanglaBERT, LaBSE,
+self-correction, proxy gaming, RAG and synthetic-audience validity. No new
+analysis or generation was performed. Citation keys were reordered across the
+assembled thesis after the prose change and resolve without gaps.
+## 2026-08-23 — Chapter 2 thesis-prose pass
+
+**Decision.** Reorganize related work around evidence and disagreement rather
+than around a list of components in the implemented system. The rewritten gap
+is an auditable integration claim: no reviewed adjacent study jointly tests the
+construct-validation, data-isolation, bounded-feedback, independent-scorer,
+compute-control, and native-speaker-evaluation contract used here.
+
+**Literature boundary.** Saleh et al. (2026) is used to reject a generic claim
+that more agent roles imply better quality. Opposing recent findings on
+refinement versus resampling are retained and interpreted as task- and
+budget-contract dependent. Consensus searches could not be extended because
+the monthly quota was exhausted; this limitation remains explicit. No new
+experimental evidence was produced.
+## 2026-08-23 — Chapter 3 thesis-prose pass
+
+**Decision.** Present construct development as a staged methodology rather than
+as a sequence of favorable clustering results. Data roles and isolation walls
+are introduced first; the source-confounded full-corpus partition, weak natural
+clusterability, failed Gold-300 instrument, and Region-B negative control remain
+part of the main argument.
+
+**Clarification.** Attempt 1 returned 598/600 ordinal ratings and failed its
+registered reliability gate. Attempt 2 used fresh Region-A R1 material with no
+Gold overlap, so it is a new comparative instrument rather than a re-analysis
+of the failed ratings. All reported quantities were carried from frozen
+artifacts; no computation or generation was repeated.
+## 2026-08-23 — Chapter 4 thesis-prose pass
+
+**Decision.** Put verifier roles and evaluation protocol before performance.
+The reordered argument makes clear that dev-82 is reused, macro-F1 measures
+constructed-label reproduction, seed variation is sensitivity evidence, and
+the paired/BH result—not the largest mean—controls the backbone verdict.
+
+**Interpretive boundary.** The LaBSE probe's near-ceiling result is reported as
+construction circularity. Verifier-A is selected for cheap in-loop use;
+Verifier-B supplies a disjoint outcome view. Neither is human ground truth, B's
+calibration improvement remains unestablished, and no A-versus-B superiority
+claim is made. No training or inference was repeated.
+## 2026-08-23 — Chapter 5 thesis-prose pass
+
+**Decision.** Present the proposed system through explicit roles, state, data
+privileges and transitions rather than relying on the word “agent.” The four
+functional roles remain Researcher, Writer, Critic and Reflector, while only
+Writer and Reflector call a language model. Routing is bounded by frozen
+thresholds and stopping rules; the architecture is not claimed to be an
+open-ended autonomous system.
+
+**Corrections.** The failure taxonomy now discloses AI-assisted initial coding,
+researcher review and absence of an independent coder. Residual English
+length-AUC values were removed from active Table 5.2 under the four-RQ Bangla
+scope. Verifier-B remains absent from the controller state and every generation
+transition. No generation or analysis was repeated.
+## 2026-08-23 — Chapter 6 thesis-prose pass
+
+**Decision.** Present the frozen experiment in evidential order: design and
+outcomes, archive integrity, descriptive 20-cell results, registered paired
+inference, same-case verifier divergence, blinded human evaluation, and
+sensitivity diagnostics. Table 6.1 now follows intervention order so the reader
+can compare added mechanisms without mistaking alphabetical order for design.
+
+**Statistical clarification.** Pairing is by plot × target level × seed. The
+identical bootstrap p-values are the 10,000-resample resolution floor and do not
+imply equal effects; effect estimates and intervals carry that information. The
+human target-match interval is item-bootstrap, and the balanced subset contains
+five items per condition × level cell. No statistic was recomputed.
+## 2026-08-23 — Chapter 7 thesis-prose pass
+
+**Decision.** Make the final chapter interpret rather than repeat Chapter 6.
+Research-question answers are followed by separate construct, internal,
+external, statistical, measurement and ethical limitations. Practical use is
+bounded to inspectable pre-writing and hypothesis generation; the live
+interface is not promoted to experimental evidence.
+
+**Conclusion boundary.** The framework supports Bangla target-level
+controllability and reveals held-out-verifier divergence. It does not support
+film-level audience prediction, natural personas, length-neutral control,
+human-quality decline, or replacement of audience research. No new result was
+introduced.
+
+## 2026-08-23 — Cross-chapter copy-edit and submission-readiness audit
+
+**Decision.** Read the seven active chapters as one thesis rather than as seven
+independent drafts. Standardize the first expansion of technical abbreviations,
+retain one thesis-facing IEEE bibliography, and record unfinished production
+work explicitly instead of allowing a polished chapter to imply that every
+figure or submission field already exists.
+
+**Checks and outcome.** The active manuscript contains 14 placed main-text
+tables. Figures 4.1, 5.1, 5.2, 6.1 and 6.2 resolve to existing files; planned
+Figures 3.1, 3.2 and 4.2 remain to be produced. Principal abbreviations now have
+first-use expansions and a separate list for front-matter integration. Active
+chapters contain no English experimental arm, draft marker, or claim that the
+live interface is thesis evidence.
+
+**Evidence boundary.** This was editorial and structural work only. No model
+call, generation, training, scoring, human judgment or statistical result was
+rerun. The repository does not claim a plagiarism percentage, a formal ethics
+approval/exemption, an unrecorded exact download date, or a fresh Consensus
+search after the available quota was exhausted.
+
+## 2026-08-23 — Supplementary appendix closure
+
+**Decision.** Treat the pipeline's verbatim-prompt and rule-table requirements
+as mandatory and materialize the manifest's numerical supplements. Do not turn
+the appendix into a raw JSONL dump or select a favourable trace. Keep complete
+sealed traces as authority and present compact reviewer-facing contracts and
+tables derived from canonical sources.
+
+**Outcome.** Appendices E--H now cover symbolic rules and diagnostic standing,
+experimental prompt structures, the eight-case single-coder failure census,
+per-seed verifier results, Phase-5 per-replicate summaries, exact paired
+Goodhart transitions, diversity/length/MAUVE diagnostics, configuration and
+runtime provenance, bibliography auditing, and the post-run interface boundary.
+The supplementary-results appendix is reproducibly rendered by
+`src/common/build_thesis_supplementary_appendix.py`.
+
+**Boundary.** The Phase-5 replicate table is a deterministic descriptive group
+of the sealed scored cases, not a new inferential family. No generation,
+training, verifier scoring, human annotation or model call was repeated. The
+interface remains a different live-model software path and is not thesis
+evidence.
+
+## 2026-08-23 — Claim-by-claim citation-placement audit
+
+**Decision.** Distinguish bibliography integrity from citation sufficiency.
+Resolving every key proves only that the file compiles; it does not prove that a
+reader meets the supporting source where a methodological claim is made.
+Repeat a citation in a later Methods, Results or Limitations chapter when it is
+locally load-bearing, while leaving original numeric findings anchored to
+canonical repository evidence rather than adding decorative citations.
+
+**Outcome.** Chapter 5 now places existing verified citations beside RAG,
+neuro-symbolic diagnosis, external-feedback motivation, self-refinement
+controls and compute-matched resampling. Chapters 6 and 7 repeat the paired
+bootstrap/BH, MAUVE and HEDS references where those methods or limitations are
+interpreted. A negative-prompting causal sentence without a final verified
+citation was narrowed to a factual description of the frozen positive-prototype
+contract. The related-work audit's stale 141-entry/29-cited mapping was corrected
+to the current 143-entry/32-cited state.
+
+**Boundary.** No new paper or claim was introduced. Consensus remained quota-
+unavailable, so the pass reused only already verified sources and does not claim
+a fresh literature search.
+
+## 2026-08-23 — Already-read literature integration beyond the core
+
+**Decision.** Do not treat the first 32 resolved citations as an exhaustive
+review and do not cite all 143 registry entries by volume. Screen the uncited
+full/primary-record set through its existing reading notes, add only sources
+that directly support a sentence in the active thesis, and leave metadata-only
+records out of load-bearing claims.
+
+**Outcome.** Twenty-three already-read sources were integrated, producing 55
+unique cited references. Coverage expanded around movie-review generation,
+role-sensitive correction, LLM-judge reliability, Bangla backbone disagreement,
+human-evaluation sampling and agreement, density clustering, AC1 interpretation,
+randomness in model comparison, small-data classification and calibration. The
+remaining 88 entries stay in the research library because they are redundant,
+out of scope, weakly transferable or not fully read.
+
+**Audit repair.** Citation reordering correctly moved the new papers into the
+first-appearance block but left their CSV `reading_status` stale. The reorder
+script now assigns `chapter_cited` to every actually cited row, so the audit map
+and chapter scan cannot disagree after a future rebuild.
+
+**Boundary.** Consensus remained quota-unavailable. This pass used only
+previously read and metadata-verified records; no new method, result, generation,
+training or analysis was introduced.

@@ -1,8 +1,8 @@
 # AGENTS.md — read this before touching anything
 
 BSc thesis, targeted at a Q1 journal.
-**Title:** *A Neuro-Symbolic Multi-Agent Framework for Pre-release Audience
-Simulation in Bangla Cinema: A Verifier-in-the-Loop Approach*
+**Title:** *A Neuro-Symbolic Multi-Agent Framework for Pre-Release Audience
+Response Generation in Bangla Cinema: A Verifier-in-the-Loop Approach*
 
 **The normative spec is `docs/research_pipeline_en.md`.** This file is only a
 summary of its non-negotiables. If this file and the pipeline ever disagree,

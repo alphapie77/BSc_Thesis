@@ -75,7 +75,8 @@ four reviews does not belong, with no construct named to them).
 
 So: the distinction is geometrically a line drawn through a continuum, and
 people can nonetheless perceive it. That is the thesis's RQ1 claim, and it is
-deliberately weaker than the "audience personas" the title still implies.
+deliberately weaker than an audience-persona claim. The final title now uses
+"Audience Response Generation" and makes no persona claim.
 
 **Both annotators reported the items looked alike to them — then scored
 0.78 and 0.84.** That note was written down *during* annotation, before any
@@ -105,8 +106,10 @@ answer was scored, so it could not later read as an excuse.
   *descriptive* and cannot be claimed as a contribution.
 - **Two unread load-bearing citations** (Chen & Witten 2023; von Luxburg 2010)
   are flagged as debts in `related_work.md`, not presented as read.
-- **The title still says "Audience Simulation"** and has not yet been revised to
-  match §4's constraint. This is outstanding.
+- **Title wording was closed on 2026-08-23:** *A Neuro-Symbolic Multi-Agent
+  Framework for Pre-Release Audience Response Generation in Bangla Cinema: A
+  Verifier-in-the-Loop Approach*. It matches §4's axis-level response-generation
+  constraint and does not claim predictive audience modelling.
 
 ---
 

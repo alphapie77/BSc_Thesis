@@ -1,6 +1,12 @@
-# Bangla plot synopses — 130, harvested from bn.wikipedia
+# Bangla plot synopses — 120 frozen, harvested from bn.wikipedia
 
-**Target:** 130 (30 dev + 100 eval, disjoint) · **File:** `plots_bn.csv`
+**Current frozen set:** 120 (30 dev + 90 eval, disjoint), assigned once with
+seed 42 · **File:** `plots_bn.csv` · frozen 2026-07-31.
+
+> The collection workflow below records how the corpus was built. Do not run it
+> to replace `plots_bn.csv`: the frozen file must be recovered from version
+> history if lost. The original 130 target was infeasible after human review;
+> the final 120/90 counts supersede command examples that mention 130/100.
 
 ```bash
 python -m src.preprocess.plots_scrape --probe             # <-- START HERE, 2 seconds

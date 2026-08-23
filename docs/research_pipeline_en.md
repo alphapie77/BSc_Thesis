@@ -1,8 +1,19 @@
 # Full Research Pipeline — From Raw 5k Dataset to Complete Thesis (v7 — English Edition)
-## Title: *A Neuro-Symbolic Multi-Agent Framework for Pre-release Audience Simulation in Bangla Cinema: A Verifier-in-the-Loop Approach*
+## Title: *A Neuro-Symbolic Multi-Agent Framework for Pre-Release Audience Response Generation in Bangla Cinema: A Verifier-in-the-Loop Approach*
 
 **Starting assets:** ~5,000 raw Bangla movie reviews (Mendeley) + the locked title. No code, no labels.
-**Core claim (one sentence):** An external, cheap, task-trained verifier embedded in a generate–verify–refine loop measurably improves persona-controllability of LLM generation in a low-resource language (Bangla), compared to prompting alone — demonstrated against a matched English reference.
+**Core claim (one sentence):** In the completed Bangla arm, an external
+task-trained verifier embedded in a generate–verify–refine loop improves control
+of a human-recognizable engagement-specificity axis relative to zero-shot
+generation, while an independent held-out verifier exposes proxy divergence;
+the thesis scope is Bangla cinema response generation.
+
+> **SCOPE AMENDMENT — 2026-08-23, Sabbir's explicit decision.** The submitted
+> thesis contains four research questions. The former cross-language RQ is
+> removed from the thesis scope, and the verifier-divergence question is
+> renumbered RQ4. Historical English-arm design sections below are retained only
+> as an audit trail; they are not a thesis contribution, result, limitation or
+> future-work commitment. This amendment supersedes their active status.
 
 **Timeline:** ~14 weeks | **Compute:** free Colab/Kaggle GPU | **API cost:** ~~৳0 (Groq free tier primary; Gemini free tier secondary)~~ **৳0 — generation local on Kaggle T4 as of 2026-08-12 (§4.4 box); Gemini secondary unchanged**
 ~~**This file is the English mirror of `research_pipeline_bn.md` (v7). Both are normative; if they ever disagree, fix both.**~~
@@ -677,20 +688,43 @@ Public GitHub (code + configs + timestamped protocol.md), updated HF model card,
 
 **1.2 Motivation:** the solution's pieces exist in separate literatures — persona generation (MoP), classifier gating (FUDGE/detox line), refinement loops (math/code) — **no one has joined them in a low-resource language**; a cheap trained verifier makes the approach practical for a real industry.
 
-**1.3 Problem statement (one sentence):** *Whether an external, cheap, task-trained verifier embedded in a generate–verify–refine loop measurably improves persona-controllability of LLM text generation in a low-resource language, relative to prompting-alone and self-critique baselines.*
+**1.3 Problem statement (one sentence):** *Whether an external task-trained
+verifier embedded in a generate–verify–refine loop measurably improves control
+of a human-recognizable engagement-specificity axis in Bangla text generation,
+relative to prompting-alone and self-critique baselines, without collapsing the
+independent evaluation wall.*
 
 **1.4 Research questions:**
-- **RQ1:** Can audience personas be discovered from unlabeled Bangla reviews via weak supervision, and validated as stable (bootstrap ARI, prediction strength) and human-recognizable (Krippendorff's α)?
-- **RQ2:** Does an external trained verifier in an evaluator-optimizer loop measurably improve persona-controllability over zero-shot, few-shot, RAG-only, and LLM-self-critique baselines?
-- **RQ3:** Does hybrid neural+symbolic validation outperform neural-only and symbolic-only gates?
-- **RQ4:** Is the verifier-in-the-loop benefit larger in low-resource Bangla than under matched English (IMDB) conditions?
-- **RQ5:** Does iterating against a fixed verifier induce measurable overoptimization (Goodhart), detectable via an independent held-out verifier?
+- **RQ1:** Can a meaningful response distinction be recovered from unlabeled
+  Bangla reviews and validated as stable and human-recognizable?
+- **RQ2:** Does an external trained verifier improve target-level controllability
+  over zero-shot, few-shot, RAG-only, and self-critique baselines?
+- **RQ3:** Does adding symbolic validation improve on neural-only and
+  symbolic-only mechanisms?
+- **RQ4:** Does iteration against Verifier-A create measurable divergence from
+  an independent Verifier-B?
+
+> **Post-run wording amendment (2026-08-23; no experiment changed):** the
+> original RQs used *persona discovery/persona controllability* and framed RQ4
+> as a completed low-resource comparison. Those words conflict with the audited
+> outcomes: the operational object is a human-recognizable two-level cut through
+> an engagement-specificity continuum, and the English mirror is deferred. The
+> current wording above matches `docs/STATUS.md` and
+> `docs/thesis_rq_evidence_map.md`. Historical pre-registration remains intact in
+> `docs/protocol.md`.
 
 **1.5 Objectives:** one operational line per RQ (from protocol.md).
 
 **1.6 Contributions (seven):** ① a human-validated, persona-labeled Bangla review dataset with a 300-item gold set and released guidelines; ② a convergence-validated persona-discovery protocol (7 criteria + stability + theory); ③ a calibrated, cheap persona verifier with dual-accuracy reporting (weak-label vs gold); ④ a compound AI system implementing the evaluator-optimizer workflow with a trained-classifier gate — *to our knowledge* the first for persona control in a low-resource language; ⑤ an A/B held-out-verifier evaluation design for detecting Goodhart effects in refinement loops; ⑥ cross-lingual evidence (Δ_bn vs Δ_en) on where verification matters most; ⑦ full open release: code, model, traces, demo.
 
-**1.7 Scope & limitations preview:** "simulation" = persona-conditioned generation (per-film prediction is not validated — the data lacks review-to-film mapping); ~~the three-persona scheme is theory-motivated and data-confirmed, with 3-vs-4 acknowledged as a modeling choice.~~ 🔴 **[D12] REPLACE — this sentence is now false in two ways.** K = 2, and the scheme is **not** "data-confirmed": G1 found no cluster structure. What the data supports is *a two-level cut through a continuum that human annotators can nonetheless recognise* (RQ1-H: 0.78/0.84 vs 0.25 chance). 🎁 State the advantage plainly — **Pinto et al. (2026) and Cornelissen et al. (2026) report the same geometric finding and neither ran human validation.**
+**1.7 Scope & limitations preview:** “Audience response generation” means
+axis-level-conditioned text generation; per-film audience prediction and
+box-office forecasting are not validated because the data lacks review-to-film
+mapping. G1 found no separated cluster structure. The supported construct is a
+two-level cut through a continuum that human annotators can nonetheless
+recognise (RQ1-H: 0.78/0.84 vs 0.25 chance). Pinto et al. (2026) and
+Cornelissen et al. (2026) report related geometric cautions; neither supplies
+this study's human comparative validation.
 
 **1.8 Thesis organization:** per the §6.1 chapter map.
 

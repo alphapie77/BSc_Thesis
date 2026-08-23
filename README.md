@@ -1,9 +1,12 @@
-# A Neuro-Symbolic Multi-Agent Framework for Pre-release Audience Simulation in Bangla Cinema
+# A Neuro-Symbolic Multi-Agent Framework for Pre-Release Audience Response Generation in Bangla Cinema
 ### A Verifier-in-the-Loop Approach
 
-**Status:** Phase 1 complete (2026-08-01) — data prepared and characterised,
-plot corpus frozen (120), split frozen (G 300 / R1 2,162 / R2 2,163).
-Phase 2 next: persona discovery, Gate G1.
+**Status (2026-08-23):** the Bangla experiment and post-run analysis are
+complete. The 5,400-generation surface is frozen; three-annotator human
+evaluation is complete; seven thesis chapters and all 14 planned tables are
+drafted. Remaining figures and institutional template fields remain. Review
+split: G 300 / R1 2,162 / R2 2,163;
+the separately registered 200-row development subset is drawn from within R1.
 
 **Read `docs/STATUS.md` first.** It is the single source of truth for progress,
 verified facts, and open decisions. This file states the contract; STATUS states
@@ -14,8 +17,10 @@ The 5,000-row corpus is **two corpora**, joined at raw row 1999 and differing
 sharply in register. LaBSE K-Means on the full corpus identifies **which of the
 two a review came from with 93.3% accuracy** — far more strongly than it tracks
 sentiment (ARI 0.4813 vs 0.1793). So `region` is a controlled factor throughout,
-persona discovery happens inside the organic region only, and no claim survives
-that does not survive within-region. Provenance is unrecoverable: no collection
+axis analysis happens inside the organic region only, and no claim survives
+that does not survive within-region. The resulting two-way cut is treated as a
+human-recognizable cut through a continuum, not as discovered personas.
+Provenance is unrecoverable: no collection
 log exists and the collector does not remember. See
 `results/s2c_region_split.md` and `results/s2_pilot_ari_trapcheck.md`.
 
@@ -39,12 +44,12 @@ log exists and the collector does not remember. See
 ## Layout
 ```
 data/      raw/ (immutable)  cleaned/ (gitignored)  splits/ (FROZEN)  plots/ (FROZEN)
-src/       common/ preprocess/ cluster/ | verifier/ agents/ eval/ (Phases 3-5, empty)
+src/       common/ preprocess/ cluster/ verifier/ agents/ eval/ demo/
 configs/   one YAML per experiment
 results/   auto-logged, never hand-edited — indexed in docs/STATUS.md
 docs/      STATUS (read first), protocol (pre-registrations + deviations),
            lab_notebook (dated reasoning), dataset_card, research_pipeline (spec)
-tests/     40 tests. The split-map and notebook ones exist because both broke.
+tests/     executable guards for splits, isolation, configs, scoring and demo
 notebooks/ Kaggle/Colab runners ONLY (clone + install + call a script)
 ```
 
