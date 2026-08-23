@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.demo.service import LiveGemmaWriter
+from src.demo.service import LiveGemmaWriter, PlotFaithfulnessJudge
 
 
 class _Response:
@@ -61,3 +61,51 @@ def test_demo_config_keeps_verifier_b_out():
     assert cfg["rag"]["top_k"] == 10
     assert cfg["verifier"]["tau"] == 0.4384071
     assert cfg["privacy"]["persist_user_plots"] is False
+
+
+class _FaithResponse:
+    status_code = 200
+
+    @staticmethod
+    def json():
+        return {
+            "id": "faith-demo",
+            "model": "gemma-4-31b-it",
+            "status": "completed",
+            "steps": [{
+                "type": "model_output",
+                "content": [{"type": "text", "text": (
+                    '{"verdict":"SUPPORTED","support_score":96,'
+                    '"explanation":"উল্লেখটি প্লটে আছে।","unsupported_claims":[]}'
+                )}],
+            }],
+        }
+
+
+class _FaithSession(_Session):
+    def post(self, url, *, headers, json, timeout):
+        self.calls.append((url, headers, json, timeout))
+        return _FaithResponse()
+
+
+def test_plot_faithfulness_check_is_source_bounded_and_structured(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-secret-not-written")
+    session = _FaithSession()
+    judge = PlotFaithfulnessJudge({
+        "model": "gemma-4-31b-it",
+        "seed": 42,
+        "thinking_level": "minimal",
+        "max_output_tokens": 220,
+        "request_timeout_seconds": 120,
+    }, session=session)
+    result = judge.evaluate(
+        plot="রাশেদ সত্য প্রকাশ করে।",
+        response_text="রাশেদের সত্য প্রকাশের দৃশ্যটি ভালো লেগেছে।",
+    )
+    assert result["status"] == "supported"
+    assert result["support_score"] == 96
+    body = session.calls[0][2]
+    assert "PLOT:\nরাশেদ সত্য প্রকাশ করে।" in body["input"]
+    assert body["response_format"]["mime_type"] == "application/json"
+    assert body["model"] == "gemma-4-31b-it"
+    assert "test-secret-not-written" not in str(body)

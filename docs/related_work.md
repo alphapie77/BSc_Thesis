@@ -718,3 +718,16 @@ factuality metrics remain limited and depend on validated evidence
 visible “not independently validated” state, and the proposed human audit is a
 separate frozen-output post-run analysis rather than a generation rerun or an
 addition to the human instrument already in progress.
+
+The 2026-08-23 interface revision narrowed the automated claim after three
+Consensus queries. Papageorgiou et al. support source-aware statement-level
+checking rather than an unexplained aggregate badge
+[@papageorgiou2025agenticfaithfulness]. Ramprasad and Wallace show that current
+automatic factuality metrics degrade on hard cases, can react more strongly to
+benign edits than factual corrections, and can be gamed
+[@ramprasad2024factualitymetrics]. Consequently the live interface reports a
+structured `SUPPORTED` / `REVIEW` / `UNSUPPORTED` operational verdict, its
+source-grounded explanation and any unsupported claims; it does **not** call
+the score human-validated, does not feed it into generation, and does not add it
+to the frozen S5 results. This search changed the design from the user's
+requested generic “faithfulness verification” into an inspectable triage check.

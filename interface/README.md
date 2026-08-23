@@ -10,6 +10,11 @@ Current state:
   and a read-only ten-condition table copied from the audited S5 master table;
 - implemented locally: live generation through the server-side Gemini secret,
   frozen R1-only retrieval, Verifier-A and symbolic feedback;
+- implemented as a separate operational check: source-bounded structured plot
+  support triage (`SUPPORTED` / `REVIEW` / `UNSUPPORTED`) using Gemma-4-31B;
+  this is visible evidence for the user, not a human-validated thesis metric;
+- product split: `/` is the focused simulator; `/research` contains method,
+  isolation, model disclosures and the frozen ten-condition table;
 - forbidden: Verifier-B in the live loop, Gold-300/R2 retrieval, fabricated
   demo outputs, and a hallucination-free claim before the separate audit.
 

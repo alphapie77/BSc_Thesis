@@ -7,6 +7,7 @@ produced S5. User plots and provider payloads are not persisted.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import threading
 from dataclasses import asdict, dataclass
@@ -108,6 +109,95 @@ class LiveGemmaWriter:
         )
 
 
+FAITHFULNESS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "verdict": {"type": "string", "enum": ["SUPPORTED", "REVIEW", "UNSUPPORTED"]},
+        "support_score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "explanation": {"type": "string"},
+        "unsupported_claims": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["verdict", "support_score", "explanation", "unsupported_claims"],
+}
+
+
+class PlotFaithfulnessJudge:
+    """Source-bounded live check; operational aid, not a validated thesis metric."""
+
+    def __init__(self, config: dict, *, session=requests):
+        self.model = config["model"]
+        self.seed = int(config["seed"])
+        self.thinking_level = config["thinking_level"]
+        self.max_output_tokens = int(config["max_output_tokens"])
+        self.timeout = int(config["request_timeout_seconds"])
+        self.api_key = require("GOOGLE_API_KEY")
+        self.session = session
+
+    def evaluate(self, *, plot: str, response_text: str) -> dict:
+        prompt = f"""You are checking whether a short Bangla audience reaction is grounded in a movie plot.
+Use ONLY the supplied plot as evidence. Check every character, relationship, event, location, actor/casting claim, and causal claim in the reaction.
+Opinions and emotions need no plot evidence. Do not penalize paraphrases or reasonable reactions.
+SUPPORTED: every factual claim is supported by the plot.
+REVIEW: the text is ambiguous or the plot lacks enough detail to decide.
+UNSUPPORTED: at least one factual claim contradicts or is absent from the plot.
+Give a brief Bangla explanation. List only unsupported factual claims; otherwise return an empty list.
+
+PLOT:
+{plot}
+
+REACTION:
+{response_text}"""
+        body = {
+            "model": self.model,
+            "input": prompt,
+            "response_format": {
+                "type": "text",
+                "mime_type": "application/json",
+                "schema": FAITHFULNESS_SCHEMA,
+            },
+            "generation_config": {
+                "seed": self.seed,
+                "thinking_level": self.thinking_level,
+                "max_output_tokens": self.max_output_tokens,
+            },
+        }
+        response = self.session.post(
+            INTERACTIONS_URL,
+            headers={"x-goog-api-key": self.api_key, "Content-Type": "application/json"},
+            json=body,
+            timeout=self.timeout,
+        )
+        if response.status_code != 200:
+            raise DemoError(f"Plot check returned HTTP {response.status_code}")
+        raw = response.json()
+        try:
+            payload = json.loads(interaction_text(raw))
+        except (ValueError, TypeError) as exc:
+            raise DemoError("Plot check returned invalid structured output") from exc
+        if not isinstance(payload, dict) or set(payload) != set(FAITHFULNESS_SCHEMA["required"]):
+            raise DemoError("Plot check returned missing or extra fields")
+        verdict = payload["verdict"]
+        score = payload["support_score"]
+        explanation = payload["explanation"]
+        claims = payload["unsupported_claims"]
+        if verdict not in {"SUPPORTED", "REVIEW", "UNSUPPORTED"}:
+            raise DemoError("Plot check returned an invalid verdict")
+        if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
+            raise DemoError("Plot check returned an invalid support score")
+        if not isinstance(explanation, str) or not explanation.strip():
+            raise DemoError("Plot check returned no explanation")
+        if not isinstance(claims, list) or any(not isinstance(x, str) for x in claims):
+            raise DemoError("Plot check returned invalid unsupported claims")
+        return {
+            "status": verdict.lower(),
+            "support_score": score,
+            "explanation": explanation.strip()[:600],
+            "unsupported_claims": [x.strip()[:300] for x in claims[:5] if x.strip()],
+            "model": self.model,
+            "standing": "automated_live_check_not_human_validated",
+        }
+
+
 class DemoService:
     def __init__(self, config_path: str | Path = "configs/demo.yaml"):
         cfg = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
@@ -127,6 +217,7 @@ class DemoService:
         # encoder avoids loading the same 471M model twice; no score changes.
         self.critic._encoder = self.researcher._encoder
         self.writer = LiveGemmaWriter(cfg["writer"])
+        self.faithfulness_judge = PlotFaithfulnessJudge(cfg["faithfulness"])
         self.reflector = Reflector(
             lambda **kw: self.writer.generate(**kw).text, arm="bn"
         )
@@ -164,6 +255,19 @@ class DemoService:
                     length_controlled=True,
                 )
                 attempts = [*result.state.trace, result.state.snapshot()]
+                try:
+                    faithfulness = self.faithfulness_judge.evaluate(
+                        plot=plot.strip(), response_text=result.emitted["draft"]
+                    )
+                except DemoError as exc:
+                    faithfulness = {
+                        "status": "check_failed",
+                        "support_score": None,
+                        "explanation": str(exc),
+                        "unsupported_claims": [],
+                        "model": self.faithfulness_judge.model,
+                        "standing": "automated_live_check_not_human_validated",
+                    }
                 outputs.append({
                     "target_level": level,
                     "final": result.emitted,
@@ -172,10 +276,7 @@ class DemoService:
                     "writer_calls": result.writer_calls,
                     "reflector_calls": result.reflector_calls,
                     "llm_calls": result.llm_calls,
-                    "faithfulness": {
-                        "status": "not_independently_validated",
-                        "automated_claim": False,
-                    },
+                    "faithfulness": faithfulness,
                 })
         return {
             "request_id": request_id,

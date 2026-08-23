@@ -19,8 +19,13 @@ writer:
   thinking_level: minimal
   max_output_tokens: 80
   request_timeout_seconds: 120
+faithfulness:
+  model: gemma-4-31b-it
+  seed: 42
+  thinking_level: minimal
+  max_output_tokens: 220
+  request_timeout_seconds: 120
 privacy:
   persist_user_plots: false
   persist_live_calls: false
   in_memory_idempotency_entries: 128
-

@@ -5053,8 +5053,9 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
   decision is available. The Docker image and split frontend/API configuration
   are ready, but local completion is not represented as public deployment.
 - The draft plot-faithfulness audit must remain unscored until its sampling and
-  human rubric are registered. The interface labels hallucination/faithfulness as
-  unvalidated and makes no automated factuality claim.
+  human rubric are registered. At this initial build the interface made no
+  automated factuality claim; `S8.demo.faithfulness` later adds only an explicitly
+  non-validated operational triage check, not a thesis metric.
 - Human evaluation continues independently in the three frozen HTML instruments;
   this demo neither writes nor reads annotator response files.
 
@@ -5062,3 +5063,51 @@ post-run scripts/configuration and `notebooks/s5_bn_postrun_kaggle.ipynb`
 - New interface/hallucination-audit literature is recorded in
   `docs/related_work.md` and `docs/references.bib`; no citation turns the live
   smoke test into scientific evidence.
+
+---
+
+## 2026-08-23 -- S8.demo.faithfulness: Focused interface and source-grounded plot check
+**Feeds:** Phase 8 demo and defence
+**Commit:** `a5b53d2bd1b50325437d7d8e86b4f6f30ee44dde-dirty`
+**Artifacts:** `src/demo/service.py`, `interface/app/page.tsx`, `interface/app/research/page.tsx`, `configs/demo.yaml`
+
+### Numbers
+- Backend unit tests: **3 passed**.
+- Production frontend build: **2 routes** (`/`, `/research`), build complete.
+- Live generic source-supported smoke: `SUPPORTED`, support score **100**, zero
+  unsupported claims. This is transport/contract evidence, not a result.
+
+### Decisions made (and why)
+- The primary simulator now contains only plot entry, output selection, generated
+  comments, an inspectable plot-support verdict and an optional correction trace.
+  Pipeline walls, model disclosures and the frozen table moved to `/research`;
+  exposing all thesis detail in the primary task flow had obscured the task.
+- Plot checking is a separate `gemma-4-31b-it` structured call over only the
+  supplied plot and emitted response. It does not gate, edit or regenerate the
+  response, so it cannot silently change the registered live loop.
+- The UI reports `SUPPORTED`, `REVIEW`, or `UNSUPPORTED` plus explanation and
+  unsupported claims. A bare “faithfulness score” was rejected because the
+  recent literature shows automatic factuality metrics are not self-validating.
+
+### Findings (things we did not expect)
+- Consensus confirmed source-aware statement-level inspection as the useful
+  product pattern, but contradicted the idea that adding an automatic score alone
+  constitutes validation. The design therefore became triage with evidence,
+  explicitly not a human-validated metric.
+- The local Vinext server binds its frontend at `localhost` while refusing
+  `127.0.0.1`; this had already been corrected in the launcher readiness check
+  and did not affect the two-route build.
+
+### Consequences for downstream steps
+- The registered frozen-output human plot-faithfulness audit remains necessary;
+  live automated verdicts may not be copied into S5 results or used to claim a
+  validated hallucination rate.
+- Any defence demonstration should use the focused root route; `/research` is
+  opened only when an examiner asks about method, isolation or frozen evidence.
+- The additional hosted check consumes one Gemini request per emitted level and
+  must be counted operationally, though it is not a generation-loop call.
+
+### Citations needed
+- `papageorgiou2025agenticfaithfulness` and
+  `ramprasad2024factualitymetrics` are recorded in `docs/related_work.md` and
+  `docs/references.bib`. `zhu2024rageval` remains the metric-separation basis.
