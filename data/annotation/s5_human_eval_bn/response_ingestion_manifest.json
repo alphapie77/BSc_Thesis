@@ -1,0 +1,41 @@
+{
+  "standing": "validated human-evaluation inputs",
+  "received_date": "2026-08-23",
+  "registered_surface": {
+    "annotators": ["A", "B", "C"],
+    "items_per_annotator": 100,
+    "expected_judgments": 300,
+    "required_columns": ["annotator", "item_id", "response"]
+  },
+  "files": [
+    {
+      "filename": "s5_human_eval_A.csv",
+      "sha256": "a1743b0bd9e1b8a7d831c918febe4467c1b17ecaeb5ec117b85021f7a33e08d5",
+      "rows": 100,
+      "annotator": "A"
+    },
+    {
+      "filename": "s5_human_eval_B.csv",
+      "sha256": "cce84c38f9f35e31d459df688f5d98c0918c291c72193cb9732ba781188f80e2",
+      "rows": 100,
+      "annotator": "B"
+    },
+    {
+      "filename": "s5_human_eval_C.csv",
+      "sha256": "ab4e6e890cc4c1ddae8deaaf8d59a2f1dc94b455add4c099511cd7c8c97f10ac",
+      "rows": 100,
+      "annotator": "C"
+    }
+  ],
+  "ingestion_gate": {
+    "exact_registered_key_set": true,
+    "missing_keys": 0,
+    "extra_keys": 0,
+    "duplicate_annotator_item_keys": 0,
+    "non_binary_responses": 0,
+    "judgments_received": 300,
+    "download_and_repository_hashes_match": true,
+    "status": "PASS"
+  },
+  "privacy": "Only blinded annotator codes A/B/C are retained; identity and consent evidence remain outside Git."
+}
