@@ -45,10 +45,10 @@ revises its own answer without dependable external feedback [@b5; @b6]. These
 problems make evaluation part of the research question rather than a final
 reporting step.
 
-The study consequently adopts two restrictions. First, it treats generated
-responses as controlled textual artefacts, not predictions of what real viewers
-will say. Second, the evaluator used to guide revision is separated from the
-evaluator used to score final outcomes. This separation is necessary because
+The study consequently adopts two design principles. First, it treats generated
+responses as controlled textual artefacts rather than predictions of what real
+viewers will say. Second, the evaluator used to guide revision is separated from
+the evaluator used to score final outcomes. This separation is necessary because
 optimization against a visible evaluator can exploit its blind spots, a form
 of proxy gaming documented in evaluator stress tests [@b7]. The thesis asks
 whether this risk can be made observable in a controlled Bangla generation
@@ -72,8 +72,8 @@ The two levels are an operational cut through a continuum and are not claimed
 to be natural clusters or demographic audience types.
 
 Therefore, this thesis investigates whether a bounded neuro-symbolic
-multi-agent workflow can improve the controllability of human-recognizable
-engagement-specificity levels in short Bangla cinema responses and reveal
+multi-agent workflow can improve control of the human-recognizable
+engagement-specificity distinction in short Bangla cinema responses and reveal
 divergence between the in-loop and independent verifiers.
 
 ## 1.4 Research Aim and Objectives
@@ -86,49 +86,42 @@ The specific objectives are to:
 1. audit, clean, and partition the Bangla review corpus while testing whether
    apparent structure is explained by corpus region, sentiment, length, or a
    residual textual distinction;
-2. determine whether two independent native-Bangla annotators can recognize the resulting
-   engagement-specificity distinction under a comparative, length-matched
-   instrument;
+2. determine whether independent native-Bangla annotators can recognize the
+   resulting engagement-specificity distinction under a comparative,
+   length-matched instrument;
 3. develop two verifiers with disjoint data privileges, using Verifier-A for
    generation control and Verifier-B only for outcome scoring;
-4. implement a traceable Researcher--Writer--Critic--Reflector workflow with
+4. implement a traceable Researcher–Writer–Critic–Reflector workflow with
    R1-only retrieval, neural acceptance, symbolic diagnosis, and bounded
    revision; and
-5. evaluate nine registered alternatives against zero-shot generation using
-   target-level outcomes, computational cost, human judgment, diversity,
-   distributional diagnostics, and verifier-divergence analysis.
+5. evaluate the registered generation strategies against zero-shot generation
+   using paired target-level outcomes and computational diagnostics, while
+   separately assessing human recoverability and verifier divergence.
 
 ## 1.5 Research Questions
 
-The study addresses four research questions:
+This study addresses the following research questions:
 
-- **RQ1:** Can a meaningful response distinction be recovered from unlabeled
-  Bangla reviews and validated as stable and human-recognizable?
-- **RQ2:** To what extent do verifier-guided generation and the registered
-  prompting, retrieval-augmented generation, self-critique, external-judge,
-  and resampling conditions improve target-level controllability over
-  zero-shot generation in Bangla?
-- **RQ3:** Does adding symbolic validation improve on neural-only and
-  symbolic-only mechanisms?
-- **RQ4:** Does iteration against Verifier-A create measurable divergence from
-  an independent Verifier-B?
+- **RQ1:** Can a meaningful and human-recognizable response distinction be
+  derived from Bangla reviews without engagement-specificity labels?
+- **RQ2:** To what extent do the registered generation strategies improve
+  target-level controllability over zero-shot generation in Bangla?
+- **RQ3:** How does neural gating with symbolic diagnostic feedback compare
+  with neural-only and symbolic-only mechanisms?
+- **RQ4:** Does iterative optimization against Verifier-A produce measurable
+  divergence from the independent Verifier-B?
 
-These questions concern controllability and evaluation. They do not ask whether
-the system predicts audience reception, discovers audience segments, or
-forecasts commercial performance.
-
-RQ3 receives a bounded answer. Symbolic-only gating is evaluated within the
-registered design, and an exploratory paired comparison directly contrasts the
-hybrid and neural-only conditions. The comparison suggests a level-specific
-advantage but does not establish overall hybrid superiority.
+These questions concern the controllability and evaluation of generated
+responses. They do not address the prediction of real audience reception, the
+discovery of demographic audience segments, or commercial forecasting.
 
 ## 1.6 Overview of the Proposed Approach
 
-The research uses two Bangla resources for different purposes. The review
+The study uses two Bangla resources for distinct purposes. The review
 corpus supports data audit, construct development, retrieval, and verifier
 training. A separate set of 120 Bangla Wikipedia film synopses supplies
 generation stimuli. The plot and review resources are not merged into
-film--review pairs because the review corpus contains no movie-title field.
+film–review pairs because the review corpus contains no movie-title field.
 
 After cleaning and near-duplicate control, 4,625 reviews form the frozen split
 surface. Gold-300 is reserved for human evaluation, R1 supplies retrieval and
@@ -140,11 +133,12 @@ the retained distinction is perceptible and whether its direction corresponds
 to engagement specificity.
 
 The generation framework follows a bounded
-Researcher--Writer--Critic--Reflector sequence. It retrieves same-level examples
-from the R1-only index following the general retrieval-augmented generation
-principle [@b8], generates a candidate, applies Verifier-A and deterministic
-symbolic diagnostics, and converts computed failures into revision guidance.
-The workflow permits at most three Writer attempts and retains the attempt-level
+Researcher–Writer–Critic–Reflector sequence. The Researcher retrieves
+same-level examples from the R1-only index following the general
+retrieval-augmented generation principle [@b8]. The Writer generates a
+candidate, the Critic applies Verifier-A and deterministic symbolic diagnostics,
+and the Reflector converts detected failures into revision guidance. The
+workflow permits at most three Writer attempts and retains an attempt-level
 trace.
 
 Thirty development plots are used for prompt, threshold, and retry-policy work.
@@ -160,48 +154,37 @@ two-annotator construct-validation study.
 
 ## 1.7 Scope and Limitations
 
-The thesis concerns short Bangla cinema responses generated at a requested
-engagement-specificity level. It does not model named individuals,
-demographics, psychological profiles, or naturally occurring audience
-segments. Because authentic reviews cannot be linked to the plot stimuli, the
-study cannot validate film-specific audience realism or individual preference.
-Generated responses are therefore research artefacts for controlled
-exploration, not substitutes for audience research.
+This thesis focuses on the controlled generation of short Bangla cinema
+responses at two engagement-specificity levels. The generated responses are
+treated as research artefacts rather than predictions of real audience
+behaviour.
 
-The submitted experiment addresses the Bangla arm of the registered design.
-Its three generation seeds are paired sensitivity blocks rather than
-independent replications. Human evaluation establishes recovery of the
-requested level on a balanced subset; it does not establish general quality,
-naturalness, factual support, or audience preference. Verifier-B is an isolated
-outcome proxy, not human ground truth, and improvement in its calibration was
-not established on the available development sample.
+The principal limitations are:
+
+- the source reviews cannot be linked to individual films or audience groups;
+- the empirical evaluation covers only Bangla cinema responses;
+- the three generation seeds provide paired sensitivity blocks rather than
+  independent replications;
+- human evaluation measures target-level recoverability, not general quality,
+  naturalness, factual support, or audience preference; and
+- Verifier-B is an isolated outcome proxy rather than human ground truth, and
+  its calibration improvement was not established.
+
+These limitations are examined in detail in Chapter 7.
 
 ## 1.8 Contributions
 
-The thesis makes six bounded contributions:
+This thesis makes five principal contributions:
 
-1. **A human-validated Bangla response construct.** It replaces the rejected
-   persona interpretation with two operational levels on an
-   engagement-specificity continuum while retaining the negative
-   clusterability evidence and the failed first human instrument.
-2. **A dual-verifier isolation protocol.** Verifier-A controls generation from
-   R1, whereas the cross-family Verifier-B is trained on disjoint R2 data and is
-   prohibited from entering the loop.
-3. **A bounded and auditable generation workflow.** The
-   Researcher--Writer--Critic--Reflector design combines R1-only retrieval,
-   neural acceptance, deterministic symbolic diagnosis, explicit stopping
-   rules, and persistent attempt traces.
-4. **A controlled evaluation protocol.** Ten conditions are evaluated on the
-   same plots and paired seeds with explicit computational accounting,
-   including prompting, retrieval, self-critique, external judging, and
-   compute-matched resampling controls.
-5. **An observable proxy-divergence diagnostic.** Same-case transitions compare
-   the in-loop and outcome verifiers, revealing when both scores improve but
-   the visible scorer improves more.
-6. **A measured separation of symbolic diagnosis from adjudication.** The
-   symbolic component identifies failed rules and supports revision, but the
-   held-out weight study does not establish independent predictive value, so it
-   is not used to decide acceptance.
+1. A human-validated engagement-specificity construct for short Bangla cinema
+   responses.
+2. A dual-verifier protocol that separates generation control from outcome
+   evaluation through disjoint data access.
+3. A bounded and auditable neuro-symbolic multi-agent generation framework.
+4. A paired comparative evaluation across ten generation conditions, supported
+   by blinded human assessment.
+5. An empirical analysis of verifier divergence and the diagnostic role of
+   symbolic feedback.
 
 Together, these contributions concern controllability, evaluator isolation,
 and auditability. They do not establish that the framework predicts real
@@ -218,6 +201,7 @@ analysis, and human validation. Chapter 4 develops and evaluates Verifier-A and
 Verifier-B and documents their isolation. Chapter 5 presents the proposed
 workflow, experimental conditions, and development-stage threshold analysis.
 Chapter 6 reports the main experiment, paired comparisons, human evaluation,
-and verifier-divergence results. Chapter 7 interprets the findings and discusses
-validity threats and ethical boundaries. The planned Chapter 8 will summarize
-the conclusions, contributions, limitations, and directions for future work.
+and verifier-divergence results. Chapter 7 interprets the findings and examines
+validity threats, ethical boundaries, and practical implications. Chapter 8
+concludes the thesis by summarizing its findings, contributions, limitations,
+and directions for future research.
