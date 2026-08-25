@@ -1,0 +1,20 @@
+# Exploratory post-hoc S5 contrast. This never enters the nine-comparison
+# confirmatory family and does not authorize a generation or scoring rerun.
+step: S5.posthoc.hybrid_vs_neural.bn
+seed: 42
+
+input:
+  verifier_b_scores_jsonl: results/s5_main_bn_verifier_b_scores.jsonl
+
+contrast:
+  treatment: rag_neural_symbolic_feedback
+  comparator: rag_neural_loop
+  estimand: paired_mean_verifier_b_target_probability_delta
+
+statistics:
+  bootstrap_resamples: 10000
+  confidence_level: 0.95
+  binary_success_threshold: 0.5
+
+output:
+  result_json: results/s5_posthoc_hybrid_vs_neural_bn_v1.json
