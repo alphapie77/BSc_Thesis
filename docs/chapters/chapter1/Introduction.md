@@ -71,12 +71,10 @@ engages with a specific event, character, relationship, or narrative element.
 The two levels are an operational cut through a continuum and are not claimed
 to be natural clusters or demographic audience types.
 
-The central research problem is therefore stated as follows:
-
-> Can a bounded neuro-symbolic multi-agent workflow improve control of a
-> human-recognizable engagement-specificity level over zero-shot generation in
-> short Bangla cinema responses, while enabling comparison with registered
-> controls and making verifier-induced proxy divergence observable?
+Therefore, this thesis investigates whether a bounded neuro-symbolic
+multi-agent workflow can improve the controllability of human-recognizable
+engagement-specificity levels in short Bangla cinema responses and reveal
+divergence between the in-loop and independent verifiers.
 
 ## 1.4 Research Aim and Objectives
 
