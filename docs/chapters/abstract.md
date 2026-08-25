@@ -1,0 +1,42 @@
+# Abstract
+
+Pre-release film development has no access to authentic audience commentary,
+while unconstrained language-model generation cannot guarantee that a requested
+response style is actually realized. This thesis develops and evaluates a
+neuro-symbolic, verifier-in-the-loop framework for controlled Bangla
+cinema-response generation. Its objectives are to establish a
+human-recognizable response construct, generate against it through a bounded and
+auditable workflow, evaluate outputs with a scorer unavailable to that workflow,
+and compare the mechanism with nine registered alternatives on target-level
+outcome, computational cost, and human judgment.
+
+A 5,000-row Bangla review corpus is audited and reduced to a frozen 4,625-row
+analysis surface. Full-corpus structure recovers a corpus-region/style signature
+at 93.3% accuracy rather than audience identity; consequently, no discrete
+persona claim is made. Analysis instead uses a two-level cut through an
+engagement-specificity continuum. In length-matched comparative judgments, two
+annotators blinded to the partition recover this distinction at 0.780 and 0.840
+against a 0.25 chance rate. The framework coordinates a Researcher, Writer,
+Critic, and Reflector. Retrieval is restricted to the R1 partition; a frozen
+LaBSE logistic probe serves as in-loop Verifier-A; symbolic rules provide
+diagnostic feedback but do not adjudicate acceptance; and a BanglaBERT verifier
+trained on disjoint R2 data serves only as outcome Verifier-B.
+
+The completed experiment contains 5,400 outputs across 90 held-out plots, two
+requested levels, ten conditions, and three paired generation seeds. All nine
+registered alternatives increase Verifier-B target probability over zero-shot
+at Benjamini--Hochberg adjusted q = 0.0002. Neural gating with symbolic feedback
+has the largest registered zero-shot effect, +0.2570 with a 95% paired-bootstrap
+interval of [0.2151, 0.2987], although no registered active-versus-active
+contrast establishes superiority over neural-only gating. On identical
+continuing cases under neural gating, a first revision raises both Verifier-A
+(+0.4835) and Verifier-B (+0.3006), but widens their gap by +0.1828, exposing
+proxy divergence that a single evaluator would conceal. On a frozen balanced
+100-item subset, three annotators blinded to condition, model, and requested
+level recover the target level with pooled accuracy 0.9133 (95% interval
+[0.8667, 0.9567]) and nominal Krippendorff alpha 0.8405.
+
+The findings support auditable and humanly recoverable control of Bangla
+response style. They do not establish audience prediction, discrete audience
+segments, film-level realism, or box-office forecasting.
+
