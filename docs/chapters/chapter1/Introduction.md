@@ -193,15 +193,12 @@ single-model alternative.
 
 ## 1.9 Organization of the Thesis
 
-Chapter 2 reviews synthetic audiences, controllable generation,
-self-correction, retrieval, neuro-symbolic diagnosis, evaluator gaming, Bangla
-NLP, and human evaluation, and then states the research gap. Chapter 3 describes
-the review and plot resources, corpus audit, frozen data split, construct
-analysis, and human validation. Chapter 4 develops and evaluates Verifier-A and
-Verifier-B and documents their isolation. Chapter 5 presents the proposed
-workflow, experimental conditions, and development-stage threshold analysis.
-Chapter 6 reports the main experiment, paired comparisons, human evaluation,
-and verifier-divergence results. Chapter 7 interprets the findings and examines
-validity threats, ethical boundaries, and practical implications. Chapter 8
-concludes the thesis by summarizing its findings, contributions, limitations,
-and directions for future research.
+The remainder of this thesis is organized as follows. Chapter 2 reviews the
+relevant literature and establishes the research gap. Chapter 3 describes the
+data, preprocessing, construct development, and human validation. Chapter 4
+presents the development and evaluation of the two verifiers. Chapter 5
+describes the proposed neuro-symbolic multi-agent framework and experimental
+design. Chapter 6 reports the experimental and human-evaluation results.
+Chapter 7 discusses the findings, validity threats, ethical considerations, and
+practical implications. Finally, Chapter 8 summarizes the conclusions,
+contributions, limitations, and directions for future research.
