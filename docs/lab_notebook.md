@@ -5870,3 +5870,59 @@ Verification: `tests/test_demo.py` passed 4/4; Vinext production build passed;
 PowerShell parsing passed; `/api/ready` returned `backend_initialized=true`,
 `verifier_b_loaded=false`, and collection `r1_regionA_k2`. No Gemini request and
 no scientific generation rerun occurred.
+
+---
+
+## 2026-08-25 -- S5.posthoc-RQ3: Exploratory hybrid versus neural-only contrast
+**Feeds:** Chapter 6 RQ3; Chapter 7 limitations
+**Commit:** `743d53ed45166c66a846fc5bccbbd53284d0ef90`
+**Artifacts:** `results/s5_posthoc_hybrid_vs_neural_bn_v1.json`
+
+### Numbers
+- `results/s5_posthoc_hybrid_vs_neural_bn_v1.json`
+  - `status` = EXPLORATORY_POSTHOC_COMPLETE
+  - `scientific_standing` = post_hoc_exploratory_not_in_confirmatory_family
+  - `selection_disclosure` = The direct contrast was added after the registered nine-vs-zero-shot results were known and after the hybrid condition was observed to have the largest zero-shot effect.
+  - `interpretation_rule` = Report effect, compute delta, and selection caveat together. Do not use the naive interval or unadjusted p-values as confirmatory evidence of hybrid superiority.
+  - `treatment` = rag_neural_symbolic_feedback
+  - `comparator` = rag_neural_loop
+  - `pairing_unit` = plot_id x target_level x replicate_seed
+  - `input` = {'path': 'results/s5_main_bn_verifier_b_scores.jsonl', 'sha256': '0a7de4b67fe41186d291cc15578401c21df4ae8fe378cf21c0f1c52385ca23f4', 'n_frozen_scores': 5400, 'generation_rerun': False, 'verifier_b_rescoring': False}
+
+### Decisions made (and why)
+- A direct frozen-pair contrast was added because RQ3 asks for the incremental
+  value of symbolic feedback and the existing nine-versus-zero-shot family
+  cannot answer that comparison. The original confirmatory family was left
+  unchanged because the contrast was selected after its treatment's favorable
+  zero-shot result was known.
+- The analysis reports paired Verifier-B target probability, binary target
+  accuracy, generator calls, and generator tokens, both overall and by target
+  level. Effect sizes and level heterogeneity are primary; the naive interval
+  and unadjusted p-values are descriptive after selection.
+- The frozen 540 exact pairs were reused. No text was regenerated and
+  Verifier-B was not rerun, preventing a new stochastic or scoring surface from
+  entering the comparison.
+
+### Findings (things we did not expect)
+- Overall target probability is 0.02159 higher for hybrid than neural-only; the
+  naive post-selection 95% interval is [0.00082, 0.04310]. Binary target
+  accuracy is only 0.02037 higher (26 hybrid-only successes versus 15
+  neural-only successes), with McNemar p=0.11728.
+- The probability difference is localized to Level 0 (+0.04328; naive interval
+  [0.00589, 0.08096]). Level 1 is effectively null (-0.00009). The hybrid also
+  uses 0.033 fewer generator calls and 8.54 fewer generator tokens per case on
+  average, but these are descriptive compute deltas rather than a composite
+  efficiency claim.
+
+### Consequences for downstream steps
+- Chapter 6 and Chapter 7 must report this as an explicitly post-hoc result and
+  retain the protocol deviation dated 2026-08-25. RQ3 remains mixed rather than
+  confirmed: the exploratory scorer-probability signal motivates a future
+  preregistered test, while the binary outcome and Level-1 result do not support
+  a general hybrid-superiority claim.
+- The abstract headline and the registered nine-comparison table do not change.
+  No downstream generation, Verifier-B scoring, or threshold tuning is needed.
+
+### Citations needed
+- None newly required. The analysis reuses the already documented paired
+  bootstrap and exact McNemar procedures; it introduces no new estimator.

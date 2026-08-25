@@ -292,9 +292,13 @@ level rather than as film-level audience prediction.
   The claim is controllability, not audience prediction.
 - **RQ3:** Mixed and narrowed. Symbolic-only gating is weak and costly, while
   symbolic diagnostics combined with a neural gate produce the largest
-  registered effect over zero-shot. A direct registered neural-plus-symbolic
-  versus neural-only inferential contrast is absent, so superiority of the
-  hybrid cannot be claimed.
+  registered effect over zero-shot. In an explicitly post-hoc comparison over
+  540 frozen pairs, hybrid minus neural-only is +0.02159 in Verifier-B target
+  probability but only +0.02037 in binary accuracy (exact McNemar p=0.11728).
+  The probability difference occurs at Level 0 (+0.04328), while Level 1 is
+  null (-0.00009). Because the contrast was selected after inspecting the
+  registered results, it is exploratory and does not establish hybrid
+  superiority.
 - **RQ4:** Supported as a diagnostic finding. Same-case A–B gaps widen across
   neural-loop revisions, consistent with overoptimization against the in-loop
   verifier. The result is bounded by failure selection and Verifier-B's

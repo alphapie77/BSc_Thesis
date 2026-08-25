@@ -1,0 +1,73 @@
+{
+  "_provenance": {
+    "timestamp_utc": "2026-08-25T16:20:44.163255+00:00",
+    "git_commit": "743d53ed45166c66a846fc5bccbbd53284d0ef90",
+    "untracked_files": 0,
+    "config": "configs/s5_posthoc_hybrid_vs_neural_bn.yaml",
+    "python": "3.13.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "result": {
+    "status": "EXPLORATORY_POSTHOC_COMPLETE",
+    "scientific_standing": "post_hoc_exploratory_not_in_confirmatory_family",
+    "selection_disclosure": "The direct contrast was added after the registered nine-vs-zero-shot results were known and after the hybrid condition was observed to have the largest zero-shot effect.",
+    "interpretation_rule": "Report effect, compute delta, and selection caveat together. Do not use the naive interval or unadjusted p-values as confirmatory evidence of hybrid superiority.",
+    "treatment": "rag_neural_symbolic_feedback",
+    "comparator": "rag_neural_loop",
+    "pairing_unit": "plot_id x target_level x replicate_seed",
+    "overall": {
+      "n_pairs": 540,
+      "verifier_b_target_probability_delta": 0.021591719044008566,
+      "naive_post_selection_ci_95": [
+        0.0008205648237281307,
+        0.043100377497444595
+      ],
+      "descriptive_unadjusted_bootstrap_p": 0.0425957404259574,
+      "treatment_only_binary_success": 26,
+      "comparator_only_binary_success": 15,
+      "descriptive_unadjusted_mcnemar_p": 0.11727520595741225,
+      "binary_accuracy_delta": 0.020370370370370372,
+      "mean_generator_calls_delta": -0.03333333333333333,
+      "mean_generator_tokens_delta": -8.542592592592593
+    },
+    "by_target_level": {
+      "0": {
+        "n_pairs": 270,
+        "verifier_b_target_probability_delta": 0.04327775013165898,
+        "naive_post_selection_ci_95": [
+          0.005888007625888524,
+          0.08095942821402197
+        ],
+        "descriptive_unadjusted_bootstrap_p": 0.023797620237976203,
+        "treatment_only_binary_success": 22,
+        "comparator_only_binary_success": 10,
+        "descriptive_unadjusted_mcnemar_p": 0.050102459732443094,
+        "binary_accuracy_delta": 0.044444444444444446,
+        "mean_generator_calls_delta": -0.014814814814814815,
+        "mean_generator_tokens_delta": -1.211111111111111
+      },
+      "1": {
+        "n_pairs": 270,
+        "verifier_b_target_probability_delta": -9.431204364184003e-05,
+        "naive_post_selection_ci_95": [
+          -0.019299883281292635,
+          0.01941815498163906
+        ],
+        "descriptive_unadjusted_bootstrap_p": 0.9875012498750125,
+        "treatment_only_binary_success": 4,
+        "comparator_only_binary_success": 5,
+        "descriptive_unadjusted_mcnemar_p": 1.0,
+        "binary_accuracy_delta": -0.003703703703703704,
+        "mean_generator_calls_delta": -0.05185185185185185,
+        "mean_generator_tokens_delta": -15.874074074074073
+      }
+    },
+    "input": {
+      "path": "results/s5_main_bn_verifier_b_scores.jsonl",
+      "sha256": "0a7de4b67fe41186d291cc15578401c21df4ae8fe378cf21c0f1c52385ca23f4",
+      "n_frozen_scores": 5400,
+      "generation_rerun": false,
+      "verifier_b_rescoring": false
+    }
+  }
+}

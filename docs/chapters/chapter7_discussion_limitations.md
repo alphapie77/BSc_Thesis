@@ -83,12 +83,16 @@ acceptance mechanism. This interpretation matches the system design: the neural
 model supplies a learned decision signal, while symbolic rules name observable
 failure modes for the Reflector.
 
-However, neural-plus-symbolic and neural-only were not directly contrasted in
-the frozen inferential family. Their descriptive difference cannot be upgraded
-after inspection into a confirmatory hybrid-superiority claim. The defensible
-conclusion is therefore that the combined condition performs strongly and that
-symbolic-only gating is inadequate; the incremental causal value of symbolic
-feedback remains unresolved.
+Neural-plus-symbolic and neural-only were not directly contrasted in the frozen
+inferential family. A later, explicitly post-hoc analysis of the 540 frozen
+pairs finds a +0.02159 target-probability difference, but only a +0.02037 binary
+accuracy difference (exact McNemar p=0.11728); moreover, the probability signal
+is confined to Level 0 while Level 1 is null. Because this comparison was
+selected after the hybrid condition's favorable zero-shot result was known, its
+interval and p-values are naive after selection. The defensible conclusion is
+therefore that the combined condition performs strongly and merits a future
+preregistered direct test, while symbolic-only gating is inadequate and general
+hybrid superiority remains unestablished.
 
 ### 7.2.4 RQ4: verifier overoptimization
 
@@ -190,10 +194,10 @@ the length-matched sensitivity cells vary from 9 to 80 pairs, making their
 accuracies unstable and selection-dependent.
 
 The registered inferential family omits direct comparisons among active systems.
-In particular, neural-plus-symbolic feedback cannot be declared significantly
-better than neural-only from their two zero-shot contrasts. Adding that test now
-would be post-hoc. The thesis reports the descriptive ordering and leaves the
-incremental comparison to a future preregistered study.
+The later hybrid-versus-neural-only contrast is reported only as a post-hoc
+diagnostic, with its selection disclosure and level heterogeneity. It cannot be
+promoted into the confirmatory family; a preregistered replication is required
+before claiming the incremental superiority of symbolic feedback.
 
 ## 7.7 Measurement limitations
 

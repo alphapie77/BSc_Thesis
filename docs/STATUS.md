@@ -1,16 +1,15 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-25 (**An explicitly post-hoc RQ3 contrast is now
-registered but NOT YET RUN: `rag_neural_symbolic_feedback` versus
-`rag_neural_loop` on the frozen 540 exact plot × level × seed pairs. The
-registered nine-condition-versus-zero-shot family is unchanged. The new
-analysis will report Verifier-B probability, binary-accuracy, generator-call
-and token deltas overall and per level, with a selection disclosure because it
-was added after the hybrid condition was observed to have the largest
-zero-shot effect. Its interval is labelled naive after selection and its
-p-values descriptive/unadjusted; no confirmatory hybrid-superiority claim is
-licensed. Five focused tests pass; no generation or Verifier-B scoring is
-authorized.**) (**The separate local Phase-8 interface now has a
+**Last updated:** 2026-08-25 (**The explicitly post-hoc RQ3 contrast is
+COMPLETE on 540 frozen exact pairs: `rag_neural_symbolic_feedback` minus
+`rag_neural_loop` is +0.02159 in Verifier-B target probability (naive
+post-selection 95% CI [0.00082, 0.04310]) and +0.02037 in binary target
+accuracy (26 versus 15 discordant successes; exact McNemar p=0.11728). The
+probability difference is localized to Level 0 (+0.04328); Level 1 is null
+(-0.00009). Hybrid averages 0.033 fewer generator calls and 8.54 fewer tokens.
+This is exploratory, outside the unchanged nine-comparison confirmatory
+family, and does not license hybrid-superiority. No generation or Verifier-B
+rescoring occurred.**) (**The separate local Phase-8 interface now has a
 full artifact-readiness gate, repository-local frontend startup, offline cached
 LaBSE loading, honest hosted-seed disclosure, bounded-agent wording, and
 per-attempt R1 evidence traces; four focused tests and a production build pass.
