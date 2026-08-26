@@ -1,4 +1,4 @@
-# Chapter 6 — Experimental Results and Analysis
+# Chapter 6 — Experimental Setup, Results, and Analysis
 
 This chapter reports the completed Bangla generation experiment. It fixes the
 experimental units, the outcome measures and the inferential family before any
@@ -10,7 +10,7 @@ sections, because they answer different questions and do not carry equal
 evidential weight. Values are quoted from the audited Phase-5 artifacts;
 rounding in the tables is presentational and introduces no new analysis.
 
-## 6.1 Experimental Design and Inferential Framework
+## 6.1 Experimental design, outcomes, and the frozen inferential family
 
 The experiment tests whether progressively stronger generation controls make
 short Bangla cinema responses conform more reliably to a requested
@@ -32,7 +32,7 @@ as three independent studies, no best seed is selected, and no result is reporte
 for a single seed except where a rule-selected illustration is explicitly labelled
 as such in Section 6.9. The execution contract that produced the surface — the
 frozen Writer, its quantization and decoding parameters, seed handling, and the
-ingestion gates applied before any model loaded — is specified in Section 5.7
+ingestion gates applied before any model loaded — is specified in Section 5.10
 and is not restated here.
 
 The ten conditions and their intervention contracts are defined in Table 5.6.
@@ -49,7 +49,7 @@ interpretable rather than circular.
 
 For a generated response $y$ and a requested level $l$, the primary outcome is
 the Verifier-B target probability $p_B(l \mid y)$, with binary target match
-taken at its registered 0.5 decision point. Accounted logical generation calls
+taken at its registered 0.5 decision point. Realized logical generation calls
 and tokens, the gave-up rate, lexical diversity, length and feature-space
 realism, and blinded human target match provide complementary evidence on
 questions the primary outcome does not answer.
@@ -66,8 +66,9 @@ contrast was registered. It does not authorize selecting a best seed. And it doe
 not authorize promoting a comparison chosen after the results were seen into the
 confirmatory family.
 
-Two analyses outside this family are reported with their exploratory standing
-made explicit. Section 6.4 reports a contrast between
+Two such post-hoc comparisons are nevertheless reported in this chapter, because
+suppressing an informative analysis is not the same as protecting the
+registration. Section 6.4 reports an exploratory contrast between
 neural-plus-symbolic feedback and the neural-only loop, and Section 6.6 reports a
 same-item comparison between Verifier-B and the blinded human panel. Both were
 specified and run after the registered results were known; both are labelled
@@ -75,10 +76,12 @@ exploratory at the point of use; their p-values are unadjusted and
 post-selection; and neither revises a registered number. Verifier-B on all 5,400
 cases remains the primary outcome throughout.
 
-The scope of the experiment and all claims in this chapter is Bangla response
-generation.
+Finally, the scope of the chapter is the Bangla arm. The English mirror described
+in the pipeline was not completed and is carried as future work rather than
+reported here, and nothing in this chapter is a joint or transfer result across
+the two languages.
 
-## 6.2 Run Integrity
+## 6.2 Integrity of the completed run
 
 The final archive contains exactly 5,400 unique registered case keys. There are
 no missing, extra, or duplicate cases, and all 5,400 outputs received a separate
@@ -97,73 +100,37 @@ check that the exploratory sections and the registered sections are reading the
 same bytes, which is the property that makes an exploratory addition auditable
 rather than merely disclosed.
 
-## 6.3 Comparative Results Across Experimental Conditions
+## 6.3 Main ablation results
 
 Table 6.1 reports the complete 20-cell Bangla result. Mean target probability
-and binary accuracy are both computed by Verifier-B. Accounted call and token counts
-include all same-model Writer, Reflector and critique calls charged to a
-condition; token totals include prompt and completion tokens. They should be
-read together with outcome quality rather than as independent quality metrics.
+and binary accuracy are both computed by Verifier-B. Calls and token counts are
+realized logical generation costs; they should be read together with outcome
+quality rather than as independent quality metrics.
 
-**Table 6.1. Verifier-B outcomes and accounted local-generation cost**
+**Table 6.1. Verifier-B outcomes and realized generation cost**
 
-**Panel A. Verifier-B outcomes**
-
-| Condition | Level | n | Mean target probability | Binary accuracy |
-|---|---:|---:|---:|---:|
-| Zero-shot | 0 | 270 | 0.3513 | 0.3296 |
-| Zero-shot | 1 | 270 | 0.7794 | 0.8074 |
-| Static few-shot | 0 | 270 | 0.6109 | 0.6037 |
-| Static few-shot | 1 | 270 | 0.8100 | 0.8407 |
-| RAG-only | 0 | 270 | 0.5314 | 0.5185 |
-| RAG-only | 1 | 270 | 0.8358 | 0.8704 |
-| RAG + neural loop | 0 | 270 | 0.6890 | 0.6889 |
-| RAG + neural loop | 1 | 270 | 0.9124 | 0.9630 |
-| RAG + symbolic loop | 0 | 270 | 0.5314 | 0.5185 |
-| RAG + symbolic loop | 1 | 270 | 0.8176 | 0.8519 |
-| RAG + neural + symbolic feedback | 0 | 270 | 0.7323 | 0.7333 |
-| RAG + neural + symbolic feedback | 1 | 270 | 0.9123 | 0.9593 |
-| Intrinsic self-critique | 0 | 270 | 0.6791 | 0.6815 |
-| Intrinsic self-critique | 1 | 270 | 0.8809 | 0.9222 |
-| External-role self-critique | 0 | 270 | 0.6109 | 0.6111 |
-| External-role self-critique | 1 | 270 | 0.8806 | 0.9222 |
-| Gemma-4 judge loop | 0 | 270 | 0.6286 | 0.6296 |
-| Gemma-4 judge loop | 1 | 270 | 0.8450 | 0.8815 |
-| Blind resampling | 0 | 270 | 0.6485 | 0.6444 |
-| Blind resampling | 1 | 270 | 0.8995 | 0.9407 |
-
-**Panel B. Accounted local-generation cost and termination**
-
-| Condition | Level | Mean model calls | Mean total tokens | Exhausted rate |
-|---|---:|---:|---:|---:|
-| Zero-shot | 0 | 1.000 | 590.3 | 0.0000 |
-| Zero-shot | 1 | 1.000 | 601.4 | 0.0000 |
-| Static few-shot | 0 | 1.000 | 823.0 | 0.0000 |
-| Static few-shot | 1 | 1.000 | 766.1 | 0.0000 |
-| RAG-only | 0 | 1.000 | 955.1 | 0.0000 |
-| RAG-only | 1 | 1.000 | 840.8 | 0.0000 |
-| RAG + neural loop | 0 | 1.904 | 1511.5 | 0.0926 |
-| RAG + neural loop | 1 | 1.681 | 1231.2 | 0.0556 |
-| RAG + symbolic loop | 0 | 1.022 | 969.3 | 0.0000 |
-| RAG + symbolic loop | 1 | 3.630 | 2409.4 | 0.5333 |
-| RAG + neural + symbolic feedback | 0 | 1.889 | 1510.3 | 0.0630 |
-| RAG + neural + symbolic feedback | 1 | 1.630 | 1215.3 | 0.0593 |
-| Intrinsic self-critique | 0 | 3.000 | 3086.7 | 0.0000 |
-| Intrinsic self-critique | 1 | 3.000 | 2757.8 | 0.0000 |
-| External-role self-critique | 0 | 3.000 | 3085.4 | 0.0000 |
-| External-role self-critique | 1 | 3.000 | 2757.6 | 0.0000 |
-| Gemma-4 judge loop | 0 | 1.389 | 1339.2 | 0.0111 |
-| Gemma-4 judge loop | 1 | 1.033 | 869.2 | 0.0000 |
-| Blind resampling | 0 | 1.456 | 1385.5 | 0.0000 |
-| Blind resampling | 1 | 1.326 | 1115.3 | 0.0000 |
-
-*Note.* Mean total tokens include prompt and completion tokens from every local
-Writer, Reflector and critique call charged to the condition. Hosted-judge calls
-and tokens are excluded from both cost columns and reported separately in the
-run audit. For blind resampling, the columns report only the budget-admitted
-candidate prefix; all five candidates were physically generated once to form
-the frozen nested frontier. The exhausted rate applies only to conditions with
-a bounded acceptance loop.
+| Condition | Level | n | Mean target p | Accuracy | Mean calls | Mean tokens | Gave-up |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Zero-shot | 0 | 270 | 0.3513 | 0.3296 | 1.000 | 590.3 | 0.0000 |
+| Zero-shot | 1 | 270 | 0.7794 | 0.8074 | 1.000 | 601.4 | 0.0000 |
+| Static few-shot | 0 | 270 | 0.6109 | 0.6037 | 1.000 | 823.0 | 0.0000 |
+| Static few-shot | 1 | 270 | 0.8100 | 0.8407 | 1.000 | 766.1 | 0.0000 |
+| RAG-only | 0 | 270 | 0.5314 | 0.5185 | 1.000 | 955.1 | 0.0000 |
+| RAG-only | 1 | 270 | 0.8358 | 0.8704 | 1.000 | 840.8 | 0.0000 |
+| RAG + neural loop | 0 | 270 | 0.6890 | 0.6889 | 1.904 | 1511.5 | 0.0926 |
+| RAG + neural loop | 1 | 270 | 0.9124 | 0.9630 | 1.681 | 1231.2 | 0.0556 |
+| RAG + symbolic loop | 0 | 270 | 0.5314 | 0.5185 | 1.022 | 969.3 | 0.0000 |
+| RAG + symbolic loop | 1 | 270 | 0.8176 | 0.8519 | 3.630 | 2409.4 | 0.5333 |
+| RAG + neural + symbolic feedback | 0 | 270 | 0.7323 | 0.7333 | 1.889 | 1510.3 | 0.0630 |
+| RAG + neural + symbolic feedback | 1 | 270 | 0.9123 | 0.9593 | 1.630 | 1215.3 | 0.0593 |
+| Intrinsic self-critique | 0 | 270 | 0.6791 | 0.6815 | 3.000 | 3086.7 | 0.0000 |
+| Intrinsic self-critique | 1 | 270 | 0.8809 | 0.9222 | 3.000 | 2757.8 | 0.0000 |
+| External-role self-critique | 0 | 270 | 0.6109 | 0.6111 | 3.000 | 3085.4 | 0.0000 |
+| External-role self-critique | 1 | 270 | 0.8806 | 0.9222 | 3.000 | 2757.6 | 0.0000 |
+| Gemma-4 judge loop | 0 | 270 | 0.6286 | 0.6296 | 1.389 | 1339.2 | 0.0111 |
+| Gemma-4 judge loop | 1 | 270 | 0.8450 | 0.8815 | 1.033 | 869.2 | 0.0000 |
+| Blind resampling | 0 | 270 | 0.6485 | 0.6444 | 1.456 | 1385.5 | 0.0000 |
+| Blind resampling | 1 | 270 | 0.8995 | 0.9407 | 1.326 | 1115.3 | 0.0000 |
 
 The table contains a strong level asymmetry. Every condition performs better at
 Level 1 than Level 0 in binary accuracy. For example, zero-shot reaches 0.8074
@@ -172,13 +139,13 @@ this weakness substantially, reaching 0.9593 and 0.7333 respectively, but does
 not remove it. Consequently, a pooled score alone would hide an important part
 of the system's behaviour.
 
-The symbolic-only loop matches RAG-only at Level 0 (accuracy 0.5185), while its
-Level-1 accuracy declines from 0.8704 to 0.8519 and it exhausts the attempt
-budget on 53.33% of Level-1 cases. Symbolic diagnostics attached to the neural
-gate produce the highest descriptive Level-0 target probability and accuracy in
-Table 6.1. Because the registered family contains no neural-only versus
-neural-plus-symbolic contrast, this table does not establish that symbolic
-feedback caused the difference. Section 6.9 illustrates the mechanism behind the
+The symbolic-only loop is not a competitive control. Its Level-0 accuracy is
+identical to RAG-only (0.5185), while Level 1 declines from 0.8704 to 0.8519 and
+the condition gives up on 53.33% of Level-1 cases. In contrast, symbolic
+diagnostics attached to the neural gate produce the highest Level-0 target
+probability and accuracy in the main table. This supports the engineering role
+of symbolic rules as feedback descriptions, but does not by itself establish a
+standalone symbolic predictor. Section 6.9 exhibits the mechanism behind the
 symbolic loop's cost: because its best-of-three fallback is selected on the
 *gate* score, a draft that both verifiers scored highly can be discarded in
 favour of one that neither accepts.
@@ -190,11 +157,14 @@ external-role critique at Level 0 but is nearly identical at Level 1. Because
 the registered inferential family compares each row only with zero-shot, these
 descriptive differences must not be presented as tested pairwise superiority.
 
-### 6.3.1 Level-Wise Outcome Pattern
+### A hypothesis for the Level-0 deficit
 
-The largest pattern in Table 6.1 is the lower automatic performance at Level 0.
-Three additional measurements characterize a plausible measurement contribution
-to this asymmetry without treating it as an established cause.
+The asymmetry in Table 6.1 is the chapter's largest single pattern, and reporting
+it without a candidate explanation would leave the reader to supply the obvious
+one — that generating a generic reaction is intrinsically harder than generating
+a specific one. Three registered observations make a different explanation more
+likely, and they are stated here as a hypothesis with its own limits rather than
+as a finding.
 
 **In the corpus the two levels sit on the opposite side of length from the naive
 reading.** The region-A cut that defines the axis is length-entangled: length AUC
@@ -207,7 +177,7 @@ therefore has a length regularity available to it, and that regularity points
 *longer* for Level 0.
 
 **In generated text the polarity inverts.** Under the uniform 20-word prompt
-ceiling of Section 5.3.2, the registered development-plot diagnostic records mean
+ceiling of Section 5.4, the registered development-plot diagnostic records mean
 lengths of 11.47 words at Level 0 against 16.23 at Level 1, a level gap of
 −4.77 words where the corpus gap is +4.27. In the same file, a word count alone
 recovers the requested level at AUC 0.9111 under length control, and the verdict
@@ -219,9 +189,8 @@ from specificity in description evaluation is the reason this cannot be waved
 away as a nuisance parameter: length and specificity are entangled in the
 construct, not only in the estimator [@b81].
 
-**On identical items, the human panel has the same observed accuracy at both
-levels, whereas the automatic instrument has a large observed gap.** Section
-6.6 reports the comparison in full. On
+**On identical items, a human panel shows no level asymmetry where the automatic
+instrument shows a large one.** Section 6.6 reports the comparison in full. On
 the 100 blinded items, the human majority label matches the requested level for
 0.92 of items at Level 0 and 0.92 at Level 1, while Verifier-B matches 0.60 at
 Level 0 and 0.90 at Level 1.
@@ -240,11 +209,11 @@ reaches 0.4667 at Level 0 against 0.8000 at Level 1 — which is what the
 hypothesis would least like to see, although the slice conditions on a
 post-treatment variable and cannot settle the question either way. And 50 items
 per level under a forced binary choice bounds the human comparison rather than
-resolving it [@b36]. The hypothesis is therefore retained as one plausible
-account consistent with the registered evidence, not as an identified cause,
-and the registered numbers are left exactly as they stand.
+resolving it [@b36]. The hypothesis is therefore recorded as the most plausible
+account consistent with the registered evidence, and the registered numbers are
+left exactly as they stand.
 
-## 6.4 Preregistered Paired Comparisons and Exploratory Direct Contrast
+## 6.4 Planned paired comparisons
 
 All nine preregistered condition-versus-zero-shot comparisons have positive
 Verifier-B target-probability effects. Under the registered paired-testing
@@ -271,35 +240,19 @@ McNemar test instead, which is the quantity the registered binary test actually
 uses and which shows how one-sided each condition's disagreement with the
 baseline is.
 
-**Table 6.2. Paired condition comparisons: preregistered baseline family and exploratory direct contrast**
+**Table 6.2. Preregistered paired comparisons against zero-shot**
 
-**Panel A. Continuous Verifier-B outcome**
-
-| Condition | n pairs | Δ target probability | 95% paired-bootstrap CI | Bootstrap p = BH q |
-|---|---:|---:|---:|---:|
-| Static few-shot | 540 | +0.1451 | [0.1001, 0.1897] | 2/10001 |
-| RAG-only | 540 | +0.1182 | [0.0753, 0.1618] | 2/10001 |
-| RAG + neural loop | 540 | +0.2354 | [0.1934, 0.2772] | 2/10001 |
-| RAG + symbolic loop | 540 | +0.1091 | [0.0649, 0.1524] | 2/10001 |
-| RAG + neural + symbolic feedback | 540 | +0.2570 | [0.2151, 0.2987] | 2/10001 |
-| Intrinsic self-critique | 540 | +0.2147 | [0.1711, 0.2584] | 2/10001 |
-| External-role self-critique | 540 | +0.1804 | [0.1381, 0.2231] | 2/10001 |
-| Gemma-4 judge loop | 540 | +0.1715 | [0.1282, 0.2149] | 2/10001 |
-| Blind resampling | 540 | +0.2087 | [0.1664, 0.2510] | 2/10001 |
-
-**Panel B. Binary Verifier-B target match**
-
-| Condition | Condition-only success | Zero-shot-only success | Exact McNemar p |
-|---|---:|---:|---:|
-| Static few-shot | 137 | 54 | 1.66×10⁻⁹ |
-| RAG-only | 122 | 54 | 3.18×10⁻⁷ |
-| RAG + neural loop | 167 | 28 | 2.70×10⁻²⁵ |
-| RAG + symbolic loop | 121 | 58 | 2.86×10⁻⁶ |
-| RAG + neural + symbolic feedback | 176 | 26 | 1.46×10⁻²⁸ |
-| Intrinsic self-critique | 160 | 34 | 9.62×10⁻²¹ |
-| External-role self-critique | 146 | 39 | 9.51×10⁻¹⁶ |
-| Gemma-4 judge loop | 147 | 46 | 1.66×10⁻¹³ |
-| Blind resampling | 154 | 33 | 6.91×10⁻²⁰ |
+| Condition | n pairs | Δ target p | 95% CI | Bootstrap p = BH q | Discordant: condition only | Discordant: baseline only | McNemar p |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Static few-shot | 540 | +0.1451 | [0.1001, 0.1897] | 2/10001 | 137 | 54 | 1.66×10⁻⁹ |
+| RAG-only | 540 | +0.1182 | [0.0753, 0.1618] | 2/10001 | 122 | 54 | 3.18×10⁻⁷ |
+| RAG + neural loop | 540 | +0.2354 | [0.1934, 0.2772] | 2/10001 | 167 | 28 | 2.70×10⁻²⁵ |
+| RAG + symbolic loop | 540 | +0.1091 | [0.0649, 0.1524] | 2/10001 | 121 | 58 | 2.86×10⁻⁶ |
+| RAG + neural + symbolic feedback | 540 | +0.2570 | [0.2151, 0.2987] | 2/10001 | 176 | 26 | 1.46×10⁻²⁸ |
+| Intrinsic self-critique | 540 | +0.2147 | [0.1711, 0.2584] | 2/10001 | 160 | 34 | 9.62×10⁻²¹ |
+| External-role self-critique | 540 | +0.1804 | [0.1381, 0.2231] | 2/10001 | 146 | 39 | 9.51×10⁻¹⁶ |
+| Gemma-4 judge loop | 540 | +0.1715 | [0.1282, 0.2149] | 2/10001 | 147 | 46 | 1.66×10⁻¹³ |
+| Blind resampling | 540 | +0.2087 | [0.1664, 0.2510] | 2/10001 | 154 | 33 | 6.91×10⁻²⁰ |
 
 Values are rounded from `s5_main_bn_paired_statistics.csv`; the registered
 family contains no active-condition-versus-active-condition contrast. A
@@ -309,27 +262,6 @@ counts entering each McNemar test. Every condition wins more discordant pairs
 than it loses, and the two neural-gated loops are the most one-sided, at 167
 against 28 and 176 against 26.
 
-**Panel C. Exploratory neural-plus-symbolic minus neural-only contrast**
-
-| Outcome or cost measure | Paired estimate | Uncertainty or paired test | Evidential standing |
-|---|---:|---|---|
-| Verifier-B target probability | +0.02159 | Naive post-selection 95% CI [0.00082, 0.04310] | Concentrated at Level 0; exploratory |
-| Binary target accuracy | +0.02037 | 26 versus 15 discordant successes; exact McNemar *p*=0.11728 | Not statistically significant |
-| Generator calls | −0.033 | Descriptive paired mean | Exploratory cost difference |
-| Generator tokens | −8.54 | Descriptive paired mean | Exploratory cost difference |
-
-Panel C uses the same 540 frozen plot–level–seed pairs but lies outside the
-registered nine-comparison family. Its interval and test are unadjusted and
-post-selection; the panel does not establish hybrid superiority.
-
-![Paired Verifier-B effects relative to zero-shot](figures/paired_effects_vs_zero_shot.png)
-
-*Figure 6.1. Preregistered paired changes in Verifier-B target probability
-relative to zero-shot. Points show mean paired differences and whiskers show
-95% paired-bootstrap confidence intervals over 540 plot–level–seed pairs per
-condition. The figure summarizes the registered condition-versus-zero-shot
-family; it does not provide confirmatory active-condition rankings.*
-
 These comparisons answer the broad RQ2 question: every registered augmentation
 improves Verifier-B target probability over zero-shot on this Bangla surface.
 To address RQ3 directly, an exploratory paired comparison was conducted between
@@ -338,21 +270,20 @@ plot–level–seed pairs. The hybrid condition increases Verifier-B target
 probability by 0.02159 and binary target accuracy by 0.02037. The binary
 difference is not statistically significant (26 versus 15 discordant
 successes; exact McNemar p=0.11728). The probability difference is concentrated
-at Level 0 (+0.04328), whereas the Level-1 difference is approximately zero
+at Level 0 (+0.04328), whereas Level 1 shows no meaningful difference
 (-0.00009). The contrast was added after the registered results were known and
 after the hybrid condition had been observed to have the largest zero-shot
 effect, so it sits outside the confirmatory family, its p-value is unadjusted and
 post-selection, and its confidence interval is a naive post-selection interval.
-The observed probability pattern is level-specific, but the analysis does not
-establish either a level-specific causal advantage or overall hybrid
-superiority.
+The analysis therefore suggests a level-specific advantage but does not establish
+overall hybrid superiority.
 
-## 6.5 Verifier-in-the-Loop Dynamics and Proxy Divergence
+## 6.5 Verifier-in-the-loop dynamics and the Goodhart diagnostic
 
-![Attempt-wise verifier scores and same-case A-minus-B gap changes](figures/verifier_divergence_diagnostics.png)
+![Attempt-wise verifier scores and same-case A-minus-B gap changes](../../results/s5_main_bn_goodhart_figure.png)
 
-*Figure 6.2. Attempt dynamics and the A-minus-B verifier-divergence diagnostic.
-The first
+*Figure 6.1. Attempt dynamics and the A-minus-B Goodhart diagnostic, reproduced
+from the hash-manifested `results/s5_main_bn_goodhart_figure.png`. The first
 panel shows attempt-wise Verifier-A and Verifier-B means, whose later attempts
 are failure-selected by construction and therefore cannot be read as a learning
 curve. The second panel reports same-case adjacent changes in the A-minus-B gap,
@@ -371,10 +302,10 @@ revision is reward hacking. Later-attempt populations contain only previous
 failures, and Verifier-B's own calibration improvement was not established.
 Recent evaluator-stress-test work likewise treats proxy–true divergence and
 controlled perturbations as diagnostics rather than assuming the optimized
-evaluator remains valid [@b7]. The sealed outcome-scorer wall therefore
+evaluator remains valid [@b7]. The independent scorer wall therefore
 makes the failure visible; it does not make Verifier-B an infallible oracle.
 
-## 6.6 Blinded Human Validation of Requested Level
+## 6.6 Blinded human validation of requested level
 
 Three adult native-Bangla annotators independently rated the same frozen,
 balanced 100-item subset under blinded condition labels. The subset contains
@@ -398,21 +329,14 @@ universal cutoff [@b37].
 | Annotator C | 100 | 100 | 0.9000 | [0.8400, 0.9500] |
 | Pooled judgments | 100 | 300 | 0.9133 | [0.8667, 0.9567] |
 
-**Panel B. Panel-level agreement**
-
-| Agreement measure | Estimate | 95% item-bootstrap CI | Interpretation |
-|---|---:|---:|---|
-| Raw three-way agreement | 0.8800 | Not estimated | All three annotators selected the same level on 88 of 100 items |
-| Nominal Krippendorff alpha | 0.8405 | [0.7473, 0.9200] | Agreement beyond chance under the registered nominal coefficient |
-
 Across items, raw three-way agreement is 0.8800 and nominal Krippendorff
 alpha is 0.8405 with 95% item-bootstrap CI [0.7473, 0.9200]. Both target levels
 have identical pooled accuracy: 137/150, or 0.9133.
 
 Level balance is exact: both levels receive 137 correct judgments out of 150.
 Among the 50 items per level, five Level-0 and seven Level-1 items split 2-to-1;
-the remainder are unanimous. The observed result is therefore not concentrated
-in one requested level or one annotator.
+the remainder are unanimous. The result therefore does not arise from one
+easier requested level or one unusually permissive annotator.
 
 The human study validates a narrower claim than the automatic table. Readers
 can usually recover the requested engagement-specificity level from outputs on
@@ -421,9 +345,9 @@ condition × level cell contains only five items and 15 judgments. It also does
 not measure overall writing quality, factual faithfulness to the plot, viewer
 preference, or predictive audience behaviour.
 
-### 6.6.1 Same-Item Instrument Comparison
+### The same items, measured twice
 
-Because the human panel scored a subset of the frozen outputs, two distinct
+Because the human panel scored a subset of the frozen outputs, two independent
 instruments answered the same question about the same 100 texts, and their
 agreement can be measured rather than assumed. Table 6.4 reports that comparison.
 It is exploratory: it was specified after the registered results were known, in
@@ -442,32 +366,21 @@ only; no claim is made that either verifier is better than the other.
 
 **Table 6.4. Same-item comparison of the level-measuring instruments, 100 blinded items**
 
-**Panel A. Target-match accuracy and raw agreement**
+| Stratum | n items | Human majority | Verifier-B | Verifier-A | Human only correct | Verifier-B only correct | Raw label agreement | Exact McNemar p |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Level 0 | 50 | 0.92 | 0.60 | 0.70 | 18 | 2 | 0.60 | 0.000402 |
+| Level 1 | 50 | 0.92 | 0.90 | 0.84 | 4 | 3 | 0.86 | 1.0 |
+| Pooled | 100 | 0.92 | 0.75 | 0.77 | 22 | 5 | 0.73 | 0.001514 |
 
-| Stratum | n items | Human majority accuracy | Verifier-B accuracy | Verifier-A accuracy | Human–B raw agreement |
-|---|---:|---:|---:|---:|---:|
-| Level 0 | 50 | 0.92 | 0.60 | 0.70 | 0.60 |
-| Level 1 | 50 | 0.92 | 0.90 | 0.84 | 0.86 |
-| Pooled | 100 | 0.92 | 0.75 | 0.77 | 0.73 |
-
-**Panel B. Paired human-majority and Verifier-B disagreements**
-
-| Stratum | Human-only correct | Verifier-B-only correct | Exact McNemar p |
-|---|---:|---:|---:|
-| Level 0 | 18 | 2 | 0.000402 |
-| Level 1 | 4 | 3 | 1.0 |
-| Pooled | 22 | 5 | 0.001514 |
-
-The pattern is consistent with the hypothesis in Section 6.3. The human panel
-has the same observed accuracy at both levels, 0.92 and 0.92. Both automatic
-instruments are markedly worse at Level 0 than at Level 1 —
+The pattern is the one the hypothesis of Section 6.3 predicts and the naive
+reading does not. The human panel is equally accurate at both levels, at 0.92 and
+0.92. Both automatic instruments are markedly worse at Level 0 than at Level 1 —
 Verifier-B at 0.60 against 0.90, Verifier-A at 0.70 against 0.84 — so the level
-asymmetry of Table 6.1 is observed in the instruments but not in the human
-majority labels on these items. The disagreement is also strongly directional at
-Level 0: on 18 items the
+asymmetry of Table 6.1 is present in the instruments and absent in the readers on
+these items. The disagreement is also one-directional at Level 0: on 18 items the
 panel recovered the requested level and Verifier-B did not, against 2 in the
 opposite direction, while at Level 1 the counts are 4 and 3 and the paired test is
-does not detect a directional difference.
+indistinguishable from chance.
 
 Chance-corrected agreement is reported for completeness and should not be
 compared across the two strata. Cohen's kappa is 0.46 pooled, 0.038 at Level 0
@@ -491,7 +404,7 @@ support is a caution that carries into Chapter 7: an automatic outcome measure
 that is 0.32 below blinded readers in one stratum and 0.02 below them in the
 other is not equally trustworthy across the two halves of its own axis.
 
-## 6.7 Length-Matched Sensitivity Analysis
+## 6.7 Length-controlled sensitivity analysis
 
 The preregistered sensitivity slice pairs Level-0 and Level-1 outputs from the
 same plot, condition, and replicate when their word counts differ by less than
@@ -533,16 +446,16 @@ length inversion, matching on length should have removed most of it, and it does
 not. What weakens the counter-argument in turn is the selection: retained pairs
 are those the treatment happened to make similar in length, and the two
 conditions with the largest apparent Level-0 recovery are the two with the least
-coverage. The combined evidence is consistent with length contributing to the
-deficit, but neither this post-treatment slice nor Table 6.4 identifies the
-magnitude of that contribution.
+coverage. The honest reading is that length is part of the deficit and not all of
+it, and that neither the slice nor Table 6.4 alone settles the proportion.
 
-## 6.8 Diversity and Corpus-Distribution Diagnostics
+## 6.8 Diversity and corpus-level realism
 
-![Separate length-distribution, short-output and LaBSE-feature MAUVE diagnostics](figures/corpus_level_diagnostics.png)
+![Separate length-distribution, short-output and LaBSE-feature MAUVE diagnostics](../../results/s5_main_bn_realism_figure.png)
 
-*Figure 6.3. Length-distribution, short-output and LaBSE-feature MAUVE
-diagnostics across the 20 Bangla condition-level cells. The three panels are
+*Figure 6.2. Length-distribution, short-output and LaBSE-feature MAUVE
+diagnostics across the 20 Bangla condition-level cells, reproduced from the
+hash-manifested `results/s5_main_bn_realism_figure.png`. The three panels are
 kept separate because no composite realism score was preregistered, and none is
 defined here.*
 
@@ -584,15 +497,15 @@ generated-text sentiment scorer exists. The data also contain no
 review-to-film mapping, so realism is assessed at corpus level rather than as
 film-level audience prediction.
 
-## 6.9 Qualitative Error Analysis
+## 6.9 Qualitative error analysis with example outputs
 
 Aggregate tables state how often the outcome measure disagreed with the request;
 they do not show what the disagreement looked like. This section shows six
 outputs. They are selected by a registered rule rather than chosen after reading
 the archive: the config fixes six strata in advance, restricts selection to
 replicate seed 42, and takes the lexicographically first case key within each
-stratum, so the choice is deterministic and independent of subjective example
-quality. Each example is reported beside the size of the stratum it was drawn from,
+stratum, so the choice is deterministic and cannot be steered toward a flattering
+text. Each example is reported beside the size of the stratum it was drawn from,
 out of the 90 evaluation plots at that condition and level, so its
 representativeness travels with it. The examples are illustrative only and define
 no new metric; because Verifier-B is the registered outcome measure and not
@@ -601,114 +514,155 @@ and not proof that a reader would agree.
 
 **Table 6.6. Rule-selected example outputs, replicate seed 42**
 
-**Panel A. Selection metadata**
+| ID | Condition | Level | Stratum | Stratum size / 90 | Words | $p_B$ | $p_A$ | Calls |
+|---|---|---:|---|---:|---:|---:|---:|---:|
+| E1 | Zero-shot | 0 | Verifier-B failure | 53 | 7 | 0.1638 | 0.0012 | 1 |
+| E2 | Zero-shot | 1 | Verifier-B failure | 19 | 20 | 0.4147 | 0.7117 | 1 |
+| E3 | RAG + neural + symbolic feedback | 0 | Residual failure | 27 | 14 | 0.4894 | 0.9925 | 1 |
+| E4 | RAG + neural + symbolic feedback | 1 | Residual failure | 3 | 15 | 0.0567 | 0.9850 | 1 |
+| E5 | RAG + neural + symbolic feedback | 0 | Repaired pair, treatment | 36 | 14 | 0.9853 | 1.0000 | 1 |
+| E5′ | Zero-shot | 0 | Repaired pair, baseline | — | 7 | 0.1638 | 0.0012 | 1 |
+| E6 | RAG + symbolic loop | 1 | Failure after budget exhaustion | 6 | 24 | 0.1173 | 0.0000015 | 5 |
 
-| ID | Condition | Level | Selection stratum | Stratum size / 90 |
-|---|---|---:|---|---:|
-| E1 | Zero-shot | 0 | Verifier-B failure | 53 |
-| E2 | Zero-shot | 1 | Verifier-B failure | 19 |
-| E3 | RAG + neural + symbolic feedback | 0 | Residual failure | 27 |
-| E4 | RAG + neural + symbolic feedback | 1 | Residual failure | 3 |
-| E5 | RAG + neural + symbolic feedback | 0 | Repaired pair, treatment | 36 |
-| E5′ | Zero-shot | 0 | Repaired pair, baseline | — |
-| E6 | RAG + symbolic loop | 1 | Failure after budget exhaustion | 6 |
+Plot BN002 supplies three of the seven rows because it is the lowest-numbered
+plot present in those strata and the tie-break is lexicographic; E5′ is the same
+case as E1, since the baseline half of the repaired pair is by construction a
+baseline failure. Neither recurrence is curation.
 
-**Panel B. Text and verifier measurements**
-
-| ID | Words | Verifier-B target probability | Verifier-A target probability | Model calls |
-|---|---:|---:|---:|---:|
-| E1 | 7 | 0.1638 | 0.0012 | 1 |
-| E2 | 20 | 0.4147 | 0.7117 | 1 |
-| E3 | 14 | 0.4894 | 0.9925 | 1 |
-| E4 | 15 | 0.0567 | 0.9850 | 1 |
-| E5 | 14 | 0.9853 | 1.0000 | 1 |
-| E5′ | 7 | 0.1638 | 0.0012 | 1 |
-| E6 | 24 | 0.1173 | 0.0000015 | 5 |
-
-Plot BN002 supplies three rows because the deterministic lexicographic rule
-selects the lowest eligible case key; E5′ and E1 are the same baseline case.
-
-**E1: baseline Level-0 failure (53/90).**
+**The baseline Level-0 failure is a short exclamation.** E1 is the most frequent
+single failure in the table's strata, at 53 of 90:
 
 > ব্যাপারটা খুবই দুঃখজনক! এমন একটা গল্প! 😥😥
 
-This seven-word exclamation contains an intensifier, repetition and emoji. Both
-verifiers reject it ($p_B=0.1638$, $p_A=0.0012$), illustrating a measured
-Level-0 failure under the two automatic instruments. The text alone does not
-establish that a human reader would reject the requested level.
+Seven words, an intensifier, a repetition and two emoji. Both instruments reject
+it in the same direction and with conviction ($p_B$ 0.1638, $p_A$ 0.0012). This is
+the mode the framework mostly removes, and it is worth noting that removing it
+does not require a verifier to be subtle.
 
-**E3: residual Level-0 failure (27/90).**
+**The residual Level-0 failure is near the decision boundary.** E3 survives the
+full proposed condition on 27 of 90 plots:
 
 > ব্যাপারটা পুরাই অন্যরকম! শেষটা মনে হল যেন একটু বেশি প্যাঁচানো ছিল, তবে ছবিটা ভালোই।
 
-The text mentions the ending and lies near Verifier-B's decision boundary
-($p_B=0.4894$), while Verifier-A accepts it strongly ($p_A=0.9925$). It therefore
-illustrates instrument divergence on a linguistically borderline response.
+Fourteen words, and $p_B$ = 0.4894 against a 0.5 cut — a failure by 0.0106. The
+text does mention the ending, which is a specific element, so it sits genuinely
+between the levels, and the loop accepted it because Verifier-A scored it 0.9925.
+A residual error of this shape is not a fluent-but-empty output; it is an item on
+which two trained instruments read the same sentence differently near their
+thresholds.
 
-**E2 and E4: opposite automatic labels at Level 1.** E4 occurs in 3/90 cases in
-its stratum:
+**The rarest failure is a Level-1 output the two verifiers score at opposite
+ends.** E4 occurs on 3 of 90 plots:
 
 > আশা মারা গেল এটা মেনে নিতে পারিনি, এমন একটা সুন্দর গল্পে এত বড় একটা ধাক্কা!
 
-Verifier-A scores E4 at 0.9850 and Verifier-B at 0.0567. E2, selected from a
-19/90 zero-shot failure stratum, shows the same directional disagreement:
+It names a character and an event, Verifier-A scores it 0.9850, and Verifier-B
+scores it 0.0567. The unconditioned Level-1 failure disagrees in the same
+direction but less extremely, on 19 of 90 plots:
 
 > গল্পটা দেখাচ্ছিল, একটা মেয়ের জীবন এভাবে শেষ হয়ে যায়! মেনে নিতে পারলাম না, এত সুন্দর একটা প্রাণ এভাবে চলে গেল।
 
-Here $p_A=0.7117$ exceeds its operating threshold while $p_B=0.4147$ remains
-below 0.5. The two examples instantiate the opposite-label disagreements
-quantified in Section 6.6; E2 also reaches the 20-word prompt ceiling.
+Verifier-A returns 0.7117 for this text, above its 0.4384 operating point, while
+Verifier-B returns 0.4147, below 0.5. E2 and E4 are the cases in which the two
+instruments do not merely differ in confidence but assign opposite labels, and
+they are the concrete form of the divergence measured in Section 6.6. E2 also
+sits exactly at the 20-word prompt ceiling, so the response the outcome measure
+rejected here is the longest one the prompt contract permits.
 
-**E5/E5′: paired Level-0 change (36/90).**
+**A repaired case shows the effect and its confound in the same pair.** E5 and
+E5′ are the same plot, level and seed under two conditions, and the direction of
+repair is the one that produces the registered effect, on 36 of 90 plots:
 
 > অসাধারণ! গল্পটা খুবই হৃদয়স্পর্শী, এমন একটা ছবি দেখে মনটা একেবারে খাঁ খাঁ করে উঠলো।
 
-For the same plot, level and seed, Verifier-B increases from 0.1638 to 0.9853,
-while length increases from seven to fourteen words. The pair illustrates both
-the measured condition effect and its length entanglement.
+Verifier-B moves from 0.1638 to 0.9853. The output is also twice as long, seven
+words to fourteen. The framework's effect at Level 0 and the length regularity of
+Section 6.3 push in the same direction on this pair, which is exactly why the
+length diagnostics of Sections 6.7 and 6.8 are reported beside the main table
+rather than in an appendix.
 
-**E6: symbolic-gate budget exhaustion (6/90 outcome failures).**
+**Budget exhaustion under the symbolic gate can emit the worst of three drafts.**
+E6 is a Level-1 case in which the symbolic loop spent five logical calls, never
+cleared the symbolic threshold, and fell back to best-of-three:
 
 > ছবিটা দেখেই বোঝা যাচ্ছে মাল কাহিনীর চেয়ে বেশি কিছু না। নায়কের অ্যাকশনগুলো একটু বেশিই ভেলান্টিয়ার লাগছে, আর ফুল আর ধনী বাবুর প্রেম—এটা আগে দেখিনি!
 
-Across its three drafts, $p_B$ is 0.9414, 0.1173 and 0.7380, whereas $p_A$ is
-0.9952, 0.0000015 and 0.9801. Under the symbolic-gate fallback, the controller
-emits the second draft even though both trained verifiers score the first more
-highly. At seed 42, 50/90 Level-1 cases
-in this condition exhaust the budget and 6/90 also fail Verifier-B. This example
-demonstrates the fallback mechanism; it does not imply that every exhausted case
-fails the outcome measure.
+Its three attempts scored $p_B$ = 0.9414, 0.1173 and 0.7380, with $p_A$ = 0.9952,
+0.0000015 and 0.9801. The first attempt was acceptable to both verifiers. The
+emitted text is the second, because the fallback ranks candidates by the *gate*
+score, and the gate here is the symbolic scorer. A rule table that was designed
+to explain failures is thus permitted to select among drafts, and on this case it
+discarded the draft both trained instruments accepted. Read with Table 6.1 — a
+0.5333 gave-up rate at Level 1, 3.630 mean calls, and the smallest registered
+effect at +0.1091 — this is a mechanism and not a coincidence. The registered
+selection census records the frequency: at seed 42, 50 of 90 Level-1 cases in
+this condition exhausted the budget, of which six also failed Verifier-B, so
+exhaustion and outcome failure are related but distinct events, and most fallback
+emissions still satisfied the outcome measure.
 
-## 6.10 Baseline Scope and External Comparability
+## 6.10 Why no external published baseline is available
 
-The experiment uses nine internal comparators against zero-shot: static
-few-shot, RAG-only, three gated-loop variants, two self-critique variants, a
-hosted same-family judge loop and blind resampling. These conditions share the
-same target definition, Writer contract and frozen evaluation cases, allowing
-paired estimation of their effects relative to zero-shot. Blind resampling is
-matched through the same-case model-token budget admitted to its primary
-candidate prefix. This controls an important component of accounted inference
-expenditure, but all five candidates were generated to construct the nested
-frontier, and the match is not equivalent to physical-run cost, hardware-FLOPs,
-or latency matching.
+This chapter compares ten conditions against one another and none against a
+published system. The omission is deliberate and it needs a stated reason,
+because a reader is entitled to ask why a 2026 generation study reports no
+external baseline.
 
-No published system is evaluated as an external baseline. The literature review
-in Chapter 2 identified no directly comparable Bangla system with the same
-engagement-specificity target and sealed outcome-verifier contract. This is a
-bounded statement about that narrative review, not a claim that no related
-system exists. In addition, the review corpus has no film identifier, so the
-study cannot construct film-matched reference responses for conventional
-reference-based evaluation. A future external comparison would require the same
-Bangla task definition, plot set, 20-word instruction, generation budget and
-outcome-scoring contract; it would constitute a new analysis rather than a
-reinterpretation of the present results.
+The first reason is that the outcome construct is defined in this thesis. The
+requested level is a cut through a corpus-derived engagement-specificity
+continuum, developed and validated in Chapter 3 and operationalized by verifiers
+trained on this corpus's own R1 and R2 partitions. Scoring an external system's
+Bangla output with Verifier-B would measure how often that system happened to
+satisfy an instruction it was never given, which is not a baseline but a category
+error.
 
-## 6.11 Answers to the Research Questions
+The second is structural in the data. The review corpus carries no film
+identifier (Section 3.3), so for no plot in the evaluation set does a reference
+audience response exist. Every reference-based comparison with a published
+generation system — the ordinary way an external baseline is run — is therefore
+unavailable by construction, not by choice of metric.
+
+The third is the state of the adjacent literature as the review of Chapter 2
+found it. Table 2.1 records no verified adjacent work that combines this task,
+this language and an independent outcome verifier; the closest lines of work are
+in other languages, other tasks, or without the sealed-verifier contract, and
+Chapter 2's own conclusion is that the gap it identifies is an **evaluation** gap
+rather than a missing component. The Bangla generation-evaluation resources that
+do exist and are recent are benchmarks for hallucination and for sociopragmatic
+and cultural alignment [@b98; @b110], not controllability benchmarks on an
+engagement-specificity target, and both were assessed at record level rather than
+read in full (Section 2.8.2).
+
+What stands in place of an external baseline is nine internal controls, three of
+which import the field's standard external mechanisms rather than inventing
+domestic ones: the two self-critique arms instantiate the established
+self-refinement formulations, blind resampling reconstructs verifier-ranked
+candidate selection, and the judge loop places a substantially larger hosted
+model in the role the small frozen probe otherwise occupies. The judge condition
+is the closest available answer to "what would a stronger off-the-shelf system
+do", and on this surface it produces a smaller registered effect than the
+neural-plus-symbolic loop (+0.1715 against +0.2570). That is a comparison between
+two conditions of this experiment under the same prompt contract and budget
+accounting, which is what makes it interpretable, and it is not a claim about the
+hosted model's general capability.
+
+One boundary on this section must be explicit. It reports what the Chapter 2
+review found, and that review is a design-driven narrative review with the limits
+stated in Section 2.1: no PRISMA screening flow, no second screener, and a
+primary index whose search quota was exhausted from 11 August 2026. The
+literature search was **not** re-run for this section. The defensible claim is
+therefore that no comparable published baseline was identified by that review,
+not that none exists. Should one be identified later, the frozen archive supports
+the comparison being added — but only as a new registered analysis in which the
+external system receives the same prompt contract, the same 20-word ceiling and
+the same budget accounting, and never as a re-reading of the numbers reported
+here.
+
+## 6.11 Answers to the research questions
 
 - **RQ1:** Answered in Chapter 3, not here. The verdict is qualified support: a
   reproducible region-A cut is human-recognizable as engagement specificity under
   length-matched comparative judgment, but it is a continuum cut rather than a
-  discovered audience segment and does not replicate structurally in region B
+  discovered persona or cluster and does not replicate structurally in region B
   (Section 3.12). That verdict is a premise of this chapter rather than one of
   its results, and it is also the origin of the length entanglement that
   Sections 6.3, 6.7 and 6.8 keep in view.
@@ -716,9 +670,9 @@ reinterpretation of the present results.
   condition improves Verifier-B target probability over zero-shot, and blinded
   human evaluation shows high overall recoverability of the requested level.
   The claim is controllability, not audience prediction.
-- **RQ3:** The two symbolic roles are differentiated. Symbolic-only acceptance
-  gating is weak and costly, while symbolic diagnostics combined with a neural
-  gate produce the largest registered effect over zero-shot. In an explicitly post-hoc comparison over
+- **RQ3:** Mixed and narrowed. Symbolic-only gating is weak and costly, while
+  symbolic diagnostics combined with a neural gate produce the largest
+  registered effect over zero-shot. In an explicitly post-hoc comparison over
   540 frozen pairs, hybrid minus neural-only is +0.02159 in Verifier-B target
   probability but only +0.02037 in binary accuracy (exact McNemar p=0.11728).
   The probability difference occurs at Level 0 (+0.04328), while Level 1 is
@@ -730,29 +684,27 @@ reinterpretation of the present results.
   verifier. The result is bounded by failure selection and Verifier-B's
   calibration null.
 
-## 6.12 Chapter Summary
+## 6.12 Chapter summary
 
-All nine registered condition-versus-zero-shot comparisons show positive
-Verifier-B target-probability differences on the frozen Bangla surface, with
-paired-bootstrap intervals excluding zero after correction of the registered
-family. These comparisons do not rank the active conditions. Blinded native
-Bangla readers recover the requested level with 0.9133 pooled accuracy on the
-balanced 100-item subset, supporting human recognizability of the controlled
-level without establishing per-condition human performance.
+The value of this chapter to the thesis is not the size of its largest effect but
+the fact that the effect survives its own controls. Nine registered comparisons
+were specified before the run, all nine were reported, the strongest of them was
+obtained against a compute-matched resampling control and a larger hosted judge
+rather than against a weakened baseline, and the outcome measure was a model that
+could not influence what it scored. Blinded native readers independently recovered
+the requested level on the audited subset at 91.33% pooled accuracy with strong
+agreement, so the target the system was steered toward is one people can see.
 
-The evidence is qualified in three ways. Automatic performance is consistently
-lower at Level 0, while the exploratory same-item comparison shows a substantially
-larger human–Verifier-B disagreement in that stratum. Generated length remains
-associated with requested level in the opposite direction from the source
-corpus, and the post-treatment length-matched slice cannot establish
-length-neutral control. Finally, same-case revision diagnostics show widening
-Verifier-A–Verifier-B gaps in the two neural-gated loops; this demonstrates
-observable proxy divergence but does not prove that every revision constitutes
-reward hacking. The direct neural-plus-symbolic versus neural-only contrast and
-the same-item instrument comparison remain explicitly exploratory and outside
-the registered confirmatory family.
+Three limits qualify that result, and each is measured in this chapter rather
+than conceded in the abstract. The Level-0 half of the axis remains harder for
+the system by every automatic measure, though the same-item comparison of Section
+6.6 shows that part of that gap belongs to the instrument. Generated length
+remains entangled with the requested level, in the opposite direction from the
+corpus, and the length-matched slice removes some but not all of the level
+difference. And optimization against the in-loop verifier widens its gap from the
+independent scorer, which is what an auditable loop is supposed to make visible.
 
-Appendix F reports the complete per-seed verifier sensitivities, per-replicate
-Phase-5 outcomes, same-case transitions, diversity diagnostics, and
-length-distribution and LaBSE-feature MAUVE values underlying the supplementary
-analyses summarized in this chapter.
+Two analyses in this chapter were added after the registered results were known
+and are labelled as such at the point of use. They change no registered number,
+and they are reported because a result whose exploratory additions are hidden is
+less trustworthy than one whose additions are declared.

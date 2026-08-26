@@ -298,23 +298,23 @@ comparison explicit.
 
 ## 2.9 Research Gap
 
-Table 2.1 positions the present study against selected adjacent work. The table
-compares reported design components rather than ranking study quality; “None
-reported” indicates only that the component is not part of the reported design.
+Table 2.1 positions the present study against selected adjacent work. It
+compares reported design components rather than ranking study quality; a
+negative entry means only that the component lies outside the reported design.
 
-**Table 2.1. Comparison with selected adjacent studies**
+**Table 2.1. Position relative to selected adjacent work**
 
-| Study | Setting | Retrieval | Feedback or control | Symbolic diagnosis | Isolated outcome evaluator | Reported evaluation |
-|---|---|---|---|---|---|---|
-| Mixture-of-Personas [@b9] | Population-conditioned generation | None reported | Persona conditioning | None reported | None reported | Study-specific task evaluation |
-| SimAB [@b10] | Persona-conditioned web A/B prediction | Context documents | Agent interaction | None reported | None reported | Historical outcomes and practitioner study |
-| FUDGE [@b11] | Controlled text generation | None reported | Discriminator-guided decoding | None reported | None reported | Task-specific automatic metrics |
-| Self-Refine [@b13] | Multi-task refinement | None reported | Same-model self-feedback | None reported | None reported | Task-dependent human and automatic evaluation |
-| Reflexion [@b14] | Reasoning, coding, and decision tasks | Task-dependent | Verbal feedback and memory | None reported | None reported | Benchmark outcomes |
-| HybridRAG-BN [@b19] | Bangla knowledge-base question answering | BM25 and BGE-M3 | Fine-tuned verifier and refiner | None reported | None reported | Token-F1 |
-| SymDiag [@b20] | Multi-step reasoning | None reported | Symbolic diagnosis and repair | Constraint-based diagnosis | None reported | Manual diagnosis audit |
-| Saleh et al. [@b21] | Repository documentation | Repository retrieval | Reviewer-mediated rewriting | None reported | None reported | Automatic metrics and manual structural assessment |
-| Present study | Bangla cinema-response generation | R1 level-specific exemplars | Verifier-A and bounded feedback | Deterministic diagnostic rules | Loop-isolated Verifier-B | Blinded construct and output judgments |
+| Work | Task and language | Retrieval | Revision signal | Symbolic diagnosis | Outcome scorer isolated from generation | Human validation |
+|---|---|---:|---|---:|---:|---:|
+| Mixture-of-Personas [@b9] | Population-conditioned text generation | No | Persona conditioning | No | No | Study-specific evaluation |
+| SimAB [@b10] | Persona-conditioned web A/B prediction | Context documents | Agent interaction | No | No | Historical outcomes and practitioner study |
+| FUDGE [@b11] | Controlled text generation | No | Learned discriminator during decoding | No | No | Task metrics |
+| Self-Refine [@b13] | Multi-task refinement | No | Same-model self-feedback | No | No | Task-dependent human and automatic evaluation |
+| Reflexion [@b14] | Reasoning, coding, and decision tasks | Task-dependent | Verbal feedback or memory | Verbal or heuristic | No | Benchmark outcomes |
+| HybridRAG-BN [@b19] | Bangla knowledge-base question answering | BM25 and BGE-M3 | Fine-tuned verifier and refiner | No | No | Competition token-F1 |
+| SymDiag [@b20] | Multi-step reasoning | No | Symbolic diagnosis supports repair | Yes | No isolated A/B wall | Manually audited diagnosis |
+| Saleh et al. [@b21] | Repository documentation | Repository retrieval | Reviewer-mediated rewriting | No | No | Manual structural analysis and automatic metrics |
+| Present study | Bangla cinema-response generation | R1 level-specific exemplars | Verifier-A and bounded feedback | Deterministic diagnostic rules | Verifier-B outside the loop | Construct study and blinded output study |
 
 *Note.* The table is selective rather than exhaustive. Evaluation approaches
 differ across tasks and should not be interpreted as equivalent instruments.

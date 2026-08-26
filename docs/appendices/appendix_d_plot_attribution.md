@@ -1,11 +1,16 @@
 # Appendix D — Bangla Wikipedia plot attribution
 
-The 120 frozen plot synopses were extracted verbatim from Bangla
-Wikipedia and are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+The 120 frozen plot stimuli are sentence-bounded excerpts from Bangla Wikipedia
+plot sections. Extraction preserves the source wording while normalizing line
+breaks and, for longer sections, stopping at the registered twelve-sentence
+boundary; it does not paraphrase the source text. The excerpts are licensed
+under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 Attribution is to the contributors of each linked article revision.
 The revision ID and timestamp identify the exact text used; any
 distributed derivative of this plot set must retain attribution and a
 compatible share-alike licence. Harvest date: 2026-07-31.
+
+**Table D.1. Article revisions and attribution records for the frozen Bangla plot corpus**
 
 | Plot ID | Split | Article | Exact revision | Revision timestamp |
 |---|---|---|---|---|

@@ -1,6 +1,6 @@
 # Chapter 5 — Neuro-Symbolic Multi-Agent Framework
 
-## 5.1 Chapter Overview
+## 5.1 Introduction
 
 Chapters 3 and 4 defined the engagement-specificity levels and the two verifier
 roles. This chapter specifies the bounded neuro-symbolic workflow used to
@@ -777,17 +777,19 @@ seed, prompt arm, attempt count, emitted draft, logical calls and tokens, and
 stopping status. Outcome scoring runs as a separate process after generation and
 joins on the frozen case key.
 
-The remaining execution detail — the complete configuration-to-output map, the
-runtime environments, the artifact lineage and the statistical contract — is
-specified in Appendix A and is not restated here. Two boundaries, however, are
+The remaining execution detail — the statistical contract and executable
+control guarantees in Appendix A, together with the configuration-to-result,
+runtime and archive-provenance map in Appendix G — is not restated here. Two
+boundaries, however, are
 substantive enough to belong in the chapter that defines the framework. Global
 seed 42 initializes every script as its first action, so the loop's routing is
 reproducible rather than merely recorded. And the live local demonstration
-interface **is not the frozen experiment**: it runs a hosted judge-family Writer
-and an additional operational plot-support check, whereas the main run uses
-frozen local Gemma-3 generation with outcome-only Verifier-B. It persists no
-prompts, contributes no evidence to any result in this thesis, and is documented
-as diagnostic software in Appendix H.
+interface **is not the frozen experiment**: it sends the supplied plot to a
+hosted judge-family Writer and an additional operational plot-support check,
+whereas the main run uses frozen local Gemma-3 generation with outcome-only
+Verifier-B. The application does not persist user plots or live-call records in
+the repository. Its outputs contribute no evidence to any result in this thesis,
+and its model, processing and persistence boundaries are documented in Appendix H.
 
 ## 5.8 Limitations
 

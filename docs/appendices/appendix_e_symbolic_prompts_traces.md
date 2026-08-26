@@ -7,6 +7,8 @@ The symbolic scorer is a standardized logistic-regression pipeline fitted on
 contains 11 features; the IDF family is disabled under the main-pipeline rule
 against TF-IDF-family evidence.
 
+**Table E.1. Symbolic feature families, interpretations, and pipeline standing**
+
 | Family | Exact features | Interpretation | Registered gameability | Main-pipeline standing |
 |---|---|---|---|---|
 | F1 IDF | `idf_min`, `idf_max`, `idf_mean` | Corpus-frequency summaries | Low | Disabled; pilot only |
@@ -117,6 +119,8 @@ three-attempt neural-gate failures, not the 50 cases anticipated by the earlier
 specification. It was coded once by Codex under researcher authorization and
 reviewed by the researcher; there is no independent coder or agreement score.
 
+**Table E.2. Complete census of exhausted neural-gate development cases**
+
 | Category | Count |
 |---|---:|
 | No observable registered emitted-text error | 5 |
@@ -134,6 +138,14 @@ To prevent outcome-based selection, the displayed case is the lexicographically
 first key among seed-42 `rag_neural_symbolic_feedback` cases requiring more than
 one attempt. The rule selects `S5BN|s42|BN006|L0|rag_neural_symbolic_feedback`
 without using Verifier-B or reading response quality.
+
+![Rule-selected audited correction trace](../figures/audited_generation_trace_bn006.png)
+
+**Figure E.1.** Rule-selected audited correction trace for BN006 at target
+Level 0. The teal dashed edge is one-way: Verifier-B scores the emitted response
+only after generation and supplies no feedback to the loop.
+
+**Table E.3. Attempt-level evidence for the rule-selected BN006 correction trace**
 
 | Field | Attempt 1 | Attempt 2 |
 |---|---|---|

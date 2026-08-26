@@ -1,6 +1,13 @@
 # Appendix G — Configuration, environment, and bibliography provenance
 
+This appendix provides the audit path from frozen configurations to result
+files, runtime records and the thesis bibliography. It records artifact
+identity rather than repeating the methodological interpretation given in the
+main chapters.
+
 ## G.1 Configuration-to-result map
+
+**Table G.1. Frozen configuration-to-result map**
 
 | Scientific component | Frozen configuration | Canonical evidence |
 |---|---|---|
@@ -23,6 +30,8 @@ files remain the authority where rounding differs.
 
 ## G.2 Principal frozen hyperparameters and checkpoints
 
+**Table G.2. Principal checkpoints and frozen settings**
+
 | Component | Frozen checkpoint/settings |
 |---|---|
 | Embedding/retrieval | `sentence-transformers/LaBSE`; cosine; top 10; Region-A R1 only |
@@ -33,10 +42,12 @@ files remain the authority where rounding differs.
 | Hosted judge | `gemma-4-26b-a4b-it`; seed 42; high thinking; structured output; maximum 512 output tokens |
 | Neural loop | τ=0.4384071; maximum three Writer attempts |
 | Symbolic loop | τ=0.18166513482099075; maximum three Writer attempts |
-| Blind resampling | maximum five candidates; realized-generator-FLOP matching; Verifier-A prefix selection |
+| Blind resampling | maximum five candidates; same-model realized token-cost matching; Verifier-A prefix selection |
 | Inference | 10,000 paired bootstrap resamples; 95% intervals; Benjamini–Hochberg family; McNemar binary check |
 
 ## G.3 Runtime-to-result map
+
+**Table G.3. Runtime evidence and attributed computations**
 
 | Runtime evidence | Work attributed to it |
 |---|---|
@@ -66,8 +77,9 @@ paths and cannot silently resume into the active archive.
 
 ## G.5 Bibliography audit
 
-The thesis-facing bibliography is `docs/references_ieee.bib`. It contains 143
-unique entries; the 55 entries cited by Chapters 1–7 are ordered first by first
-appearance and all active citation keys resolve. `docs/reference_key_map_full.csv`
-retains the complete key/order audit. Bibliography order is presentation
-metadata, not scientific evidence.
+The thesis-facing bibliography is `docs/chapters/references.bib`. It contains
+67 unique entries, exactly matching the 67 unique citation keys used across
+Chapters 1–8: no cited key is unresolved and no bibliography entry is uncited.
+The larger `docs/references_ieee.bib` remains the research registry rather than
+the rendered thesis bibliography. Bibliography order is presentation metadata,
+not scientific evidence.

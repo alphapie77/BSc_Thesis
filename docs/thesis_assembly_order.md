@@ -10,26 +10,36 @@ margin, font, signature or binding rules.
 2. Candidate declaration — exact university wording pending
 3. Supervisor certificate/approval page — exact university wording pending
 4. Acknowledgements — researcher-authored personal text pending
-5. Abstract and keywords — `docs/thesis_front_matter.md`
+5. Abstract — `docs/chapters/abstract.md`; keywords and remaining front-matter
+   fields — `docs/thesis_front_matter.md`
 6. Table of contents
 7. List of tables
 8. List of figures
-9. Abbreviations and symbols — `docs/thesis_abbreviations.md`
+9. List of algorithms — generated from Algorithms 5.1 and 5.2
+10. Abbreviations and symbols — `docs/thesis_abbreviations.md`
 
 ## Main text
 
-1. `docs/chapters/chapter1_introduction.md`
-2. `docs/chapters/chapter2_related_work.md`
-3. `docs/chapters/chapter3_data_axis.md`
-4. `docs/chapters/chapter4_verifiers.md`
-5. `docs/chapters/chapter5_multi_agent_system.md`
-6. `docs/chapters/chapter6_experiments_results.md`
-7. `docs/chapters/chapter7_discussion_limitations.md`
+1. `docs/chapters/chapter1/Introduction.md`
+2. `docs/chapters/chapter2/Related_Work.md`
+3. `docs/chapters/chapter3/Research_Methodology.md`
+4. `docs/chapters/chapter4/Verification_and_Validation.md`
+5. `docs/chapters/chapter5/Neuro_Symbolic_Multi_Agent_Framework.md`
+6. `docs/chapters/chapter6/Experimental_Results_and_Analysis.md`
+7. `docs/chapters/chapter7/Discussion_and_Limitations.md`
+8. `docs/chapters/chapter8/Conclusion_and_Future_Work.md` — conclusion, contributions and future
+   work. This material was promoted out of Chapter 7 under the Phase 1 structure
+   recommendation in `docs/thesis_phase1_audit_report.md` §3. If the university
+   template later mandates exactly seven chapters, Chapters 7 and 8 will require
+   an explicit structural merge rather than parallel duplicate sections.
 
 ## End matter
 
 1. `docs/generative_ai_declaration.md`
-2. References rendered from `docs/references_ieee.bib` under IEEE style
+2. References rendered from `docs/chapters/references.bib` under IEEE style;
+   this file contains exactly the works cited by Chapters 1–8. The larger
+   `docs/references_ieee.bib` remains the master research registry and is not
+   rendered wholesale in the submitted thesis.
 3. Appendix A — `docs/appendices/appendix_a_reproducibility.md`
 4. Appendix B — `docs/appendices/appendix_b_human_evaluation_ethics.md`
 5. Appendix C — `docs/appendices/appendix_c_responsible_nlp.md`

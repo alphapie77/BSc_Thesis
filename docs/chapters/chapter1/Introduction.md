@@ -102,12 +102,14 @@ The specific objectives are to:
 
 This study addresses the following research questions:
 
-- **RQ1:** Can a meaningful and human-recognizable response distinction be
-  derived from Bangla reviews without engagement-specificity labels?
-- **RQ2:** To what extent do the registered generation strategies improve
-  target-level controllability over zero-shot generation in Bangla?
-- **RQ3:** How does neural gating with symbolic diagnostic feedback compare
-  with neural-only and symbolic-only mechanisms?
+- **RQ1:** Can a meaningful response distinction be recovered from unlabeled
+  Bangla reviews and validated as stable and human-recognizable?
+- **RQ2:** To what extent do verifier-guided generation and the registered
+  prompting, retrieval, self-critique, external-judge, and resampling controls
+  improve target-level controllability over zero-shot generation in Bangla?
+- **RQ3:** What role does symbolic information play when used for acceptance
+  gating and for diagnostic feedback within verifier-guided Bangla response
+  generation?
 - **RQ4:** Does iterative optimization against Verifier-A produce measurable
   divergence from the independent Verifier-B?
 
@@ -174,17 +176,22 @@ These limitations are examined in detail in Chapter 7.
 
 ## 1.8 Contributions
 
-This thesis makes five principal contributions:
+This thesis makes six principal contributions:
 
-1. A human-validated engagement-specificity construct for short Bangla cinema
-   responses.
-2. A dual-verifier protocol that separates generation control from outcome
-   evaluation through disjoint data access.
-3. A bounded and auditable neuro-symbolic multi-agent generation framework.
-4. A paired comparative evaluation across ten generation conditions, supported
-   by blinded human assessment.
-5. An empirical analysis of verifier divergence and the diagnostic role of
-   symbolic feedback.
+1. A verifier-isolation protocol that separates in-loop control from disjoint
+   outcome evaluation and makes proxy divergence observable.
+2. A bounded and auditable neuro-symbolic multi-agent workflow evaluated under
+   explicit logical-call and token accounting.
+3. A construct-validation process that rejects the initial persona
+   interpretation and retains only a human-recognizable
+   engagement-specificity continuum.
+4. An explicit circularity analysis showing why Verifier-A's near-perfect
+   label-reproduction result is not evidence of independent human validity.
+5. Blinded human validation of requested-level recovery on a frozen, balanced
+   subset of generated responses.
+6. An empirically motivated separation between symbolic diagnosis, which
+   guides revision, and symbolic adjudication, which the evidence does not
+   support.
 
 Together, these contributions concern controllability, evaluator isolation,
 and auditability. They do not establish that the framework predicts real

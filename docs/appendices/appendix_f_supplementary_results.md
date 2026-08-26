@@ -6,6 +6,8 @@ studies. No value in this appendix is recomputed from model outputs.
 
 ## F.1 Verifier per-seed sensitivity
 
+**Table F.1. Backbone-ablation macro-F1 by learning rate and seed**
+
 | Backbone | Learning rate | Seed | Macro-F1 |
 |---|---|---|---|
 | banglabert | 2e-05 | 42 | 0.9866 |
@@ -81,6 +83,8 @@ studies. No value in this appendix is recomputed from model outputs.
 
 Source: `results/s3_backbone_per_seed.csv`.
 
+**Table F.2. Verifier-B macro-F1 and error count by seed**
+
 | Verifier-B seed | Learning rate | Macro-F1 | Errors |
 |---|---|---|---|
 | 42 | 2e-05 | 0.9597 | 3 |
@@ -93,6 +97,8 @@ Source: `results/s3d_verifier_b_per_seed.csv`. The persisted artifact is
 seed 42 by the preregistered global-seed rule, not the best seed.
 
 ## F.2 Phase-5 per-replicate descriptive outcomes
+
+**Table F.3. Verifier-B outcomes by condition, requested level, and replicate block**
 
 | Condition | Level | Replicate seed | n | Mean Verifier-B target probability | Binary success rate |
 |---|---|---|---|---|---|
@@ -163,6 +169,8 @@ sensitivity blocks and are not treated as three independent studies.
 
 ## F.3 Same-case Goodhart transitions
 
+**Table F.4. Selection-aware adjacent-attempt transitions among continuing cases**
+
 | Condition | Transition | Paired cases | Δ Verifier-A | Δ Verifier-B | Δ(A−B) | Standing |
 |---|---|---|---|---|---|---|
 | rag_neural_loop | 1→2 | 147 | 0.483451 | 0.300649 | 0.182802 | same cases only; positive gap delta indicates widening A−B gap |
@@ -177,6 +185,8 @@ selection-aware adjacent transitions among continuing failed cases, not
 population effects over all 540 cases in a condition.
 
 ## F.4 Diversity and short-output diagnostics
+
+**Table F.5. Short-output and lexical-diversity diagnostics by condition and requested level**
 
 | Condition | Level | n | Under 4 words | Rate | Distinct-1 | Distinct-2 | Self-BLEU-4 |
 |---|---|---|---|---|---|---|---|
@@ -204,6 +214,8 @@ population effects over all 540 cases in a condition.
 Source: `results/s5_main_bn_diversity.csv`.
 
 ## F.5 Length-distribution and LaBSE-feature MAUVE sensitivity
+
+**Table F.6. Length-distribution divergence and LaBSE-feature MAUVE sensitivity**
 
 | Condition | Level | Generated n | Real length-reference n | Length JS | MAUVE generated/real n | LaBSE-feature MAUVE |
 |---|---|---|---|---|---|---|

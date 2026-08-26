@@ -20,6 +20,8 @@ contains no batch simulator and cannot rerun the experiment.
 
 ## H.3 Model and data differences from the experiment
 
+**Table H.1. Separation between the frozen experiment and the post-run interface**
+
 | Component | Frozen experiment | Local interface |
 |---|---|---|
 | Writer | local `google/gemma-3-12b-it`, NF4 | Gemini API `gemma-4-26b-a4b-it` |
@@ -27,7 +29,7 @@ contains no batch simulator and cannot rerun the experiment.
 | Retrieval | frozen Region-A R1 index, top 10 | same frozen R1-only index, top 10 |
 | In-loop gate | Verifier-A, τ=0.4384071 | same artifact and threshold |
 | Outcome Verifier-B | post-generation scoring only | prohibited from the live loop |
-| Persistence | sealed cases and manifests | user plots and live calls are not persisted |
+| Processing and persistence | sealed cases and manifests | plots are sent to Google-hosted models; the application does not persist user plots or live-call records in the repository |
 
 The interface's `SUPPORTED`, `REVIEW`, and `UNSUPPORTED` faithfulness labels are
 operational aids, not human-validated thesis metrics. Repeated live calls may

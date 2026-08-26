@@ -1,6 +1,6 @@
 # Chapter 3 — Research Methodology
 
-## 3.1 Chapter Overview
+## 3.1 Introduction
 
 This chapter presents the research design and the methodological foundation of
 the thesis. It describes the data resources, preprocessing rules, frozen data
@@ -101,7 +101,8 @@ Generation stimuli were collected separately from Bangla Wikipedia through the
 MediaWiki API. The harvest identified 3,135 candidate articles; 124 passed the
 mechanical quality gate, and 120 were retained after manual review. Each retained
 row records its source URL, revision identifier, revision timestamp, and CC
-BY-SA 4.0 metadata. Plot sections contain between three and twelve sentences,
+BY-SA 4.0 metadata; the complete article-revision attribution is reported in
+Appendix D. Plot sections contain between three and twelve sentences,
 with a median of nine. A seed-42 split assigns 30 plots to development and 90 to
 the final evaluation surface. Plot text enters neither construct discovery nor
 verifier training.
