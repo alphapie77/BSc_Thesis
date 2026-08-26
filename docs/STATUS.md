@@ -1,6 +1,6 @@
 # STATUS — single source of truth for "where are we"
 
-**Last updated:** 2026-08-25 (**The explicitly post-hoc RQ3 contrast is
+**Last updated:** 2026-08-26 (**The explicitly post-hoc RQ3 contrast is
 COMPLETE on 540 frozen exact pairs: `rag_neural_symbolic_feedback` minus
 `rag_neural_loop` is +0.02159 in Verifier-B target probability (naive
 post-selection 95% CI [0.00082, 0.04310]) and +0.02037 in binary target
@@ -233,6 +233,8 @@ can equal 1.0. Next: finish the resumable trace/frontier runner and run it.
 
 | 49 | **Already-read literature integration beyond the minimal core** | ✅ **COMPLETE 2026-08-23.** The 56 full/primary-record uncited candidates were screened by recorded relevance rather than added by quota. Twenty-three directly supporting sources were integrated, raising active coverage from 32 to **55 unique references** while retaining **88 uncited library entries**. Added coverage includes generated movie reviews, role-sensitive self-correction, judge replacement/self-preference, multilingual and low-resource judging, recent Bangla backbone disagreement, outcome-blind human-item selection, rater allocation/modeling, agreement-metric interpretation, HDBSCAN method/software separation, AC1 limitations, random-seed/model-comparison robustness, small-data BERT-NLI, discriminative-vs-generative classification and calibration under data scarcity. Metadata-only records remain excluded from load-bearing claims. The bibliography reorder script now marks newly cited rows `chapter_cited`, closing an audit-map bug. Consensus was quota-unavailable; only already-read/verified records were used. No result, analysis or generation changed. | Chapters 2--4, 6--7; `src/common/order_thesis_bibliography.py`; 143-entry IEEE bibliography/map | 2026-08-23 |
 
+| 50 | **Canonical Chapters 3–4 figure and evidence audit** | ✅ **COMPLETE 2026-08-26.** Canonical Chapter 3 now contains three placed figures, including a source-derived K=2–8 diagnostic plot that keeps prediction strength, bootstrap ARI, silhouette and gap separate and leaves HDBSCAN as a non-K-dependent diagnostic. Canonical Chapter 4 now contains shared-dev confusion matrices reconstructed from the two frozen 82-row prediction files. The prose distinguishes held-out development evaluation from an independent human-gold final test, and the chapter title is restored to the researcher-approved **Verifier Development and Validation**. All table/figure sequences, internal references, image paths and chapter citation keys resolve; source spot-checks reproduce the reported K=2 and verifier values. No training, generation, scoring, split or scientific result changed. | `docs/chapters/chapter3/Research_Methodology.md`; `docs/chapters/chapter4/Verifier_Development.md`; chapter figure files and plotting scripts | 2026-08-26 |
+
 ### S4.5a repair state
 
 ✅ **RUNNER REPAIRED AND RESULT RUN 2026-08-18.** Attempt 1 reached all 120
@@ -254,7 +256,7 @@ and the post-run verdict-mapping audit are recorded in pipeline row 17e above.
 
 ## Parallel tracks (no step blocks these — but they block later steps)
 
-> **Checked 2026-08-23 against the files on disk** — the hook
+> **Checked 2026-08-26 against the files on disk** — the hook
 > asks for the counts at every close, so the answer is written rather than
 > skipped. **Plot synopses:** frozen at 120 (30 dev + 90 eval); nothing in
 > Phase 4 touches them. **Base-paper reading:** still **6 briefed, 0 read by

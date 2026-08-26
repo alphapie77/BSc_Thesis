@@ -25,9 +25,9 @@ responses only during independent outcome evaluation.
 
 ![Macro-level research methodology](figures/macro_level_research_methodology.png)
 
-**Figure 3.1:** Macro-level research methodology. Solid arrows show the main
+*Figure 3.1. Macro-level research methodology. Solid arrows show the main
 research flow, dashed red arrows show bounded revision, and the dashed teal
-path denotes the isolation of Verifier-B from generation.
+path denotes the isolation of Verifier-B from generation.*
 
 ## 3.2 Research Design
 
@@ -73,9 +73,9 @@ or threshold selection.
 
 ![Micro-level verifier-in-the-loop generation workflow](figures/micro_level_generation_workflow.png)
 
-**Figure 3.2:** Micro-level verifier-in-the-loop generation workflow. Solid
+*Figure 3.2. Micro-level verifier-in-the-loop generation workflow. Solid
 arrows denote the generation path, dashed red arrows denote bounded retries,
-and the dashed teal path denotes sealed outcome evaluation.
+and the dashed teal path denotes sealed outcome evaluation.*
 
 ## 3.3 Data Sources
 
@@ -234,6 +234,25 @@ that a stable partition can be contentless.
 | Surface-feature AUC | Test length and stylistic confounds | Bounds construct interpretation |
 | Region-B negative control | Test whether stability carries content | Negative control |
 | Human judgments | Test perceptibility and direction | Construct-validity arbiter |
+
+Figure 3.3 displays the four K-dependent diagnostics without collapsing them
+into a single score. Prediction strength is the registered selection criterion:
+K=2 is the only candidate above 0.80 in both regions. Bootstrap ARI shows that
+this cut is reproducible, whereas the very small silhouette values and the
+absence of a gap-statistic selection show that reproducibility is not evidence
+of well-separated natural groups. HDBSCAN is not plotted as a function of K
+because it does not require a prespecified cluster count; its independent
+density-based result is reported in Table 3.5.
+
+![K-selection diagnostics for Region A and the Region-B negative control](figures/k_selection_diagnostics.png)
+
+*Figure 3.3. K-selection diagnostics for K=2–8. Points show the frozen
+diagnostic values; whiskers show ±1 bootstrap standard deviation for ARI and
+±1 standard error for the gap statistic. The vertical dotted line marks K=2,
+and the dashed horizontal line marks the registered prediction-strength
+threshold of 0.80. Region B is a negative control. The figure supports K=2 as a
+stable operational bisection, not as evidence of two discrete audience
+personas.*
 
 For Region A, K=2 was the only solution to clear the registered prediction-
 strength threshold of 0.80, reaching 0.8605 with bootstrap ARI 0.9399 ± 0.0290.

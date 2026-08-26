@@ -1,4 +1,4 @@
-# Chapter 4 — Verifier Development, Validation, and Isolation
+# Chapter 4 — Verifier Development and Validation
 
 ## 4.1 Chapter Overview
 
@@ -409,10 +409,26 @@ trained on different rows and is quoted only as context.
 | Encoder family | LaBSE multilingual sentence encoder | BanglaBERT Bangla-specific ELECTRA |
 | Model adaptation | Frozen encoder with an L2-regularised logistic head | End-to-end fine-tuning |
 | Hyperparameter selection | Fixed library defaults; no development-score selection | Registered learning rate; no development-score selection |
-| Evaluation data | dev-82 (Level 0/1: 53/29) | dev-82 (Level 0/1: 53/29) |
+| Held-out development evaluation | dev-82 (Level 0/1: 53/29) | dev-82 (Level 0/1: 53/29) |
 | Development macro-F1 | 0.9866 (1 error) | 0.9597 (3 errors; persisted seed-42 model) |
 | Seed sensitivity | Deterministic fit; not applicable | Mean 0.9674 ± 0.0158; range 0.9448–0.9866 |
 | Calibration interpretation | Improvement supported on dev-82 (Section 4.7) | Improvement not established on dev-82 |
+
+Figure 4.3 resolves the aggregate error counts by reference and predicted
+level. It is a descriptive confusion matrix on the shared held-out development
+slice, not a final test-set confusion matrix. The reference values are the
+operational K=2 labels produced during construct development; they are not
+independent human-gold judgements. Verifier-A makes one error, misclassifying a
+Level-1 item as Level 0. Verifier-B makes three errors: one Level-0 item is
+assigned Level 1 and two Level-1 items are assigned Level 0.
+
+![Confusion matrices for Verifier-A and Verifier-B on the shared held-out development slice](figures/verifier_confusion_matrices.png)
+
+*Figure 4.3. Descriptive confusion matrices on the shared held-out development
+evaluation slice (dev-82; Level 0/1: 53/29). Cell percentages are conditional
+on the K=2 reference label. Because these labels are operational weak labels and
+the slice is not an independent human-gold test set, the figure measures label
+reproduction rather than human-ground-truth validity.*
 
 ## 4.7 Probability Calibration
 
@@ -531,7 +547,7 @@ the registered outcome-only role.
 | Isolation dimension | Design constraint | Verification mechanism |
 |---|---|---|
 | Training data | R1 and R2 remain disjoint | Identifier-intersection test between R1 and the Verifier-B training set |
-| Development data | dev-82 is withheld from both verifier-training partitions | Split-contract and configuration-level sample assertions |
+| Development evaluation data | dev-82 is withheld from both verifier-training partitions | Split-contract and configuration-level sample assertions |
 | Gold evaluation data | Gold-300 is excluded from fitting, selection, and calibration | Per-stage data-access assertions |
 | Encoder family | Verifier-A and Verifier-B use different pretraining families | Configuration checks against the registered model specifications |
 | Model checkpoints | Verifier-B is trained on R2 rather than reused from the R1 ablation | Explicit role declaration and checkpoint-origin tests |
@@ -547,25 +563,31 @@ on generated text in Chapter 6.
 
 ## 4.9 Limitations
 
-Four limitations constrain the interpretation of this chapter. First, dev-82
-is used for learning-rate selection in the ablation, temperature fitting, and
-reported evaluation; its results are therefore descriptive rather than clean
-held-out estimates. Second, the operational labels originate from LaBSE
-geometry, making Verifier-A's near-ceiling performance circular by construction.
-Third, the SetFit arm did not expose effective learning-rate or seed variation,
-so its zero standard deviation is an implementation artifact and cannot support
-a stability claim. Fourth, calibration is fitted and assessed in sample on only
-82 rows; improvement is established for Verifier-A on this slice, whereas the
+Five limitations constrain the interpretation of this chapter. First, dev-82
+is genuinely held out from the training rows of both verifiers, but it is reused
+for ablation reporting, temperature fitting, and verifier evaluation; it is
+therefore a shared held-out development evaluation slice rather than an
+independent final test set. Second, no reliable human-labelled verifier test set
+is available. Gold-300 was reserved for evaluation, but its ordinal annotation
+failed the prespecified reliability gate (Krippendorff's ordinal alpha =
+0.4970), so none of its ratings is treated as a binary ground-truth label for
+Phase 3. Third, the operational labels originate from LaBSE geometry, making
+Verifier-A's near-ceiling performance circular by construction. Fourth, the
+SetFit arm did not expose effective learning-rate or seed variation, so its zero
+standard deviation is an implementation artifact and cannot support a stability
+claim. Fifth, calibration is fitted and assessed in sample on only 82 rows;
+improvement is established for Verifier-A on this slice, whereas the
 corresponding claim is not established for Verifier-B. These limitations do not
 invalidate the instruments' registered roles, but they preclude claims of human
-ground truth, general backbone superiority, or out-of-sample calibration.
+ground truth, final test-set generalisation, general backbone superiority, or
+out-of-sample calibration.
 
 ## 4.10 Chapter Summary
 
 Verifier development produced two competent instruments with different system
 privileges. A frozen LaBSE encoder with a logistic head serves as the in-loop
-gate, reaching 0.9866 macro-F1 on the shared development slice at one error in
-82, with no hyperparameter selected against a score and no gradient computation
+gate, reaching 0.9866 macro-F1 on the shared held-out development evaluation
+slice at one error in 82, with no hyperparameter selected against a score and no gradient computation
 inside the generation loop. A BanglaBERT recipe retrained on the disjoint R2
 half serves as the outcome scorer, reaching 0.9597 with the pre-declared seed-42
 artifact. Executable tests prevent it from entering the generation loop.
