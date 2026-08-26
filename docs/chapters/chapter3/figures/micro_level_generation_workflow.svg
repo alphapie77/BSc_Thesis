@@ -73,7 +73,7 @@
   <rect x="80" y="865" width="470" height="310" rx="20" fill="#f0ecff" stroke="#7948d6" class="panel"/>
   <text x="315" y="915" text-anchor="middle" class="head">VALIDATION COMPONENTS</text>
   <text x="120" y="968" class="body">Neural gate</text>
-  <text x="145" y="1006" class="small">BanglaBERT Verifier-A probability</text>
+  <text x="145" y="1006" class="small">Frozen LaBSE-probe Verifier-A probability</text>
   <text x="120" y="1057" class="body">Symbolic diagnostics</text>
   <text x="145" y="1095" class="small">Interpretable rule-name feedback</text>
   <text x="120" y="1146" class="small">Gate and diagnosis have separate roles</text>

@@ -322,6 +322,9 @@ Panel C uses the same 540 frozen plot–level–seed pairs but lies outside the
 registered nine-comparison family. Its interval and test are unadjusted and
 post-selection; the panel does not establish hybrid superiority.
 
+Figure 6.1 visualizes the nine registered condition-versus-zero-shot
+probability effects and their paired-bootstrap intervals.
+
 ![Paired Verifier-B effects relative to zero-shot](figures/paired_effects_vs_zero_shot.png)
 
 *Figure 6.1. Preregistered paired changes in Verifier-B target probability
@@ -348,6 +351,9 @@ establish either a level-specific causal advantage or overall hybrid
 superiority.
 
 ## 6.5 Verifier-in-the-Loop Dynamics and Proxy Divergence
+
+Figure 6.2 separates the failure-selected attempt trajectories from the
+same-case changes in the Verifier-A-minus-Verifier-B gap.
 
 ![Attempt-wise verifier scores and same-case A-minus-B gap changes](figures/verifier_divergence_diagnostics.png)
 
@@ -538,6 +544,9 @@ deficit, but neither this post-treatment slice nor Table 6.4 identifies the
 magnitude of that contribution.
 
 ## 6.8 Diversity and Corpus-Distribution Diagnostics
+
+Figure 6.3 presents the three corpus-level diagnostics separately, preserving
+their distinct estimands rather than combining them into an unregistered score.
 
 ![Separate length-distribution, short-output and LaBSE-feature MAUVE diagnostics](figures/corpus_level_diagnostics.png)
 

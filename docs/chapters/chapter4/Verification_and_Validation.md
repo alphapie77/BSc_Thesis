@@ -50,6 +50,9 @@ human validity. Human validity comes from the comparative intrusion study of
 Section 3.9 and from the blinded evaluation of generated output in Chapter 6,
 neither of which uses either verifier.
 
+Figure 4.1 summarizes these data privileges and the isolation wall between the
+in-loop and outcome-only verifiers.
+
 ![Dual-verifier data and privilege isolation](../../figures/dual_verifier_isolation.svg)
 
 *Figure 4.1. Data and privilege isolation for the two verifiers. Gold-300
@@ -220,6 +223,9 @@ in this chapter.
 | Training-fitted length rule | 0.6197 | — | Quantifies performance obtainable from review length alone |
 | Frozen LaBSE encoder with an L2-logistic head | **0.9866** | 1 | Measures linear recovery from the representation used to construct the labels |
 | BanglaBERT, five-seed mean | 0.9647 | — | Provides the highest descriptive mean among the fine-tuned candidates |
+
+Figure 4.2 visualizes the descriptive ablation results against the frozen
+LaBSE circularity reference.
 
 ![Backbone ablation and construction-circularity reference](../../figures/backbone_ablation_circularity.svg)
 
