@@ -244,7 +244,7 @@ resolving it [@b36]. The hypothesis is therefore retained as one plausible
 account consistent with the registered evidence, not as an identified cause,
 and the registered numbers are left exactly as they stand.
 
-## 6.4 Preregistered Paired Comparisons
+## 6.4 Preregistered Paired Comparisons and Exploratory Direct Contrast
 
 All nine preregistered condition-versus-zero-shot comparisons have positive
 Verifier-B target-probability effects. Under the registered paired-testing
@@ -271,7 +271,7 @@ McNemar test instead, which is the quantity the registered binary test actually
 uses and which shows how one-sided each condition's disagreement with the
 baseline is.
 
-**Table 6.2. Preregistered paired comparisons against zero-shot**
+**Table 6.2. Paired condition comparisons: preregistered baseline family and exploratory direct contrast**
 
 **Panel A. Continuous Verifier-B outcome**
 
@@ -308,6 +308,19 @@ Verifier-B target match on the same plot, level and seed; the two columns are th
 counts entering each McNemar test. Every condition wins more discordant pairs
 than it loses, and the two neural-gated loops are the most one-sided, at 167
 against 28 and 176 against 26.
+
+**Panel C. Exploratory neural-plus-symbolic minus neural-only contrast**
+
+| Outcome or cost measure | Paired estimate | Uncertainty or paired test | Evidential standing |
+|---|---:|---|---|
+| Verifier-B target probability | +0.02159 | Naive post-selection 95% CI [0.00082, 0.04310] | Concentrated at Level 0; exploratory |
+| Binary target accuracy | +0.02037 | 26 versus 15 discordant successes; exact McNemar *p*=0.11728 | Not statistically significant |
+| Generator calls | −0.033 | Descriptive paired mean | Exploratory cost difference |
+| Generator tokens | −8.54 | Descriptive paired mean | Exploratory cost difference |
+
+Panel C uses the same 540 frozen plot–level–seed pairs but lies outside the
+registered nine-comparison family. Its interval and test are unadjusted and
+post-selection; the panel does not establish hybrid superiority.
 
 ![Paired Verifier-B effects relative to zero-shot](figures/paired_effects_vs_zero_shot.png)
 
@@ -384,6 +397,13 @@ universal cutoff [@b37].
 | Annotator B | 100 | 100 | 0.9300 | [0.8800, 0.9800] |
 | Annotator C | 100 | 100 | 0.9000 | [0.8400, 0.9500] |
 | Pooled judgments | 100 | 300 | 0.9133 | [0.8667, 0.9567] |
+
+**Panel B. Panel-level agreement**
+
+| Agreement measure | Estimate | 95% item-bootstrap CI | Interpretation |
+|---|---:|---:|---|
+| Raw three-way agreement | 0.8800 | Not estimated | All three annotators selected the same level on 88 of 100 items |
+| Nominal Krippendorff alpha | 0.8405 | [0.7473, 0.9200] | Agreement beyond chance under the registered nominal coefficient |
 
 Across items, raw three-way agreement is 0.8800 and nominal Krippendorff
 alpha is 0.8405 with 95% item-bootstrap CI [0.7473, 0.9200]. Both target levels
@@ -696,9 +716,9 @@ reinterpretation of the present results.
   condition improves Verifier-B target probability over zero-shot, and blinded
   human evaluation shows high overall recoverability of the requested level.
   The claim is controllability, not audience prediction.
-- **RQ3:** Mixed and narrowed. Symbolic-only gating is weak and costly, while
-  symbolic diagnostics combined with a neural gate produce the largest
-  registered effect over zero-shot. In an explicitly post-hoc comparison over
+- **RQ3:** The two symbolic roles are differentiated. Symbolic-only acceptance
+  gating is weak and costly, while symbolic diagnostics combined with a neural
+  gate produce the largest registered effect over zero-shot. In an explicitly post-hoc comparison over
   540 frozen pairs, hybrid minus neural-only is +0.02159 in Verifier-B target
   probability but only +0.02037 in binary accuracy (exact McNemar p=0.11728).
   The probability difference occurs at Level 0 (+0.04328), while Level 1 is

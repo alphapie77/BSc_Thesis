@@ -37,9 +37,10 @@ disagreement that can be inspected after generation has finished, and Chapter 6
 inspects it.
 
 This chapter establishes the measurement instruments required by the subsequent
-experiments. RQ2 uses Verifier-B probability as an outcome measure, RQ3 compares
-conditions that differ in their use of Verifier-A, and RQ4 examines divergence
-between the two verifiers on the same generated responses. Section 4.5 also
+experiments. RQ2 uses Verifier-B probability as an outcome measure, RQ3 uses
+the development weight study and experimental conditions to distinguish
+symbolic acceptance gating from symbolic diagnostic feedback, and RQ4 examines
+divergence between the two verifiers on the same generated responses. Section 4.5 also
 identifies a construction-circularity finding that constrains the interpretation
 of the operational levels introduced in Chapter 3.
 

@@ -321,8 +321,8 @@ two facts are jointly coherent, and together they are an argument for exactly th
 placement the framework adopts. A signal that changes verdicts without improving
 them must not be allowed to adjudicate; a signal that localizes a defect can
 still be useful for saying *what* to fix. Consequently no single $w$ is selected,
-no hybrid-accuracy claim is made anywhere in this thesis, and the symbolic module
-is retained solely for failed-rule naming and feedback localization.
+no hybrid-gate accuracy claim is made from this weight study, and the symbolic
+module is retained solely for failed-rule naming and feedback localization.
 
 Table 5.2 explains why the symbolic scorer behaves this way, and the explanation
 is more damaging to the adjudication reading than the held-out ties are. The

@@ -1,22 +1,25 @@
-# Chapter 7 — Discussion, Limitations, and Conclusion
+# Chapter 7 — Discussion and Limitations
 
 This chapter interprets the completed Bangla study without extending its claims
 beyond the registered evidence. Automatic scores, human judgments, cost, and
 distributional diagnostics are treated as complementary rather than collapsed
 into a single notion of quality. The discussion first answers the four research
-questions, then examines validity and ethical limitations, practical use,
-contributions, future work, and the final conclusion.
+questions and then examines construct, internal, external, statistical,
+measurement, ethical, and practical limitations. Contributions, future work,
+and the final synthesis are reserved for Chapter 8.
 
 ## 7.1 What the experiment establishes
 
 The central positive finding is not that a language model can reproduce a real
 audience. It is that an auditable generation system can make Bangla cinema
 comments more consistent with a requested engagement-specificity level than a
-zero-shot prompt. All nine registered alternatives improve independent
-Verifier-B target probability over zero-shot, and the largest registered effect
-is obtained by a neural gate whose correction feedback includes symbolic
-diagnostics. On a separately frozen 100-item subset, native-Bangla readers match
-the requested level in 91.33% of judgments with 88% unanimous three-way
+zero-shot prompt. All nine registered alternatives improve target probability
+under the sealed Verifier-B outcome measure, and the largest observed
+condition-versus-zero-shot difference belongs to a neural gate whose correction
+feedback includes symbolic diagnostics. This does not constitute a registered
+ranking among active conditions. On a separately frozen 100-item subset,
+native-Bangla readers match the requested level in 91.33% of judgments, with
+88% unanimous three-way
 agreement.
 
 The evidence is strongest when the computational and human results are read
@@ -28,7 +31,7 @@ oracle, and the human sample is not large enough for condition ranking.
 
 The second substantive finding is negative but useful. Repeated optimization
 against Verifier-A increases the same-case A–B gap in the neural and
-neural-plus-symbolic loops. This demonstrates why a held-out outcome scorer is a
+neural-plus-symbolic loops. This illustrates why a held-out outcome scorer is a
 load-bearing design element rather than redundant evaluation. Recent work on
 evaluator stress testing reaches the same methodological conclusion: improvement
 against a proxy must be separated from improvement in the intended construct,
@@ -59,11 +62,11 @@ produce positive registered effects. The result should therefore be framed as
 comparative evidence about a family of controls, not as proof that only the
 proposed architecture can work.
 
-The trained loop offers a favorable quality–compute pattern relative to the
-three-call self-critique controls. Neural-plus-symbolic feedback uses roughly
-1.63–1.89 logical model calls per case while the two self-critique variants use
-three. Nevertheless, the thesis does not reduce quality and cost to one
-unregistered composite score. Depending on deployment priorities, blind
+Descriptively, the trained loop offers a favorable outcome-score–compute pattern
+relative to the three-call self-critique controls. Neural-plus-symbolic feedback
+uses roughly 1.63–1.89 logical model calls per case, while the two self-critique
+variants use three. Nevertheless, the thesis does not reduce outcome score and
+cost to one unregistered composite measure. Depending on deployment priorities, blind
 resampling or a hosted judge may remain attractive alternatives.
 
 The hosted-judge result must also retain its measurement boundary. Judge
@@ -73,7 +76,7 @@ multilingual and low-resource studies report uneven agreement with humans
 [@b24; @b25]. The Gemma-4 arm is therefore a treatment comparison, not an
 independent outcome authority.
 
-### 7.2.3 RQ3: the role of symbolic knowledge
+### 7.2.3 RQ3: symbolic gating and diagnostic feedback
 
 The experiment rejects a strong interpretation in which symbolic gating is
 sufficient. The symbolic-only loop fails to improve Level-0 accuracy over
@@ -83,16 +86,14 @@ acceptance mechanism. This interpretation matches the system design: the neural
 model supplies a learned decision signal, while symbolic rules name observable
 failure modes for the Reflector.
 
-Neural-plus-symbolic and neural-only were not directly contrasted in the frozen
-inferential family. A later, explicitly post-hoc analysis of the 540 frozen
-pairs finds a +0.02159 target-probability difference, but only a +0.02037 binary
-accuracy difference (exact McNemar p=0.11728); moreover, the probability signal
-is confined to Level 0 while Level 1 is null. Because this comparison was
-selected after the hybrid condition's favorable zero-shot result was known, its
-interval and p-values are naive after selection. The defensible conclusion is
-therefore that the combined condition performs strongly and merits a future
-preregistered direct test, while symbolic-only gating is inadequate and general
-hybrid superiority remains unestablished.
+An exploratory paired comparison of the 540 frozen hybrid and neural-only pairs
+finds a +0.02159 target-probability difference, but only a +0.02037 binary
+accuracy difference (exact McNemar p=0.11728). The observed probability
+difference is concentrated at Level 0, while the Level-1 estimate is
+approximately zero. The defensible conclusion is that the combined condition
+performs strongly and exhibits a possible level-specific pattern, while
+symbolic-only gating is inadequate and neither a level-specific causal advantage
+nor overall hybrid superiority is established.
 
 ### 7.2.4 RQ4: verifier overoptimization
 
@@ -120,8 +121,9 @@ behavioral groups. A 2026 systematic review of synthetic audiences highlights
 hallucination, bias, prompt sensitivity, and anthropomorphic overgeneralization
 as recurring threats [@b1]. Accordingly,
 the thesis claims **axis-level-conditioned response generation**, not audience
-simulation. This does not mean substitution for real viewers, prediction of individual
-opinions, box-office forecasting, or estimation of a film's audience mix.
+simulation. This does not imply substitution for real viewers, prediction of
+individual opinions, box-office forecasting, or estimation of a film's audience
+mix.
 
 Generated length is a further construct threat. Although a uniform length clause
 reduced the original gap, level remained recoverable from length in development,
@@ -194,10 +196,10 @@ the length-matched sensitivity cells vary from 9 to 80 pairs, making their
 accuracies unstable and selection-dependent.
 
 The registered inferential family omits direct comparisons among active systems.
-The later hybrid-versus-neural-only contrast is reported only as a post-hoc
-diagnostic, with its selection disclosure and level heterogeneity. It cannot be
-promoted into the confirmatory family; a preregistered replication is required
-before claiming the incremental superiority of symbolic feedback.
+The exploratory hybrid-versus-neural-only contrast is therefore interpreted
+separately from that family and reported with its level heterogeneity. A
+preregistered replication is required before claiming the incremental
+superiority of symbolic feedback.
 
 ## 7.7 Measurement limitations
 
@@ -248,7 +250,7 @@ decision-maker for casting, marketing, or audience targeting.
 | Construct | Axis labels originate from a geometric cut; specificity remains entangled with length | Comparative human validation; persona/cluster terminology retired; length diagnostics reported | Human target match is not overall quality or real-audience validity |
 | Internal | Optimization may exploit Verifier-A; both verifiers reproduce the same operational label | Disjoint R1/R2 training, cross-family models, executable B-outside-loop guard, paired keys | Verifier errors are not independent; later attempts are failure-selected |
 | External | One short-comment Bangla corpus, 90 plots, no review-to-film mapping | Claims restricted to corpus-level Bangla response generation | No film-level audience prediction or other-register/domain generalization |
-| Statistical conclusion | Three seeds can be mistaken for independent replications; active systems lack direct contrasts | Paired 540-case comparisons, 10,000 bootstrap resamples, frozen BH family | Hybrid-vs-neural superiority remains untested; small human per-cell n |
+| Statistical conclusion | Three seeds can be mistaken for independent replications; the direct hybrid contrast is exploratory | Paired 540-case comparisons, 10,000 bootstrap resamples, frozen BH family | Overall hybrid superiority remains unestablished; small human per-cell n |
 | Measurement | Verifier-B calibration improvement not established; realism metrics measure different properties | Calibration null retained; length/diversity/MAUVE reported separately | B is not ground truth; LaBSE-feature MAUVE is small-sample sensitivity only |
 | Human evaluation | Three known university batchmates form a convenience sample | Adults, native Bangla, blinded sheets, consent, coded identities | Social-pressure and population-representativeness risks remain |
 | Ethics/governance | Generated claims may be stereotyped, offensive or plot-unsupported | Research/pre-writing use only; diagnostic support check separated from results; adult consent and coded responses documented | No institutional approval/exemption claim; convenience-sample pressure risk remains |
@@ -267,10 +269,10 @@ The experiment also shows that system choice should depend on the intended
 trade-off. Static examples and RAG provide inexpensive improvement; blind
 resampling is a strong control; self-critique consumes a fixed three calls; the
 symbolic-only loop is inefficient at Level 1; and the neural-plus-symbolic
-condition has the largest registered effect against zero-shot without a proven
-increment over neural-only. A practical deployment should therefore expose
-cost, stopping status, and verifier disagreement rather than display one
-unqualified quality score.
+condition has the largest observed registered difference against zero-shot and
+a small, Level-0-specific exploratory increment over neural-only. A practical
+deployment should therefore expose cost, stopping status, and verifier
+disagreement rather than display one unqualified quality score.
 
 The local interface demonstrates this inspectable workflow but is not the
 frozen experimental system. Its hosted Writer and source-support triage are
@@ -278,56 +280,19 @@ useful for exploration, yet their outputs cannot be added to the Phase-5 result
 surface or used to estimate a hallucination rate. Any consequential audience or
 marketing decision still requires direct human evidence.
 
-## 7.10 Contributions under the bounded claim
+## 7.10 Chapter Summary
 
-Within these limitations, the thesis makes four defensible contributions:
+The results support controllable generation of a human-recognizable
+engagement-specificity level within the completed Bangla experiment, while
+rejecting stronger interpretations involving natural audience segments or
+audience prediction. The principal methodological lesson is equally bounded:
+verifier-guided revision can improve the registered outcome measure, but the
+widening relationship between the in-loop and sealed outcome verifiers makes
+proxy divergence observable rather than eliminating it.
 
-1. It reports a negative clusterability result rather than converting a stable
-   geometric cut into unsupported discrete personas.
-2. It implements an auditable Bangla multi-agent generation loop with a strict
-   in-loop/outcome-verifier wall and ten matched conditions.
-3. It demonstrates both improved requested-level controllability and measurable
-   verifier divergence, showing the benefit and risk of verifier-guided revision
-   in the same experiment.
-4. It provides a reproducible analysis trail covering the complete frozen
-   5,400-case surface and blinded native-speaker validation while retaining
-   negative, null, and unavailable results.
-
-## 7.11 Future work
-
-A future study should preregister direct active-system contrasts, especially
-neural-plus-symbolic versus neural-only, with adequate power for the incremental
-effect. A larger human sample should allocate enough unique items per condition
-to evaluate system-specific target match, overall quality, and source-grounded
-plot faithfulness as separate criteria. Evaluator-stress perturbations could
-also test whether the observed A–B divergence follows length, register,
-formatting, or other exploitable cues.
-
-Finally, film-linked human response data would be required for any move from
-corpus-level controlled generation to genuine pre-release audience prediction.
-Until such data exist, the appropriate application is transparent hypothesis
-generation and interface-assisted exploration, with authentic audience research
-remaining the validation standard.
-
-## 7.12 Conclusion
-
-**Table 7.2. Final research-question verdicts**
-
-| RQ | Verdict | Evidence-bearing conclusion | Claim that remains prohibited/unanswered |
-|---|---|---|---|
-| RQ1 | Qualified support | A stable Region-A continuum cut is human-recognizable as engagement specificity under length-matched comparison. | No discovered persona, natural cluster or replicated Region-B structure |
-| RQ2 | Supported within Bangla | All nine active conditions improve Verifier-B target probability over zero-shot; pooled human target match is 0.9133. | No audience prediction and no claim that only the proposed loop succeeds |
-| RQ3 | Mixed / unresolved increment | Symbolic-only gating is weak; neural plus symbolic feedback performs strongly against zero-shot. | No registered evidence that hybrid is superior to neural-only |
-| RQ4 | Supported diagnostic | Same-case A–B gaps widen across neural-loop revisions, consistent with proxy overoptimization. | No proof of human-quality decline and no claim that Verifier-B is an oracle |
-
-This thesis set out to determine whether a verifier-in-the-loop framework could
-control a human-recognizable response distinction in short Bangla cinema
-comments while exposing the risk of optimizing against that verifier. The
-results support a bounded answer: the proposed framework improves control of
-a human-recognizable engagement-specificity axis in Bangla cinema comments, and
-its held-out verifier reveals divergence that a single in-loop score would hide.
-They do not support discrete audience personas, length-neutral control,
-film-level realism, or replacement of human audiences.
-Preserving those boundaries is not merely cautious wording; it is the difference
-between the experiment that was actually run and a stronger experiment that
-remains future work.
+These findings remain constrained by length entanglement, a corpus without
+film-linked responses, one generation model family, a convenience sample of
+three human evaluators, an outcome verifier whose calibration improvement was
+not established, and exploratory rather than confirmatory evidence for the
+incremental value of symbolic feedback. Chapter 8 consolidates the resulting
+contributions, future research priorities, and final thesis conclusion.
