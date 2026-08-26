@@ -4,6 +4,7 @@ $demoRoot = $PSScriptRoot
 $demoPython = Join-Path $demoRoot ".venv\Scripts\python.exe"
 $demoInterface = Join-Path $demoRoot "interface"
 $demoVinext = Join-Path $demoInterface "node_modules\.bin\vinext.cmd"
+$demoPackageLock = Join-Path $demoInterface "package-lock.json"
 $demoEnv = Join-Path $demoRoot ".env"
 $demoBackendLog = Join-Path $env:TEMP "thesis-demo-backend.log"
 $demoBackendErrorLog = Join-Path $env:TEMP "thesis-demo-backend-error.log"
@@ -49,23 +50,28 @@ try {
         }
     }
 
-    if (-not (Test-Path -LiteralPath (Join-Path $demoInterface "node_modules"))) {
-        if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-            throw "npm not found. Install Node.js and try again."
+    if (-not (Test-Path -LiteralPath $demoVinext)) {
+        $nodeCommand = Get-Command node.exe -ErrorAction SilentlyContinue
+        if ($null -eq $nodeCommand) {
+            throw "Node.js not found. Install Node.js 22 or later and try again."
         }
-        & npm --version *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "npm is installed but not working. Repair Node.js/npm and try again."
+        $nodeDirectory = Split-Path -Parent $nodeCommand.Source
+        $npmCli = Join-Path $nodeDirectory "node_modules\npm\bin\npm-cli.js"
+        if (-not (Test-Path -LiteralPath $npmCli)) {
+            throw "npm CLI not found beside Node.js: $npmCli. Repair Node.js/npm and try again."
         }
-        Write-Host "Installing frontend dependencies for the first run..." -ForegroundColor Yellow
+        if (-not (Test-Path -LiteralPath $demoPackageLock)) {
+            throw "Frontend lockfile not found: $demoPackageLock"
+        }
+        Write-Host "Frontend dependencies are missing or incomplete; restoring package-lock.json exactly..." -ForegroundColor Yellow
         Push-Location -LiteralPath $demoInterface
         try {
             $ErrorActionPreference = "Continue"
-            & npm install
+            & $nodeCommand.Source $npmCli ci
             $npmInstallExitCode = $LASTEXITCODE
             $ErrorActionPreference = $savedErrorPreference
             if ($npmInstallExitCode -ne 0) {
-                throw "npm install failed."
+                throw "npm ci failed. Close any running demo/Node process that may lock interface\node_modules, then run start_demo.cmd again."
             }
         }
         finally {
@@ -73,7 +79,7 @@ try {
         }
     }
     if (-not (Test-Path -LiteralPath $demoVinext)) {
-        throw "Frontend runner not found: $demoVinext"
+        throw "Frontend dependency restore completed but Vinext is still missing: $demoVinext"
     }
 
     Remove-Item -LiteralPath $demoBackendLog, $demoBackendErrorLog, $demoFrontendLog, $demoFrontendErrorLog -Force -ErrorAction SilentlyContinue
@@ -109,11 +115,28 @@ try {
         throw "Backend was not ready within 3 minutes. Log: $demoBackendLog"
     }
     Write-Host "Loading R1 and verifier artifacts..." -ForegroundColor Cyan
-    try {
-        Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/ready" -TimeoutSec 300 | Out-Null
+    $artifactsReady = $false
+    foreach ($attempt in 1..60) {
+        if ($null -ne $demoBackend -and $demoBackend.HasExited) {
+            throw "Backend stopped while loading artifacts. Log: $demoBackendErrorLog"
+        }
+        try {
+            $readiness = Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/ready" -TimeoutSec 15
+            if ($readiness.status -eq "ready" -and
+                $readiness.backend_initialized -eq $true -and
+                $readiness.verifier_b_loaded -eq $false) {
+                $artifactsReady = $true
+                break
+            }
+        }
+        catch {
+            # A 503 response means the one-time CPU artifact load is still in
+            # progress. Retry within the bounded five-minute startup window.
+        }
+        Start-Sleep -Seconds 5
     }
-    catch {
-        throw "Backend artifacts failed readiness. Log: $demoBackendErrorLog"
+    if (-not $artifactsReady) {
+        throw "Backend artifacts were not ready within 5 minutes. Log: $demoBackendErrorLog"
     }
 
     $frontendReady = $false

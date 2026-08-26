@@ -23,13 +23,19 @@ Current state:
 
 ## Run locally on Windows
 
-From the repository root, double-click `start_demo.cmd`. It checks the API key
+Download or clone the full repository; the `interface/` folder alone is not a
+self-contained application because the live workflow requires the backend,
+R1 index and Verifier-A artifact. Then double-click either the root
+`start_demo.cmd` or `interface/start_demo.cmd`. The interface-folder launcher
+forwards to the same root startup contract. It checks the API key
 and local environments, installs only a missing first-run dependency, starts
 both services, and opens `http://localhost:3000`. Keep the launcher window open;
 press Ctrl+C there to stop both services.
 
-When `node_modules` is present, the launcher uses the repository-local Vinext
-runner instead of depending on a global npm shim. It opens the UI only after
+The launcher requires the repository-local Vinext runner. If that runner is
+missing or `node_modules` is incomplete, it restores the exact lockfile state
+with `npm ci` through Node's own npm CLI instead of trusting a broken global npm
+shim. It opens the UI only after
 R1 and the in-loop verifier artifacts pass `/api/ready`. Seed 42 is a
 best-effort hosted-model setting; repeated responses are not promised to be
 byte-identical.

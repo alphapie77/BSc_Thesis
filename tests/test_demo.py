@@ -51,6 +51,9 @@ def test_live_writer_uses_interactions_without_persisting(monkeypatch):
         "seed": 42, "thinking_level": "minimal", "max_output_tokens": 80,
     }
     assert "test-secret-not-written" not in str(body)
+    assert "LIVE DEMO SOURCE-GROUNDING RULE" in body["input"]
+    assert "acting," in body["input"]
+    assert "casting performance, music" in body["input"]
 
 
 def test_ready_initializes_artifacts_without_verifier_b(monkeypatch):
@@ -121,6 +124,8 @@ def test_plot_faithfulness_check_is_source_bounded_and_structured(monkeypatch):
     assert result["support_score"] == 96
     body = session.calls[0][2]
     assert "PLOT:\nরাশেদ সত্য প্রকাশ করে।" in body["input"]
+    assert "the acting was excellent" in body["input"]
+    assert "absence of necessary evidence is not support" in body["input"]
     assert body["response_format"]["mime_type"] == "application/json"
     assert body["model"] == "gemma-4-31b-it"
     assert "test-secret-not-written" not in str(body)

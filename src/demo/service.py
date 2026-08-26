@@ -90,7 +90,18 @@ class LiveGemmaWriter:
 
     def generate(self, *, prompt: str, plot_id: str, target_level: int,
                  attempt: int = 1, **_: Any) -> Generation:
-        out = self._call(prompt)
+        # Demo-only grounding guard. The frozen S5 renderer remains untouched:
+        # a synopsis cannot support claims about production execution.
+        grounded_prompt = f"""{prompt}
+
+[LIVE DEMO SOURCE-GROUNDING RULE]
+Use the supplied plot as the only factual source. Do not claim that acting,
+casting performance, music, cinematography, editing, direction, visuals, or
+production quality is good or bad unless that information is explicitly stated
+in the plot. Do not invent a scene, character, relationship, event, or ending.
+An emotional reaction is allowed, but anchor any specific detail to the plot.
+[/LIVE DEMO SOURCE-GROUNDING RULE]"""
+        out = self._call(grounded_prompt)
         return Generation(
             key=f"demo|{plot_id}|L{target_level}|a{attempt}|{self.model}",
             plot_id=plot_id,
@@ -98,7 +109,7 @@ class LiveGemmaWriter:
             attempt=attempt,
             arm="bn",
             model=self.model,
-            prompt=prompt,
+            prompt=grounded_prompt,
             text=out.text,
             temperature=0.0,
             top_p=1.0,
@@ -137,11 +148,21 @@ class PlotFaithfulnessJudge:
 
     def evaluate(self, *, plot: str, response_text: str) -> dict:
         prompt = f"""You are checking whether a short Bangla audience reaction is grounded in a movie plot.
-Use ONLY the supplied plot as evidence. Check every character, relationship, event, location, actor/casting claim, and causal claim in the reaction.
-Opinions and emotions need no plot evidence. Do not penalize paraphrases or reasonable reactions.
-SUPPORTED: every factual claim is supported by the plot.
-REVIEW: the text is ambiguous or the plot lacks enough detail to decide.
-UNSUPPORTED: at least one factual claim contradicts or is absent from the plot.
+Use ONLY the supplied plot as evidence. Check every character, relationship,
+event, location, actor/casting claim, causal claim, and claim about acting,
+music, cinematography, editing, direction, visuals, or production quality.
+Personal emotions and simple preferences need no plot evidence. However, an
+evaluation such as "the acting was excellent", "the music was moving", or
+"the cinematography was beautiful" is NOT a source-free emotion: it evaluates
+information unavailable from an ordinary plot synopsis.
+Do not penalize paraphrases or reasonable reactions.
+SUPPORTED: every checkable claim is supported by the plot.
+REVIEW: the response makes a production-quality evaluation (acting, music,
+visuals, cinematography, editing, direction, casting performance) that the plot
+does not establish, or the text is ambiguous and needs human review.
+UNSUPPORTED: at least one specific factual detail contradicts or is absent from
+the plot. Do not use SUPPORTED merely because a claim does not contradict the
+plot; absence of necessary evidence is not support.
 Give a brief Bangla explanation. List only unsupported factual claims; otherwise return an empty list.
 
 PLOT:
