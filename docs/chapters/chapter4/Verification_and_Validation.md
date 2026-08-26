@@ -1,4 +1,4 @@
-# Chapter 4 — Verifier Development and Validation
+# Chapter 4 — Verification and Validation
 
 ## 4.1 Chapter Overview
 
