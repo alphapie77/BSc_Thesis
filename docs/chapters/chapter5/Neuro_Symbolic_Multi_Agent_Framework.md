@@ -31,9 +31,9 @@ graph:
    role that generates a candidate response; the Reflector generates only a
    correction brief.
 3. **Critic.** Applies Verifier-A to obtain the acceptance score and computes
-   the symbolic diagnostics. It performs local inference with the frozen
-   BanglaBERT-based Verifier-A, makes no generative-model or hosted-API call,
-   and never loads Verifier-B.
+   the symbolic diagnostics. It performs local inference with Verifier-A, a
+   frozen LaBSE encoder with an L2-regularised logistic head. It makes no
+   generative-model or hosted-API call and never loads Verifier-B.
 4. **Reflector.** Converts the failed verdict and, where enabled, a set of named
    failed rules into bounded natural-language feedback for the next Writer
    attempt. It does not receive the numerical Verifier-A score.
